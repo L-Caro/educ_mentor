@@ -10,6 +10,12 @@ const AccessGate = ({ children }: { children: React.ReactNode }) => {
   const [accessStatus, setAccessStatus] = useState<AccessStatus>('loading');
 
   useEffect(() => {
+    // En dev, le système d'invitation n'a aucun intérêt — on bypass entièrement.
+    if (import.meta.env.DEV) {
+      setAccessStatus('authorized');
+      return;
+    }
+
     // Sur /invite/:token, l'app n'a pas encore de cookie — c'est InvitePage qui le pose.
     // On laisse passer : InvitePage fera un rechargement complet après succès.
     if (window.location.pathname.startsWith('/invite/') || window.location.pathname === '/admin-access') {
