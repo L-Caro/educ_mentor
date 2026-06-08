@@ -41,11 +41,11 @@ const InvitePage = () => {
   const messages: Record<Exclude<InviteStatus, 'loading' | 'redirecting'>, { title: string; detail: string }> = {
     invalid: {
       title: 'Lien invalide',
-      detail: 'Ce lien d'invitation n'existe pas ou a expiré.',
+      detail: "Ce lien d'invitation n'existe pas ou a expiré.",
     },
     already_used: {
       title: 'Lien déjà utilisé',
-      detail: 'Ce lien a déjà été utilisé sur un autre appareil. Demande un nouveau lien à Lionel.',
+      detail: "Ce lien a déjà été utilisé sur un autre appareil. Demande un nouveau lien à Lionel.",
     },
     error: {
       title: 'Erreur',
