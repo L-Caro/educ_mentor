@@ -1,23 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  startCalculSession,
-  recordCalculAnswer,
-  completeCalculSession,
-} from 'src/api/calcul.api';
-import GameFooter from "src/components/common/GameFooter.tsx";
+import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/calcul.api';
 import type { CalculSessionResponse } from 'src/types';
 import type { CalculHistoryEntry } from './CalculResult';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
+import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
-import { useQuestionTimer } from 'src/hook';
+import { useGameSession } from 'src/hook';
 
-type AnswerState = 'idle' | 'correct' | 'wrong' | 'timeout';
-
-function renderOperation(op: string) {
-  const parts = op.split('?');
-  if (parts.length !== 2) return <>{op}</>;
+function renderOperation(operation: string) {
+  const parts = operation.split('?');
+  if (parts.length !== 2) return <>{operation}</>;
   return (
     <>{parts[0]}<span className="CalculGame__blank">?</span>{parts[1]}</>
   );
@@ -25,103 +19,52 @@ function renderOperation(op: string) {
 
 export default function CalculGame() {
   const navigate = useNavigate();
-  const [session, setSession] = useState<CalculSessionResponse | null>(null);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [inputValue, setInputValue] = useState('');
-  const [answerState, setAnswerState] = useState<AnswerState>('idle');
-  const [correctCount, setCorrectCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
 
-  const answerStateRef = useRef<AnswerState>('idle');
-  const correctCountRef = useRef(0);
-  const historyRef = useRef<CalculHistoryEntry[]>([]);
-  const sessionRef = useRef<CalculSessionResponse | null>(null);
-  const currentIdxRef = useRef(0);
+  const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { timeRemaining, timerPct, isUrgent, startTimer, stopTimer } = useQuestionTimer(
-    session?.timer_seconds ?? 0,
-    handleTimeout,
-  );
+  const {
+    loading, error,
+    session, currentIdx, answerState, correctCount,
+    timeRemaining, timerPct, isUrgent,
+    submitAnswer, handleTerminate,
+  } = useGameSession<CalculSessionResponse, CalculSessionResponse['questions'][number], CalculHistoryEntry>({
+    loader: () => startCalculSession(),
+    homePath: '/module/calcul-mental',
+    resultsPath: '/module/calcul-mental/result',
+    getQuestions: (session) => session.questions,
+    getSessionId: (session) => session.session_id,
+    getTimerSeconds: (session) => session.timer_seconds,
+    onComplete: (sessionId, correctCount, total) => completeCalculSession(sessionId, correctCount, total),
+    buildResultsState: (correctCount, total, history) => ({ correctCount, total, history }),
+    buildTimeoutResult: (question) => ({
+      operation: question.operation,
+      answer: question.answer,
+      given: null,
+      correct: false,
+      timeout: true,
+    }),
+    recordTimeout: (sessionId, question) => recordCalculAnswer(sessionId, question.answer, false),
+    onQuestionChange: () => setInputValue(''),
+  });
 
-  useEffect(() => { answerStateRef.current = answerState; }, [answerState]);
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { currentIdxRef.current = currentIdx; }, [currentIdx]);
-
+  // Focus input à chaque nouvelle question
   useEffect(() => {
-    startCalculSession()
-      .then((s) => setSession(s))
-      .catch(() => setError('Impossible de démarrer la session.'))
-      .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Démarre le timer + focus input à chaque nouvelle question
-  useEffect(() => {
-    if (!session) return;
-    startTimer();
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, [currentIdx, session?.session_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIdx, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleTimeout() {
-    const currentSession = sessionRef.current;
-    const idx = currentIdxRef.current;
-    if (!currentSession) return;
-    const timedOutQuestion = currentSession.questions[idx];
-    setAnswerState('timeout');
-    historyRef.current.push({ operation: timedOutQuestion.operation, answer: timedOutQuestion.answer, given: null, correct: false, timeout: true });
-    recordCalculAnswer(currentSession.session_id, timedOutQuestion.answer, false).catch(console.error);
-    setTimeout(() => advance(currentSession, idx), 1600);
-  }
+  function handleValidate() {
+    if (!session || answerState !== 'idle' || inputValue.trim() === '') return;
 
-  async function handleValidate() {
-    if (answerStateRef.current !== 'idle' || !session || inputValue.trim() === '') return;
-    stopTimer();
-
-    const currentQuestion = session.questions[currentIdx];
+    const question = session.questions[currentIdx];
     const given = parseInt(inputValue.trim(), 10);
-    const correct = !isNaN(given) && given === currentQuestion.answer;
+    const correct = !isNaN(given) && given === question.answer;
 
-    setAnswerState(correct ? 'correct' : 'wrong');
-    if (correct) {
-      correctCountRef.current++;
-      setCorrectCount(correctCountRef.current);
-    }
-    historyRef.current.push({ operation: currentQuestion.operation, answer: currentQuestion.answer, given, correct, timeout: false });
-
-    recordCalculAnswer(session.session_id, currentQuestion.answer, correct).catch(console.error);
-
-    setTimeout(() => advance(session, currentIdx), correct ? 900 : 1600);
-  }
-
-  function advance(s: CalculSessionResponse, idx: number) {
-    if (idx + 1 >= s.questions.length) {
-      finishSession(s);
-    } else {
-      setCurrentIdx(idx + 1);
-      setInputValue('');
-      setAnswerState('idle');
-    }
-  }
-
-  async function finishSession(s: CalculSessionResponse) {
-    await completeCalculSession(s.session_id, correctCountRef.current, historyRef.current.length).catch(console.error);
-    navigate('/module/calcul-mental/result', {
-      state: { correctCount: correctCountRef.current, total: historyRef.current.length, history: historyRef.current },
-    });
-  }
-
-  async function handleTerminate() {
-    stopTimer();
-    const s = sessionRef.current;
-    if (!s || historyRef.current.length === 0) {
-      navigate('/module/calcul-mental');
-      return;
-    }
-    await completeCalculSession(s.session_id, correctCountRef.current, historyRef.current.length).catch(console.error);
-    navigate('/module/calcul-mental/result', {
-      state: { correctCount: correctCountRef.current, total: historyRef.current.length, history: historyRef.current },
-    });
+    submitAnswer(
+      correct,
+      { operation: question.operation, answer: question.answer, given, correct, timeout: false },
+      () => recordCalculAnswer(session.session_id, question.answer, correct),
+    );
   }
 
   if (loading) {
@@ -153,14 +96,12 @@ export default function CalculGame() {
 
   return (
     <PageContainer className="CalculGame">
-      {/* Barre de progression (mode limité) */}
       {!isUnlimited && (
         <div className="CalculGame__progressWrap">
           <div className="CalculGame__progressBar" style={{ width: `${progressPct}%` }} />
         </div>
       )}
 
-      {/* Barre de timer */}
       {timerSeconds > 0 && (
         <div className="CalculGame__timerWrap">
           <div
@@ -170,7 +111,6 @@ export default function CalculGame() {
         </div>
       )}
 
-      {/* Score bar */}
       <div className="CalculGame__scoreBar">
         <div className="CalculGame__stars">
           {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
@@ -183,7 +123,6 @@ export default function CalculGame() {
         <div className="CalculGame__counter">{correctCount}/{answeredCount}</div>
       </div>
 
-      {/* Carte opération */}
       <div className={`CalculGame__card${answerState === 'wrong' || answerState === 'timeout' ? ' CalculGame__card--shake' : ''}`}>
         {!isUnlimited && (
           <span className="CalculGame__questionTag">

@@ -1,6 +1,6 @@
-@use '../../_abstracts/variables' as v;
+@use '../_abstracts/variables' as v;
 
-.CalculResult {
+.GameResult {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -8,6 +8,7 @@
   padding: 2rem 1.5rem;
   gap: 1.5rem;
 
+  // ─── Score ────────────────────────────────────────────────────────────────
   &__score {
     background: var(--color-base-100);
     border-radius: v.$border-radius;
@@ -46,6 +47,7 @@
     margin: 0;
   }
 
+  // ─── À retravailler ───────────────────────────────────────────────────────
   &__errors {
     background: var(--color-base-100);
     border-radius: v.$border-radius;
@@ -75,17 +77,35 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.875rem;
     padding: 0.75rem 1.25rem;
     border-bottom: 1px solid var(--color-base-200);
 
     &:last-child { border-bottom: none; }
   }
 
+  // ─── Éléments d'erreur — Tables ───────────────────────────────────────────
+  &__errorFact {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-base-content);
+    font-variant-numeric: tabular-nums;
+    min-width: 4.5rem;
+  }
+
+  &__errorArrow {
+    color: var(--color-base-content);
+    opacity: 0.3;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  // ─── Éléments d'erreur — Calcul / Monnaie ─────────────────────────────────
   &__errorLeft {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    min-width: 0;
   }
 
   &__errorOp {
@@ -93,6 +113,9 @@
     font-weight: 600;
     color: var(--color-base-content);
     font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   &__errorGiven,
@@ -102,13 +125,48 @@
     opacity: 0.5;
   }
 
+  // ─── Éléments d'erreur — Imagier ──────────────────────────────────────────
+  &__errorThumb {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.625rem;
+    background: var(--color-base-200);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__errorFr {
+    font-weight: 600;
+    color: var(--color-base-content);
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+
+  &__errorEn {
+    font-size: 0.875rem;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  // ─── Réponse correcte (tous modules) ─────────────────────────────────────
   &__errorAnswer {
-    font-size: 1.375rem;
+    font-size: 1.25rem;
     font-weight: 800;
     color: var(--color-success);
     flex-shrink: 0;
   }
 
+  // ─── Actions ──────────────────────────────────────────────────────────────
   &__actions {
     width: 100%;
     max-width: 20rem;

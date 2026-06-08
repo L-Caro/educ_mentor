@@ -44,3 +44,7 @@ frontend/tailwind-output.css
 /data/operations-a-trous.html
 /data/images/imagier
 /data/images/monnaie
+
+/data/educmentor.db
+/data/educmentor.db-shm
+/data/educmentor.db-wal

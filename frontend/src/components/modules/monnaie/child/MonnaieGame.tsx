@@ -1,20 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  startMonnaieSession,
-  recordMonnaieAnswer,
-  completeMonnaieSession,
-} from 'src/api/monnaie.api';
+import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/monnaie.api';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
 import type { MonnaieHistoryEntry } from './MonnaieResult';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from '../constants/denominations';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
+import GameChoices from 'src/components/common/GameChoices';
 import Spinner from 'src/components/common/Spinner';
-import { useQuestionTimer } from 'src/hook';
-
-type AnswerState = 'idle' | 'correct' | 'wrong' | 'timeout';
+import { useGameSession } from 'src/hook';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   reconnaitre: 'Combien y a-t-il en tout ?',
@@ -68,66 +63,42 @@ export default function MonnaieGame() {
   const location = useLocation();
   const exerciseType = (location.state as { exerciseType?: MonnaieExerciseType } | null)?.exerciseType;
 
-  const [session, setSession] = useState<MonnaieSessionResponse | null>(null);
-  const [currentIdx, setCurrentIdx] = useState(0);
   const [inputValue, setInputValue] = useState('');
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
-  const [answerState, setAnswerState] = useState<AnswerState>('idle');
-  const [correctCount, setCorrectCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  const answerStateRef = useRef<AnswerState>('idle');
-  const correctCountRef = useRef(0);
-  const historyRef = useRef<MonnaieHistoryEntry[]>([]);
-  const sessionRef = useRef<MonnaieSessionResponse | null>(null);
-  const currentIdxRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { timeRemaining, timerPct, isUrgent, startTimer, stopTimer } = useQuestionTimer(
-    session?.timer_seconds ?? 0,
-    handleTimeout,
-  );
+  const {
+    loading, error,
+    session, currentIdx, answerState, correctCount,
+    timeRemaining, timerPct, isUrgent,
+    submitAnswer, handleTerminate,
+  } = useGameSession<MonnaieSessionResponse, MonnaieQuestion, MonnaieHistoryEntry>({
+    loader: () => {
+      if (!exerciseType) return Promise.reject(new Error('Type d\'exercice manquant.'));
+      return startMonnaieSession(exerciseType);
+    },
+    homePath: '/module/monnaie',
+    resultsPath: '/module/monnaie/result',
+    getQuestions: (session) => session.questions,
+    getSessionId: (session) => session.session_id,
+    getTimerSeconds: (session) => session.timer_seconds,
+    onComplete: (sessionId, correctCount, total) => completeMonnaieSession(sessionId, correctCount, total),
+    buildResultsState: (correctCount, total, history) => ({ exerciseType, correctCount, total, history }),
+    buildTimeoutResult: (question) => ({ question, given: null, correct: false, timeout: true }),
+    recordTimeout: (sessionId, question) => recordMonnaieAnswer(sessionId, question.type, question.answer, false),
+    onQuestionChange: () => { setInputValue(''); setSelectedChoice(null); },
+  });
 
-  useEffect(() => { answerStateRef.current = answerState; }, [answerState]);
-  useEffect(() => { sessionRef.current = session; }, [session]);
-  useEffect(() => { currentIdxRef.current = currentIdx; }, [currentIdx]);
-
+  // Focus input à chaque nouvelle question
   useEffect(() => {
-    if (!exerciseType) { navigate('/module/monnaie'); return; }
-    startMonnaieSession(exerciseType)
-      .then((startedSession) => setSession(startedSession))
-      .catch(() => setError('Impossible de démarrer la session.'))
-      .finally(() => setLoading(false));
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!session) return;
-    startTimer();
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, [currentIdx, session?.session_id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentIdx, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function handleTimeout() {
-    const currentSession = sessionRef.current;
-    const idx = currentIdxRef.current;
-    if (!currentSession) return;
-    const question = currentSession.questions[idx];
-    setAnswerState('timeout');
-    historyRef.current.push({ question, given: null, correct: false, timeout: true });
-    recordMonnaieAnswer(currentSession.session_id, question.type, question.answer, false).catch(console.error);
-    setTimeout(() => advance(currentSession, idx), 1600);
-  }
-
-  function handleQcmChoice(choiceValue: number) {
-    if (answerStateRef.current !== 'idle') return;
-    setSelectedChoice(choiceValue);
-  }
-
-  async function handleValidate() {
-    if (answerStateRef.current !== 'idle' || !session) return;
-    stopTimer();
+  function handleValidate() {
+    if (!session || answerState !== 'idle') return;
 
     const question = session.questions[currentIdx];
+    const isFreeMode = session.response_mode === 'free';
     let given: number;
     let correct: boolean;
 
@@ -140,55 +111,11 @@ export default function MonnaieGame() {
       correct = selectedChoice === question.answer;
     }
 
-    setAnswerState(correct ? 'correct' : 'wrong');
-    if (correct) {
-      correctCountRef.current++;
-      setCorrectCount(correctCountRef.current);
-    }
-    historyRef.current.push({ question, given, correct, timeout: false });
-    recordMonnaieAnswer(session.session_id, question.type, question.answer, correct).catch(console.error);
-    setTimeout(() => advance(session, currentIdx), correct ? 900 : 1600);
-  }
-
-  function advance(currentSession: MonnaieSessionResponse, idx: number) {
-    if (idx + 1 >= currentSession.questions.length) {
-      finishSession(currentSession);
-    } else {
-      setCurrentIdx(idx + 1);
-      setInputValue('');
-      setSelectedChoice(null);
-      setAnswerState('idle');
-    }
-  }
-
-  async function finishSession(currentSession: MonnaieSessionResponse) {
-    await completeMonnaieSession(currentSession.session_id, correctCountRef.current, historyRef.current.length).catch(console.error);
-    navigate('/module/monnaie/result', {
-      state: {
-        exerciseType,
-        correctCount: correctCountRef.current,
-        total: historyRef.current.length,
-        history: historyRef.current,
-      },
-    });
-  }
-
-  async function handleTerminate() {
-    stopTimer();
-    const currentSession = sessionRef.current;
-    if (!currentSession || historyRef.current.length === 0) {
-      navigate('/module/monnaie');
-      return;
-    }
-    await completeMonnaieSession(currentSession.session_id, correctCountRef.current, historyRef.current.length).catch(console.error);
-    navigate('/module/monnaie/result', {
-      state: {
-        exerciseType,
-        correctCount: correctCountRef.current,
-        total: historyRef.current.length,
-        history: historyRef.current,
-      },
-    });
+    submitAnswer(
+      correct,
+      { question, given, correct, timeout: false },
+      () => recordMonnaieAnswer(session.session_id, question.type, question.answer, correct),
+    );
   }
 
   if (loading) {
@@ -290,22 +217,13 @@ export default function MonnaieGame() {
           </>
         ) : (
           <>
-            <div className="MonnaieGame__qcmChoices">
-              {(question.choices ?? []).map((choice, choiceIndex) => (
-                <button
-                  key={choiceIndex}
-                  className={`MonnaieGame__qcmChoice${
-                    answerState !== 'idle' && choice === question.answer ? ' MonnaieGame__qcmChoice--correct'
-                    : answerState !== 'idle' ? ' MonnaieGame__qcmChoice--disabled'
-                    : ''
-                  }`}
-                  onClick={() => handleQcmChoice(choice)}
-                  disabled={answerState !== 'idle'}
-                >
-                  {formatCents(choice)}
-                </button>
-              ))}
-            </div>
+            <GameChoices
+              options={(question.choices ?? []).map((choice) => ({ key: String(choice), label: formatCents(choice) }))}
+              selectedKey={selectedChoice === null ? null : String(selectedChoice)}
+              correctKey={String(question.answer)}
+              answerState={answerState}
+              onSelect={(key) => setSelectedChoice(Number(key))}
+            />
 
             {(answerState === 'wrong' || answerState === 'timeout') && (
               <p className="MonnaieGame__correction">

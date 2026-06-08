@@ -110,56 +110,6 @@
 		text-align: center;
 	}
 
-	// ─── Choices ─────────────────────────────────────────────────────────
-	&__choices {
-		width: 100%;
-		max-width: 26rem;
-		display: flex;
-		flex-direction: column;
-		gap: 0.75rem;
-	}
-
-	&__choice {
-		width: 100%;
-		padding: 1.125rem 1.5rem;
-		border-radius: v.$border-radius;
-		border: 2px solid var(--color-primary);
-		background: var(--color-base-100);
-		color: var(--color-primary);
-		font-size: 1.25rem;
-		font-weight: 600;
-		cursor: pointer;
-		text-align: left;
-		transition: transform 0.1s ease, background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
-
-		// Tinte légère de primary sur base-100 → contraste préservé (texte reste primary)
-		&:hover:not(:disabled) {
-			background: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100));
-			transform: translateX(2px);
-		}
-
-		&--correct {
-			background: var(--color-success);
-			border-color: var(--color-success);
-			color: #fff;
-			cursor: default;
-		}
-
-		&--wrong {
-			background: var(--color-error);
-			border-color: var(--color-error);
-			color: #fff;
-			cursor: default;
-		}
-
-		&--faded {
-			border-color: var(--color-base-300);
-			color: var(--color-base-content);
-			opacity: 0.3;
-			cursor: default;
-		}
-	}
-
 	// ─── Free input (level_3) ────────────────────────────────────────────────
 	&__freeInput {
 		width: 100%;
@@ -224,16 +174,6 @@
 
 		&__prompt {
 			font-size: 2.75rem;
-		}
-
-		&__choices {
-			max-width: 36rem;
-			gap: 1rem;
-		}
-
-		&__choice {
-			font-size: 1.5rem;
-			padding: 1.5rem 2rem;
 		}
 
 		&__freeInputField {

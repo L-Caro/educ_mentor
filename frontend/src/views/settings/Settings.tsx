@@ -196,7 +196,7 @@ export default function Settings() {
       </div>
 
       <Link to="/admin" className="Settings__adminLink">
-        🔧 Administration complète
+        🔧 Tableau de bord
       </Link>
     </PageContainer>
     </>

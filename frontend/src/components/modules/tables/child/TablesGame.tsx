@@ -1,138 +1,71 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  startTablesSession,
-  recordTablesAnswer,
-  completeTablesSession,
-} from 'src/api/tables.api';
+import { startTablesSession, recordTablesAnswer, completeTablesSession } from 'src/api/tables.api';
 import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
+import GameChoices from 'src/components/common/GameChoices';
 import Spinner from 'src/components/common/Spinner';
-import { useNextOnSpace, useDevMode, useQuestionTimer } from 'src/hook';
+import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
 import { generateTablesDevSession } from 'src/api/tables.dev';
 import DevBadge from 'src/components/common/DevBadge';
 
-type AnswerState = 'idle' | 'correct' | 'wrong' | 'timeout';
-
+type TablesResult = { question: TablesQuestion; wasCorrect: boolean };
 
 export default function TablesGame() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [session, setSession] = useState<TablesSessionResponse | null>(null);
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [answerState, setAnswerState] = useState<AnswerState>('idle');
+  const { isDevMode } = useDevMode();
+
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [freeInput, setFreeInput] = useState('');
-  const [correctCount, setCorrectCount] = useState(0);
   const [streak, setStreak] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const resultsRef = useRef<{ question: TablesQuestion; wasCorrect: boolean }[]>([]);
   const streakRef = useRef(0);
-  const correctCountRef = useRef(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const isFreeMode = parseInt(searchParams.get('choices_count') ?? '4', 10) === 0;
   const showHints = searchParams.get('hints') !== 'false';
-  const { isDevMode } = useDevMode();
 
-  const { timeRemaining, timerPct, isUrgent, startTimer, stopTimer } = useQuestionTimer(
-    session?.timer_seconds ?? 0,
-    handleTimeout,
-  );
+  const tables = searchParams.get('tables')?.split(',').map(Number).filter((n) => !isNaN(n)) ?? [];
+  const count = parseInt(searchParams.get('count') ?? '10', 10);
+  const choicesCount = parseInt(searchParams.get('choices_count') ?? '4', 10);
+  const excludeTrivial = searchParams.get('exclude_trivial') === 'true';
 
-  useEffect(() => {
-    const tables = searchParams.get('tables')?.split(',').map(Number).filter((n) => !isNaN(n)) ?? [];
-    const count = parseInt(searchParams.get('count') ?? '10', 10);
-    const choicesCount = parseInt(searchParams.get('choices_count') ?? '4', 10);
-    const excludeTrivial = searchParams.get('exclude_trivial') === 'true';
+  const {
+    loading, error,
+    session, currentIdx, answerState, correctCount,
+    timeRemaining, timerPct, isUrgent,
+    submitAnswer, advanceNow, handleTerminate,
+  } = useGameSession<TablesSessionResponse, TablesQuestion, TablesResult>({
+    loader: () => isDevMode
+      ? Promise.resolve(generateTablesDevSession({ selectedTables: tables, count, choicesCount, excludeTrivial }))
+      : startTablesSession({ selectedTables: tables, count, choicesCount, excludeTrivial }),
+    homePath: '/module/tables',
+    resultsPath: '/module/tables/result',
+    getQuestions: (session) => session.questions,
+    getSessionId: (session) => session.session_id,
+    getTimerSeconds: (session) => session.timer_seconds,
+    onComplete: (sessionId, correctCount, total) => completeTablesSession(sessionId, correctCount, total),
+    buildResultsState: (correctCount, total, results) => ({ correctCount, total, results }),
+    buildTimeoutResult: (question) => ({ question, wasCorrect: false }),
+    recordTimeout: (sessionId, question) => recordTablesAnswer(sessionId, question.display_a, question.display_b, false),
+    onQuestionChange: () => { setSelectedChoice(null); setFreeInput(''); },
+    skipApiCalls: isDevMode,
+    emptySessionError: 'Aucune question disponible. Sélectionne au moins une table.',
+  });
 
-    if (isDevMode) {
-      const s = generateTablesDevSession({ selectedTables: tables, count, choicesCount, excludeTrivial });
-      if (s.questions.length === 0) setError('Aucune question disponible. Sélectionne au moins une table.');
-      setSession(s);
-      setLoading(false);
-    } else {
-      startTablesSession({ selectedTables: tables, count, choicesCount, excludeTrivial })
-        .then((s) => {
-          if (s.questions.length === 0) setError('Aucune question disponible. Sélectionne au moins une table.');
-          setSession(s);
-        })
-        .catch(() => setError('Impossible de démarrer la session.'))
-        .finally(() => setLoading(false));
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Démarre le timer à chaque nouvelle question
-  useEffect(() => {
-    if (!session) return;
-    startTimer();
-  }, [currentIdx, session?.session_id]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-focus input in free mode when question changes
+  // Auto-focus input en mode libre à chaque nouvelle question
   useEffect(() => {
     if (isFreeMode && answerState === 'idle') {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [currentIdx, isFreeMode, answerState]);
 
-  useNextOnSpace(answerState, handleNext);
+  useNextOnSpace(answerState, advanceNow);
 
-  async function handleTerminate() {
-    stopTimer();
-    if (resultsRef.current.length === 0) {
-      navigate('/module/tables');
-      return;
-    }
-    if (!isDevMode) {
-      await completeTablesSession(session!.session_id, correctCountRef.current, resultsRef.current.length).catch(console.error);
-    }
-    navigate('/module/tables/result', {
-      state: {
-        correctCount: correctCountRef.current,
-        total: resultsRef.current.length,
-        results: resultsRef.current,
-      },
-    });
-  }
-
-  function handleTimeout() {
-    if (!session) return;
-    const timedOutQuestion = session.questions[currentIdx];
-    stopTimer();
-    setAnswerState('timeout');
-    resultsRef.current.push({ question: timedOutQuestion, wasCorrect: false });
-    if (!isDevMode) recordTablesAnswer(session.session_id, timedOutQuestion.display_a, timedOutQuestion.display_b, false).catch(console.error);
-    setTimeout(handleNext, 1600);
-  }
-
-  async function processAnswer(isCorrect: boolean, question: TablesQuestion) {
-    stopTimer();
-    setAnswerState(isCorrect ? 'correct' : 'wrong');
-
-    if (isCorrect) {
-      streakRef.current++;
-      correctCountRef.current++;
-      setStreak(streakRef.current);
-      setCorrectCount(correctCountRef.current);
-    } else {
-      streakRef.current = 0;
-      setStreak(0);
-    }
-
-    resultsRef.current.push({ question, wasCorrect: isCorrect });
-    if (!isDevMode) await recordTablesAnswer(session!.session_id, question.display_a, question.display_b, isCorrect);
-  }
-
-  function handleChoice(choice: number) {
-    if (answerState !== 'idle') return;
-    setSelectedChoice(choice);
-  }
-
-  async function handleValidate() {
-    if (answerState !== 'idle' || !session) return;
+  function handleValidate() {
+    if (!session || answerState !== 'idle') return;
     const question = session.questions[currentIdx];
     let isCorrect: boolean;
 
@@ -144,28 +77,14 @@ export default function TablesGame() {
       isCorrect = selectedChoice === question.answer;
     }
 
-    await processAnswer(isCorrect, question);
-    setTimeout(handleNext, isCorrect ? 900 : 1600);
-  }
+    if (isCorrect) { streakRef.current++; setStreak(streakRef.current); }
+    else { streakRef.current = 0; setStreak(0); }
 
-  async function handleNext() {
-    if (!session) return;
-    const nextIdx = currentIdx + 1;
-    if (nextIdx >= session.questions.length) {
-      if (!isDevMode) await completeTablesSession(session.session_id, correctCountRef.current, session.questions.length);
-      navigate('/module/tables/result', {
-        state: {
-          correctCount: correctCountRef.current,
-          total: session.questions.length,
-          results: resultsRef.current,
-        },
-      });
-      return;
-    }
-    setCurrentIdx(nextIdx);
-    setAnswerState('idle');
-    setSelectedChoice(null);
-    setFreeInput('');
+    submitAnswer(
+      isCorrect,
+      { question, wasCorrect: isCorrect },
+      () => recordTablesAnswer(session.session_id, question.display_a, question.display_b, isCorrect),
+    );
   }
 
   if (loading) {
@@ -191,15 +110,8 @@ export default function TablesGame() {
   const timerSeconds = session.timer_seconds;
   const total = session.questions.length;
   const progress = (currentIdx / total) * 100;
-  const filledStars = Math.min(5, Math.floor(correctCountRef.current / Math.max(1, total / 5)));
+  const filledStars = Math.min(5, Math.floor(correctCount / Math.max(1, total / 5)));
   const showUrgent = isUrgent && answerState === 'idle';
-
-  function choiceClass(choice: number): string {
-    if (answerState === 'idle') return 'TablesGame__choice';
-    if (choice === question.answer) return 'TablesGame__choice TablesGame__choice--correct';
-    if (choice === selectedChoice) return 'TablesGame__choice TablesGame__choice--wrong';
-    return 'TablesGame__choice TablesGame__choice--faded';
-  }
 
   return (
     <PageContainer className="TablesGame">
@@ -230,7 +142,7 @@ export default function TablesGame() {
         <div className="TablesGame__streak" data-active={streak > 0}>
           🔥 {streak} série
         </div>
-        <div className="TablesGame__counter">{correctCountRef.current}/{total}</div>
+        <div className="TablesGame__counter">{correctCount}/{total}</div>
       </div>
 
       <div className="TablesGame__card">
@@ -255,8 +167,8 @@ export default function TablesGame() {
                 : ''
               }`}
               value={answerState !== 'idle' ? String(question.answer) : freeInput}
-              onChange={(e) => answerState === 'idle' && setFreeInput(e.target.value.replace(/\D/g, ''))}
-              onKeyDown={(e) => e.key === 'Enter' && handleValidate()}
+              onChange={(event) => answerState === 'idle' && setFreeInput(event.target.value.replace(/\D/g, ''))}
+              onKeyDown={(event) => event.key === 'Enter' && handleValidate()}
               disabled={answerState !== 'idle'}
               placeholder="?"
               maxLength={3}
@@ -268,18 +180,13 @@ export default function TablesGame() {
             )}
           </div>
         ) : (
-          <div className="TablesGame__choices">
-            {question.choices.map((choice) => (
-              <button
-                key={choice}
-                className={choiceClass(choice)}
-                onClick={() => handleChoice(choice)}
-                disabled={answerState !== 'idle'}
-              >
-                {choice}
-              </button>
-            ))}
-          </div>
+          <GameChoices
+            options={question.choices.map((choice) => ({ key: String(choice), label: choice }))}
+            selectedKey={selectedChoice === null ? null : String(selectedChoice)}
+            correctKey={String(question.answer)}
+            answerState={answerState}
+            onSelect={(key) => setSelectedChoice(Number(key))}
+          />
         )}
       </div>
 
