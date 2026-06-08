@@ -17,6 +17,6 @@ export class Invitation {
   created_at: Date;
 
   /** Null tant que le lien n'a pas été utilisé. Renseigné au premier clic. */
-  @Column({ nullable: true, default: null })
+  @Column({ type: 'datetime', nullable: true })
   used_at: Date | null;
 }
