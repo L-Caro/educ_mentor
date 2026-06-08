@@ -98,6 +98,7 @@ const Router = createBrowserRouter([
   {
     path: '/settings',
     element: <PinGate><Settings /></PinGate>,
+    handle: { title: 'Paramètres' },
   },
 
   // ── Admin (protégé PIN, layout sidebar) ───────────────────────────────────

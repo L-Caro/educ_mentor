@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import Header from 'src/components/layout/Header/Header';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Toggle from 'src/components/common/Toggle';
 import { useDevMode } from 'src/hook';
@@ -66,6 +67,8 @@ export default function Settings() {
   const durationLabel = duration === 0 ? 'Désactivé' : `${duration} min`;
 
   return (
+    <>
+    <Header />
     <PageContainer className="Settings">
 
       {/* ── Temps de session (écran) ────────────────────────────────────── */}
@@ -196,5 +199,6 @@ export default function Settings() {
         🔧 Administration complète
       </Link>
     </PageContainer>
+    </>
   );
 }

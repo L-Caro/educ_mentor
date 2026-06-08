@@ -5,8 +5,12 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 2rem 1.5rem;
+	padding: 1rem;
 	gap: 1.25rem;
+
+	@media (min-width: 600px) {
+		padding: 2rem 1.5rem;
+	}
 
 	&__card {
 		width: 100%;
