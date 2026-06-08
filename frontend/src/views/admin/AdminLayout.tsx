@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Header from "src/components/layout/Header/Header.tsx";
 import { useAuth } from 'src/hook/useAuth';
@@ -10,12 +11,21 @@ const NAV_ITEMS = [
 export default function AdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  function closeMobileMenu() {
+    setIsMobileMenuOpen(false);
+  }
 
   return (
     <>
       <Header />
       <div className="AdminLayout">
-        <aside className="AdminLayout__sidebar">
+        {isMobileMenuOpen && (
+          <div className="AdminLayout__overlay" onClick={closeMobileMenu} />
+        )}
+
+        <aside className={`AdminLayout__sidebar${isMobileMenuOpen ? ' AdminLayout__sidebar--open' : ''}`}>
           <div className="AdminLayout__brand">
             <p className="AdminLayout__brandTitle">ÉducMentor</p>
             <p className="AdminLayout__brandSub">Administration</p>
@@ -30,6 +40,7 @@ export default function AdminLayout() {
                   className={({ isActive }) =>
                     `AdminLayout__navLink${isActive ? ' AdminLayout__navLink--active' : ''}`
                   }
+                  onClick={closeMobileMenu}
                 >
                   <span>{navItem.icon}</span>
                   {navItem.label}
@@ -45,6 +56,7 @@ export default function AdminLayout() {
                 className={({ isActive }) =>
                   `AdminLayout__navLink${isActive ? ' AdminLayout__navLink--active' : ''}`
                 }
+                onClick={closeMobileMenu}
               >
                 <span>⚙️</span> Paramètres
               </NavLink>
@@ -52,7 +64,7 @@ export default function AdminLayout() {
             <li>
               <button
                 className="AdminLayout__navButton"
-                onClick={() => { logout(); navigate('/'); }}
+                onClick={() => { closeMobileMenu(); logout(); navigate('/'); }}
               >
                 <span>🚪</span> Retour accueil
               </button>
@@ -61,6 +73,13 @@ export default function AdminLayout() {
         </aside>
 
         <main className="AdminLayout__main">
+          <button
+            className="AdminLayout__hamburger"
+            onClick={() => setIsMobileMenuOpen((previousIsOpen) => !previousIsOpen)}
+            aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+          >
+            {isMobileMenuOpen ? '✕' : '☰'}
+          </button>
           <Outlet />
         </main>
       </div>
