@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Invitation } from './entities/invitation.entity';
 import { InvitationService } from './invitation.service';
 import { InvitationAdminController } from './invitation-admin.controller';
+import { InvitationPublicController } from './invitation-public.controller';
 import { AuthModule } from '../auth/auth.module';
 
 /** InvitationService est exporté : consommé par AccessGuard pour valider le cookie.
@@ -10,7 +11,7 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Invitation]), AuthModule],
   providers: [InvitationService],
-  controllers: [InvitationAdminController],
+  controllers: [InvitationAdminController, InvitationPublicController],
   exports: [InvitationService],
 })
 export class InvitationModule {}
