@@ -71,6 +71,7 @@ export default function MonnaieGame() {
   const [session, setSession] = useState<MonnaieSessionResponse | null>(null);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [inputValue, setInputValue] = useState('');
+  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [answerState, setAnswerState] = useState<AnswerState>('idle');
   const [correctCount, setCorrectCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -117,13 +118,27 @@ export default function MonnaieGame() {
     setTimeout(() => advance(currentSession, idx), 1600);
   }
 
+  function handleQcmChoice(choiceValue: number) {
+    if (answerStateRef.current !== 'idle') return;
+    setSelectedChoice(choiceValue);
+  }
+
   async function handleValidate() {
     if (answerStateRef.current !== 'idle' || !session) return;
     stopTimer();
 
     const question = session.questions[currentIdx];
-    const given = parseMoneyInput(inputValue);
-    const correct = given !== -1 && given === question.answer;
+    let given: number;
+    let correct: boolean;
+
+    if (isFreeMode) {
+      given = parseMoneyInput(inputValue);
+      correct = given !== -1 && given === question.answer;
+    } else {
+      if (selectedChoice === null) return;
+      given = selectedChoice;
+      correct = selectedChoice === question.answer;
+    }
 
     setAnswerState(correct ? 'correct' : 'wrong');
     if (correct) {
@@ -135,29 +150,13 @@ export default function MonnaieGame() {
     setTimeout(() => advance(session, currentIdx), correct ? 900 : 1600);
   }
 
-  function handleQcmChoice(choiceValue: number) {
-    if (answerStateRef.current !== 'idle' || !session) return;
-    stopTimer();
-
-    const question = session.questions[currentIdx];
-    const correct = choiceValue === question.answer;
-
-    setAnswerState(correct ? 'correct' : 'wrong');
-    if (correct) {
-      correctCountRef.current++;
-      setCorrectCount(correctCountRef.current);
-    }
-    historyRef.current.push({ question, given: choiceValue, correct, timeout: false });
-    recordMonnaieAnswer(session.session_id, question.type, question.answer, correct).catch(console.error);
-    setTimeout(() => advance(session, currentIdx), correct ? 900 : 1600);
-  }
-
   function advance(currentSession: MonnaieSessionResponse, idx: number) {
     if (idx + 1 >= currentSession.questions.length) {
       finishSession(currentSession);
     } else {
       setCurrentIdx(idx + 1);
       setInputValue('');
+      setSelectedChoice(null);
       setAnswerState('idle');
     }
   }
@@ -318,15 +317,11 @@ export default function MonnaieGame() {
         )}
       </div>
 
-      <GameFooter onTerminate={handleTerminate}>
-        {isFreeMode && answerState === 'idle' && (
-          <Button
-            title="✓ Valider"
-            onClick={handleValidate}
-            disabled={inputValue.trim() === ''}
-          />
-        )}
-      </GameFooter>
+      <GameFooter
+        onTerminate={handleTerminate}
+        onValidate={handleValidate}
+        isValidateDisabled={answerState !== 'idle' || (isFreeMode ? inputValue.trim() === '' : selectedChoice === null)}
+      />
     </PageContainer>
   );
 }

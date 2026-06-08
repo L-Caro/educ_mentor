@@ -160,15 +160,28 @@ export default function ImagierGame() {
     if (!isDevMode) await recordAnswer(session!.session_id, question.word_id, isCorrect);
   }
 
-  async function handleChoice(choiceId: string) {
+  function handleChoice(choiceId: string) {
     if (answerState !== 'idle') return;
-    await processAnswer(choiceId === question.correct_id, choiceId);
+    setSelectedId(choiceId);
   }
 
-  async function handleFreeSubmit() {
-    if (answerState !== 'idle' || freeInput.trim() === '') return;
-    const isCorrect = freeInput.trim().toLowerCase() === correctChoiceLabel.toLowerCase();
-    await processAnswer(isCorrect, isCorrect ? question.correct_id : '__wrong__');
+  async function handleValidate() {
+    if (answerState !== 'idle') return;
+    let isCorrect: boolean;
+    let choiceId: string;
+
+    if (isFreeMode) {
+      if (freeInput.trim() === '') return;
+      isCorrect = freeInput.trim().toLowerCase() === correctChoiceLabel.toLowerCase();
+      choiceId = isCorrect ? question.correct_id : '__wrong__';
+    } else {
+      if (selectedId === null) return;
+      isCorrect = selectedId === question.correct_id;
+      choiceId = selectedId;
+    }
+
+    await processAnswer(isCorrect, choiceId);
+    setTimeout(handleNext, isCorrect ? 900 : 1600);
   }
 
   async function handleNext() {
@@ -235,7 +248,7 @@ export default function ImagierGame() {
               }`}
               value={answerState !== 'idle' ? correctChoiceLabel : freeInput}
               onChange={(e) => answerState === 'idle' && setFreeInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleFreeSubmit()}
+              onKeyDown={(e) => e.key === 'Enter' && handleValidate()}
               disabled={answerState !== 'idle'}
               placeholder="Tape la réponse…"
               autoComplete="off"
@@ -264,17 +277,11 @@ export default function ImagierGame() {
         )}
       </div>
 
-      <GameFooter onTerminate={handleTerminate}>
-        {isFreeMode && answerState === 'idle' && (
-          <Button title="✓ Valider" onClick={handleFreeSubmit} />
-        )}
-        {answerState !== 'idle' && (
-          <Button
-            title={currentIdx + 1 >= total ? 'Voir les résultats 🎉' : 'Suivant →'}
-            onClick={handleNext}
-          />
-        )}
-      </GameFooter>
+      <GameFooter
+        onTerminate={handleTerminate}
+        onValidate={handleValidate}
+        isValidateDisabled={answerState !== 'idle' || (isFreeMode ? freeInput.trim() === '' : selectedId === null)}
+      />
     </PageContainer>
   );
 }

@@ -5,11 +5,11 @@ import {
   recordCalculAnswer,
   completeCalculSession,
 } from 'src/api/calcul.api';
+import GameFooter from "src/components/common/GameFooter.tsx";
 import type { CalculSessionResponse } from 'src/types';
 import type { CalculHistoryEntry } from './CalculResult';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
-import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
 import { useQuestionTimer } from 'src/hook';
 
@@ -221,15 +221,11 @@ export default function CalculGame() {
         )}
       </div>
 
-      <GameFooter onTerminate={handleTerminate}>
-        {answerState === 'idle' && (
-          <Button
-            title="✓ Valider"
-            onClick={handleValidate}
-            disabled={inputValue.trim() === ''}
-          />
-        )}
-      </GameFooter>
+      <GameFooter
+        onTerminate={handleTerminate}
+        onValidate={handleValidate}
+        isValidateDisabled={answerState !== 'idle' || inputValue.trim() === ''}
+      />
     </PageContainer>
   );
 }
