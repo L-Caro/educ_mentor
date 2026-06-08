@@ -6,6 +6,7 @@ import ModuleAdminLayout from 'src/components/layout/ModuleAdminLayout/ModuleAdm
 
 // Auth
 import PinGate from 'src/components/auth/PinGate';
+import InvitePage from 'src/views/invite/InvitePage';
 
 // Error
 import ErrorPage from 'src/components/Error/pages/ErrorPage';
@@ -87,6 +88,9 @@ const Router = createBrowserRouter([
       { path: '/module/monnaie/result', element: <MonnaieResult />, handle: { title: 'Monnaie' } },
     ],
   },
+
+  // ── Invitation — route publique, sans layout, sans AccessGate ────────────
+  { path: '/invite/:token', element: <InvitePage /> },
 
   // ── Settings (protégé PIN) ─────────────────────────────────────────────────
   {
