@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { startSession, recordAnswer, completeSession } from 'src/api/imagier.api';
 import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
 import Button from 'src/components/common/Button';
+import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import { capitalize } from "src/utils/capitilize.ts";
@@ -263,10 +264,7 @@ export default function ImagierGame() {
         )}
       </div>
 
-      <div className="ImagierGame__actions">
-        <button className="ImagierGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
+      <GameFooter onTerminate={handleTerminate}>
         {isFreeMode && answerState === 'idle' && (
           <Button title="✓ Valider" onClick={handleFreeSubmit} />
         )}
@@ -276,7 +274,7 @@ export default function ImagierGame() {
             onClick={handleNext}
           />
         )}
-      </div>
+      </GameFooter>
     </PageContainer>
   );
 }

@@ -9,6 +9,7 @@ import type { CalculSessionResponse } from 'src/types';
 import type { CalculHistoryEntry } from './CalculResult';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
+import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
 import { useQuestionTimer } from 'src/hook';
 
@@ -220,11 +221,7 @@ export default function CalculGame() {
         )}
       </div>
 
-      {/* Actions */}
-      <div className="CalculGame__actions">
-        <button className="CalculGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
+      <GameFooter onTerminate={handleTerminate}>
         {answerState === 'idle' && (
           <Button
             title="✓ Valider"
@@ -232,7 +229,7 @@ export default function CalculGame() {
             disabled={inputValue.trim() === ''}
           />
         )}
-      </div>
+      </GameFooter>
     </PageContainer>
   );
 }

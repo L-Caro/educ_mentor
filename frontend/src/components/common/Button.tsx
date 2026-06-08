@@ -29,10 +29,11 @@ export default function Button({
   type = 'button',
   'aria-label': ariaLabel,
 }: ButtonProps) {
+  const variantClass = variant !== 'primary' ? ` Button--${variant}` : '';
   const base =
     size === 'sm'
       ? `AdminBtn AdminBtn--${variant}`
-      : `Button${isSelected ? ' Button--selected' : ''}`;
+      : `Button${variantClass}${isSelected ? ' Button--selected' : ''}`;
 
   const cls = [base, className].filter(Boolean).join(' ');
 

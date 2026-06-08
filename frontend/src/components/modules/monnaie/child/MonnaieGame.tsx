@@ -10,6 +10,7 @@ import type { MonnaieHistoryEntry } from './MonnaieResult';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from '../constants/denominations';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
+import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
 import { useQuestionTimer } from 'src/hook';
 
@@ -317,10 +318,7 @@ export default function MonnaieGame() {
         )}
       </div>
 
-      <div className="MonnaieGame__actions">
-        <button className="MonnaieGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
+      <GameFooter onTerminate={handleTerminate}>
         {isFreeMode && answerState === 'idle' && (
           <Button
             title="✓ Valider"
@@ -328,7 +326,7 @@ export default function MonnaieGame() {
             disabled={inputValue.trim() === ''}
           />
         )}
-      </div>
+      </GameFooter>
     </PageContainer>
   );
 }

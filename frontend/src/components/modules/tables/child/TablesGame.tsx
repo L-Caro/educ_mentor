@@ -8,6 +8,7 @@ import {
 import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
+import GameFooter from 'src/components/common/GameFooter';
 import Spinner from 'src/components/common/Spinner';
 import { useNextOnSpace, useDevMode, useQuestionTimer } from 'src/hook';
 import { generateTablesDevSession } from 'src/api/tables.dev';
@@ -274,10 +275,7 @@ export default function TablesGame() {
         )}
       </div>
 
-      <div className="TablesGame__actions">
-        <button className="TablesGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
+      <GameFooter onTerminate={handleTerminate}>
         {isFreeMode && answerState === 'idle' && (
           <Button title="✓ Valider" onClick={handleFreeSubmit} />
         )}
@@ -287,7 +285,7 @@ export default function TablesGame() {
             onClick={handleNext}
           />
         )}
-      </div>
+      </GameFooter>
     </PageContainer>
   );
 }

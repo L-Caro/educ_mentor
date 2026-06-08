@@ -202,33 +202,6 @@
     }
   }
 
-  // ─── Actions ──────────────────────────────────────────────────────────────
-  &__actions {
-    width: 100%;
-    max-width: 26rem;
-    padding: 1rem 1rem 1.5rem;
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  &__btnTerminer {
-    background: transparent;
-    border: none;
-    color: var(--color-base-content);
-    opacity: 0.4;
-    font-family: inherit;
-    font-size: 0.9rem;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    border-radius: v.$border-radius;
-    transition: opacity 0.15s ease;
-
-    &:hover { opacity: 0.7; }
-  }
 }
 
 // ─── Tablette (≥ 600px) ──────────────────────────────────────────────────────
@@ -254,9 +227,5 @@
       padding: 1.25rem 1.5rem;
     }
 
-    &__actions {
-      max-width: 36rem;
-      padding: 1.25rem 1rem 2rem;
-    }
   }
 }
