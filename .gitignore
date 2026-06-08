@@ -15,6 +15,7 @@ backend/data/images/
 
 # Environnement
 .env
+.env.production
 *.env.local
 *.env.production
 

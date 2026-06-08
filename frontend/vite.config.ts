@@ -1,6 +1,5 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-import path from 'path';
 
 // En Docker dev, BACKEND_URL pointe vers le service "backend" du réseau Docker.
 // En local, la variable n'est pas définie et on retombe sur localhost.
@@ -14,7 +13,9 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(__dirname, '../backend/static'),
+    // Sortie standard Vite : frontend/dist/.
+    // En dev on utilise le serveur Vite (npm run dev) — ce chemin ne sert qu'au build Docker/prod.
+    outDir: 'dist',
     emptyOutDir: true,
   },
   server: {

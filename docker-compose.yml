@@ -1,11 +1,37 @@
 services:
-  educmentor:
-    build: .
-    ports:
-      - "4005:4005"
-    volumes:
-      # Données persistées sur le NAS (SQLite + images)
-      - ./data:/app/data
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    networks:
+      - traefik-network
+      - app-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.educmentor.rule=Host(`educmentor.lionelcaro.fr`)"
+      - "traefik.http.routers.educmentor.entrypoints=websecure"
+      - "traefik.http.routers.educmentor.tls.certresolver=letsencrypt"
+      # Port interne du container nginx — Traefik doit savoir où envoyer le trafic.
+      - "traefik.http.services.educmentor.loadbalancer.server.port=80"
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    networks:
+      # Pas sur traefik-network : le backend n'est jamais exposé directement.
+      # Nginx (frontend) le joint via app-network.
+      - app-network
     env_file:
       - .env
-    restart: unless-stopped
+    volumes:
+      - app_data:/app/data
+
+networks:
+  traefik-network:
+    external: true
+  app-network:
+    driver: bridge
+
+volumes:
+  app_data:
