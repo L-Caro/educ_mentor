@@ -140,6 +140,48 @@
 		line-height: 1.4;
 	}
 
+	// ─── Accordéon accès appareils ───────────────────────────────────────
+	&__accessCard {
+		width: 100%;
+		max-width: 28rem;
+		background: var(--color-base-100);
+		border-radius: v.$border-radius;
+		border: 2px solid var(--color-base-300);
+		box-shadow: var(--shadow-sm);
+		overflow: hidden;
+	}
+
+	&__accessHeader {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1.25rem 1.5rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	&__accessChevron {
+		font-size: 1rem;
+		color: var(--color-base-content);
+		opacity: 0.4;
+		transition: transform 0.2s;
+		flex-shrink: 0;
+
+		&--open {
+			transform: rotate(180deg);
+		}
+	}
+
+	&__accessBody {
+		padding: 0 1.5rem 1.5rem;
+		border-top: 1px solid var(--color-base-300);
+		padding-top: 1.5rem;
+	}
+
 	// ─── Admin link — outline → filled au hover pour contraste garanti ─────
 	&__adminLink {
 		width: 100%;
@@ -160,6 +202,153 @@
 		&:hover {
 			background: var(--color-primary);
 			color: var(--color-primary-content);
+		}
+	}
+}
+
+// ─── InvitationsAdmin — intégré dans l'accordéon Settings ────────────────────
+@use '../_abstracts/variables' as v2;
+
+.InvitationsAdmin {
+	display: flex;
+	flex-direction: column;
+	gap: 1.75rem;
+
+	&__hint {
+		margin: 0;
+		font-size: 0.8125rem;
+		color: var(--color-base-content);
+		opacity: 0.6;
+		line-height: 1.4;
+	}
+
+	&__form {
+		display: flex;
+		gap: 0.625rem;
+	}
+
+	&__input {
+		flex: 1;
+		min-width: 0;
+		background: var(--color-base-200);
+		border: 1.5px solid var(--color-base-300);
+		border-radius: v2.$border-radius-2;
+		padding: 0.625rem 1rem;
+		font-size: 0.9375rem;
+		font-family: inherit;
+		color: var(--color-base-content);
+		outline: none;
+		transition: border-color 0.15s;
+
+		&::placeholder {
+			opacity: 0.45;
+		}
+
+		&:focus {
+			border-color: var(--color-primary);
+		}
+	}
+
+	&__btn {
+		flex-shrink: 0;
+		background: var(--color-primary);
+		color: var(--color-primary-content);
+		border: none;
+		border-radius: v2.$border-radius-2;
+		padding: 0.625rem 1.125rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		font-family: inherit;
+		cursor: pointer;
+		transition: opacity 0.15s;
+
+		&:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+	}
+
+	// ─── Lien généré ─────────────────────────────────────────────────────
+	&__linkBox {
+		display: flex;
+		align-items: center;
+		gap: 0.625rem;
+		background: var(--color-base-200);
+		border-radius: v2.$border-radius-2;
+		padding: 0.75rem 1rem;
+	}
+
+	&__linkText {
+		flex: 1;
+		min-width: 0;
+		font-size: 0.75rem;
+		color: var(--color-base-content);
+		opacity: 0.65;
+		word-break: break-all;
+		font-family: monospace;
+	}
+
+	&__copyBtn {
+		flex-shrink: 0;
+		background: transparent;
+		border: 1.5px solid var(--color-primary);
+		border-radius: v2.$border-radius-2;
+		padding: 0.3rem 0.75rem;
+		font-size: 0.8125rem;
+		font-weight: 600;
+		font-family: inherit;
+		color: var(--color-primary);
+		cursor: pointer;
+		transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+		&--done {
+			background: var(--color-success);
+			border-color: var(--color-success);
+			color: white;
+		}
+	}
+
+	// ─── Liste appareils ──────────────────────────────────────────────────
+	&__list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	&__item {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		padding: 0.625rem 0;
+		border-bottom: 1px solid var(--color-base-300);
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	&__itemLabel {
+		flex: 1;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--color-base-content);
+	}
+
+	&__itemMeta {
+		font-size: 0.8125rem;
+		color: var(--color-base-content);
+		opacity: 0.45;
+	}
+
+	&__badge {
+		font-size: 0.9rem;
+		opacity: 0.4;
+
+		&--active {
+			color: var(--color-success);
+			opacity: 1;
 		}
 	}
 }

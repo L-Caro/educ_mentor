@@ -21,7 +21,6 @@ import ImagierResult from 'src/components/modules/imagier/child/ImagierResult.ts
 
 // Admin
 import AdminDashboard from 'src/views/admin/AdminDashboard';
-import InvitationsAdmin from 'src/views/admin/InvitationsAdmin';
 import ModuleCatalog from 'src/views/admin/ModuleCatalog';
 
 import ImagierWordList from 'src/components/modules/imagier/admin/ImagierWordList.tsx';
@@ -108,7 +107,6 @@ const Router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboard />, handle: { title: 'Tableau de bord admin' } },
       { path: 'modules', element: <ModuleCatalog /> },
-      { path: 'invitations', element: <InvitationsAdmin /> },
       {
         path: 'imagier',
         element: <ModuleAdminLayout title="Imagier Anglais" tabs={IMAGIER_TABS} />,

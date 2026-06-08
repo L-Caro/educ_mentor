@@ -5,6 +5,7 @@ import Toggle from 'src/components/common/Toggle';
 import { useDevMode } from 'src/hook';
 import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext';
 import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import InvitationsAdmin from 'src/views/admin/InvitationsAdmin';
 
 const DURATION_STEPS = [0, 1, 10, 15, 20, 30, 45, 60];
 const QUESTION_COUNTS = [5, 10, 15, 20];
@@ -18,6 +19,7 @@ function formatTimer(seconds: number): string {
 
 export default function Settings() {
   const { isDevMode, toggle } = useDevMode();
+  const [isAccessOpen, setIsAccessOpen] = useState(false);
 
   const [duration, setDuration] = useState(() =>
     parseInt(localStorage.getItem(DURATION_KEY) ?? '0', 10)
@@ -163,6 +165,31 @@ export default function Settings() {
           </div>
         </div>
         <Toggle checked={isDevMode} onChange={toggle} />
+      </div>
+
+      {/* ── Accès appareils ─────────────────────────────────────────────── */}
+      <div className="Settings__accessCard">
+        <button
+          type="button"
+          className="Settings__accessHeader"
+          onClick={() => setIsAccessOpen(previous => !previous)}
+        >
+          <div className="Settings__devCardHeader">
+            <span className="Settings__devCardIcon">🔒</span>
+            <div>
+              <p className="Settings__devCardTitle">Appareils autorisés</p>
+              <p className="Settings__devCardDesc">
+                Gérer les accès par lien d'invitation.
+              </p>
+            </div>
+          </div>
+          <span className={`Settings__accessChevron${isAccessOpen ? ' Settings__accessChevron--open' : ''}`}>▾</span>
+        </button>
+        {isAccessOpen && (
+          <div className="Settings__accessBody">
+            <InvitationsAdmin />
+          </div>
+        )}
       </div>
 
       <Link to="/admin" className="Settings__adminLink">

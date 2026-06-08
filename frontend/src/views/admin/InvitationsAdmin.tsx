@@ -20,11 +20,9 @@ const InvitationsAdmin = () => {
     event.preventDefault();
     const label = labelInputRef.current?.value.trim();
     if (!label) return;
-
     setCreating(true);
     setGeneratedLink(null);
     setCopied(false);
-
     const invitation = await createInvitation(label);
     setInvitations(previous => [invitation, ...previous]);
     setGeneratedLink(invitation.link);
@@ -41,79 +39,57 @@ const InvitationsAdmin = () => {
 
   return (
     <div className="InvitationsAdmin">
-      <div className="AdminCard mb-4">
-        <h2 className="h6 mb-3">Générer un lien d'invitation</h2>
-        <p className="text-muted small mb-3">
-          Un lien par appareil. Le destinataire clique une fois — l'accès est ensuite permanent sur cet appareil.
+      <div className="Settings__section">
+        <p className="Settings__cardTitle">Générer un lien</p>
+        <p className="InvitationsAdmin__hint">
+          Un lien par appareil — usage unique. L'accès devient permanent après validation.
         </p>
-        <form onSubmit={handleCreate} className="d-flex gap-2 align-items-end">
-          <div className="flex-grow-1">
-            <label htmlFor="invitation-label" className="form-label small">Nom de l'appareil</label>
-            <input
-              id="invitation-label"
-              ref={labelInputRef}
-              type="text"
-              className="form-control"
-              placeholder="ex : Tablette Maëve, iPad salon"
-              maxLength={50}
-              required
-            />
-          </div>
-          <button type="submit" className="btn btn-primary" disabled={creating}>
+        <form onSubmit={handleCreate} className="InvitationsAdmin__form">
+          <input
+            ref={labelInputRef}
+            type="text"
+            className="InvitationsAdmin__input"
+            placeholder="ex : Tablette Maëve"
+            maxLength={50}
+            required
+          />
+          <button type="submit" className="InvitationsAdmin__btn" disabled={creating}>
             {creating ? <Spinner size="xs" /> : 'Générer'}
           </button>
         </form>
 
         {generatedLink && (
-          <div className="mt-3 p-3 bg-light rounded">
-            <p className="small text-muted mb-1">Lien à envoyer par mail :</p>
-            <div className="d-flex gap-2 align-items-center">
-              <code className="flex-grow-1 text-break small">{generatedLink}</code>
-              <button
-                type="button"
-                className={`btn btn-sm ${copied ? 'btn-success' : 'btn-outline-secondary'}`}
-                onClick={handleCopy}
-              >
-                {copied ? '✓ Copié' : 'Copier'}
-              </button>
-            </div>
+          <div className="InvitationsAdmin__linkBox">
+            <span className="InvitationsAdmin__linkText">{generatedLink}</span>
+            <button
+              type="button"
+              className={`InvitationsAdmin__copyBtn${copied ? ' InvitationsAdmin__copyBtn--done' : ''}`}
+              onClick={handleCopy}
+            >
+              {copied ? '✓' : 'Copier'}
+            </button>
           </div>
         )}
       </div>
 
-      <div className="AdminCard">
-        <h2 className="h6 mb-3">Appareils invités ({invitations.length})</h2>
-        {invitations.length === 0 ? (
-          <p className="text-muted small">Aucun appareil invité pour l'instant.</p>
-        ) : (
-          <table className="table table-sm">
-            <thead>
-              <tr>
-                <th>Appareil</th>
-                <th>Invité le</th>
-                <th>Statut</th>
-              </tr>
-            </thead>
-            <tbody>
-              {invitations.map(invitation => (
-                <tr key={invitation.id}>
-                  <td>{invitation.label}</td>
-                  <td className="text-muted small">
-                    {new Date(invitation.created_at).toLocaleDateString('fr-FR')}
-                  </td>
-                  <td>
-                    {invitation.used_at ? (
-                      <span className="badge bg-success">Activé</span>
-                    ) : (
-                      <span className="badge bg-warning text-dark">En attente</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {invitations.length > 0 && (
+        <div className="Settings__section">
+          <p className="Settings__cardTitle">Appareils ({invitations.length})</p>
+          <ul className="InvitationsAdmin__list">
+            {invitations.map(invitation => (
+              <li key={invitation.id} className="InvitationsAdmin__item">
+                <span className="InvitationsAdmin__itemLabel">{invitation.label}</span>
+                <span className="InvitationsAdmin__itemMeta">
+                  {new Date(invitation.created_at).toLocaleDateString('fr-FR')}
+                </span>
+                <span className={`InvitationsAdmin__badge${invitation.used_at ? ' InvitationsAdmin__badge--active' : ''}`}>
+                  {invitation.used_at ? '✓' : '⏳'}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
