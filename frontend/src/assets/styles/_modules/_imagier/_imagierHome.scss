@@ -32,7 +32,7 @@
 	// ─── Subtitle ────────────────────────────────
 	&__subtitle {
 		text-align: center;
-		padding: 1rem 0 0.5rem;
+		padding: 0.5rem 0;
 		color: var(--color-base-content);
 		opacity: 0.5;
 		margin: 0;
@@ -44,7 +44,8 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		padding: 1.5rem;
+		justify-content: center;
+		padding: 1rem;
 		gap: 1.5rem;
 	}
 
