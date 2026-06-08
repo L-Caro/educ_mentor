@@ -25,13 +25,12 @@ services:
     env_file:
       - .env
     volumes:
-      - app_data:/app/data
+      # Bind mount : les données sont dans ./data/ à côté du docker-compose.yml.
+      # Avantage : facile à localiser, sauvegarder et inspecter directement sur le VPS.
+      - ./data:/app/data
 
 networks:
   traefik-network:
     external: true
   app-network:
     driver: bridge
-
-volumes:
-  app_data:
