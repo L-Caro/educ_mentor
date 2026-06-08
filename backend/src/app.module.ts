@@ -14,6 +14,7 @@ import { ImagierModule } from './modules/imagier/imagier.module';
 import { TablesModule } from './modules/tables/tables.module';
 import { CalculModule } from './modules/calcul/calcul.module';
 import { MonnaieModule } from './modules/monnaie/monnaie.module';
+import { InvitationModule } from './modules/invitation/invitation.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { MonnaieModule } from './modules/monnaie/monnaie.module';
     TablesModule,
     CalculModule,
     MonnaieModule,
+    InvitationModule,
   ],
 })
 export class AppModule {}
