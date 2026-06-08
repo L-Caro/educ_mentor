@@ -1,0 +1,11 @@
+services:
+  educmentor:
+    build: .
+    ports:
+      - "4005:4005"
+    volumes:
+      # Données persistées sur le NAS (SQLite + images)
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped

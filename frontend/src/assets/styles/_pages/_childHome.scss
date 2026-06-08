@@ -1,0 +1,51 @@
+@use '../_abstracts/variables' as v;
+@use '../_abstracts/mixins' as m;
+
+.ChildHome {
+	flex: 1;
+	padding: 3rem 2rem;
+
+	&__loading {
+		min-height: 40vh;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&__empty {
+		border-radius: v.$border-radius;
+		background: var(--color-base-100);
+		border: 1px solid var(--color-base-300);
+		box-shadow: var(--shadow-md);
+		color: var(--color-base-content);
+		padding: 2rem;
+		text-align: center;
+		margin: 2rem 0;
+	}
+
+	&__timerRow {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 1rem;
+		min-height: 2rem; // reserve space even when timer is hidden
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 1rem;
+
+		@include m.lg-lt {
+			grid-template-columns: repeat(3, 1fr);
+		}
+
+		@include m.sm-lt {
+			grid-template-columns: repeat(2, 1fr);
+		}
+	}
+
+	&__col {
+		display: flex;
+	}
+}
+

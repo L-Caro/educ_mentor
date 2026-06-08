@@ -1,0 +1,40 @@
+@use '../_abstracts/variables' as v;
+@use '../_abstracts/mixins.scss' as m;
+
+.b1 {
+    background-color : red;
+    border           : red;
+}
+
+.b2 {
+    background-color : green;
+    border           : green;
+}
+
+.b3 {
+    background-color : blue;
+    border           : blue;
+}
+
+.b4 {
+    background-color : purple;
+    border           : purple;
+}
+
+.br {
+    @include m.xs {
+        border : 2px solid red;
+    }
+    @include m.sm {
+        border : 2px solid green;
+    }
+    @include m.md {
+        border : 2px solid blue;
+    }
+    @include m.lg {
+        border : 2px solid orange;
+    }
+    @include m.xl {
+        border : 2px solid purple;
+    }
+}

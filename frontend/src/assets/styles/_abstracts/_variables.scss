@@ -1,0 +1,43 @@
+// ? Utilisation de variables CSS plutôt que SCSS, la portée est limitée au bloc en scss.
+// === Palette ÉducMentor ===
+// Light mode (défaut) — surchargé par html.dark dans _themes/_dark.scss
+:root {
+  // Couleurs principales
+  --color-primary:           #7d8cc4;
+  --color-primary-content:   #ffffff;
+  --color-secondary:         #ffb5c2;
+  --color-secondary-content: #4a4a4a;
+  --color-accent:            #bcc8f2;
+  --color-accent-content:    #4a4a4a;
+  --color-neutral:           #4a4a4a;
+  --color-neutral-content:   #ffffff;
+
+  // Surfaces
+  --color-base-100:          #ffffff;
+  --color-base-200:          #f5f7fa;
+  --color-base-300:          #e8ecf5;
+  --color-base-content:      #4a4a4a;
+
+  // Feedback
+  --color-info:              #7d8cc4;
+  --color-success:           #68b09f;
+  --color-warning:           #f4a261;
+  --color-error:             #e76f51;
+
+  // Ombres — redéfinies par html.dark pour visibilité sur fond sombre
+  --shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.06);
+  --shadow-md:  0 4px 16px 0 rgba(0, 0, 0, 0.10);
+  --shadow-nav: 0 2px 18px 0 rgba(0, 0, 0, 0.12);
+}
+
+// Fonts
+// TODO: ajouter l'import Google Fonts (ex: Nunito) dans index.html
+$font-special    : 'Nunito', system-ui, sans-serif;
+$font-family     : 'Nunito', system-ui, sans-serif;
+
+// Border radius
+$border-radius   : 1.5rem;
+$border-radius-2 : 0.8rem;
+
+// Gutter
+$gutter          : 1rem;

@@ -1,0 +1,15 @@
+@use '../_abstracts/variables' as v;
+@use '../_abstracts/mixins.scss' as m;
+
+.error {
+    align-items     : center;
+    display         : flex;
+    flex-direction  : column;
+    flex-grow       : 1;
+    justify-content : center;
+
+    p {
+        color     : var(--color-base-content);
+        font-size : 2.1rem;
+    }
+}

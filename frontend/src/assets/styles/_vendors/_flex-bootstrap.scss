@@ -1,0 +1,26 @@
+// Classe à utiliser directement dans les classNames
+// Inspiré de bootstrap
+
+.d-flex {
+    display : flex;
+}
+
+.flex-column {
+    flex-direction : column;
+}
+
+.flex-row {
+    flex-direction : row;
+}
+
+.flex-fill {
+    flex : 1 1 auto;
+}
+
+.justify-content-center {
+    justify-content : center;
+}
+
+.align-items-center {
+    align-items : center;
+}

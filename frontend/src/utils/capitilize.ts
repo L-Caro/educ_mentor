@@ -1,0 +1,8 @@
+/**
+ * Capitalise la première lettre d'une chaîne.
+ * "bonjour monde" → "Bonjour monde"
+ */
+export function capitalize(value: string): string {
+  if (!value) return '';
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}

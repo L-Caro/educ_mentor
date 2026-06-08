@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(npx vite *)",
+      "Bash(npx sass *)",
+      "Bash(curl -sv -H 'Authorization: Bearer perm-YWRtaW4=.NDItMA==.OFBRIHxnsNrmrsK8MVymiZoyxBVHbh' https://lionel-dev.youtrack.cloud/api/users/me?fields=login,fullName)",
+      "Bash(curl *)",
+      "Bash(python3 -c \"import sys,json; fields=json.load\\(sys.stdin\\); [print\\(f['name'],'→',f['value']\\) for f in fields]\")",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import sys,json; [print\\(' -', v['name']\\) for v in json.load\\(sys.stdin\\)]\")"
+    ]
+  }
+}

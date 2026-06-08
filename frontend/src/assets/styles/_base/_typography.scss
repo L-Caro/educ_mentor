@@ -1,0 +1,50 @@
+@use '../_abstracts/variables' as v;
+@use '../_abstracts/mixins' as m;
+
+html {
+
+	font-size         : 62.5%; // 10px par default, facilite les calculs de taille
+	width             : 100vw;
+
+}
+
+
+body {
+	background              : transparent;
+	font-family             : v.$font-family;
+	font-size               : 1.6rem; // On règle la taille de police par défaut
+	-webkit-font-smoothing  : antialiased;
+	margin                  : 0 auto;
+	-moz-osx-font-smoothing : grayscale;
+	color: var(--color-base-content)
+}
+
+
+.root {
+	display        : flex; // On passe le conteneur en flexbox pour pouvoir utiliser les propriétés flex grow
+	flex-direction : column;
+	min-height     : 100vh; // On règle la hauteur à 100vh pour que tout l'espace vertical soit pris
+}
+
+ul {
+	list-style           : none;
+	padding-inline-start : 0;
+}
+
+img {
+	max-width : 100%;
+}
+
+.small {
+	font-size   : 0.5em;
+	font-weight : 500;
+}
+
+label {
+	font-weight   : 500;
+	margin-bottom : 0.3rem;
+}
+
+a {
+	text-decoration : none;
+}

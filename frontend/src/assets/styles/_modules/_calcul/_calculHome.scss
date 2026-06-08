@@ -1,0 +1,81 @@
+@use '../../_abstracts/variables' as v;
+
+.CalculHome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  &__card {
+    background: var(--color-base-100);
+    border-radius: v.$border-radius;
+    box-shadow: var(--shadow-md);
+    padding: 2.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    max-width: 22rem;
+    text-align: center;
+  }
+
+  &__icon {
+    font-size: 3.5rem;
+    line-height: 1;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    margin: 0;
+  }
+
+  &__subtitle {
+    font-size: 1rem;
+    color: var(--color-base-content);
+    opacity: 0.6;
+    margin: 0;
+  }
+
+  &__infos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    background: var(--color-base-200);
+    border-radius: v.$border-radius;
+    padding: 0.625rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  &__infoIcon {
+    font-size: 1.1rem;
+  }
+
+  &__infoLabel {
+    color: var(--color-base-content);
+  }
+
+  &__startBtn {
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+}

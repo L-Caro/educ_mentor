@@ -1,0 +1,5 @@
+// Light mode — les variables :root sont déjà en light, ce fichier sert
+// uniquement aux surcharges de composants spécifiques au thème clair.
+html.light {
+  background-color: var(--color-base-200);
+}

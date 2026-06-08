@@ -1,0 +1,45 @@
+import client from './client';
+import type { MonnaieSessionResponse, MonnaieProgression, MonnaieSession } from 'src/types';
+
+export async function startMonnaieSession(exerciseType: string): Promise<MonnaieSessionResponse> {
+  const { data } = await client.post<MonnaieSessionResponse>('/monnaie/session', { exercise_type: exerciseType });
+  return data;
+}
+
+export async function recordMonnaieAnswer(
+  sessionId: string,
+  exerciseType: string,
+  answerValue: number,
+  isCorrect: boolean,
+): Promise<void> {
+  await client.post(`/monnaie/session/${sessionId}/answer`, {
+    exercise_type: exerciseType,
+    answer_value: answerValue,
+    is_correct: isCorrect,
+  });
+}
+
+export async function completeMonnaieSession(
+  sessionId: string,
+  correctAnswers: number,
+  totalQuestions: number,
+): Promise<void> {
+  await client.post(`/monnaie/session/${sessionId}/complete`, {
+    correct_answers: correctAnswers,
+    total_questions: totalQuestions,
+  });
+}
+
+export async function getMonnaieProgression(): Promise<MonnaieProgression[]> {
+  const { data } = await client.get<MonnaieProgression[]>('/monnaie/progression');
+  return data;
+}
+
+export async function getMonnaieSessions(): Promise<MonnaieSession[]> {
+  const { data } = await client.get<MonnaieSession[]>('/monnaie/sessions');
+  return data;
+}
+
+export async function resetMonnaieProgression(): Promise<void> {
+  await client.delete('/monnaie/progression');
+}

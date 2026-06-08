@@ -1,0 +1,6 @@
+// components/PageContainer/PageContainer.scss
+.PageContainer {
+	min-height: calc(100vh - 6rem);
+	display: flex;
+	flex-direction: column;
+}

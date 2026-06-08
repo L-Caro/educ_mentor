@@ -1,0 +1,43 @@
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*, *::before, *::after {
+	// box-sizing : border-box;
+}
+
+/*
+  2. Remove default margin
+*/
+* {
+	margin : 0;
+}
+
+/*
+  Typographic tweaks!
+  3. Add accessible line-height
+*/
+body {
+	line-height : 1.5;
+}
+
+/*
+  4. Improve media defaults
+*/
+img, picture, video, canvas, svg {
+	display   : block;
+	max-width : 100%;
+}
+
+/*
+  5. Avoid text overflows
+*/
+p, h1, h2, h3, h4, h5, h6 {
+	overflow-wrap : break-word;
+}
+
+/*
+  6. Create a root stacking context
+*/
+#root, #__next {
+	isolation : isolate;
+}

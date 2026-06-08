@@ -1,0 +1,17 @@
+@use '../_abstracts/variables' as v;
+@use '../_abstracts/mixins' as m;
+
+.ChildLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-base-200);
+
+
+
+  &__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+}
