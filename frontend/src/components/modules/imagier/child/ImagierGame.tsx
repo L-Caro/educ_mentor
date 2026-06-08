@@ -78,6 +78,19 @@ export default function ImagierGame() {
 
   useNextOnSpace(answerState, handleNext);
 
+  async function handleTerminate() {
+    stopTimer();
+    if (resultsRef.current.length === 0) {
+      navigate('/module/imagier');
+      return;
+    }
+    const finalCorrectCount = resultsRef.current.filter((result) => result.wasCorrect).length;
+    if (!isDevMode) await completeSession(session!.session_id, finalCorrectCount, resultsRef.current.length).catch(console.error);
+    navigate('/module/imagier/result', {
+      state: { correctCount: finalCorrectCount, total: resultsRef.current.length, results: resultsRef.current },
+    });
+  }
+
   function handleTimeout() {
     const currentSession = sessionRef.current;
     const idx = currentIdxRef.current;
@@ -250,18 +263,20 @@ export default function ImagierGame() {
         )}
       </div>
 
-      {isFreeMode && answerState === 'idle' ? (
-        <div className="ImagierGame__next">
+      <div className="ImagierGame__actions">
+        <button className="ImagierGame__btnTerminer" onClick={handleTerminate}>
+          Terminer
+        </button>
+        {isFreeMode && answerState === 'idle' && (
           <Button title="✓ Valider" onClick={handleFreeSubmit} />
-        </div>
-      ) : answerState !== 'idle' ? (
-        <div className="ImagierGame__next">
+        )}
+        {answerState !== 'idle' && (
           <Button
             title={currentIdx + 1 >= total ? 'Voir les résultats 🎉' : 'Suivant →'}
             onClick={handleNext}
           />
-        </div>
-      ) : null}
+        )}
+      </div>
     </PageContainer>
   );
 }

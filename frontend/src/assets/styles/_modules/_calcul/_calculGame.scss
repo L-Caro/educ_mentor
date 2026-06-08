@@ -209,9 +209,9 @@
     padding: 1rem 1rem 1.5rem;
     margin-top: auto;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 0.625rem;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
   &__btnTerminer {

@@ -79,6 +79,24 @@ export default function TablesGame() {
 
   useNextOnSpace(answerState, handleNext);
 
+  async function handleTerminate() {
+    stopTimer();
+    if (resultsRef.current.length === 0) {
+      navigate('/module/tables');
+      return;
+    }
+    if (!isDevMode) {
+      await completeTablesSession(session!.session_id, correctCountRef.current, resultsRef.current.length).catch(console.error);
+    }
+    navigate('/module/tables/result', {
+      state: {
+        correctCount: correctCountRef.current,
+        total: resultsRef.current.length,
+        results: resultsRef.current,
+      },
+    });
+  }
+
   function handleTimeout() {
     if (!session) return;
     const timedOutQuestion = session.questions[currentIdx];
@@ -256,18 +274,20 @@ export default function TablesGame() {
         )}
       </div>
 
-      {isFreeMode && answerState === 'idle' ? (
-        <div className="TablesGame__next">
+      <div className="TablesGame__actions">
+        <button className="TablesGame__btnTerminer" onClick={handleTerminate}>
+          Terminer
+        </button>
+        {isFreeMode && answerState === 'idle' && (
           <Button title="✓ Valider" onClick={handleFreeSubmit} />
-        </div>
-      ) : answerState !== 'idle' ? (
-        <div className="TablesGame__next">
+        )}
+        {answerState !== 'idle' && (
           <Button
             title={currentIdx + 1 >= total ? 'Voir les résultats 🎉' : 'Suivant →'}
             onClick={handleNext}
           />
-        </div>
-      ) : null}
+        )}
+      </div>
     </PageContainer>
   );
 }

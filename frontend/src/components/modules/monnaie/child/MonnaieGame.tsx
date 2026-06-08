@@ -318,6 +318,9 @@ export default function MonnaieGame() {
       </div>
 
       <div className="MonnaieGame__actions">
+        <button className="MonnaieGame__btnTerminer" onClick={handleTerminate}>
+          Terminer
+        </button>
         {isFreeMode && answerState === 'idle' && (
           <Button
             title="✓ Valider"
@@ -325,9 +328,6 @@ export default function MonnaieGame() {
             disabled={inputValue.trim() === ''}
           />
         )}
-        <button className="MonnaieGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
       </div>
     </PageContainer>
   );

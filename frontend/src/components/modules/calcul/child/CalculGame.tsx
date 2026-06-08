@@ -222,6 +222,9 @@ export default function CalculGame() {
 
       {/* Actions */}
       <div className="CalculGame__actions">
+        <button className="CalculGame__btnTerminer" onClick={handleTerminate}>
+          Terminer
+        </button>
         {answerState === 'idle' && (
           <Button
             title="✓ Valider"
@@ -229,9 +232,6 @@ export default function CalculGame() {
             disabled={inputValue.trim() === ''}
           />
         )}
-        <button className="CalculGame__btnTerminer" onClick={handleTerminate}>
-          Terminer
-        </button>
       </div>
     </PageContainer>
   );
