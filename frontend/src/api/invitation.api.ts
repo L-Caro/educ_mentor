@@ -19,3 +19,7 @@ export async function fetchInvitations(): Promise<Invitation[]> {
   const { data } = await client.get<Invitation[]>('/admin/invitations');
   return data;
 }
+
+export async function deleteInvitation(invitationId: string): Promise<void> {
+  await client.delete(`/admin/invitations/${invitationId}`);
+}

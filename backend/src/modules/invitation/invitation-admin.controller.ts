@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -32,5 +32,11 @@ export class InvitationAdminController {
   @Get()
   findAll() {
     return this.invitationService.findAll();
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  remove(@Param('id') invitationId: string) {
+    return this.invitationService.remove(invitationId);
   }
 }

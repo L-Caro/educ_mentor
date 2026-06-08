@@ -38,4 +38,10 @@ export class InvitationService {
     if (!invitation) throw new NotFoundException('Invitation introuvable');
     await this.repo.update(invitationId, { used_at: new Date() });
   }
+
+  async remove(invitationId: string): Promise<void> {
+    const invitation = await this.repo.findOneBy({ id: invitationId });
+    if (!invitation) throw new NotFoundException('Invitation introuvable');
+    await this.repo.delete(invitationId);
+  }
 }

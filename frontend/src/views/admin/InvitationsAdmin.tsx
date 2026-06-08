@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createInvitation, fetchInvitations, type Invitation } from 'src/api/invitation.api';
+import { createInvitation, deleteInvitation, fetchInvitations, type Invitation } from 'src/api/invitation.api';
 import Spinner from 'src/components/common/Spinner';
 
 const InvitationsAdmin = () => {
@@ -33,6 +33,11 @@ const InvitationsAdmin = () => {
   function handleCopy() {
     if (!generatedLink) return;
     navigator.clipboard.writeText(generatedLink).then(() => setCopied(true));
+  }
+
+  async function handleDelete(invitationId: string) {
+    await deleteInvitation(invitationId);
+    setInvitations(previous => previous.filter(invitation => invitation.id !== invitationId));
   }
 
   if (loading) return <Spinner size="sm" />;
@@ -85,6 +90,14 @@ const InvitationsAdmin = () => {
                 <span className={`InvitationsAdmin__badge${invitation.used_at ? ' InvitationsAdmin__badge--active' : ''}`}>
                   {invitation.used_at ? '✓' : '⏳'}
                 </span>
+                <button
+                  type="button"
+                  className="InvitationsAdmin__deleteBtn"
+                  onClick={() => handleDelete(invitation.id)}
+                  aria-label={`Supprimer ${invitation.label}`}
+                >
+                  ✕
+                </button>
               </li>
             ))}
           </ul>
