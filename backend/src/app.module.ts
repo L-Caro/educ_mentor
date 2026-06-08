@@ -2,6 +2,7 @@
  * d'un registre central. Pour ajouter un module, on l'importe ici. ServeStaticModule gère deux chemins
  * statiques : /media/ pour les images et / pour le build React (SPA fallback). */
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import * as path from 'path';
@@ -15,6 +16,7 @@ import { TablesModule } from './modules/tables/tables.module';
 import { CalculModule } from './modules/calcul/calcul.module';
 import { MonnaieModule } from './modules/monnaie/monnaie.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
+import { AccessGuard } from './modules/invitation/access.guard';
 
 @Module({
   imports: [
@@ -49,6 +51,9 @@ import { InvitationModule } from './modules/invitation/invitation.module';
     CalculModule,
     MonnaieModule,
     InvitationModule,
+  ],
+  providers: [
+    { provide: APP_GUARD, useClass: AccessGuard },
   ],
 })
 export class AppModule {}
