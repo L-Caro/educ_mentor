@@ -17,6 +17,9 @@ export default function PinGate({ children }: PinGateProps) {
   const { isAuthenticated, login } = useAuth();
   const [error, setError] = useState('');
 
+  // En dev, pas besoin du PIN — accès direct.
+  if (import.meta.env.DEV) return <>{children}</>;
+
   if (isAuthenticated) return <>{children}</>;
 
   async function handleSubmit(pin: string) {
