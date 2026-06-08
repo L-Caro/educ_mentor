@@ -28,7 +28,7 @@ const InvitePage = () => {
         setInviteStatus(message.includes('déjà') ? 'already_used' : 'invalid');
       })
       .catch(() => setInviteStatus('error'));
-  }, [token, navigate]);
+  }, [token]);
 
   if (inviteStatus === 'loading' || inviteStatus === 'redirecting') {
     return (
