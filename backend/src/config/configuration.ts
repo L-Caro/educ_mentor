@@ -6,4 +6,5 @@ export default () => ({
   dbPath: process.env.DB_PATH ?? './data/educmentor.db',
   imagesPath: process.env.IMAGES_PATH ?? './data/images',
   staticPath: process.env.STATIC_PATH ?? './static',
+  appUrl: process.env.APP_URL ?? 'http://localhost:5173',
 });
