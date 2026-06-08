@@ -12,7 +12,7 @@ const AccessGate = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Sur /invite/:token, l'app n'a pas encore de cookie — c'est InvitePage qui le pose.
     // On laisse passer : InvitePage fera un rechargement complet après succès.
-    if (window.location.pathname.startsWith('/invite/')) {
+    if (window.location.pathname.startsWith('/invite/') || window.location.pathname === '/admin-access') {
       setAccessStatus('authorized');
       return;
     }

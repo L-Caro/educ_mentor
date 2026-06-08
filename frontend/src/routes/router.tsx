@@ -7,6 +7,7 @@ import ModuleAdminLayout from 'src/components/layout/ModuleAdminLayout/ModuleAdm
 // Auth
 import PinGate from 'src/components/auth/PinGate';
 import InvitePage from 'src/views/invite/InvitePage';
+import AdminAccessPage from 'src/views/invite/AdminAccessPage';
 
 // Error
 import ErrorPage from 'src/components/Error/pages/ErrorPage';
@@ -90,8 +91,9 @@ const Router = createBrowserRouter([
     ],
   },
 
-  // ── Invitation — route publique, sans layout, sans AccessGate ────────────
+  // ── Routes publiques — sans layout, sans AccessGate ──────────────────────
   { path: '/invite/:token', element: <InvitePage /> },
+  { path: '/admin-access', element: <AdminAccessPage /> },
 
   // ── Settings (protégé PIN) ─────────────────────────────────────────────────
   {

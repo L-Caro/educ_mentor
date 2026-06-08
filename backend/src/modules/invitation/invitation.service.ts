@@ -24,6 +24,14 @@ export class InvitationService {
     return this.repo.findOneBy({ token });
   }
 
+  /** Crée une invitation et la marque immédiatement comme utilisée.
+   * Utilisé par le bootstrap admin : chaque appel crée une entrée distincte
+   * (un appareil admin = une entrée dans la liste), sans consommer le bootstrap token. */
+  async createAndUse(label: string): Promise<Invitation> {
+    const invitation = this.repo.create({ token: uuidv4(), label, used_at: new Date() });
+    return this.repo.save(invitation);
+  }
+
   /** Marque le token comme utilisé. Appelé une seule fois au premier clic sur le lien. */
   async markAsUsed(invitationId: string): Promise<void> {
     const invitation = await this.repo.findOneBy({ id: invitationId });

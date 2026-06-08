@@ -20,6 +20,7 @@ export class AccessGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<{ path: string; cookies: Record<string, string> }>();
 
     if (request.path.startsWith('/api/auth/invite/')) return true;
+    if (request.path === '/api/auth/admin-access') return true;
 
     const accessToken = request.cookies?.access_token;
     if (!accessToken) throw new UnauthorizedException('Accès non autorisé');
