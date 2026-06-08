@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { IsString, Length } from 'class-validator';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
@@ -22,6 +22,13 @@ class ChangePinDto {
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  /** Vérifie que l'appareil est autorisé (cookie access_token valide via AccessGuard global).
+   * Retourne 200 si autorisé, 401 sinon. Utilisé par le frontend au démarrage. */
+  @Get('check')
+  check() {
+    return { ok: true };
+  }
 
   @Post('verify-pin')
   verifyPin(@Body() dto: VerifyPinDto) {

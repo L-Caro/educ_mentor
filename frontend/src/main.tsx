@@ -12,6 +12,7 @@ import { ThemeProvider } from "./context/ThemeContext.tsx";
 //? Provider
 import Router from "./routes/router.tsx";
 import store from "./store";
+import AccessGate from "./components/auth/AccessGate.tsx";
 import "./assets/styles/main.scss";
 
 /** Enregistrer le Service Worker uniquement en production.
@@ -28,8 +29,10 @@ const root = createRoot(
 
 root.render(
   <ThemeProvider>
-      <Provider store={ store }>
-        <RouterProvider router={ Router } />
-      </Provider>
+    <Provider store={store}>
+      <AccessGate>
+        <RouterProvider router={Router} />
+      </AccessGate>
+    </Provider>
   </ThemeProvider>
 );
