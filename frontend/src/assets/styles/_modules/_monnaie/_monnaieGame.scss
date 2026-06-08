@@ -317,3 +317,41 @@
     &:hover { opacity: 0.7; }
   }
 }
+
+// ─── Tablette (≥ 600px) ──────────────────────────────────────────────────────
+@media (min-width: 600px) {
+  .MonnaieGame {
+    &__scoreBar {
+      margin: 1rem;
+      padding: 1rem 1.5rem;
+    }
+
+    &__card {
+      padding: 2rem 2rem 1.5rem;
+      margin: 1rem;
+    }
+
+    &__prompt {
+      font-size: 1.5rem;
+    }
+
+    &__qcmChoices {
+      gap: 1rem;
+    }
+
+    &__qcmChoice {
+      font-size: 1.5rem;
+      padding: 1.5rem 1rem;
+    }
+
+    &__input {
+      font-size: 2.5rem;
+      width: 10rem;
+    }
+
+    &__actions {
+      max-width: 36rem;
+      padding: 1.25rem 1rem 2rem;
+    }
+  }
+}

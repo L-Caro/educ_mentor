@@ -240,3 +240,37 @@
 		&:hover { opacity: 0.7; }
 	}
 }
+
+// ─── Tablette (≥ 600px) ──────────────────────────────────────────────────────
+@media (min-width: 600px) {
+	.ImagierGame {
+		&__imageCard {
+			width: 16rem;
+			height: 16rem;
+		}
+
+		&__prompt {
+			font-size: 2.75rem;
+		}
+
+		&__choices {
+			max-width: 36rem;
+			gap: 1rem;
+		}
+
+		&__choice {
+			font-size: 1.5rem;
+			padding: 1.5rem 2rem;
+		}
+
+		&__freeInputField {
+			font-size: 2rem;
+			padding: 1.25rem 1.5rem;
+		}
+
+		&__actions {
+			max-width: 36rem;
+			padding: 1.25rem 1rem 2rem;
+		}
+	}
+}
