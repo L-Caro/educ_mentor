@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/calcul.api';
 import type { CalculSessionResponse } from 'src/types';
 import type { CalculHistoryEntry } from './CalculResult';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
-import Spinner from 'src/components/common/Spinner';
+import GameInput from 'src/components/common/GameInput';
+import GameCorrection from 'src/components/common/GameCorrection';
+import GameScoreBar from 'src/components/common/GameScoreBar';
+import GameProgressBar from 'src/components/common/GameProgressBar';
+import GameTimerBar from 'src/components/common/GameTimerBar';
+import GameCard from 'src/components/common/GameCard';
+import GameStateView from 'src/components/common/GameStateView';
 import { useGameSession } from 'src/hook';
 
 function renderOperation(operation: string) {
@@ -21,7 +26,6 @@ export default function CalculGame() {
   const navigate = useNavigate();
 
   const [inputValue, setInputValue] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const {
     loading, error,
@@ -48,11 +52,6 @@ export default function CalculGame() {
     onQuestionChange: () => setInputValue(''),
   });
 
-  // Focus input à chaque nouvelle question
-  useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, [currentIdx, session]); // eslint-disable-line react-hooks/exhaustive-deps
-
   function handleValidate() {
     if (!session || answerState !== 'idle' || inputValue.trim() === '') return;
 
@@ -67,23 +66,10 @@ export default function CalculGame() {
     );
   }
 
-  if (loading) {
-    return (
-      <PageContainer className="CalculGame">
-        <div className="CalculGame__loading"><Spinner /></div>
-      </PageContainer>
-    );
-  }
+  if (loading) return <GameStateView loading onBack={() => navigate('/module/calcul-mental')} />;
 
   if (error || !session || session.questions.length === 0) {
-    return (
-      <PageContainer className="CalculGame">
-        <div className="CalculGame__error">
-          <p>{error || 'Aucune question disponible.'}</p>
-          <Button title="← Retour" onClick={() => navigate('/module/calcul-mental')} />
-        </div>
-      </PageContainer>
-    );
+    return <GameStateView errorMessage={error || 'Aucune question disponible.'} onBack={() => navigate('/module/calcul-mental')} />;
   }
 
   const question = session.questions[currentIdx];
@@ -96,34 +82,19 @@ export default function CalculGame() {
 
   return (
     <PageContainer className="CalculGame">
-      {!isUnlimited && (
-        <div className="CalculGame__progressWrap">
-          <div className="CalculGame__progressBar" style={{ width: `${progressPct}%` }} />
-        </div>
-      )}
+      {!isUnlimited && <GameProgressBar progress={progressPct} />}
 
-      {timerSeconds > 0 && (
-        <div className="CalculGame__timerWrap">
-          <div
-            className={`CalculGame__timerBar${showUrgent ? ' CalculGame__timerBar--urgent' : ''}`}
-            style={{ width: `${timerPct}%` }}
-          />
-        </div>
-      )}
+      {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
-      <div className="CalculGame__scoreBar">
-        <div className="CalculGame__stars">
-          {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
-        </div>
-        {timerSeconds > 0 && (
-          <div className={`CalculGame__timerChip${showUrgent ? ' CalculGame__timerChip--urgent' : ''}`}>
-            ⏱ {Math.ceil(timeRemaining)}s
-          </div>
-        )}
-        <div className="CalculGame__counter">{correctCount}/{answeredCount}</div>
-      </div>
+      <GameScoreBar
+        filledStars={filledStars}
+        correctCount={correctCount}
+        total={answeredCount}
+        timeRemaining={timerSeconds > 0 ? timeRemaining : null}
+        isUrgent={showUrgent}
+      />
 
-      <div className={`CalculGame__card${answerState === 'wrong' || answerState === 'timeout' ? ' CalculGame__card--shake' : ''}`}>
+      <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
         {!isUnlimited && (
           <span className="CalculGame__questionTag">
             {currentIdx + 1} / {session.questions.length}
@@ -134,31 +105,19 @@ export default function CalculGame() {
           {renderOperation(question.operation)}
         </p>
 
-        <input
-          ref={inputRef}
-          type="tel"
-          inputMode="numeric"
-          pattern="[0-9]*"
-          className={`CalculGame__input${
-            answerState === 'correct' ? ' CalculGame__input--correct'
-            : answerState === 'wrong' || answerState === 'timeout' ? ' CalculGame__input--wrong'
-            : ''
-          }`}
-          value={answerState !== 'idle' ? (answerState === 'timeout' ? '' : inputValue) : inputValue}
-          onChange={(event) => answerState === 'idle' && setInputValue(event.target.value.replace(/\D/g, ''))}
-          onKeyDown={(event) => event.key === 'Enter' && handleValidate()}
-          disabled={answerState !== 'idle'}
-          placeholder="?"
+        <GameInput
+          value={answerState === 'timeout' ? '' : inputValue}
+          onChange={setInputValue}
+          onSubmit={handleValidate}
+          answerState={answerState}
+          numeric
           maxLength={3}
+          placeholder="?"
+          focusKey={currentIdx}
         />
 
-        {(answerState === 'wrong' || answerState === 'timeout') && (
-          <p className="CalculGame__correction">
-            {answerState === 'timeout' ? '⏰ Trop tard ! ' : ''}
-            La réponse était <strong>{question.answer}</strong>
-          </p>
-        )}
-      </div>
+        <GameCorrection answerState={answerState} answer={question.answer} />
+      </GameCard>
 
       <GameFooter
         onTerminate={handleTerminate}

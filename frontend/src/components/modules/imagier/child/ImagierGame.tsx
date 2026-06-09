@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { startSession, recordAnswer, completeSession } from 'src/api/imagier.api';
 import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
-import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
 import GameChoices from 'src/components/common/GameChoices';
-import Spinner from 'src/components/common/Spinner';
+import GameInput from 'src/components/common/GameInput';
+import GameCorrection from 'src/components/common/GameCorrection';
+import GameProgressBar from 'src/components/common/GameProgressBar';
+import GameTimerBar from 'src/components/common/GameTimerBar';
+import GameStateView from 'src/components/common/GameStateView';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import { capitalize } from 'src/utils/capitilize.ts';
 import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
@@ -20,7 +23,6 @@ export default function ImagierGame() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [freeInput, setFreeInput] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const difficulty = searchParams.get('difficulty') ?? 'level_1';
   const isFreeMode = difficulty === 'level_3';
@@ -33,8 +35,8 @@ export default function ImagierGame() {
 
   const {
     loading, error,
-    session, currentIdx, answerState, correctCount,
-    timeRemaining, timerPct, isUrgent,
+    session, currentIdx, answerState,
+    timerPct, isUrgent,
     submitAnswer, advanceNow, handleTerminate,
   } = useGameSession<ImagierSessionResponse, ImagierQuestion, ImagierResult>({
     loader: () => startSession({
@@ -56,13 +58,6 @@ export default function ImagierGame() {
     skipApiCalls: isDevMode,
     emptySessionError: "Aucun mot disponible. Active des mots dans l'administration.",
   });
-
-  // Auto-focus input en mode libre à chaque nouvelle question
-  useEffect(() => {
-    if (isFreeMode && answerState === 'idle') {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [currentIdx, isFreeMode, answerState]);
 
   useNextOnSpace(answerState, advanceNow);
 
@@ -91,23 +86,10 @@ export default function ImagierGame() {
     );
   }
 
-  if (loading) {
-    return (
-      <PageContainer className="ImagierGame">
-        <div className="ImagierGame__loading"><Spinner /></div>
-      </PageContainer>
-    );
-  }
+  if (loading) return <GameStateView loading onBack={() => navigate('/module/imagier')} />;
 
   if (error || !session || session.questions.length === 0) {
-    return (
-      <PageContainer className="ImagierGame">
-        <div className="ImagierGame__error">
-          <p className="ImagierGame__errorMsg">{error || 'Aucune question disponible.'}</p>
-          <Button title="← Retour" onClick={() => navigate('/module/imagier')} />
-        </div>
-      </PageContainer>
-    );
+    return <GameStateView errorMessage={error || 'Aucune question disponible.'} onBack={() => navigate('/module/imagier')} />;
   }
 
   const question = session.questions[currentIdx];
@@ -121,20 +103,11 @@ export default function ImagierGame() {
   return (
     <PageContainer className="ImagierGame">
       {isDevMode && <DevBadge />}
-      <div className="ImagierGame__progressWrap">
-        <div className="ImagierGame__progressBar" style={{ width: `${progress}%` }} />
-      </div>
+      <GameProgressBar progress={progress} />
 
-      {timerSeconds > 0 && (
-        <div className="ImagierGame__timerWrap">
-          <div
-            className={`ImagierGame__timerBar${showUrgent ? ' ImagierGame__timerBar--urgent' : ''}`}
-            style={{ width: `${timerPct}%` }}
-          />
-        </div>
-      )}
+      {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
-      <div className="ImagierGame__content">
+      <div className={`ImagierGame__content${answerState === 'wrong' || answerState === 'timeout' ? ' ImagierGame__content--shake' : ''}`}>
         <div className={`ImagierGame__imageCard${hideImage ? ' ImagierGame__imageCard--hidden' : ''}`}>
           {hideImage
             ? <span className="ImagierGame__imagePlaceholder">🙈</span>
@@ -148,30 +121,15 @@ export default function ImagierGame() {
         </div>
 
         {isFreeMode ? (
-          <div className="ImagierGame__freeInput">
-            <input
-              ref={inputRef}
-              type="text"
-              className={`ImagierGame__freeInputField${
-                answerState === 'correct' ? ' ImagierGame__freeInputField--correct'
-                : answerState === 'wrong' ? ' ImagierGame__freeInputField--wrong'
-                : ''
-              }`}
-              value={answerState !== 'idle' ? correctChoiceLabel : freeInput}
-              onChange={(event) => answerState === 'idle' && setFreeInput(event.target.value)}
-              onKeyDown={(event) => event.key === 'Enter' && handleValidate()}
-              disabled={answerState !== 'idle'}
-              placeholder="Tape la réponse…"
-              autoComplete="off"
-              autoCorrect="off"
-              spellCheck={false}
-            />
-            {answerState === 'wrong' && (
-              <p className="ImagierGame__freeCorrect">
-                Réponse : <strong>{correctChoiceLabel}</strong>
-              </p>
-            )}
-          </div>
+          <GameInput
+            value={answerState === 'timeout' ? '' : freeInput}
+            onChange={setFreeInput}
+            onSubmit={handleValidate}
+            answerState={answerState}
+            variant="text"
+            placeholder="Tape la réponse…"
+            focusKey={currentIdx}
+          />
         ) : (
           <GameChoices
             options={question.choices.map((choice) => ({ key: choice.id, label: capitalize(choice.label) }))}
@@ -181,6 +139,8 @@ export default function ImagierGame() {
             onSelect={(key) => setSelectedId(key)}
           />
         )}
+
+        <GameCorrection answerState={answerState} answer={correctChoiceLabel} />
       </div>
 
       <GameFooter

@@ -1,0 +1,12 @@
+.GameCorrection {
+  font-size: 1rem;
+  color: var(--color-base-content);
+  opacity: 0.7;
+  margin: 0;
+  text-align: center;
+
+  strong {
+    color: var(--color-success);
+    font-size: 1.125rem;
+  }
+}

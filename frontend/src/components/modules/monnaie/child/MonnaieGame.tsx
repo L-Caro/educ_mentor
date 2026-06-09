@@ -1,14 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/monnaie.api';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
 import type { MonnaieHistoryEntry } from './MonnaieResult';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from '../constants/denominations';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
 import GameChoices from 'src/components/common/GameChoices';
-import Spinner from 'src/components/common/Spinner';
+import GameInput from 'src/components/common/GameInput';
+import GameCorrection from 'src/components/common/GameCorrection';
+import GameScoreBar from 'src/components/common/GameScoreBar';
+import GameProgressBar from 'src/components/common/GameProgressBar';
+import GameTimerBar from 'src/components/common/GameTimerBar';
+import GameCard from 'src/components/common/GameCard';
+import GameStateView from 'src/components/common/GameStateView';
 import { useGameSession } from 'src/hook';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
@@ -65,7 +70,6 @@ export default function MonnaieGame() {
 
   const [inputValue, setInputValue] = useState('');
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const {
     loading, error,
@@ -88,11 +92,6 @@ export default function MonnaieGame() {
     recordTimeout: (sessionId, question) => recordMonnaieAnswer(sessionId, question.type, question.answer, false),
     onQuestionChange: () => { setInputValue(''); setSelectedChoice(null); },
   });
-
-  // Focus input à chaque nouvelle question
-  useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, [currentIdx, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleValidate() {
     if (!session || answerState !== 'idle') return;
@@ -118,23 +117,10 @@ export default function MonnaieGame() {
     );
   }
 
-  if (loading) {
-    return (
-      <PageContainer className="MonnaieGame">
-        <div className="MonnaieGame__loading"><Spinner /></div>
-      </PageContainer>
-    );
-  }
+  if (loading) return <GameStateView loading onBack={() => navigate('/module/monnaie')} />;
 
   if (error || !session || session.questions.length === 0) {
-    return (
-      <PageContainer className="MonnaieGame">
-        <div className="MonnaieGame__error">
-          <p>{error || 'Aucune question disponible.'}</p>
-          <Button title="← Retour" onClick={() => navigate('/module/monnaie')} />
-        </div>
-      </PageContainer>
-    );
+    return <GameStateView errorMessage={error || 'Aucune question disponible.'} onBack={() => navigate('/module/monnaie')} />;
   }
 
   const question = session.questions[currentIdx];
@@ -148,34 +134,19 @@ export default function MonnaieGame() {
 
   return (
     <PageContainer className="MonnaieGame">
-      {!isUnlimited && (
-        <div className="MonnaieGame__progressWrap">
-          <div className="MonnaieGame__progressBar" style={{ width: `${progressPct}%` }} />
-        </div>
-      )}
+      {!isUnlimited && <GameProgressBar progress={progressPct} />}
 
-      {timerSeconds > 0 && (
-        <div className="MonnaieGame__timerWrap">
-          <div
-            className={`MonnaieGame__timerBar${showUrgent ? ' MonnaieGame__timerBar--urgent' : ''}`}
-            style={{ width: `${timerPct}%` }}
-          />
-        </div>
-      )}
+      {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
-      <div className="MonnaieGame__scoreBar">
-        <div className="MonnaieGame__stars">
-          {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
-        </div>
-        {timerSeconds > 0 && (
-          <div className={`MonnaieGame__timerChip${showUrgent ? ' MonnaieGame__timerChip--urgent' : ''}`}>
-            ⏱ {Math.ceil(timeRemaining)}s
-          </div>
-        )}
-        <div className="MonnaieGame__counter">{correctCount}/{answeredCount}</div>
-      </div>
+      <GameScoreBar
+        filledStars={filledStars}
+        correctCount={correctCount}
+        total={answeredCount}
+        timeRemaining={timerSeconds > 0 ? timeRemaining : null}
+        isUrgent={showUrgent}
+      />
 
-      <div className={`MonnaieGame__card${answerState === 'wrong' || answerState === 'timeout' ? ' MonnaieGame__card--shake' : ''}`}>
+      <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
         {!isUnlimited && (
           <span className="MonnaieGame__questionTag">
             {currentIdx + 1} / {session.questions.length}
@@ -187,53 +158,29 @@ export default function MonnaieGame() {
         {renderQuestion(question)}
 
         {isFreeMode ? (
-          <>
-            <div className="MonnaieGame__inputWrap">
-              <input
-                ref={inputRef}
-                type="text"
-                inputMode="decimal"
-                className={`MonnaieGame__input${
-                  answerState === 'correct' ? ' MonnaieGame__input--correct'
-                  : answerState === 'wrong' || answerState === 'timeout' ? ' MonnaieGame__input--wrong'
-                  : ''
-                }`}
-                value={answerState !== 'idle' ? (answerState === 'timeout' ? '' : inputValue) : inputValue}
-                onChange={(event) => answerState === 'idle' && setInputValue(event.target.value)}
-                onKeyDown={(event) => event.key === 'Enter' && handleValidate()}
-                disabled={answerState !== 'idle'}
-                placeholder="0"
-                maxLength={8}
-              />
-              <span className="MonnaieGame__inputCurrency">€</span>
-            </div>
-
-            {(answerState === 'wrong' || answerState === 'timeout') && (
-              <p className="MonnaieGame__correction">
-                {answerState === 'timeout' ? '⏰ Trop tard ! ' : ''}
-                La réponse était <strong>{formatCents(question.answer)}</strong>
-              </p>
-            )}
-          </>
+          <GameInput
+            value={answerState === 'timeout' ? '' : inputValue}
+            onChange={setInputValue}
+            onSubmit={handleValidate}
+            answerState={answerState}
+            inputMode="decimal"
+            suffix="€"
+            maxLength={8}
+            placeholder="0"
+            focusKey={currentIdx}
+          />
         ) : (
-          <>
-            <GameChoices
-              options={(question.choices ?? []).map((choice) => ({ key: String(choice), label: formatCents(choice) }))}
-              selectedKey={selectedChoice === null ? null : String(selectedChoice)}
-              correctKey={String(question.answer)}
-              answerState={answerState}
-              onSelect={(key) => setSelectedChoice(Number(key))}
-            />
-
-            {(answerState === 'wrong' || answerState === 'timeout') && (
-              <p className="MonnaieGame__correction">
-                {answerState === 'timeout' ? '⏰ Trop tard ! ' : ''}
-                La réponse était <strong>{formatCents(question.answer)}</strong>
-              </p>
-            )}
-          </>
+          <GameChoices
+            options={(question.choices ?? []).map((choice) => ({ key: String(choice), label: formatCents(choice) }))}
+            selectedKey={selectedChoice === null ? null : String(selectedChoice)}
+            correctKey={String(question.answer)}
+            answerState={answerState}
+            onSelect={(key) => setSelectedChoice(Number(key))}
+          />
         )}
-      </div>
+
+        <GameCorrection answerState={answerState} answer={formatCents(question.answer)} />
+      </GameCard>
 
       <GameFooter
         onTerminate={handleTerminate}

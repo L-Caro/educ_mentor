@@ -30,6 +30,14 @@
 @use './_components/gameFooter';
 @use './_components/gameResult';
 @use './_components/gameChoices';
+@use './_components/gameInput';
+@use './_components/gameCorrection';
+@use './_components/gameScoreBar';
+@use './_components/gameProgressBar';
+@use './_components/gameTimerBar';
+@use './_components/gameCard';
+@use './_components/gameStateView';
+@use './_components/gamePrompt';
 @use './_components/moduleCard';
 @use './_components/pinModal';
 @use './_components/spinner';

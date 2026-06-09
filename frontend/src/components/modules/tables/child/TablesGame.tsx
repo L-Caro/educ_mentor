@@ -1,12 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { startTablesSession, recordTablesAnswer, completeTablesSession } from 'src/api/tables.api';
 import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import Button from 'src/components/common/Button';
 import GameFooter from 'src/components/common/GameFooter';
 import GameChoices from 'src/components/common/GameChoices';
-import Spinner from 'src/components/common/Spinner';
+import GameInput from 'src/components/common/GameInput';
+import GameCorrection from 'src/components/common/GameCorrection';
+import GameScoreBar from 'src/components/common/GameScoreBar';
+import GameProgressBar from 'src/components/common/GameProgressBar';
+import GameTimerBar from 'src/components/common/GameTimerBar';
+import GameCard from 'src/components/common/GameCard';
+import GameStateView from 'src/components/common/GameStateView';
 import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
 import { generateTablesDevSession } from 'src/api/tables.dev';
 import DevBadge from 'src/components/common/DevBadge';
@@ -22,7 +27,6 @@ export default function TablesGame() {
   const [freeInput, setFreeInput] = useState('');
   const [streak, setStreak] = useState(0);
   const streakRef = useRef(0);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const isFreeMode = parseInt(searchParams.get('choices_count') ?? '4', 10) === 0;
   const showHints = searchParams.get('hints') !== 'false';
@@ -55,13 +59,6 @@ export default function TablesGame() {
     emptySessionError: 'Aucune question disponible. Sélectionne au moins une table.',
   });
 
-  // Auto-focus input en mode libre à chaque nouvelle question
-  useEffect(() => {
-    if (isFreeMode && answerState === 'idle') {
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
-  }, [currentIdx, isFreeMode, answerState]);
-
   useNextOnSpace(answerState, advanceNow);
 
   function handleValidate() {
@@ -87,23 +84,10 @@ export default function TablesGame() {
     );
   }
 
-  if (loading) {
-    return (
-      <PageContainer className="TablesGame">
-        <div className="TablesGame__loading"><Spinner /></div>
-      </PageContainer>
-    );
-  }
+  if (loading) return <GameStateView loading onBack={() => navigate('/module/tables')} />;
 
   if (error || !session || session.questions.length === 0) {
-    return (
-      <PageContainer className="TablesGame">
-        <div className="TablesGame__error">
-          <p>{error || 'Aucune question disponible.'}</p>
-          <Button title="← Retour" onClick={() => navigate('/module/tables')} />
-        </div>
-      </PageContainer>
-    );
+    return <GameStateView errorMessage={error || 'Aucune question disponible.'} onBack={() => navigate('/module/tables')} />;
   }
 
   const question = session.questions[currentIdx];
@@ -117,35 +101,20 @@ export default function TablesGame() {
     <PageContainer className="TablesGame">
       {isDevMode && <DevBadge />}
 
-      <div className="TablesGame__progressWrap">
-        <div className="TablesGame__progressBar" style={{ width: `${progress}%` }} />
-      </div>
+      <GameProgressBar progress={progress} />
 
-      {timerSeconds > 0 && (
-        <div className="TablesGame__timerWrap">
-          <div
-            className={`TablesGame__timerBar${showUrgent ? ' TablesGame__timerBar--urgent' : ''}`}
-            style={{ width: `${timerPct}%` }}
-          />
-        </div>
-      )}
+      {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
-      <div className="TablesGame__scoreBar">
-        <div className="TablesGame__stars">
-          {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
-        </div>
-        {timerSeconds > 0 && (
-          <div className={`TablesGame__timerChip${showUrgent ? ' TablesGame__timerChip--urgent' : ''}`}>
-            ⏱ {Math.ceil(timeRemaining)}s
-          </div>
-        )}
-        <div className="TablesGame__streak" data-active={streak > 0}>
-          🔥 {streak} série
-        </div>
-        <div className="TablesGame__counter">{correctCount}/{total}</div>
-      </div>
+      <GameScoreBar
+        filledStars={filledStars}
+        correctCount={correctCount}
+        total={total}
+        timeRemaining={timerSeconds > 0 ? timeRemaining : null}
+        isUrgent={showUrgent}
+        streak={streak}
+      />
 
-      <div className="TablesGame__card">
+      <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
         <span className="TablesGame__questionTag">Question {currentIdx + 1} / {total}</span>
         <p className="TablesGame__question">
           {question.display_a} × {question.display_b} = ?
@@ -155,30 +124,16 @@ export default function TablesGame() {
         )}
 
         {isFreeMode ? (
-          <div className="TablesGame__freeInput">
-            <input
-              ref={inputRef}
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              className={`TablesGame__freeInputField${
-                answerState === 'correct' ? ' TablesGame__freeInputField--correct'
-                : answerState === 'wrong' ? ' TablesGame__freeInputField--wrong'
-                : ''
-              }`}
-              value={answerState !== 'idle' ? String(question.answer) : freeInput}
-              onChange={(event) => answerState === 'idle' && setFreeInput(event.target.value.replace(/\D/g, ''))}
-              onKeyDown={(event) => event.key === 'Enter' && handleValidate()}
-              disabled={answerState !== 'idle'}
-              placeholder="?"
-              maxLength={3}
-            />
-            {answerState === 'wrong' && (
-              <p className="TablesGame__freeCorrect">
-                Réponse : <strong>{question.answer}</strong>
-              </p>
-            )}
-          </div>
+          <GameInput
+            value={answerState === 'timeout' ? '' : freeInput}
+            onChange={setFreeInput}
+            onSubmit={handleValidate}
+            answerState={answerState}
+            numeric
+            maxLength={3}
+            placeholder="?"
+            focusKey={currentIdx}
+          />
         ) : (
           <GameChoices
             options={question.choices.map((choice) => ({ key: String(choice), label: choice }))}
@@ -188,7 +143,9 @@ export default function TablesGame() {
             onSelect={(key) => setSelectedChoice(Number(key))}
           />
         )}
-      </div>
+
+        <GameCorrection answerState={answerState} answer={question.answer} />
+      </GameCard>
 
       <GameFooter
         onTerminate={handleTerminate}

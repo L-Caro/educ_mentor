@@ -9,7 +9,8 @@
       "Bash(python3 -c \"import sys,json; fields=json.load\\(sys.stdin\\); [print\\(f['name'],'→',f['value']\\) for f in fields]\")",
       "Bash(python3 -c ' *)",
       "Bash(python3 -m json.tool)",
-      "Bash(python3 -c \"import sys,json; [print\\(' -', v['name']\\) for v in json.load\\(sys.stdin\\)]\")"
+      "Bash(python3 -c \"import sys,json; [print\\(' -', v['name']\\) for v in json.load\\(sys.stdin\\)]\")",
+      "PowerShell(wsl -d fedora bash -lc \"cd /home/lionel/development/projets/maeve/educ_mentor/frontend && node_modules/.bin/tsc --noEmit -p tsconfig.app.json 2>&1; echo EXIT=\\\\$?\")"
     ]
   }
 }
