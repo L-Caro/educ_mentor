@@ -11,6 +11,7 @@ import GameScoreBar from 'src/components/common/GameScoreBar';
 import GameProgressBar from 'src/components/common/GameProgressBar';
 import GameTimerBar from 'src/components/common/GameTimerBar';
 import GameCard from 'src/components/common/GameCard';
+import GamePrompt from 'src/components/common/GamePrompt';
 import GameStateView from 'src/components/common/GameStateView';
 import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
 import { generateTablesDevSession } from 'src/api/tables.dev';
@@ -116,12 +117,14 @@ export default function TablesGame() {
 
       <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
         <span className="TablesGame__questionTag">Question {currentIdx + 1} / {total}</span>
-        <p className="TablesGame__question">
-          {question.display_a} × {question.display_b} = ?
-        </p>
-        {showHints && question.hint && (
-          <p className="TablesGame__hint">{question.hint}</p>
-        )}
+        <GamePrompt>
+          <p className="TablesGame__question">
+            {question.display_a} × {question.display_b} = ?
+          </p>
+          {showHints && question.hint && (
+            <p className="TablesGame__hint">{question.hint}</p>
+          )}
+        </GamePrompt>
 
         {isFreeMode ? (
           <GameInput

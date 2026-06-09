@@ -45,6 +45,6 @@ frontend/tailwind-output.css
 /data/images/imagier
 /data/images/monnaie
 
-/data/educmentor.db
-/data/educmentor.db-shm
-/data/educmentor.db-wal
+data/educmentor.db
+data/educmentor.db-shm
+data/educmentor.db-wal

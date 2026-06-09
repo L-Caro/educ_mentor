@@ -11,6 +11,7 @@ import GameScoreBar from 'src/components/common/GameScoreBar';
 import GameProgressBar from 'src/components/common/GameProgressBar';
 import GameTimerBar from 'src/components/common/GameTimerBar';
 import GameCard from 'src/components/common/GameCard';
+import GamePrompt from 'src/components/common/GamePrompt';
 import GameStateView from 'src/components/common/GameStateView';
 import { useGameSession } from 'src/hook';
 
@@ -101,9 +102,11 @@ export default function CalculGame() {
           </span>
         )}
 
-        <p className="CalculGame__operation">
-          {renderOperation(question.operation)}
-        </p>
+        <GamePrompt>
+          <p className="CalculGame__operation">
+            {renderOperation(question.operation)}
+          </p>
+        </GamePrompt>
 
         <GameInput
           value={answerState === 'timeout' ? '' : inputValue}

@@ -13,6 +13,7 @@ import GameScoreBar from 'src/components/common/GameScoreBar';
 import GameProgressBar from 'src/components/common/GameProgressBar';
 import GameTimerBar from 'src/components/common/GameTimerBar';
 import GameCard from 'src/components/common/GameCard';
+import GamePrompt from 'src/components/common/GamePrompt';
 import GameStateView from 'src/components/common/GameStateView';
 import { useGameSession } from 'src/hook';
 
@@ -153,9 +154,10 @@ export default function MonnaieGame() {
           </span>
         )}
 
-        <p className="MonnaieGame__prompt">{EXERCISE_PROMPTS[question.type]}</p>
-
-        {renderQuestion(question)}
+        <GamePrompt>
+          <p className="MonnaieGame__prompt">{EXERCISE_PROMPTS[question.type]}</p>
+          {renderQuestion(question)}
+        </GamePrompt>
 
         {isFreeMode ? (
           <GameInput

@@ -9,6 +9,8 @@ import GameCorrection from 'src/components/common/GameCorrection';
 import GameProgressBar from 'src/components/common/GameProgressBar';
 import GameTimerBar from 'src/components/common/GameTimerBar';
 import GameStateView from 'src/components/common/GameStateView';
+import GameCard from 'src/components/common/GameCard';
+import GamePrompt from 'src/components/common/GamePrompt';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import { capitalize } from 'src/utils/capitilize.ts';
 import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
@@ -107,18 +109,12 @@ export default function ImagierGame() {
 
       {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
-      <div className={`ImagierGame__content${answerState === 'wrong' || answerState === 'timeout' ? ' ImagierGame__content--shake' : ''}`}>
-        <div className={`ImagierGame__imageCard${hideImage ? ' ImagierGame__imageCard--hidden' : ''}`}>
-          {hideImage
-            ? <span className="ImagierGame__imagePlaceholder">🙈</span>
-            : question.image_url
-              ? <img src={question.image_url} alt={question.prompt} className="ImagierGame__image" />
-              : <span className="ImagierGame__imagePlaceholder">❓</span>}
-        </div>
-
-        <div className="ImagierGame__promptCard">
-          <p className="ImagierGame__prompt">{capitalize(question.prompt)}</p>
-        </div>
+      <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
+        <GamePrompt imageUrl={question.image_url} imageHidden={hideImage} imageAlt={question.prompt}>
+          <div className="ImagierGame__promptCard">
+            <p className="ImagierGame__prompt">{capitalize(question.prompt)}</p>
+          </div>
+        </GamePrompt>
 
         {isFreeMode ? (
           <GameInput
@@ -141,7 +137,7 @@ export default function ImagierGame() {
         )}
 
         <GameCorrection answerState={answerState} answer={correctChoiceLabel} />
-      </div>
+      </GameCard>
 
       <GameFooter
         onTerminate={handleTerminate}

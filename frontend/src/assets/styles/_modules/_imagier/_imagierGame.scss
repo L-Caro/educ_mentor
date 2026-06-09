@@ -1,50 +1,6 @@
 @use '../../_abstracts/variables' as v;
 
 .ImagierGame {
-	// ─── Content ──────────────────────────────────────────────────────────
-	&__content {
-		flex: 1;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 1.5rem 1.5rem 0;
-		gap: 1.25rem;
-
-		&--shake { animation: gameShake 0.4s ease; }
-	}
-
-	// ─── Image ────────────────────────────────────────────────────────────
-	&__imageCard {
-		width: 11rem;
-		height: 11rem;
-		border-radius: v.$border-radius;
-		background: var(--color-base-100);
-		box-shadow: var(--shadow-md);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		overflow: hidden;
-		flex-shrink: 0;
-		transition: background 0.2s ease;
-
-		&--hidden {
-			background: var(--color-base-300);
-			box-shadow: none;
-		}
-	}
-
-	&__image {
-		width: 100%;
-		height: 100%;
-		object-fit: contain;
-	}
-
-	&__imagePlaceholder {
-		font-size: 3rem;
-		line-height: 1;
-	}
-
-	// ─── Prompt ───────────────────────────────────────────────────────────
 	&__promptCard {
 		background: var(--color-base-100);
 		box-shadow: var(--shadow-md);
@@ -62,14 +18,7 @@
 }
 
 @media (min-width: 600px) {
-	.ImagierGame {
-		&__imageCard {
-			width: 16rem;
-			height: 16rem;
-		}
-
-		&__prompt {
-			font-size: 2.75rem;
-		}
+	.ImagierGame__prompt {
+		font-size: 2.75rem;
 	}
 }
