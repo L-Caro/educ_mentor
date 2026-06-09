@@ -9,7 +9,6 @@ interface GameCardProps {
 export default function GameCard({ shake = false, children }: GameCardProps) {
   return (
     <div className={`GameCard${shake ? ' GameCard--shake' : ''}`}>
-      
       {children}
     </div>
   );
