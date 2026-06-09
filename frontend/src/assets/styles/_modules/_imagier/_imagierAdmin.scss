@@ -576,24 +576,3 @@
 	}
 }
 
-// ─── ImagierProgression ───────────────────────────────────────────────────────
-
-.ImagierProgression {
-	&__header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-bottom: 1.25rem;
-	}
-
-	&__stats {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	&__filters {
-		margin-bottom: 1rem;
-	}
-}

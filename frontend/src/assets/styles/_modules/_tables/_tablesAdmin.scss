@@ -1,42 +1,5 @@
 @use '../../_abstracts/variables' as v;
 
-// ─── TablesAdmin (nav tabs + outlet wrapper) ──────────────────────────────────
-
-.TablesAdmin {
-	&__title {
-		font-size: 1.5rem;
-		font-weight: 700;
-		color: var(--color-base-content);
-		margin: 0 0 0.75rem;
-	}
-}
-
-// ─── TablesProgression ────────────────────────────────────────────────────────
-
-.TablesProgression {
-	&__header {
-		display: flex;
-		align-items: flex-start;
-		justify-content: space-between;
-		gap: 1rem;
-		margin-bottom: 1.25rem;
-	}
-
-	&__stats {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-	}
-
-	&__empty {
-		color: var(--color-base-content);
-		opacity: 0.4;
-		font-size: 0.9375rem;
-		margin: 2rem 0;
-		text-align: center;
-	}
-}
-
 // ─── TablesSettings ───────────────────────────────────────────────────────────
 
 .TablesSettings {

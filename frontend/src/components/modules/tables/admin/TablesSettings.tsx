@@ -1,25 +1,11 @@
-import { useEffect, useState } from 'react';
-import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import { useModuleSettings } from 'src/hook';
 import Spinner from 'src/components/common/Spinner';
 
 const ALL_TABLES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const THRESHOLDS = [2, 3, 5];
 
 export default function TablesSettings() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    getSettingsMap().then(setSettings).finally(() => setLoading(false));
-  }, []);
-
-  async function save(key: string, value: string) {
-    setSaving(true);
-    await updateSetting(key, value);
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    setSaving(false);
-  }
+  const { settings, loading, saving, save } = useModuleSettings();
 
   if (loading) return <Spinner size="sm" />;
 

@@ -1,16 +1,5 @@
 @use '../../_abstracts/variables' as v;
 
-// ─── Admin layout ─────────────────────────────────────────────────────────────
-
-.CalculAdmin {
-  &__title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-base-content);
-    margin: 0 0 1.25rem;
-  }
-}
-
 // ─── Settings ─────────────────────────────────────────────────────────────────
 
 .CalculSettings {
@@ -171,43 +160,3 @@
   }
 }
 
-// ─── Progression ──────────────────────────────────────────────────────────────
-
-.CalculProgression {
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-  }
-
-  &__stats {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-  }
-
-  &__section {
-    margin-bottom: 2rem;
-  }
-
-  &__sectionTitle {
-    font-size: 0.85rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-base-content);
-    opacity: 0.5;
-    margin: 0 0 0.75rem;
-  }
-
-  &__empty {
-    font-size: 0.9rem;
-    color: var(--color-base-content);
-    opacity: 0.4;
-    text-align: center;
-    padding: 2rem 0;
-  }
-}

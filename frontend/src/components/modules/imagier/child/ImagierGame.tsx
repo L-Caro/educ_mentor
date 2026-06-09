@@ -8,6 +8,7 @@ import GameInput from 'src/components/common/GameInput';
 import GameCorrection from 'src/components/common/GameCorrection';
 import GameProgressBar from 'src/components/common/GameProgressBar';
 import GameTimerBar from 'src/components/common/GameTimerBar';
+import GameScoreBar from 'src/components/common/GameScoreBar';
 import GameStateView from 'src/components/common/GameStateView';
 import GameCard from 'src/components/common/GameCard';
 import GamePrompt from 'src/components/common/GamePrompt';
@@ -37,8 +38,8 @@ export default function ImagierGame() {
 
   const {
     loading, error,
-    session, currentIdx, answerState,
-    timerPct, isUrgent,
+    session, currentIdx, answerState, correctCount,
+    timeRemaining, timerPct, isUrgent,
     submitAnswer, advanceNow, handleTerminate,
   } = useGameSession<ImagierSessionResponse, ImagierQuestion, ImagierResult>({
     loader: () => startSession({
@@ -100,6 +101,7 @@ export default function ImagierGame() {
   const progress = (currentIdx / total) * 100;
   const hideImage = question.direction === 'en_to_fr' && answerState === 'idle';
   const correctChoiceLabel = question.choices.find((choice) => choice.id === question.correct_id)?.label ?? '';
+  const filledStars = Math.min(5, Math.floor(correctCount / Math.max(1, total / 5)));
   const showUrgent = isUrgent && answerState === 'idle';
 
   return (
@@ -108,6 +110,14 @@ export default function ImagierGame() {
       <GameProgressBar progress={progress} />
 
       {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
+
+      <GameScoreBar
+        filledStars={filledStars}
+        correctCount={correctCount}
+        total={total}
+        timeRemaining={timerSeconds > 0 ? timeRemaining : null}
+        isUrgent={showUrgent}
+      />
 
       <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
         <GamePrompt imageUrl={question.image_url} imageHidden={hideImage} imageAlt={question.prompt}>

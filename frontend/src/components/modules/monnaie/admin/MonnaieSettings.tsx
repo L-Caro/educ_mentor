@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import { useModuleSettings } from 'src/hook';
 import Spinner from 'src/components/common/Spinner';
 
 const MAX_AMOUNT_PRESETS = [5, 10, 20, 50, 100, 500];
@@ -24,20 +23,7 @@ const BILLET_DENOMINATIONS = [
 ];
 
 export default function MonnaieSettings() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    getSettingsMap().then(setSettings).finally(() => setLoading(false));
-  }, []);
-
-  async function save(key: string, value: string) {
-    setSaving(true);
-    await updateSetting(key, value);
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    setSaving(false);
-  }
+  const { settings, loading, saving, save } = useModuleSettings();
 
   function toggleDenomination(denominationValue: number, enabled: boolean) {
     const current = (settings.monnaie_denominations ?? '1,2,5,10,20,50,100,200,500,1000,2000,5000')

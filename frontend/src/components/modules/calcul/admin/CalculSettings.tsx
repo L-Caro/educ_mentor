@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import { useModuleSettings } from 'src/hook';
 import Spinner from 'src/components/common/Spinner';
 
 const THRESHOLDS = [2, 3, 5];
@@ -13,31 +12,7 @@ const OPERATION_TYPES = [
 ] as const;
 
 export default function CalculSettings() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    getSettingsMap().then(setSettings).finally(() => setLoading(false));
-  }, []);
-
-  async function save(key: string, value: string) {
-    setSaving(true);
-    await updateSetting(key, value);
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    setSaving(false);
-  }
-
-  async function saveMultiple(pairs: [string, string][]) {
-    setSaving(true);
-    await Promise.all(pairs.map(([k, v]) => updateSetting(k, v)));
-    setSettings((prev) => {
-      const next = { ...prev };
-      pairs.forEach(([k, v]) => { next[k] = v; });
-      return next;
-    });
-    setSaving(false);
-  }
+  const { settings, loading, saving, save, saveMultiple } = useModuleSettings();
 
   if (loading) return <Spinner size="sm" />;
 

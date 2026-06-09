@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import { useState } from 'react';
+import { useModuleSettings } from 'src/hook';
 import { normalizeCategories } from 'src/api/imagier.api';
 import Spinner from 'src/components/common/Spinner';
 import type { ImagierDifficulty, ImagierMode } from 'src/types';
@@ -17,15 +17,9 @@ const DIFFICULTIES: [ImagierDifficulty, string][] = [
 ];
 
 export default function ImagierSettings() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const { settings, loading, saving, save } = useModuleSettings();
   const [normalizing, setNormalizing] = useState(false);
   const [normalizeResult, setNormalizeResult] = useState<number | null>(null);
-
-  useEffect(() => {
-    getSettingsMap().then(setSettings).finally(() => setLoading(false));
-  }, []);
 
   async function handleNormalizeCategories() {
     setNormalizing(true);
@@ -33,13 +27,6 @@ export default function ImagierSettings() {
     const result = await normalizeCategories();
     setNormalizeResult(result.updated);
     setNormalizing(false);
-  }
-
-  async function save(key: string, value: string) {
-    setSaving(true);
-    await updateSetting(key, value);
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    setSaving(false);
   }
 
   if (loading) return <Spinner size="sm" />;
