@@ -1,5 +1,23 @@
 @use '../_abstracts/variables' as v;
 
+// Conteneur flex parfaitement centré (loading, états vides…)
+@mixin flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+// Titre « overline » des cartes de réglages admin
+@mixin overline-label {
+	font-size: 0.8rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--color-base-content);
+	opacity: 0.5;
+	margin: 0 0 v.$space-4;
+}
+
 @mixin xs {
 	@media (max-width : 576px) {
 		@content;

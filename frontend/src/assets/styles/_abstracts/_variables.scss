@@ -41,3 +41,27 @@ $border-radius-2 : 0.8rem;
 
 // Gutter
 $gutter          : 1rem;
+
+// ── Échelles (Lot 1) ───────────────────────────────────────────────────────────
+// Espacement
+$space-1: 0.25rem;
+$space-2: 0.5rem;
+$space-3: 0.75rem;
+$space-4: 1rem;
+$space-5: 1.5rem;
+$space-6: 2rem;
+$space-8: 3rem;
+
+// Tailles de police
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.875rem;
+$font-size-base: 1rem;
+$font-size-lg: 1.25rem;
+$font-size-xl: 2rem;
+$font-size-2xl: 3rem;
+
+// Rayons (alias des valeurs historiques pour cohérence)
+$radius-sm: 0.5rem;
+$radius-md: $border-radius-2;
+$radius-lg: $border-radius;
+$radius-pill: 999px;

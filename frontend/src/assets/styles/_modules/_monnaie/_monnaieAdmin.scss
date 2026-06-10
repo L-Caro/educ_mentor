@@ -1,4 +1,5 @@
 @use '../../_abstracts/variables' as v;
+@use '../../_abstracts/mixins' as m;
 
 .MonnaieSettings {
   &__header {
@@ -24,13 +25,7 @@
   &__card { padding: 1.25rem; }
 
   &__cardTitle {
-    font-size: 0.8rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-base-content);
-    opacity: 0.5;
-    margin: 0 0 1rem;
+    @include m.overline-label;
   }
 
   &__denominations {

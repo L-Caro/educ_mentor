@@ -1,4 +1,5 @@
 @use '../../_abstracts/variables' as v;
+@use '../../_abstracts/mixins' as m;
 
 .TablesHome {
 	flex: 1;
@@ -9,9 +10,7 @@
 	// ─── Loading ──────────────────────────────────────────────────────────────
 	&__loading {
 		flex: 1;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		@include m.flex-center;
 	}
 
 	// ─── Subtitle ─────────────────────────────────────────────────────────────
