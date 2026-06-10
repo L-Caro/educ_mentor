@@ -9,12 +9,11 @@ const DEFAULTS = {
   // ── Paramètres globaux (tous modules) ──────────────────────────────────────
   questions_per_session: '10',
   question_timer_seconds: '0',
+  mastery_threshold: '10',
   // ── Imagier ────────────────────────────────────────────────────────────────
-  imagier_mastery_threshold: '5',
   imagier_default_difficulty: 'level_1',
   imagier_default_mode: 'fr_to_en',
   // ── Tables de multiplication ───────────────────────────────────────────────
-  tables_mastery_threshold: '3',
   tables_known_tables: '[0,1,2,5,9,10]',
   tables_choice_count: '4',
   tables_hints_enabled: 'true',
@@ -22,7 +21,6 @@ const DEFAULTS = {
   // ── Calcul Mental ──────────────────────────────────────────────────────────
   calcul_min_value: '0',
   calcul_max_value: '20',
-  calcul_mastery_threshold: '3',
   calcul_operation_types: 'complement,addition,soustraction',
   // ── Monnaie ────────────────────────────────────────────────────────────────
   monnaie_denominations: '1,2,5,10,20,50,100,200,500,1000,2000,5000',
@@ -30,7 +28,6 @@ const DEFAULTS = {
   monnaie_whole_euros: 'false',
   monnaie_items_count: '3',
   monnaie_response_mode: 'free',
-  monnaie_mastery_threshold: '3',
 };
 
 @Injectable()
