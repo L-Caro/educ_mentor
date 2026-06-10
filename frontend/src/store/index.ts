@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slice/authSlice";
+import gameSetupReducer from "./slice/gameSetupSlice";
 import { api } from "./api/api";
 
 //? Reducers
 const rootReducers = {
   auth: authReducer,
+  gameSetup: gameSetupReducer,
   [api.reducerPath]: api.reducer,
 };
 

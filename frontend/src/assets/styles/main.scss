@@ -22,7 +22,6 @@
 @use './_modules/_calcul/calculGame';
 @use './_modules/_calcul/calculAdmin';
 
-@use './_modules/_monnaie/monnaieHome';
 @use './_modules/_monnaie/monnaieGame';
 @use './_modules/_monnaie/monnaieAdmin';
 
@@ -38,6 +37,7 @@
 @use './_components/gameCard';
 @use './_components/gameStateView';
 @use './_components/gamePrompt';
+@use './_components/gamePreSetup';
 @use './_components/moduleCard';
 @use './_components/pinModal';
 @use './_components/spinner';

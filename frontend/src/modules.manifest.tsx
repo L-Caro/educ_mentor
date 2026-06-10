@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav';
+import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 
 // ─── Composants enfant (jeu) ──────────────────────────────────────────────────
 import ImagierHome from 'src/components/modules/imagier/child/ImagierHome';
@@ -12,7 +13,6 @@ import TablesResult from 'src/components/modules/tables/child/TablesResult';
 import CalculHome from 'src/components/modules/calcul/child/CalculHome';
 import CalculGame from 'src/components/modules/calcul/child/CalculGame';
 import CalculResult from 'src/components/modules/calcul/child/CalculResult';
-import MonnaieHome from 'src/components/modules/monnaie/child/MonnaieHome';
 import MonnaieGame from 'src/components/modules/monnaie/child/MonnaieGame';
 import MonnaieResult from 'src/components/modules/monnaie/child/MonnaieResult';
 
@@ -42,8 +42,9 @@ export interface ModuleManifest {
   id: string;            // = AppModule.id (backend) et segment d'URL
   label: string;         // titre affiché (header enfant + admin)
   icon: string;
+  setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
   child: {
-    Home?: ComponentType;   // page de sélection optionnelle
+    Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
     Game: ComponentType;
     Result: ComponentType;
   };
@@ -54,6 +55,19 @@ export interface ModuleManifest {
     reset: () => Promise<void>;
   };
 }
+
+const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
+  {
+    key: 'exerciseType',
+    type: 'single',
+    label: 'Quel exercice veux-tu faire ?',
+    choices: [
+      { value: 'reconnaitre', icon: '👀', label: 'Reconnaître', description: 'Compte les pièces et les billets' },
+      { value: 'total', icon: '🛒', label: "Total d'achat", description: 'Calcule le prix de tous les articles' },
+      { value: 'rendre', icon: '💸', label: 'Rendre la monnaie', description: "Calcule ce qu'on te rend" },
+    ],
+  },
+];
 
 export const MODULES: ModuleManifest[] = [
   {
@@ -102,7 +116,8 @@ export const MODULES: ModuleManifest[] = [
     id: 'monnaie',
     label: 'Monnaie',
     icon: '💶',
-    child: { Home: MonnaieHome, Game: MonnaieGame, Result: MonnaieResult },
+    setupOptions: MONNAIE_SETUP_OPTIONS,
+    child: { Game: MonnaieGame, Result: MonnaieResult },
     adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <MonnaieSettings /> }],
     progression: { getStats: getMonnaieProgression, reset: resetMonnaieProgression },

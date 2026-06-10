@@ -11,7 +11,6 @@ export interface MonnaieHistoryEntry {
 }
 
 interface ResultState {
-  exerciseType: string;
   correctCount: number;
   total: number;
   history: MonnaieHistoryEntry[];
@@ -32,14 +31,14 @@ export default function MonnaieResult() {
 
   if (!state) { navigate('/module/monnaie'); return null; }
 
-  const { exerciseType, correctCount, total, history } = state;
+  const { correctCount, total, history } = state;
   const errors = history.filter((entry) => !entry.correct);
 
   return (
     <GameResultPage
       correctCount={correctCount}
       total={total}
-      onReplay={() => navigate('/module/monnaie/play', { state: { exerciseType } })}
+      onReplay={() => navigate('/module/monnaie/play')}
       onHome={() => navigate('/module/monnaie')}
       homeLabel="Choisir un exercice"
       errorCount={errors.length}

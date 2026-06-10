@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/module/monnaie.api.ts';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
 import type { MonnaieHistoryEntry } from './MonnaieResult';
@@ -15,7 +15,8 @@ import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
 import GameCard from 'src/components/common/Game/GameCard.tsx';
 import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
 import GameStateView from 'src/components/common/Game/GameStateView.tsx';
-import { useDevMode, useGameSession } from 'src/hook';
+import { useDevMode, useGameSession, useAppSelector } from 'src/hook';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   reconnaitre: 'Combien y a-t-il en tout ?',
@@ -66,10 +67,10 @@ function renderQuestion(question: MonnaieQuestion) {
 
 export default function MonnaieGame() {
   const navigate = useNavigate();
-  const location = useLocation();
   const { isDevMode } = useDevMode();
+  const setup = useAppSelector(selectModuleSetup('monnaie'));
 
-  const exerciseType = (location.state as { exerciseType?: MonnaieExerciseType } | null)?.exerciseType;
+  const exerciseType = setup?.exerciseType as MonnaieExerciseType | undefined;
 
   const [inputValue, setInputValue] = useState('');
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
@@ -90,7 +91,7 @@ export default function MonnaieGame() {
     getSessionId: (session) => session.session_id,
     getTimerSeconds: (session) => session.timer_seconds,
     onComplete: (sessionId, correctCount, total) => completeMonnaieSession(sessionId, correctCount, total),
-    buildResultsState: (correctCount, total, history) => ({ exerciseType, correctCount, total, history }),
+    buildResultsState: (correctCount, total, history) => ({ correctCount, total, history }),
     buildTimeoutResult: (question) => ({ question, given: null, correct: false, timeout: true }),
     recordTimeout: (sessionId, question) => recordMonnaieAnswer(sessionId, question.type, question.answer, false),
     onQuestionChange: () => { setInputValue(''); setSelectedChoice(null); },

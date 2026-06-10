@@ -19,6 +19,8 @@ import AdminDashboard from 'src/views/admin/AdminDashboard';
 import ModuleCatalog from 'src/views/admin/ModuleCatalog';
 import Settings from 'src/views/settings/Settings';
 
+import ModulePreSetup from 'src/components/common/Game/ModulePreSetup';
+
 // Source unique des modules
 import { MODULES, type ModuleManifest } from 'src/modules.manifest';
 
@@ -26,13 +28,16 @@ export const MAIN_TITLE = 'Maëve';
 
 /** Routes enfant d'un module : sélection (ou jeu direct), jeu, résultats. */
 function buildChildRoutes(module: ModuleManifest): RouteObject[] {
-  const Home = module.child.Home ?? module.child.Game;
+  const Home = module.child.Home;
   const Game = module.child.Game;
   const Result = module.child.Result;
   const handle = { title: module.label };
 
+  // Home dédié si déclaré, sinon écran de pré-jeu générique piloté par setupOptions.
+  const homeElement = Home ? <Home /> : module.setupOptions ? <ModulePreSetup module={module} /> : <Game />;
+
   return [
-    { path: `/module/${module.id}`, element: <Home />, handle },
+    { path: `/module/${module.id}`, element: homeElement, handle },
     { path: `/module/${module.id}/play`, element: <Game />, handle },
     { path: `/module/${module.id}/result`, element: <Result />, handle },
   ];
