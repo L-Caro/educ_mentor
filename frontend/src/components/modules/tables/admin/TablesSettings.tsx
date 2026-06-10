@@ -2,7 +2,6 @@ import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api
 import Spinner from 'src/components/common/Spinner';
 
 const ALL_TABLES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-const THRESHOLDS = [2, 3, 5];
 
 export default function TablesSettings() {
   const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
@@ -10,7 +9,6 @@ export default function TablesSettings() {
 
   if (loading) return <Spinner size="sm" />;
 
-  const threshold = parseInt(settings.tables_mastery_threshold ?? '3', 10);
   const knownTables: number[] = JSON.parse(settings.tables_known_tables ?? '[0,1,2,5,9,10]');
   const choiceCount     = settings.tables_choice_count ?? '4';
   const hintsEnabled    = settings.tables_hints_enabled !== 'false';
@@ -47,25 +45,6 @@ export default function TablesSettings() {
                   onChange={() => updateSetting({ key: 'tables_choice_count', value: val })}
                 />
                 {label}
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Seuil de maîtrise */}
-        <div className="AdminCard TablesSettings__card">
-          <p className="TablesSettings__cardTitle">Bonnes réponses pour maîtriser un fait</p>
-          <div className="TablesSettings__radios">
-            {THRESHOLDS.map((val) => (
-              <label key={val} className="TablesSettings__radio">
-                <input
-                  type="radio"
-                  name="tables-threshold"
-                  value={val}
-                  checked={threshold === val}
-                  onChange={() => updateSetting({ key: 'tables_mastery_threshold', value: String(val) })}
-                />
-                {val} bonne{val > 1 ? 's' : ''} réponse{val > 1 ? 's' : ''}
               </label>
             ))}
           </div>

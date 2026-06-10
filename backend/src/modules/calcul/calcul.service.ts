@@ -6,6 +6,7 @@ import { CalculProgression } from './entities/calcul-progression.entity';
 import { CalculSession } from './entities/calcul-session.entity';
 import { SettingsService } from '../settings/settings.service';
 import type { RecordCalculAnswerDto } from './dto/calcul.dto';
+import { masteryScore, isMastered } from '../../common/mastery';
 
 export interface CalculQuestion {
   operation: string;
@@ -66,7 +67,7 @@ export class CalculService {
   }
 
   async recordAnswer(sessionId: string, dto: RecordCalculAnswerDto): Promise<void> {
-    const threshold = parseInt((await this.settingsService.get('calcul_mastery_threshold')) ?? '3', 10);
+    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
 
     let prog = await this.progressionRepo.findOneBy({ answer_value: dto.answer_value });
     if (!prog) {
@@ -82,13 +83,12 @@ export class CalculService {
 
     if (dto.is_correct) {
       prog.correct_count++;
-      if (!prog.is_mastered && prog.correct_count >= threshold) {
-        prog.is_mastered = true;
-      }
     } else {
       prog.incorrect_count++;
     }
     prog.last_seen = new Date();
+
+    prog.is_mastered = isMastered(masteryScore(prog.correct_count, prog.incorrect_count), threshold);
 
     await this.progressionRepo.save(prog);
   }

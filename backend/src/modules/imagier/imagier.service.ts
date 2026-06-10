@@ -15,6 +15,7 @@ import type {
   CreateWordDto,
   UpdateWordDto,
 } from './dto/imagier.dto';
+import { masteryScore, isMastered, selectionWeight } from '../../common/mastery';
 
 export interface ImagierQuestion {
   word_id: string;
@@ -56,6 +57,7 @@ export class ImagierService {
 
   async startSession(dto: StartSessionDto): Promise<SessionResult> {
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
+    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
     const count = dto.count ?? parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
     const difficulty = dto.difficulty ?? 'level_1';
     const choicesCount = difficulty === 'level_2' ? 2 : 4;
@@ -77,8 +79,8 @@ export class ImagierService {
     });
     const progMap = new Map(progressions.map((p) => [p.word_id, p]));
 
-    // Sélection pondérée : jamais vu=5, en cours=3, maîtrisé=1
-    const selected = this.weightedSample(allWords, progMap, count);
+    // Sélection pondérée par maîtrise (fréquence selon le score)
+    const selected = this.weightedSample(allWords, progMap, count, threshold);
 
     // Construire les questions
     const questions: ImagierQuestion[] = [];
@@ -123,7 +125,7 @@ export class ImagierService {
 
   async recordAnswer(sessionId: string, wordId: string, isCorrect: boolean): Promise<void> {
     const threshold = parseInt(
-      (await this.settingsService.get('imagier_mastery_threshold')) ?? '5',
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
       10,
     );
 
@@ -145,10 +147,10 @@ export class ImagierService {
     }
     prog.last_seen = new Date();
 
-    if (!prog.is_mastered && prog.correct_count >= threshold) {
-      prog.is_mastered = true;
-      prog.mastered_at = new Date();
-    }
+    const score = masteryScore(prog.correct_count, prog.incorrect_count);
+    const mastered = isMastered(score, threshold);
+    if (mastered && !prog.is_mastered) prog.mastered_at = new Date();
+    prog.is_mastered = mastered;
 
     await this.progressionRepo.save(prog);
   }
@@ -292,14 +294,16 @@ export class ImagierService {
     words: ImagierWord[],
     progMap: Map<string, ImagierProgression>,
     count: number,
+    threshold: number,
   ): ImagierWord[] {
     if (words.length <= count) return this.shuffle([...words]);
 
-    // Construire un tableau pondéré
+    // Tableau pondéré par maîtrise (fréquence selon le score)
     const weighted: ImagierWord[] = [];
     for (const w of words) {
       const prog = progMap.get(w.id);
-      const weight = !prog ? 5 : prog.is_mastered ? 1 : 3;
+      const score = prog ? masteryScore(prog.correct_count, prog.incorrect_count) : 0;
+      const weight = selectionWeight(score, threshold);
       for (let i = 0; i < weight; i++) weighted.push(w);
     }
 

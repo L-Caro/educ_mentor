@@ -2,7 +2,6 @@ import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api
 import Spinner from 'src/components/common/Spinner';
 
 const MAX_AMOUNT_PRESETS = [5, 10, 20, 50, 100, 500];
-const THRESHOLDS = [2, 3, 5];
 
 const PIECE_DENOMINATIONS = [
   { value: 1, label: '1c' },
@@ -47,7 +46,6 @@ export default function MonnaieSettings() {
   const wholeEuros = settings.monnaie_whole_euros === 'true';
   const itemsCount = parseInt(settings.monnaie_items_count ?? '3', 10);
   const responseMode = settings.monnaie_response_mode ?? 'free';
-  const threshold = parseInt(settings.monnaie_mastery_threshold ?? '3', 10);
 
   return (
     <div className="MonnaieSettings">
@@ -153,24 +151,6 @@ export default function MonnaieSettings() {
               />
               QCM (4 choix)
             </label>
-          </div>
-        </div>
-
-        {/* Seuil de maîtrise */}
-        <div className="AdminCard MonnaieSettings__card">
-          <p className="MonnaieSettings__cardTitle">Bonnes réponses pour maîtriser</p>
-          <div className="MonnaieSettings__radios">
-            {THRESHOLDS.map((value) => (
-              <label key={value} className="MonnaieSettings__radio">
-                <input
-                  type="radio"
-                  name="monnaie-threshold"
-                  checked={threshold === value}
-                  onChange={() => updateSetting({ key: 'monnaie_mastery_threshold', value: String(value) })}
-                />
-                {value} bonne{value > 1 ? 's' : ''} réponse{value > 1 ? 's' : ''}
-              </label>
-            ))}
           </div>
         </div>
       </div>

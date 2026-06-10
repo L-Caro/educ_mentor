@@ -6,6 +6,7 @@ import { MonnaieProgression } from './entities/monnaie-progression.entity';
 import { MonnaieSession } from './entities/monnaie-session.entity';
 import { SettingsService } from '../settings/settings.service';
 import type { RecordMonnaieAnswerDto } from './dto/monnaie.dto';
+import { masteryScore, isMastered } from '../../common/mastery';
 
 export type ExerciseType = 'reconnaitre' | 'total' | 'rendre';
 
@@ -88,7 +89,7 @@ export class MonnaieService {
   }
 
   async recordAnswer(sessionId: string, dto: RecordMonnaieAnswerDto): Promise<void> {
-    const threshold = parseInt((await this.settingsService.get('monnaie_mastery_threshold')) ?? '3', 10);
+    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
 
     let progression = await this.progressionRepo.findOneBy({
       exercise_type: dto.exercise_type,
@@ -109,13 +110,12 @@ export class MonnaieService {
 
     if (dto.is_correct) {
       progression.correct_count++;
-      if (!progression.is_mastered && progression.correct_count >= threshold) {
-        progression.is_mastered = true;
-      }
     } else {
       progression.incorrect_count++;
     }
     progression.last_seen = new Date();
+
+    progression.is_mastered = isMastered(masteryScore(progression.correct_count, progression.incorrect_count), threshold);
 
     await this.progressionRepo.save(progression);
   }

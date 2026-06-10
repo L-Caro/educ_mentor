@@ -34,6 +34,7 @@ export default function Settings() {
   const savedTimer = parseInt(settings?.question_timer_seconds ?? '0', 10);
   const timerEnabled = savedTimer > 0;
   const timerSeconds = timerEnabled ? savedTimer : 30;
+  const masteryThreshold = parseInt(settings?.mastery_threshold ?? '10', 10);
 
   function handleDurationChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = DURATION_STEPS[parseInt(event.target.value, 10)];
@@ -52,6 +53,10 @@ export default function Settings() {
 
   async function handleTimerSecondsChange(seconds: number) {
     await updateSetting({ key: 'question_timer_seconds', value: String(seconds) });
+  }
+
+  async function handleMasteryThresholdChange(value: number) {
+    await updateSetting({ key: 'mastery_threshold', value: String(value) });
   }
 
   const sliderIndex = DURATION_STEPS.indexOf(duration) === -1 ? 0 : DURATION_STEPS.indexOf(duration);
@@ -144,6 +149,23 @@ export default function Settings() {
               </div>
             </>
           )}
+        </div>
+
+        <div className="Settings__section">
+          <p className="Settings__cardTitle">🎯 Réussites pour maîtriser une notion</p>
+          <div className="Settings__label">
+            <span>1 erreur annule 1 réussite</span>
+            <span className="Settings__labelValue">{masteryThreshold}</span>
+          </div>
+          <input
+            type="range"
+            className="Settings__range"
+            min={4}
+            max={20}
+            step={1}
+            value={masteryThreshold}
+            onChange={(event) => handleMasteryThresholdChange(parseInt(event.target.value, 10))}
+          />
         </div>
       </div>
 

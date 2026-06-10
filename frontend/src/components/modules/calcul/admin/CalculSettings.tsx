@@ -1,8 +1,6 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import Spinner from 'src/components/common/Spinner';
 
-const THRESHOLDS = [2, 3, 5];
-
 const OPERATION_TYPES = [
   { key: 'complement', label: 'Compléments', example: '3 + ? = 10' },
   { key: 'addition', label: 'Additions', example: '3 + 4 = ?' },
@@ -19,7 +17,6 @@ export default function CalculSettings() {
 
   const minValue = parseInt(settings.calcul_min_value ?? '0', 10);
   const maxValue = parseInt(settings.calcul_max_value ?? '20', 10);
-  const threshold = parseInt(settings.calcul_mastery_threshold ?? '3', 10);
   const activeOperationTypes = (settings.calcul_operation_types ?? 'complement,addition,soustraction')
     .split(',')
     .map((rawType) => rawType.trim());
@@ -115,24 +112,6 @@ export default function CalculSettings() {
                 />
                 <span className="CalculSettings__checkLabel">{label}</span>
                 <span className="CalculSettings__checkExample">{example}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Seuil de maîtrise */}
-        <div className="AdminCard CalculSettings__card">
-          <p className="CalculSettings__cardTitle">Bonnes réponses pour maîtriser une valeur</p>
-          <div className="CalculSettings__radios">
-            {THRESHOLDS.map((v) => (
-              <label key={v} className="CalculSettings__radio">
-                <input
-                  type="radio"
-                  name="calcul-threshold"
-                  checked={threshold === v}
-                  onChange={() => updateSetting({ key: 'calcul_mastery_threshold', value: String(v) })}
-                />
-                {v} bonne{v > 1 ? 's' : ''} réponse{v > 1 ? 's' : ''}
               </label>
             ))}
           </div>

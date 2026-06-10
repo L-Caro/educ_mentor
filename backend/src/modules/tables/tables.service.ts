@@ -9,6 +9,7 @@ import type {
   StartTablesSessionDto,
   RecordTablesAnswerDto,
 } from './dto/tables.dto';
+import { masteryScore, isMastered, selectionWeight } from '../../common/mastery';
 
 export interface TablesQuestion {
   // Normalized fact key (min×max)
@@ -49,6 +50,7 @@ export class TablesService {
 
   async startSession(dto: StartTablesSessionDto): Promise<TablesSessionResult> {
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
+    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
     const count = dto.count ?? parseInt(
       (await this.settingsService.get('questions_per_session')) ?? '10',
       10,
@@ -84,12 +86,13 @@ export class TablesService {
       allProgressions.map((p) => [`${p.factor_a}x${p.factor_b}`, p]),
     );
 
-    // Weighted selection: not_seen=5, in_progress=3, mastered=1
+    // Sélection pondérée par maîtrise (fréquence selon le score)
     const factEntries = [...factSet.entries()];
     const weighted: string[] = [];
-    for (const [key, _] of factEntries) {
+    for (const [key] of factEntries) {
       const prog = progMap.get(key);
-      const weight = !prog ? 5 : prog.is_mastered ? 1 : 3;
+      const score = prog ? masteryScore(prog.correct_count, prog.incorrect_count) : 0;
+      const weight = selectionWeight(score, threshold);
       for (let i = 0; i < weight; i++) weighted.push(key);
     }
 
@@ -145,7 +148,7 @@ export class TablesService {
     dto: RecordTablesAnswerDto,
   ): Promise<void> {
     const threshold = parseInt(
-      (await this.settingsService.get('tables_mastery_threshold')) ?? '3',
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
       10,
     );
 
@@ -173,10 +176,10 @@ export class TablesService {
     }
     prog.last_seen = new Date();
 
-    if (!prog.is_mastered && prog.correct_count >= threshold) {
-      prog.is_mastered = true;
-      prog.mastered_at = new Date();
-    }
+    const score = masteryScore(prog.correct_count, prog.incorrect_count);
+    const mastered = isMastered(score, threshold);
+    if (mastered && !prog.is_mastered) prog.mastered_at = new Date();
+    prog.is_mastered = mastered;
 
     await this.progressionRepo.save(prog);
   }
