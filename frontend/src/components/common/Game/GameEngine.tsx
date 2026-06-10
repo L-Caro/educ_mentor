@@ -52,6 +52,10 @@ export interface GameModuleSpec<TSession, TQuestion, TResult> {
   emptyError?: string;
   showStreak?: boolean;
   showQuestionTag?: boolean;
+  /** Mode libre déterminé par le module (sinon dérivé de l'absence de choix). */
+  isFreeMode?: (session: TSession, question: TQuestion) => boolean;
+  /** Session « illimitée » : masque la progression, total affiché = nombre répondu. */
+  isUnlimited?: (session: TSession) => boolean;
 }
 
 interface GameEngineProps<TSession, TQuestion, TResult> {
@@ -98,8 +102,9 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     emptySessionError: spec.emptyError,
   });
 
-  function isQcm(question: TQuestion): boolean {
-    return !!spec.qcm && spec.qcm.getChoices(question).length > 0;
+  function isFree(currentSession: TSession, question: TQuestion): boolean {
+    if (spec.isFreeMode) return spec.isFreeMode(currentSession, question);
+    return !(spec.qcm && spec.qcm.getChoices(question).length > 0);
   }
 
   function handleValidate() {
@@ -109,7 +114,7 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     let correct: boolean;
     let given: unknown;
 
-    if (isQcm(question)) {
+    if (!isFree(session, question)) {
       if (selectedKey === null) return;
       given = selectedKey;
       correct = selectedKey === spec.qcm!.correctKey(question);
@@ -137,7 +142,8 @@ export default function GameEngine<TSession, TQuestion, TResult>({
 
   const questions = getQuestions(session);
   const question = questions[currentIdx];
-  const qcm = isQcm(question);
+  const qcm = !isFree(session, question);
+  const unlimited = spec.isUnlimited?.(session) ?? false;
   const timerSeconds = getTimerSeconds(session);
   const total = questions.length;
   const progress = (currentIdx / total) * 100;
@@ -151,21 +157,21 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     <PageContainer className="GameEngine">
       {isDevMode && <DevBadge />}
 
-      <GameProgressBar progress={progress} />
+      {!unlimited && <GameProgressBar progress={progress} />}
 
       {timerSeconds > 0 && <GameTimerBar timerPct={timerPct} isUrgent={showUrgent} />}
 
       <GameScoreBar
         filledStars={filledStars}
         correctCount={correctCount}
-        total={total}
+        total={unlimited ? answeredCount : total}
         timeRemaining={timerSeconds > 0 ? timeRemaining : null}
         isUrgent={showUrgent}
         streak={spec.showStreak ? streak : undefined}
       />
 
       <GameCard shake={answerState === 'wrong' || answerState === 'timeout'}>
-        {spec.showQuestionTag && (
+        {spec.showQuestionTag && !unlimited && (
           <span className="GameEngine__questionTag">Question {currentIdx + 1} / {total}</span>
         )}
 

@@ -6,14 +6,14 @@ import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 import { IMAGIER_SETUP_OPTIONS } from 'src/components/modules/imagier/imagier.setup';
 import { TABLES_SETUP_OPTIONS } from 'src/components/modules/tables/tables.setup';
 import { tablesGameSpec } from 'src/components/modules/tables/tables.game';
+import { imagierGameSpec } from 'src/components/modules/imagier/imagier.game';
+import { calculGameSpec } from 'src/components/modules/calcul/calcul.game';
+import { monnaieGameSpec } from 'src/components/modules/monnaie/monnaie.game';
 
 // ─── Composants enfant (jeu) ──────────────────────────────────────────────────
-import ImagierGame from 'src/components/modules/imagier/child/ImagierGame';
 import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
 import TablesResult from 'src/components/modules/tables/child/TablesResult';
-import CalculGame from 'src/components/modules/calcul/child/CalculGame';
 import CalculResult from 'src/components/modules/calcul/child/CalculResult';
-import MonnaieGame from 'src/components/modules/monnaie/child/MonnaieGame';
 import MonnaieResult from 'src/components/modules/monnaie/child/MonnaieResult';
 
 // ─── Composants admin ─────────────────────────────────────────────────────────
@@ -94,7 +94,8 @@ export const MODULES: ModuleManifest[] = [
     label: 'Imagier Anglais',
     icon: '🇬🇧',
     setupOptions: IMAGIER_SETUP_OPTIONS,
-    child: { Game: ImagierGame, Result: ImagierResult },
+    gameSpec: imagierGameSpec,
+    child: { Result: ImagierResult },
     adminTabs: [
       { to: '/admin/imagier', label: 'Mots', end: true },
       { to: '/admin/imagier/images', label: 'Images' },
@@ -130,7 +131,8 @@ export const MODULES: ModuleManifest[] = [
     label: 'Calcul Mental',
     icon: '🧮',
     setupOptions: CALCUL_SETUP_OPTIONS,
-    child: { Game: CalculGame, Result: CalculResult },
+    gameSpec: calculGameSpec,
+    child: { Result: CalculResult },
     adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <CalculSettings /> }],
     progression: { getStats: getCalculProgression, reset: resetCalculProgression },
@@ -140,7 +142,8 @@ export const MODULES: ModuleManifest[] = [
     label: 'Monnaie',
     icon: '💶',
     setupOptions: MONNAIE_SETUP_OPTIONS,
-    child: { Game: MonnaieGame, Result: MonnaieResult },
+    gameSpec: monnaieGameSpec,
+    child: { Result: MonnaieResult },
     adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <MonnaieSettings /> }],
     progression: { getStats: getMonnaieProgression, reset: resetMonnaieProgression },

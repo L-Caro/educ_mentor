@@ -10,16 +10,12 @@
 @use '_layout/header';
 @use '_layout/pageContainer';
 
-@use './_modules/_imagier/imagierGame';
 @use './_modules/_imagier/imagierAdmin';
 
-@use './_modules/_tables/tablesGame';
 @use './_modules/_tables/tablesAdmin';
 
-@use './_modules/_calcul/calculGame';
 @use './_modules/_calcul/calculAdmin';
 
-@use './_modules/_monnaie/monnaieGame';
 @use './_modules/_monnaie/monnaieAdmin';
 
 @use './_components/button';
