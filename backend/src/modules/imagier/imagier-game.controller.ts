@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ImagierService } from './imagier.service';
 import {
   StartSessionDto,
@@ -10,8 +10,8 @@ import {
 export class ImagierGameController {
   constructor(private readonly imagierService: ImagierService) {}
 
-  @Get()
-  startSession(@Query() dto: StartSessionDto) {
+  @Post()
+  startSession(@Body() dto: StartSessionDto) {
     return this.imagierService.startSession(dto);
   }
 

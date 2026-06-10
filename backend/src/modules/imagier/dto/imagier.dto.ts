@@ -3,12 +3,9 @@ import {
   IsOptional,
   IsString,
   IsArray,
-  IsIn,
   IsNumber,
-  Min,
-  Max,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Transform } from 'class-transformer';
 
 export class CreateWordDto {
   @IsString()
@@ -63,21 +60,6 @@ export class StartSessionDto {
     typeof value === 'string' ? value.split(',').filter(Boolean) : value,
   )
   categories?: string[];
-
-  @IsOptional()
-  @IsIn(['fr_to_en', 'en_to_fr', 'random'])
-  mode?: string;
-
-  @IsOptional()
-  @IsIn(['level_1', 'level_2', 'level_3'])
-  difficulty?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  @Max(30)
-  count?: number;
 }
 
 export class RecordAnswerDto {

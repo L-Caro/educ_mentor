@@ -1,26 +1,50 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'src/hook';
 import { setModuleSetup, selectModuleSetup } from 'src/store/slice/gameSetupSlice';
-import GamePreSetup, { type SetupValues } from 'src/components/common/Game/GamePreSetup';
+import GamePreSetup, { type SetupOption, type SetupValues } from 'src/components/common/Game/GamePreSetup';
+import GameStateView from 'src/components/common/Game/GameStateView';
 import type { ModuleManifest } from 'src/modules.manifest';
 
 /**
- * Écran de pré-jeu générique, piloté par le manifest : rend les `setupOptions` du
- * module, mémorise la sélection dans `gameSetup` et lance la partie. Remplace les
- * composants Home par module.
- *
- * TODO(Imagier/Tables) : résoudre les `loader?()` des options à choix dynamiques
- * (avec état de chargement) — câblé avec le premier module dynamique.
+ * Écran de pré-jeu générique, piloté par le manifest : résout les `loader` des options
+ * (choix dynamiques, via le cache RTK Query), rend `GamePreSetup`, mémorise la sélection
+ * dans `gameSetup` et lance la partie. Remplace les composants Home par module.
  */
 export default function ModulePreSetup({ module }: { module: ModuleManifest }) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const lastSetup = useAppSelector(selectModuleSetup(module.id));
 
+  const options = module.setupOptions ?? [];
+  const hasLoaders = options.some((option) => option.loader);
+  const [resolved, setResolved] = useState<SetupOption[] | null>(hasLoaders ? null : options);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    if (!hasLoaders) return;
+    let isMounted = true;
+    Promise.all(
+      options.map(async (option) =>
+        option.loader ? { ...option, choices: await option.loader() } : option,
+      ),
+    )
+      .then((resolvedOptions) => { if (isMounted) setResolved(resolvedOptions); })
+      .catch(() => { if (isMounted) setFailed(true); });
+    return () => { isMounted = false; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   function handleStart(values: SetupValues) {
     dispatch(setModuleSetup({ moduleId: module.id, setup: values }));
     navigate(`/module/${module.id}/play`);
   }
 
-  return <GamePreSetup options={module.setupOptions ?? []} initialValues={lastSetup} onStart={handleStart} />;
+  if (failed) {
+    return <GameStateView errorMessage="Impossible de charger les options." onBack={() => navigate('/')} />;
+  }
+  if (!resolved) {
+    return <GameStateView loading onBack={() => navigate('/')} />;
+  }
+
+  return <GamePreSetup options={resolved} initialValues={lastSetup} onStart={handleStart} />;
 }

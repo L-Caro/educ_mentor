@@ -30,6 +30,7 @@ export interface SessionResult {
   session_id: string;
   questions: ImagierQuestion[];
   timer_seconds: number;
+  difficulty: string;
 }
 
 @Injectable()
@@ -58,8 +59,9 @@ export class ImagierService {
   async startSession(dto: StartSessionDto): Promise<SessionResult> {
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
     const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
-    const count = dto.count ?? parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-    const difficulty = dto.difficulty ?? 'level_1';
+    const count = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
+    const difficulty = (await this.settingsService.get('imagier_default_difficulty')) ?? 'level_1';
+    const mode = (await this.settingsService.get('imagier_default_mode')) ?? 'fr_to_en';
     const choicesCount = difficulty === 'level_2' ? 2 : 4;
 
     // Récupérer les mots actifs pour les catégories demandées
@@ -70,7 +72,7 @@ export class ImagierService {
     const allWords = await qb.getMany();
 
     if (allWords.length === 0) {
-      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds };
+      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds, difficulty };
     }
 
     // Joindre avec la progression pour pondérer la sélection
@@ -85,9 +87,9 @@ export class ImagierService {
     // Construire les questions
     const questions: ImagierQuestion[] = [];
     for (const word of selected) {
-      const resolvedMode = dto.mode === 'random' || !dto.mode
+      const resolvedMode = mode === 'random'
         ? Math.random() > 0.5 ? 'fr_to_en' : 'en_to_fr'
-        : dto.mode;
+        : mode;
 
       const distractors = this.pickDistractors(word, allWords, choicesCount - 1);
       const correct = {
@@ -114,13 +116,13 @@ export class ImagierService {
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
-      mode: dto.mode ?? 'fr_to_en',
+      mode,
       difficulty,
       categories: JSON.stringify(dto.categories ?? []),
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds };
+    return { session_id: session.id, questions, timer_seconds: timerSeconds, difficulty };
   }
 
   async recordAnswer(sessionId: string, wordId: string, isCorrect: boolean): Promise<void> {
@@ -296,7 +298,8 @@ export class ImagierService {
     count: number,
     threshold: number,
   ): ImagierWord[] {
-    if (words.length <= count) return this.shuffle([...words]);
+    // count <= 0 = « illimité » → tout le pool de mots actifs.
+    if (count <= 0 || words.length <= count) return this.shuffle([...words]);
 
     // Tableau pondéré par maîtrise (fréquence selon le score)
     const weighted: ImagierWord[] = [];

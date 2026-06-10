@@ -16,7 +16,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Settings', 'Catalog'],
+  tagTypes: ['Settings', 'Catalog', 'ImagierCategories'],
   endpoints: (builder) => ({
     getSettings: builder.query<Record<string, string>, void>({
       query: () => '/settings',
@@ -41,6 +41,13 @@ export const api = createApi({
     >({
       query: ({ id, payload }) => ({ url: `/catalog/modules/${id}`, method: 'PATCH', body: payload }),
       invalidatesTags: ['Catalog'],
+    }),
+    getImagierCategories: builder.query<
+      { category: string; count: number; active_count: number }[],
+      void
+    >({
+      query: () => '/imagier/categories',
+      providesTags: ['ImagierCategories'],
     }),
   }),
 });

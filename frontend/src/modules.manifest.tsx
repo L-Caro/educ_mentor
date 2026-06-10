@@ -2,9 +2,9 @@ import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
+import { IMAGIER_SETUP_OPTIONS } from 'src/components/modules/imagier/imagier.setup';
 
 // ─── Composants enfant (jeu) ──────────────────────────────────────────────────
-import ImagierHome from 'src/components/modules/imagier/child/ImagierHome';
 import ImagierGame from 'src/components/modules/imagier/child/ImagierGame';
 import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
 import TablesHome from 'src/components/modules/tables/child/TablesHome';
@@ -74,7 +74,8 @@ export const MODULES: ModuleManifest[] = [
     id: 'imagier',
     label: 'Imagier Anglais',
     icon: '🇬🇧',
-    child: { Home: ImagierHome, Game: ImagierGame, Result: ImagierResult },
+    setupOptions: IMAGIER_SETUP_OPTIONS,
+    child: { Game: ImagierGame, Result: ImagierResult },
     adminTabs: [
       { to: '/admin/imagier', label: 'Mots', end: true },
       { to: '/admin/imagier/images', label: 'Images' },

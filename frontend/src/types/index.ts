@@ -49,6 +49,7 @@ export interface ImagierSessionResponse {
   session_id: string;
   questions: ImagierQuestion[];
   timer_seconds: number;
+  difficulty: string;
 }
 
 // ── Tables de multiplication ───────────────────────────────────────────────

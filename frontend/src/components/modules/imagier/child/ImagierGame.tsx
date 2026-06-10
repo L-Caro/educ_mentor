@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { startSession, recordAnswer, completeSession } from 'src/api/module/imagier.api.ts';
 import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
 import GameFooter from 'src/components/common/Game/GameFooter.tsx';
@@ -14,27 +14,22 @@ import GameCard from 'src/components/common/Game/GameCard.tsx';
 import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import { capitalize } from 'src/utils/capitilize.ts';
-import { useDevMode, useGameSession } from 'src/hook';
+import { useDevMode, useGameSession, useAppSelector } from 'src/hook';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 import DevBadge from 'src/components/common/DevBadge';
 
 type ImagierResult = { question: ImagierQuestion; wasCorrect: boolean };
 
 export default function ImagierGame() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { isDevMode } = useDevMode();
+  const setup = useAppSelector(selectModuleSetup('imagier'));
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [freeInput, setFreeInput] = useState('');
 
-  const difficulty = searchParams.get('difficulty') ?? 'level_1';
-  const isFreeMode = difficulty === 'level_3';
-
-  // Lus une seule fois au montage — pas de dépendance sur searchParams dans le loader
-  const sessionCategories = searchParams.get('categories')?.split(',').filter(Boolean);
-  const sessionMode = searchParams.get('mode') ?? 'fr_to_en';
-  const sessionDifficulty = searchParams.get('difficulty') ?? 'level_1';
-  const sessionCount = parseInt(searchParams.get('count') ?? '10', 10);
+  // Choix éphémère (catégories) depuis le slice ; mode/difficulté/count sont lus côté back.
+  const sessionCategories = setup?.categories as string[] | undefined;
 
   const {
     loading, error,
@@ -42,12 +37,7 @@ export default function ImagierGame() {
     timeRemaining, timerPct, isUrgent,
     submitAnswer, handleTerminate,
   } = useGameSession<ImagierSessionResponse, ImagierQuestion, ImagierResult>({
-    loader: () => startSession({
-      categories: sessionCategories,
-      mode: sessionMode,
-      difficulty: sessionDifficulty,
-      count: sessionCount,
-    }),
+    loader: () => startSession(sessionCategories),
     homePath: '/module/imagier',
     resultsPath: '/module/imagier/result',
     getQuestions: (session) => session.questions,
@@ -66,6 +56,7 @@ export default function ImagierGame() {
     if (!session || answerState !== 'idle') return;
 
     const question = session.questions[currentIdx];
+    const isFreeMode = session.difficulty === 'level_3';
     const correctChoiceLabel = question.choices.find((choice) => choice.id === question.correct_id)?.label ?? '';
     let isCorrect: boolean;
     let choiceId: string;
@@ -95,6 +86,7 @@ export default function ImagierGame() {
   }
 
   const question = session.questions[currentIdx];
+  const isFreeMode = session.difficulty === 'level_3';
   const timerSeconds = session.timer_seconds;
   const total = session.questions.length;
   const progress = (currentIdx / total) * 100;

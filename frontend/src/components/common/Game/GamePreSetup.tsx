@@ -9,10 +9,13 @@ export interface SetupChoice {
   description?: string;
 }
 
-/** Une option de pré-jeu : choix unique (`single`) ou multiple (`multi`). */
+/**
+ * Une option de pré-jeu : choix unique (`single`) ou multiple (`multi`).
+ * `choices` statiques OU `loader` async (résolu par <ModulePreSetup> avant rendu).
+ */
 export type SetupOption =
-  | { key: string; type: 'single'; label: string; choices: SetupChoice[] }
-  | { key: string; type: 'multi'; label: string; choices: SetupChoice[] };
+  | { key: string; type: 'single'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> }
+  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> };
 
 export type SetupValues = Record<string, string | string[]>;
 
@@ -66,7 +69,7 @@ export default function GamePreSetup({
           <section key={option.key} className="GamePreSetup__group">
             <p className="GamePreSetup__groupLabel">{option.label}</p>
             <div className="GamePreSetup__choices">
-              {option.choices.map((choice) => {
+              {(option.choices ?? []).map((choice) => {
                 const isSelected =
                   option.type === 'single'
                     ? values[option.key] === choice.value
