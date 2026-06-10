@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { getModules } from 'src/api/catalog.api';
-import ModuleCard from 'src/components/common/ModuleCard.tsx';
+import ModuleCard from 'src/components/common/Game/ModuleCard.tsx';
 import Spinner from 'src/components/common/Spinner';
 import SessionTimerDisplay from 'src/components/common/SessionTimerDisplay';
 import type { AppModule } from 'src/types';

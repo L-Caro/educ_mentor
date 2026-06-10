@@ -10,7 +10,9 @@
       "Bash(python3 -c ' *)",
       "Bash(python3 -m json.tool)",
       "Bash(python3 -c \"import sys,json; [print\\(' -', v['name']\\) for v in json.load\\(sys.stdin\\)]\")",
-      "PowerShell(wsl -d fedora bash -lc \"cd /home/lionel/development/projets/maeve/educ_mentor/frontend && node_modules/.bin/tsc --noEmit -p tsconfig.app.json 2>&1; echo EXIT=\\\\$?\")"
+      "PowerShell(wsl -d fedora bash -lc \"cd /home/lionel/development/projets/maeve/educ_mentor/frontend && node_modules/.bin/tsc --noEmit -p tsconfig.app.json 2>&1; echo EXIT=\\\\$?\")",
+      "PowerShell(\"---\")",
+      "Bash(ls -la \"/home/lionel/development/projets/maeve/educ_mentor/.claude\" 2>/dev/null; echo \"---MEMORY DIR---\"; ls -la \"/c/Users/Lionel/.claude/projects/--wsl-localhost-fedora-home-lionel-development-projets-maeve-educ-mentor/memory/\" 2>/dev/null)"
     ]
   }
 }

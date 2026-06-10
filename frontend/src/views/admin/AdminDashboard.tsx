@@ -1,38 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getProgression as getImagierProgression, resetProgression as resetImagierProgression } from 'src/api/imagier.api';
-import { getCalculProgression, resetCalculProgression } from 'src/api/calcul.api';
-import { getTablesProgression, resetTablesProgression } from 'src/api/tables.api';
-import { getMonnaieProgression, resetMonnaieProgression } from 'src/api/monnaie.api';
 import Spinner from 'src/components/common/Spinner';
+import { MODULES } from 'src/modules.manifest';
+import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest';
 
 const SHORTCUTS = [
   { to: '/admin/modules', icon: '🧩', label: 'Modules', desc: 'Activer / désactiver les modules' },
   { to: '/settings', icon: '⚙️', label: 'Paramètres', desc: 'Options de jeu' },
 ];
 
-interface ProgressionStats {
+interface ProgressionSummary {
   mastered: number;
   inProgress: number;
   accuracy: number | null;
 }
 
-interface ModuleDef {
-  id: string;
-  label: string;
-  icon: string;
-}
-
-const MODULE_DEFS: ModuleDef[] = [
-  { id: 'imagier', label: 'Imagier Anglais', icon: '🇬🇧' },
-  { id: 'tables', label: 'Tables', icon: '✖️' },
-  { id: 'calcul', label: 'Calcul Mental', icon: '🧮' },
-  { id: 'monnaie', label: 'Monnaie', icon: '💶' },
-];
-
-function computeStats(
-  items: { is_mastered: boolean; correct_count: number; incorrect_count: number }[],
-): ProgressionStats {
+function computeStats(items: ProgressionStat[]): ProgressionSummary {
   const seen = items.filter((item) => item.correct_count > 0 || item.incorrect_count > 0);
   const mastered = seen.filter((item) => item.is_mastered).length;
   const inProgress = seen.filter((item) => !item.is_mastered).length;
@@ -43,48 +26,28 @@ function computeStats(
 }
 
 export default function AdminDashboard() {
-  const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionStats>>>({});
+  const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { loadAll(); }, []);
 
   async function loadAll() {
     setLoading(true);
-
-    const [imagierItems, calculItems, tablesItems, monnaieItems] = await Promise.all([
-      getImagierProgression().catch(() => []),
-      getCalculProgression().catch(() => []),
-      getTablesProgression().catch(() => []),
-      getMonnaieProgression().catch(() => []),
-    ]);
-
-    const imagierStats = computeStats(
-      imagierItems
-        .filter((item) => item.progression !== null)
-        .map((item) => item.progression!),
+    const entries = await Promise.all(
+      MODULES.map(async (module): Promise<[string, ProgressionSummary | undefined]> => {
+        if (!module.progression) return [module.id, undefined];
+        const items = await module.progression.getStats().catch(() => []);
+        return [module.id, computeStats(items)];
+      }),
     );
-
-    setStatsMap({
-      imagier: imagierStats,
-      calcul: computeStats(calculItems),
-      tables: computeStats(tablesItems),
-      monnaie: computeStats(monnaieItems),
-    });
-
+    setStatsMap(Object.fromEntries(entries));
     setLoading(false);
   }
 
-  async function handleReset(moduleId: string) {
-    if (!confirm(`Réinitialiser toute la progression ${MODULE_DEFS.find((m) => m.id === moduleId)?.label} ? Action irréversible.`)) return;
-
-    const resetFns: Record<string, () => Promise<void>> = {
-      imagier: resetImagierProgression,
-      calcul: resetCalculProgression,
-      tables: resetTablesProgression,
-      monnaie: resetMonnaieProgression,
-    };
-
-    await resetFns[moduleId]?.();
+  async function handleReset(module: ModuleManifest) {
+    if (!module.progression) return;
+    if (!confirm(`Réinitialiser toute la progression ${module.label} ? Action irréversible.`)) return;
+    await module.progression.reset();
     await loadAll();
   }
 
@@ -112,15 +75,15 @@ export default function AdminDashboard() {
           <Spinner size="sm" />
         ) : (
           <div className="AdminDashboard__modules">
-            {MODULE_DEFS.map((moduleDef) => {
-              const stats = statsMap[moduleDef.id];
+            {MODULES.map((module) => {
+              const stats = statsMap[module.id];
               const hasData = stats !== undefined && (stats.mastered > 0 || stats.inProgress > 0);
 
               return (
-                <div key={moduleDef.id} className="AdminDashboard__module">
+                <div key={module.id} className="AdminDashboard__module">
                   <div className="AdminDashboard__moduleHeader">
-                    <span className="AdminDashboard__moduleIcon">{moduleDef.icon}</span>
-                    <p className="AdminDashboard__moduleLabel">{moduleDef.label}</p>
+                    <span className="AdminDashboard__moduleIcon">{module.icon}</span>
+                    <p className="AdminDashboard__moduleLabel">{module.label}</p>
                   </div>
 
                   {hasData ? (
@@ -139,7 +102,7 @@ export default function AdminDashboard() {
 
                   <button
                     className="AdminBtn AdminBtn--danger-ghost AdminDashboard__moduleReset"
-                    onClick={() => handleReset(moduleDef.id)}
+                    onClick={() => handleReset(module)}
                     disabled={!hasData}
                   >
                     Réinitialiser

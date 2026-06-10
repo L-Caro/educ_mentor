@@ -1,6 +1,6 @@
-import Button from 'src/components/common/Button';
-import Spinner from 'src/components/common/Spinner';
-import PageContainer from 'src/components/layout/PageContainer/PageContainer';
+import Button from 'src/components/common/Button.tsx';
+import Spinner from 'src/components/common/Spinner.tsx';
+import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 
 interface GameStateViewProps {
   loading?: boolean;

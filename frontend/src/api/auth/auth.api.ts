@@ -1,4 +1,4 @@
-import client from './client';
+import client from '../client.ts';
 
 export async function verifyPin(pin: string): Promise<string> {
   const { data } = await client.post<{ token: string }>('/auth/verify-pin', { pin });

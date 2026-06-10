@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getCategories } from 'src/api/imagier.api';
+import { getCategories } from 'src/api/module/imagier.api.ts';
 import { getSettingsMap } from 'src/api/settings.api';
 import Button from "src/components/common/Button.tsx";
 import Spinner from 'src/components/common/Spinner';

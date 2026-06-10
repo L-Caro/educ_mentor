@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { ImagierQuestion } from 'src/types';
-import GameResultPage from 'src/components/common/GameResultPage';
+import GameResultPage from 'src/components/common/Game/GameResultPage.tsx';
 
 interface ResultState {
   correctCount: number;

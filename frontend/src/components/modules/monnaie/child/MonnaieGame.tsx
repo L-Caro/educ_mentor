@@ -1,21 +1,21 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/monnaie.api';
+import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/module/monnaie.api.ts';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
 import type { MonnaieHistoryEntry } from './MonnaieResult';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from '../constants/denominations';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import GameFooter from 'src/components/common/GameFooter';
-import GameChoices from 'src/components/common/GameChoices';
-import GameInput from 'src/components/common/GameInput';
-import GameCorrection from 'src/components/common/GameCorrection';
-import GameScoreBar from 'src/components/common/GameScoreBar';
-import GameProgressBar from 'src/components/common/GameProgressBar';
-import GameTimerBar from 'src/components/common/GameTimerBar';
-import GameCard from 'src/components/common/GameCard';
-import GamePrompt from 'src/components/common/GamePrompt';
-import GameStateView from 'src/components/common/GameStateView';
-import { useGameSession } from 'src/hook';
+import GameFooter from 'src/components/common/Game/GameFooter.tsx';
+import GameChoices from 'src/components/common/Game/GameChoices.tsx';
+import GameInput from 'src/components/common/Game/GameInput.tsx';
+import GameCorrection from 'src/components/common/Game/GameCorrection.tsx';
+import GameScoreBar from 'src/components/common/Game/GameScoreBar.tsx';
+import GameProgressBar from 'src/components/common/Game/GameProgressBar.tsx';
+import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
+import GameCard from 'src/components/common/Game/GameCard.tsx';
+import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
+import GameStateView from 'src/components/common/Game/GameStateView.tsx';
+import { useDevMode, useGameSession } from 'src/hook';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   reconnaitre: 'Combien y a-t-il en tout ?',
@@ -67,6 +67,8 @@ function renderQuestion(question: MonnaieQuestion) {
 export default function MonnaieGame() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDevMode } = useDevMode();
+
   const exerciseType = (location.state as { exerciseType?: MonnaieExerciseType } | null)?.exerciseType;
 
   const [inputValue, setInputValue] = useState('');
@@ -92,6 +94,7 @@ export default function MonnaieGame() {
     buildTimeoutResult: (question) => ({ question, given: null, correct: false, timeout: true }),
     recordTimeout: (sessionId, question) => recordMonnaieAnswer(sessionId, question.type, question.answer, false),
     onQuestionChange: () => { setInputValue(''); setSelectedChoice(null); },
+    skipApiCalls: isDevMode,
   });
 
   function handleValidate() {

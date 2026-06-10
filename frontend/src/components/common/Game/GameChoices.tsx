@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { GameAnswerState } from 'src/hook/useGameSession';
+import type { GameAnswerState } from 'src/hook/useGameSession.ts';
 
 export interface GameChoiceOption {
   key: string;        // identité unique du choix (sert aussi de clé React)

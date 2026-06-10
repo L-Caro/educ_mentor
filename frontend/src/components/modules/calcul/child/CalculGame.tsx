@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/calcul.api';
+import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/module/calcul.api.ts';
 import type { CalculSessionResponse } from 'src/types';
 import type { CalculHistoryEntry } from './CalculResult';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import GameFooter from 'src/components/common/GameFooter';
-import GameInput from 'src/components/common/GameInput';
-import GameCorrection from 'src/components/common/GameCorrection';
-import GameScoreBar from 'src/components/common/GameScoreBar';
-import GameProgressBar from 'src/components/common/GameProgressBar';
-import GameTimerBar from 'src/components/common/GameTimerBar';
-import GameCard from 'src/components/common/GameCard';
-import GamePrompt from 'src/components/common/GamePrompt';
-import GameStateView from 'src/components/common/GameStateView';
+import GameFooter from 'src/components/common/Game/GameFooter.tsx';
+import GameInput from 'src/components/common/Game/GameInput.tsx';
+import GameCorrection from 'src/components/common/Game/GameCorrection.tsx';
+import GameScoreBar from 'src/components/common/Game/GameScoreBar.tsx';
+import GameProgressBar from 'src/components/common/Game/GameProgressBar.tsx';
+import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
+import GameCard from 'src/components/common/Game/GameCard.tsx';
+import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
+import GameStateView from 'src/components/common/Game/GameStateView.tsx';
 import { useGameSession } from 'src/hook';
 
 function renderOperation(operation: string) {

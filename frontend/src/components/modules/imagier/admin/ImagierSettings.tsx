@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useModuleSettings } from 'src/hook';
-import { normalizeCategories } from 'src/api/imagier.api';
+import { normalizeCategories } from 'src/api/module/imagier.api.ts';
 import Spinner from 'src/components/common/Spinner';
 import type { ImagierDifficulty, ImagierMode } from 'src/types';
 

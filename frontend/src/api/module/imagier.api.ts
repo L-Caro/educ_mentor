@@ -1,5 +1,5 @@
-import client from './client';
-import type { ImagierWord, ImagierSessionResponse } from '../types';
+import client from '../client.ts';
+import type { ImagierWord, ImagierSessionResponse } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 

@@ -1,20 +1,19 @@
 import { useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { startTablesSession, recordTablesAnswer, completeTablesSession } from 'src/api/tables.api';
+import { startTablesSession, recordTablesAnswer, completeTablesSession } from 'src/api/module/tables.api.ts';
 import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import GameFooter from 'src/components/common/GameFooter';
-import GameChoices from 'src/components/common/GameChoices';
-import GameInput from 'src/components/common/GameInput';
-import GameCorrection from 'src/components/common/GameCorrection';
-import GameScoreBar from 'src/components/common/GameScoreBar';
-import GameProgressBar from 'src/components/common/GameProgressBar';
-import GameTimerBar from 'src/components/common/GameTimerBar';
-import GameCard from 'src/components/common/GameCard';
-import GamePrompt from 'src/components/common/GamePrompt';
-import GameStateView from 'src/components/common/GameStateView';
-import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
-import { generateTablesDevSession } from 'src/api/tables.dev';
+import GameFooter from 'src/components/common/Game/GameFooter.tsx';
+import GameChoices from 'src/components/common/Game/GameChoices.tsx';
+import GameInput from 'src/components/common/Game/GameInput.tsx';
+import GameCorrection from 'src/components/common/Game/GameCorrection.tsx';
+import GameScoreBar from 'src/components/common/Game/GameScoreBar.tsx';
+import GameProgressBar from 'src/components/common/Game/GameProgressBar.tsx';
+import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
+import GameCard from 'src/components/common/Game/GameCard.tsx';
+import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
+import GameStateView from 'src/components/common/Game/GameStateView.tsx';
+import { useDevMode, useGameSession } from 'src/hook';
 import DevBadge from 'src/components/common/DevBadge';
 
 type TablesResult = { question: TablesQuestion; wasCorrect: boolean };
@@ -41,11 +40,9 @@ export default function TablesGame() {
     loading, error,
     session, currentIdx, answerState, correctCount,
     timeRemaining, timerPct, isUrgent,
-    submitAnswer, advanceNow, handleTerminate,
+    submitAnswer, handleTerminate,
   } = useGameSession<TablesSessionResponse, TablesQuestion, TablesResult>({
-    loader: () => isDevMode
-      ? Promise.resolve(generateTablesDevSession({ selectedTables: tables, count, choicesCount, excludeTrivial }))
-      : startTablesSession({ selectedTables: tables, count, choicesCount, excludeTrivial }),
+    loader: () => startTablesSession({ selectedTables: tables, count, choicesCount, excludeTrivial }),
     homePath: '/module/tables',
     resultsPath: '/module/tables/result',
     getQuestions: (session) => session.questions,
@@ -59,8 +56,6 @@ export default function TablesGame() {
     skipApiCalls: isDevMode,
     emptySessionError: 'Aucune question disponible. Sélectionne au moins une table.',
   });
-
-  useNextOnSpace(answerState, advanceNow);
 
   function handleValidate() {
     if (!session || answerState !== 'idle') return;

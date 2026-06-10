@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getWords, updateWord, deleteWord } from 'src/api/imagier.api';
+import { getWords, updateWord, deleteWord } from 'src/api/module/imagier.api.ts';
 import Badge from 'src/components/common/Badge';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';

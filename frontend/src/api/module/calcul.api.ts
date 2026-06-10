@@ -1,4 +1,4 @@
-import client from './client';
+import client from '../client.ts';
 import type { CalculSessionResponse, CalculProgression, CalculSession } from 'src/types';
 
 export async function startCalculSession(): Promise<CalculSessionResponse> {

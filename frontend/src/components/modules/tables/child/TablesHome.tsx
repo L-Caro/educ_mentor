@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getTableStatus } from 'src/api/tables.api';
+import { getTableStatus } from 'src/api/module/tables.api.ts';
 import { getSettingsMap } from 'src/api/settings.api';
 import type { TableStatus } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';

@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { startSession, recordAnswer, completeSession } from 'src/api/imagier.api';
+import { startSession, recordAnswer, completeSession } from 'src/api/module/imagier.api.ts';
 import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
-import GameFooter from 'src/components/common/GameFooter';
-import GameChoices from 'src/components/common/GameChoices';
-import GameInput from 'src/components/common/GameInput';
-import GameCorrection from 'src/components/common/GameCorrection';
-import GameProgressBar from 'src/components/common/GameProgressBar';
-import GameTimerBar from 'src/components/common/GameTimerBar';
-import GameScoreBar from 'src/components/common/GameScoreBar';
-import GameStateView from 'src/components/common/GameStateView';
-import GameCard from 'src/components/common/GameCard';
-import GamePrompt from 'src/components/common/GamePrompt';
+import GameFooter from 'src/components/common/Game/GameFooter.tsx';
+import GameChoices from 'src/components/common/Game/GameChoices.tsx';
+import GameInput from 'src/components/common/Game/GameInput.tsx';
+import GameCorrection from 'src/components/common/Game/GameCorrection.tsx';
+import GameProgressBar from 'src/components/common/Game/GameProgressBar.tsx';
+import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
+import GameScoreBar from 'src/components/common/Game/GameScoreBar.tsx';
+import GameStateView from 'src/components/common/Game/GameStateView.tsx';
+import GameCard from 'src/components/common/Game/GameCard.tsx';
+import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import { capitalize } from 'src/utils/capitilize.ts';
-import { useNextOnSpace, useDevMode, useGameSession } from 'src/hook';
+import { useDevMode, useGameSession } from 'src/hook';
 import DevBadge from 'src/components/common/DevBadge';
 
 type ImagierResult = { question: ImagierQuestion; wasCorrect: boolean };
@@ -40,7 +40,7 @@ export default function ImagierGame() {
     loading, error,
     session, currentIdx, answerState, correctCount,
     timeRemaining, timerPct, isUrgent,
-    submitAnswer, advanceNow, handleTerminate,
+    submitAnswer, handleTerminate,
   } = useGameSession<ImagierSessionResponse, ImagierQuestion, ImagierResult>({
     loader: () => startSession({
       categories: sessionCategories,
@@ -62,10 +62,9 @@ export default function ImagierGame() {
     emptySessionError: "Aucun mot disponible. Active des mots dans l'administration.",
   });
 
-  useNextOnSpace(answerState, advanceNow);
-
   function handleValidate() {
     if (!session || answerState !== 'idle') return;
+
     const question = session.questions[currentIdx];
     const correctChoiceLabel = question.choices.find((choice) => choice.id === question.correct_id)?.label ?? '';
     let isCorrect: boolean;

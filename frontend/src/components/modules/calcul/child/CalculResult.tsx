@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import GameResultPage from 'src/components/common/GameResultPage';
+import GameResultPage from 'src/components/common/Game/GameResultPage.tsx';
 
 export interface CalculHistoryEntry {
   operation: string;

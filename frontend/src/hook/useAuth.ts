@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from './redux';
 import { setToken, clearToken, selectIsAuthenticated } from 'src/store/slice/authSlice';
-import { verifyPin } from 'src/api/auth.api';
+import { verifyPin } from 'src/api/auth/auth.api.ts';
 
 export function useAuth() {
   const dispatch = useAppDispatch();

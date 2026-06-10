@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { createInvitation, deleteInvitation, fetchInvitations, type Invitation } from 'src/api/invitation.api';
+import { createInvitation, deleteInvitation, fetchInvitations, type Invitation } from 'src/api/auth/invitation.api.ts';
 import Spinner from 'src/components/common/Spinner';
 
 const InvitationsAdmin = () => {

@@ -1,4 +1,4 @@
-import client from './client';
+import client from '../client.ts';
 import type { MonnaieSessionResponse, MonnaieProgression, MonnaieSession } from 'src/types';
 
 export async function startMonnaieSession(exerciseType: string): Promise<MonnaieSessionResponse> {

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import Button from 'src/components/common/Button';
-import PageContainer from 'src/components/layout/PageContainer/PageContainer';
+import Button from 'src/components/common/Button.tsx';
+import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 
 interface GameResultPageProps {
   correctCount: number;

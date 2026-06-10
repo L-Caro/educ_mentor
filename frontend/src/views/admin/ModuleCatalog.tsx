@@ -4,7 +4,7 @@ import { getModules, updateModule } from 'src/api/catalog.api';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';
 import type { AppModule } from 'src/types';
-import { MODULE_REGISTRY } from 'src/modules.registry';
+import { MODULES } from 'src/modules.manifest';
 
 export default function ModuleCatalog() {
   const [modules, setModules] = useState<AppModule[]>([]);
@@ -26,7 +26,7 @@ export default function ModuleCatalog() {
 
       <div className="ModuleCatalog__list">
         {modules.map((mod) => {
-          const registryEntry = MODULE_REGISTRY.find((entry) => entry.id === mod.id);
+          const manifest = MODULES.find((entry) => entry.id === mod.id);
           return (
             <div key={mod.id} className="ModuleCatalog__item">
               <span className="ModuleCatalog__icon">{mod.icon}</span>
@@ -35,8 +35,8 @@ export default function ModuleCatalog() {
                 {mod.description && <p className="ModuleCatalog__desc">{mod.description}</p>}
               </div>
               <Toggle checked={mod.is_active} onChange={() => toggleActive(mod)} />
-              {registryEntry && (
-                <Link to={registryEntry.adminPath} className="ModuleCatalog__configure">
+              {manifest && (
+                <Link to={`/admin/${manifest.id}`} className="ModuleCatalog__configure">
                   Configurer →
                 </Link>
               )}

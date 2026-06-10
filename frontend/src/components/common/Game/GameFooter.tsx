@@ -1,4 +1,4 @@
-import Button from 'src/components/common/Button';
+import Button from 'src/components/common/Button.tsx';
 
 interface GameFooterProps {
   onTerminate: () => void;

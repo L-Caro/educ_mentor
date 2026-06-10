@@ -6,7 +6,7 @@ const AccessDenied = () => (
       Cet appareil n'a pas encore été invité à accéder à ÉducMentor.
     </p>
     <p className="text-muted">
-      Demande un lien d'invitation à Lionel.
+      Demande un lien d'invitation à l'administrateur du site.
     </p>
   </div>
 );

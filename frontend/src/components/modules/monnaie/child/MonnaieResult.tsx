@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { MonnaieQuestion } from 'src/types';
-import GameResultPage from 'src/components/common/GameResultPage';
+import GameResultPage from 'src/components/common/Game/GameResultPage.tsx';
 import { formatCents } from '../constants/denominations';
 
 export interface MonnaieHistoryEntry {

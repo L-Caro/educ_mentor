@@ -1,5 +1,5 @@
-import client from './client';
-import type { TablesSessionResponse, TablesProgression, TableStatus } from '../types';
+import client from '../client.ts';
+import type { TablesSessionResponse, TablesProgression, TableStatus } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 

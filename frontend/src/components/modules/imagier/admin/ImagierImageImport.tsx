@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { createWord, uploadWordImage } from 'src/api/imagier.api';
+import { createWord, uploadWordImage } from 'src/api/module/imagier.api.ts';
 import Spinner from 'src/components/common/Spinner';
 import { lookupWord, filenameToFr } from 'src/components/modules/imagier/constants/lookupWord';
 

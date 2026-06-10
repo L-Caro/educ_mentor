@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { createWord, updateWord, uploadWordImage, getWords, getCategories } from 'src/api/imagier.api';
+import { createWord, updateWord, uploadWordImage, getWords, getCategories } from 'src/api/module/imagier.api.ts';
 import Button from 'src/components/common/Button';
 import Spinner from 'src/components/common/Spinner';
 import type { ImagierWord } from 'src/types';
