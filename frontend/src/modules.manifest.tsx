@@ -1,0 +1,110 @@
+import type { ComponentType } from 'react';
+import type { RouteObject } from 'react-router-dom';
+import type { Tab } from 'src/components/common/TabNav';
+
+// ─── Composants enfant (jeu) ──────────────────────────────────────────────────
+import ImagierHome from 'src/components/modules/imagier/child/ImagierHome';
+import ImagierGame from 'src/components/modules/imagier/child/ImagierGame';
+import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
+import TablesHome from 'src/components/modules/tables/child/TablesHome';
+import TablesGame from 'src/components/modules/tables/child/TablesGame';
+import TablesResult from 'src/components/modules/tables/child/TablesResult';
+import CalculHome from 'src/components/modules/calcul/child/CalculHome';
+import CalculGame from 'src/components/modules/calcul/child/CalculGame';
+import CalculResult from 'src/components/modules/calcul/child/CalculResult';
+import MonnaieHome from 'src/components/modules/monnaie/child/MonnaieHome';
+import MonnaieGame from 'src/components/modules/monnaie/child/MonnaieGame';
+import MonnaieResult from 'src/components/modules/monnaie/child/MonnaieResult';
+
+// ─── Composants admin ─────────────────────────────────────────────────────────
+import ImagierWordList from 'src/components/modules/imagier/admin/ImagierWordList';
+import ImagierWordForm from 'src/components/modules/imagier/admin/ImagierWordForm';
+import ImagierImageImport from 'src/components/modules/imagier/admin/ImagierImageImport';
+import ImagierSettings from 'src/components/modules/imagier/admin/ImagierSettings';
+import TablesSettings from 'src/components/modules/tables/admin/TablesSettings';
+import CalculSettings from 'src/components/modules/calcul/admin/CalculSettings';
+import MonnaieSettings from 'src/components/modules/monnaie/admin/MonnaieSettings';
+
+// ─── Sources de progression (pour le tableau de bord) ─────────────────────────
+import { getProgression as getImagierProgression, resetProgression as resetImagierProgression } from 'src/api/module/imagier.api.ts';
+import { getCalculProgression, resetCalculProgression } from 'src/api/module/calcul.api.ts';
+import { getTablesProgression, resetTablesProgression } from 'src/api/module/tables.api.ts';
+import { getMonnaieProgression, resetMonnaieProgression } from 'src/api/module/monnaie.api.ts';
+
+/** Forme normalisée d'une ligne de progression, telle que consommée par le tableau de bord. */
+export interface ProgressionStat {
+  is_mastered: boolean;
+  correct_count: number;
+  incorrect_count: number;
+}
+
+export interface ModuleManifest {
+  id: string;            // = AppModule.id (backend) et segment d'URL
+  label: string;         // titre affiché (header enfant + admin)
+  icon: string;
+  child: {
+    Home?: ComponentType;   // page de sélection optionnelle
+    Game: ComponentType;
+    Result: ComponentType;
+  };
+  adminTabs: Tab[];
+  adminRoutes: RouteObject[];
+  progression?: {
+    getStats: () => Promise<ProgressionStat[]>;
+    reset: () => Promise<void>;
+  };
+}
+
+export const MODULES: ModuleManifest[] = [
+  {
+    id: 'imagier',
+    label: 'Imagier Anglais',
+    icon: '🇬🇧',
+    child: { Home: ImagierHome, Game: ImagierGame, Result: ImagierResult },
+    adminTabs: [
+      { to: '/admin/imagier', label: 'Mots', end: true },
+      { to: '/admin/imagier/images', label: 'Images' },
+      { to: '/admin/imagier/settings', label: 'Paramètres' },
+    ],
+    adminRoutes: [
+      { index: true, element: <ImagierWordList /> },
+      { path: 'images', element: <ImagierImageImport /> },
+      { path: 'settings', element: <ImagierSettings /> },
+      { path: 'mots/:id', element: <ImagierWordForm /> },
+    ],
+    progression: {
+      getStats: async () =>
+        (await getImagierProgression())
+          .filter((word) => word.progression !== null)
+          .map((word) => word.progression!),
+      reset: resetImagierProgression,
+    },
+  },
+  {
+    id: 'tables',
+    label: 'Tables de multiplication',
+    icon: '✖️',
+    child: { Home: TablesHome, Game: TablesGame, Result: TablesResult },
+    adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
+    adminRoutes: [{ index: true, element: <TablesSettings /> }],
+    progression: { getStats: getTablesProgression, reset: resetTablesProgression },
+  },
+  {
+    id: 'calcul-mental',
+    label: 'Calcul Mental',
+    icon: '🧮',
+    child: { Home: CalculHome, Game: CalculGame, Result: CalculResult },
+    adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
+    adminRoutes: [{ index: true, element: <CalculSettings /> }],
+    progression: { getStats: getCalculProgression, reset: resetCalculProgression },
+  },
+  {
+    id: 'monnaie',
+    label: 'Monnaie',
+    icon: '💶',
+    child: { Home: MonnaieHome, Game: MonnaieGame, Result: MonnaieResult },
+    adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
+    adminRoutes: [{ index: true, element: <MonnaieSettings /> }],
+    progression: { getStats: getMonnaieProgression, reset: resetMonnaieProgression },
+  },
+];
