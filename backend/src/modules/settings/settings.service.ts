@@ -21,7 +21,6 @@ const DEFAULTS = {
   // ── Calcul Mental ──────────────────────────────────────────────────────────
   calcul_min_value: '0',
   calcul_max_value: '20',
-  calcul_operation_types: 'complement,addition,soustraction',
   // ── Monnaie ────────────────────────────────────────────────────────────────
   monnaie_denominations: '1,2,5,10,20,50,100,200,500,1000,2000,5000',
   monnaie_max_amount: '10',

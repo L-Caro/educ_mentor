@@ -10,7 +10,6 @@ import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
 import TablesHome from 'src/components/modules/tables/child/TablesHome';
 import TablesGame from 'src/components/modules/tables/child/TablesGame';
 import TablesResult from 'src/components/modules/tables/child/TablesResult';
-import CalculHome from 'src/components/modules/calcul/child/CalculHome';
 import CalculGame from 'src/components/modules/calcul/child/CalculGame';
 import CalculResult from 'src/components/modules/calcul/child/CalculResult';
 import MonnaieGame from 'src/components/modules/monnaie/child/MonnaieGame';
@@ -69,6 +68,21 @@ const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
   },
 ];
 
+const CALCUL_SETUP_OPTIONS: SetupOption[] = [
+  {
+    key: 'operationTypes',
+    type: 'multi',
+    label: 'Quoi travailler ?',
+    choices: [
+      { value: 'complement', label: 'Compléments', description: '3 + ? = 10' },
+      { value: 'addition', label: 'Additions', description: '3 + 4 = ?' },
+      { value: 'soustraction', label: 'Soustractions', description: '10 − 3 = ?' },
+      { value: 'double', label: 'Doubles', description: 'Double de 6 = ?' },
+      { value: 'moitie', label: 'Moitiés', description: 'Moitié de 12 = ?' },
+    ],
+  },
+];
+
 export const MODULES: ModuleManifest[] = [
   {
     id: 'imagier',
@@ -108,7 +122,8 @@ export const MODULES: ModuleManifest[] = [
     id: 'calcul-mental',
     label: 'Calcul Mental',
     icon: '🧮',
-    child: { Home: CalculHome, Game: CalculGame, Result: CalculResult },
+    setupOptions: CALCUL_SETUP_OPTIONS,
+    child: { Game: CalculGame, Result: CalculResult },
     adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <CalculSettings /> }],
     progression: { getStats: getCalculProgression, reset: resetCalculProgression },

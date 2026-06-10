@@ -1,14 +1,14 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { CalculService } from './calcul.service';
-import { RecordCalculAnswerDto, CompleteCalculSessionDto } from './dto/calcul.dto';
+import { RecordCalculAnswerDto, CompleteCalculSessionDto, StartCalculSessionDto } from './dto/calcul.dto';
 
 @Controller('calcul')
 export class CalculGameController {
   constructor(private readonly calculService: CalculService) {}
 
   @Post('session')
-  startSession() {
-    return this.calculService.startSession();
+  startSession(@Body() dto: StartCalculSessionDto) {
+    return this.calculService.startSession(dto);
   }
 
   @Post('session/:id/answer')

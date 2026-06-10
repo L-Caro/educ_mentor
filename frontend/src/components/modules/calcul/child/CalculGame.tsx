@@ -13,7 +13,8 @@ import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
 import GameCard from 'src/components/common/Game/GameCard.tsx';
 import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
 import GameStateView from 'src/components/common/Game/GameStateView.tsx';
-import { useGameSession } from 'src/hook';
+import { useGameSession, useAppSelector } from 'src/hook';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 
 function renderOperation(operation: string) {
   const parts = operation.split('?');
@@ -25,6 +26,8 @@ function renderOperation(operation: string) {
 
 export default function CalculGame() {
   const navigate = useNavigate();
+  const setup = useAppSelector(selectModuleSetup('calcul-mental'));
+  const operationTypes = setup?.operationTypes as string[] | undefined;
 
   const [inputValue, setInputValue] = useState('');
 
@@ -34,7 +37,7 @@ export default function CalculGame() {
     timeRemaining, timerPct, isUrgent,
     submitAnswer, handleTerminate,
   } = useGameSession<CalculSessionResponse, CalculSessionResponse['questions'][number], CalculHistoryEntry>({
-    loader: () => startCalculSession(),
+    loader: () => startCalculSession(operationTypes),
     homePath: '/module/calcul-mental',
     resultsPath: '/module/calcul-mental/result',
     getQuestions: (session) => session.questions,

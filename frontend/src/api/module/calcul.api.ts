@@ -1,8 +1,8 @@
 import client from '../client.ts';
 import type { CalculSessionResponse, CalculProgression, CalculSession } from 'src/types';
 
-export async function startCalculSession(): Promise<CalculSessionResponse> {
-  const { data } = await client.post<CalculSessionResponse>('/calcul/session');
+export async function startCalculSession(operationTypes?: string[]): Promise<CalculSessionResponse> {
+  const { data } = await client.post<CalculSessionResponse>('/calcul/session', { operation_types: operationTypes });
   return data;
 }
 

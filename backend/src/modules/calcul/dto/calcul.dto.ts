@@ -1,4 +1,11 @@
-import { IsBoolean, IsInt, IsNumber } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+
+export class StartCalculSessionDto {
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  operation_types?: string[];
+}
 
 export class RecordCalculAnswerDto {
   @IsNumber()

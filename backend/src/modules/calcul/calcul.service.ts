@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CalculProgression } from './entities/calcul-progression.entity';
 import { CalculSession } from './entities/calcul-session.entity';
 import { SettingsService } from '../settings/settings.service';
-import type { RecordCalculAnswerDto } from './dto/calcul.dto';
+import type { RecordCalculAnswerDto, StartCalculSessionDto } from './dto/calcul.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 
 export interface CalculQuestion {
@@ -37,18 +37,16 @@ export class CalculService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(): Promise<CalculSessionResult> {
+  async startSession(dto: StartCalculSessionDto): Promise<CalculSessionResult> {
     const minValue = parseInt((await this.settingsService.get('calcul_min_value')) ?? '0', 10);
     const maxValue = parseInt((await this.settingsService.get('calcul_max_value')) ?? '20', 10);
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
     const questionsPerSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-    const operationTypesRaw = (await this.settingsService.get('calcul_operation_types')) ?? 'complement,addition,soustraction';
 
-    const parsedTypes = operationTypesRaw
-      .split(',')
-      .map((rawType) => rawType.trim())
+    // Types d'opérations = choix de pré-jeu (body) ; fallback sur les 3 de base si rien de valide.
+    const requestedTypes = (dto.operation_types ?? [])
       .filter((rawType): rawType is OperationType => VALID_OPERATION_TYPES.includes(rawType as OperationType));
-    const operationTypes: OperationType[] = parsedTypes.length > 0 ? parsedTypes : ['complement', 'addition', 'soustraction'];
+    const operationTypes: OperationType[] = requestedTypes.length > 0 ? requestedTypes : ['complement', 'addition', 'soustraction'];
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
