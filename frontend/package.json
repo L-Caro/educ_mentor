@@ -1,5 +1,5 @@
 {
-  "name": "base_react",
+  "name": "educmentor-frontend",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -14,6 +14,7 @@
   "dependencies": {
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-portal": "^1.1.10",
+    "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.15.0",
     "bootstrap": "^5.3.8",
     "react": "19.2.5",
@@ -25,7 +26,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
-    "@reduxjs/toolkit": "^2.11.2",
     "@types/node": "^24.12.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

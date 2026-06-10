@@ -58,7 +58,7 @@ export function useGameSession<TSession, TQuestion, TResult>({
   const answerStateRef = useRef<GameAnswerState>('idle');
   const correctCountRef = useRef(0);
   const resultsRef = useRef<TResult[]>([]);
-  // Ref sur le setTimeout d'avance automatique — permet l'annulation si advanceNow() est appelé avant
+  // Ref sur le setTimeout d'avance automatique — permet son annulation depuis handleTerminate
   const pendingAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { sessionRef.current = session; }, [session]);
@@ -185,24 +185,6 @@ export function useGameSession<TSession, TQuestion, TResult>({
     }, isCorrect ? 900 : 1600);
   }
 
-  /**
-   * Avance immédiatement sans attendre le délai du setTimeout.
-   * Utilisé avec useNextOnSpace pour que l'élève puisse passer à la suite
-   * en appuyant sur espace sans attendre la transition automatique.
-   */
-  function advanceNow() {
-    const currentSession = sessionRef.current;
-    const idx = currentIdxRef.current;
-    if (!currentSession || answerStateRef.current === 'idle') return;
-
-    if (pendingAdvanceRef.current) {
-      clearTimeout(pendingAdvanceRef.current);
-      pendingAdvanceRef.current = null;
-    }
-
-    advance(currentSession, idx);
-  }
-
   async function handleTerminate() {
     const config = configRef.current;
     const currentSession = sessionRef.current;
@@ -243,7 +225,6 @@ export function useGameSession<TSession, TQuestion, TResult>({
     timerPct,
     isUrgent,
     submitAnswer,
-    advanceNow,
     handleTerminate,
   };
 }
