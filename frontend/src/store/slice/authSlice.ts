@@ -44,6 +44,8 @@ const authSlice = createSlice({
 
 export const { setToken, clearToken } = authSlice.actions;
 
+export const selectToken = (state: RootState) => state.auth.token;
+
 export const selectIsAuthenticated = (state: RootState) =>
   isTokenValid(state.auth.token);
 
