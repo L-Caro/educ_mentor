@@ -1,25 +1,11 @@
 import client from '../client.ts';
-import type { TablesSessionResponse, TablesProgression, TableStatus } from '../../types';
+import type { TablesSessionResponse, TablesProgression } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 
-export interface TablesSessionParams {
-  selectedTables: number[];
-  count?: number;
-  choicesCount?: number; // 0 = free input, 2 or 4 = QCM
-  excludeTrivial?: boolean;
-}
-
-export async function startTablesSession(
-  params: TablesSessionParams,
-): Promise<TablesSessionResponse> {
-  const { data } = await client.get<TablesSessionResponse>('/tables/session', {
-    params: {
-      selected_tables: params.selectedTables.join(','),
-      ...(params.count !== undefined ? { count: params.count } : {}),
-      ...(params.choicesCount !== undefined ? { choices_count: params.choicesCount } : {}),
-      ...(params.excludeTrivial !== undefined ? { exclude_trivial: params.excludeTrivial } : {}),
-    },
+export async function startTablesSession(selectedTables: number[]): Promise<TablesSessionResponse> {
+  const { data } = await client.post<TablesSessionResponse>('/tables/session', {
+    selected_tables: selectedTables,
   });
   return data;
 }
@@ -46,13 +32,6 @@ export async function completeTablesSession(
     correct_answers: correctAnswers,
     total_questions: totalQuestions,
   });
-}
-
-// ─── Status (vue enfant) ──────────────────────────────────────────────────────
-
-export async function getTableStatus(): Promise<TableStatus[]> {
-  const { data } = await client.get<TableStatus[]>('/tables/status');
-  return data;
 }
 
 // ─── Admin ────────────────────────────────────────────────────────────────────

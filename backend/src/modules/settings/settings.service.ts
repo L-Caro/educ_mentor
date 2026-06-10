@@ -14,9 +14,7 @@ const DEFAULTS = {
   imagier_default_difficulty: 'level_1',
   imagier_default_mode: 'fr_to_en',
   // ── Tables de multiplication ───────────────────────────────────────────────
-  tables_known_tables: '[0,1,2,5,9,10]',
   tables_choice_count: '4',
-  tables_hints_enabled: 'true',
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────
   calcul_min_value: '0',

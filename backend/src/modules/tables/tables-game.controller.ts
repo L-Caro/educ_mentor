@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Param, Post } from '@nestjs/common';
 import { TablesService } from './tables.service';
 import {
   StartTablesSessionDto,
@@ -10,13 +10,8 @@ import {
 export class TablesGameController {
   constructor(private readonly tablesService: TablesService) {}
 
-  @Get('status')
-  getTableStatus() {
-    return this.tablesService.getTableStatus();
-  }
-
-  @Get('session')
-  startSession(@Query() dto: StartTablesSessionDto) {
+  @Post('session')
+  startSession(@Body() dto: StartTablesSessionDto) {
     return this.tablesService.startSession(dto);
   }
 

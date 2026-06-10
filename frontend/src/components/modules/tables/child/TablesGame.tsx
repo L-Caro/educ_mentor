@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { startTablesSession, recordTablesAnswer, completeTablesSession } from 'src/api/module/tables.api.ts';
 import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
@@ -13,28 +13,24 @@ import GameTimerBar from 'src/components/common/Game/GameTimerBar.tsx';
 import GameCard from 'src/components/common/Game/GameCard.tsx';
 import GamePrompt from 'src/components/common/Game/GamePrompt.tsx';
 import GameStateView from 'src/components/common/Game/GameStateView.tsx';
-import { useDevMode, useGameSession } from 'src/hook';
+import { useDevMode, useGameSession, useAppSelector } from 'src/hook';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 import DevBadge from 'src/components/common/DevBadge';
 
 type TablesResult = { question: TablesQuestion; wasCorrect: boolean };
 
 export default function TablesGame() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { isDevMode } = useDevMode();
+  const setup = useAppSelector(selectModuleSetup('tables'));
 
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [freeInput, setFreeInput] = useState('');
   const [streak, setStreak] = useState(0);
   const streakRef = useRef(0);
 
-  const isFreeMode = parseInt(searchParams.get('choices_count') ?? '4', 10) === 0;
-  const showHints = searchParams.get('hints') !== 'false';
-
-  const tables = searchParams.get('tables')?.split(',').map(Number).filter((n) => !isNaN(n)) ?? [];
-  const count = parseInt(searchParams.get('count') ?? '10', 10);
-  const choicesCount = parseInt(searchParams.get('choices_count') ?? '4', 10);
-  const excludeTrivial = searchParams.get('exclude_trivial') === 'true';
+  // Choix éphémère (tables) depuis le slice ; nombre/mode de réponse/trivial sont lus côté back.
+  const tables = (setup?.tables as string[] | undefined)?.map(Number).filter((n) => !isNaN(n)) ?? [];
 
   const {
     loading, error,
@@ -42,7 +38,7 @@ export default function TablesGame() {
     timeRemaining, timerPct, isUrgent,
     submitAnswer, handleTerminate,
   } = useGameSession<TablesSessionResponse, TablesQuestion, TablesResult>({
-    loader: () => startTablesSession({ selectedTables: tables, count, choicesCount, excludeTrivial }),
+    loader: () => startTablesSession(tables),
     homePath: '/module/tables',
     resultsPath: '/module/tables/result',
     getQuestions: (session) => session.questions,
@@ -60,6 +56,7 @@ export default function TablesGame() {
   function handleValidate() {
     if (!session || answerState !== 'idle') return;
     const question = session.questions[currentIdx];
+    const isFreeMode = question.choices.length === 0;
     let isCorrect: boolean;
 
     if (isFreeMode) {
@@ -87,6 +84,7 @@ export default function TablesGame() {
   }
 
   const question = session.questions[currentIdx];
+  const isFreeMode = question.choices.length === 0;
   const timerSeconds = session.timer_seconds;
   const total = session.questions.length;
   const progress = (currentIdx / total) * 100;
@@ -116,9 +114,6 @@ export default function TablesGame() {
           <p className="TablesGame__question">
             {question.display_a} × {question.display_b} = ?
           </p>
-          {showHints && question.hint && (
-            <p className="TablesGame__hint">{question.hint}</p>
-          )}
         </GamePrompt>
 
         {isFreeMode ? (

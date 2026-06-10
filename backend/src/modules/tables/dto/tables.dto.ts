@@ -1,13 +1,5 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  Max,
-  Min,
-} from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsInt, IsNumber, Max, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class StartTablesSessionDto {
   @IsArray()
@@ -20,26 +12,6 @@ export class StartTablesSessionDto {
       : value,
   )
   selected_tables: number[];
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(1)
-  @Max(50)
-  count?: number;
-
-  // 0 = saisie libre, 2 ou 4 = QCM
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  @Max(4)
-  choices_count?: number;
-
-  @IsOptional()
-  @Transform(({ value }) => value === 'true' || value === true)
-  @IsBoolean()
-  exclude_trivial?: boolean;
 }
 
 export class RecordTablesAnswerDto {

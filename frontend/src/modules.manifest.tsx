@@ -3,11 +3,11 @@ import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 import { IMAGIER_SETUP_OPTIONS } from 'src/components/modules/imagier/imagier.setup';
+import { TABLES_SETUP_OPTIONS } from 'src/components/modules/tables/tables.setup';
 
 // ─── Composants enfant (jeu) ──────────────────────────────────────────────────
 import ImagierGame from 'src/components/modules/imagier/child/ImagierGame';
 import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
-import TablesHome from 'src/components/modules/tables/child/TablesHome';
 import TablesGame from 'src/components/modules/tables/child/TablesGame';
 import TablesResult from 'src/components/modules/tables/child/TablesResult';
 import CalculGame from 'src/components/modules/calcul/child/CalculGame';
@@ -113,7 +113,8 @@ export const MODULES: ModuleManifest[] = [
     id: 'tables',
     label: 'Tables de multiplication',
     icon: '✖️',
-    child: { Home: TablesHome, Game: TablesGame, Result: TablesResult },
+    setupOptions: TABLES_SETUP_OPTIONS,
+    child: { Game: TablesGame, Result: TablesResult },
     adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <TablesSettings /> }],
     progression: { getStats: getTablesProgression, reset: resetTablesProgression },

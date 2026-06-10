@@ -59,8 +59,7 @@ export interface TablesQuestion {
   display_a: number;  // left operand as shown to child
   display_b: number;  // right operand as shown to child
   answer: number;
-  choices: number[];  // 4 shuffled numbers
-  hint: string;
+  choices: number[];  // QCM : 2 ou 4 nombres mélangés ; saisie libre : []
 }
 
 export interface TablesSessionResponse {
@@ -78,14 +77,6 @@ export interface TablesProgression {
   is_mastered: boolean;
   mastered_at?: string;
   last_seen?: string;
-}
-
-export interface TableStatus {
-  table: number;
-  is_known: boolean;
-  mastered_count: number;
-  in_progress_count: number;
-  total_facts: number;
 }
 
 // ── Calcul Mental ─────────────────────────────────────────────────────────────
