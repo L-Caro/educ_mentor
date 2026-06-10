@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useModuleSettings } from 'src/hook';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import { normalizeCategories } from 'src/api/module/imagier.api.ts';
 import Spinner from 'src/components/common/Spinner';
 import type { ImagierDifficulty, ImagierMode } from 'src/types';
@@ -17,7 +17,8 @@ const DIFFICULTIES: [ImagierDifficulty, string][] = [
 ];
 
 export default function ImagierSettings() {
-  const { settings, loading, saving, save } = useModuleSettings();
+  const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
+  const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
   const [normalizing, setNormalizing] = useState(false);
   const [normalizeResult, setNormalizeResult] = useState<number | null>(null);
 
@@ -55,7 +56,7 @@ export default function ImagierSettings() {
                   name="imagier-mode"
                   value={val}
                   checked={mode === val}
-                  onChange={() => save('imagier_default_mode', val)}
+                  onChange={() => updateSetting({ key: 'imagier_default_mode', value: val })}
                 />
                 {label}
               </label>
@@ -74,7 +75,7 @@ export default function ImagierSettings() {
                   name="imagier-difficulty"
                   value={val}
                   checked={difficulty === val}
-                  onChange={() => save('imagier_default_difficulty', val)}
+                  onChange={() => updateSetting({ key: 'imagier_default_difficulty', value: val })}
                 />
                 {label}
               </label>

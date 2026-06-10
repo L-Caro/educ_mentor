@@ -1,4 +1,4 @@
-import { useModuleSettings } from 'src/hook';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import Spinner from 'src/components/common/Spinner';
 
 const MAX_AMOUNT_PRESETS = [5, 10, 20, 50, 100, 500];
@@ -23,7 +23,8 @@ const BILLET_DENOMINATIONS = [
 ];
 
 export default function MonnaieSettings() {
-  const { settings, loading, saving, save } = useModuleSettings();
+  const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
+  const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
   function toggleDenomination(denominationValue: number, enabled: boolean) {
     const current = (settings.monnaie_denominations ?? '1,2,5,10,20,50,100,200,500,1000,2000,5000')
@@ -35,7 +36,7 @@ export default function MonnaieSettings() {
       updated = current.filter((activeValue) => activeValue !== denominationValue);
       if (updated.length === 0) return;
     }
-    save('monnaie_denominations', updated.join(','));
+    updateSetting({ key: 'monnaie_denominations', value: updated.join(',') });
   }
 
   if (loading) return <Spinner size="sm" />;
@@ -92,7 +93,7 @@ export default function MonnaieSettings() {
             <input
               type="checkbox"
               checked={wholeEuros}
-              onChange={(event) => save('monnaie_whole_euros', String(event.target.checked))}
+              onChange={(event) => updateSetting({ key: 'monnaie_whole_euros', value: String(event.target.checked) })}
             />
             Euros entiers uniquement
           </label>
@@ -107,7 +108,7 @@ export default function MonnaieSettings() {
                 key={preset}
                 type="button"
                 className={`MonnaieSettings__preset${maxAmount === preset ? ' MonnaieSettings__preset--active' : ''}`}
-                onClick={() => save('monnaie_max_amount', String(preset))}
+                onClick={() => updateSetting({ key: 'monnaie_max_amount', value: String(preset) })}
               >
                 {preset}€
               </button>
@@ -123,7 +124,7 @@ export default function MonnaieSettings() {
               type="range"
               min={1} max={10} step={1}
               value={itemsCount}
-              onChange={(event) => save('monnaie_items_count', event.target.value)}
+              onChange={(event) => updateSetting({ key: 'monnaie_items_count', value: event.target.value })}
               className="MonnaieSettings__range"
             />
             <span className="MonnaieSettings__rangeValue">{itemsCount}</span>
@@ -139,7 +140,7 @@ export default function MonnaieSettings() {
                 type="radio"
                 name="monnaie-mode"
                 checked={responseMode === 'free'}
-                onChange={() => save('monnaie_response_mode', 'free')}
+                onChange={() => updateSetting({ key: 'monnaie_response_mode', value: 'free' })}
               />
               Saisie libre
             </label>
@@ -148,7 +149,7 @@ export default function MonnaieSettings() {
                 type="radio"
                 name="monnaie-mode"
                 checked={responseMode === 'qcm'}
-                onChange={() => save('monnaie_response_mode', 'qcm')}
+                onChange={() => updateSetting({ key: 'monnaie_response_mode', value: 'qcm' })}
               />
               QCM (4 choix)
             </label>
@@ -165,7 +166,7 @@ export default function MonnaieSettings() {
                   type="radio"
                   name="monnaie-threshold"
                   checked={threshold === value}
-                  onChange={() => save('monnaie_mastery_threshold', String(value))}
+                  onChange={() => updateSetting({ key: 'monnaie_mastery_threshold', value: String(value) })}
                 />
                 {value} bonne{value > 1 ? 's' : ''} réponse{value > 1 ? 's' : ''}
               </label>

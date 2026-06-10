@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCategories } from 'src/api/module/imagier.api.ts';
-import { getSettingsMap } from 'src/api/settings.api';
+import { useGetSettingsQuery } from 'src/store/api/api';
 import Button from "src/components/common/Button.tsx";
 import Spinner from 'src/components/common/Spinner';
 import PageContainer from "src/components/layout/PageContainer/PageContainer.tsx";
@@ -15,39 +15,28 @@ interface CategoryData {
 
 export default function ImagierHome() {
   const navigate = useNavigate();
+  const { data: settings = {}, isLoading: settingsLoading } = useGetSettingsQuery();
   const [categories, setCategories] = useState<CategoryData[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
-  // ─── Chargement initial ───
+  // ─── Chargement initial des catégories ───
   useEffect(() => {
     let isMounted = true;
 
-    const loadData = async () => {
-      try {
-        const catsPromise = getCategories();
-        const settingsPromise = getSettingsMap();
-
-        const cats = await catsPromise;
-        const settingsMap = await settingsPromise;
-
+    getCategories()
+      .then((cats) => {
         if (!isMounted) return;
-
-        const active = cats.filter((c) => c.active_count > 0);
-        setCategories(active);
+        setCategories(cats.filter((c) => c.active_count > 0));
         setSelected(new Set());
-        setSettings(settingsMap);
-      } catch (error) {
-        console.error('Erreur de chargement:', error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
+      })
+      .catch((error) => console.error('Erreur de chargement:', error))
+      .finally(() => { if (isMounted) setCategoriesLoading(false); });
 
-    loadData();
     return () => { isMounted = false; };
   }, []);
+
+  const loading = settingsLoading || categoriesLoading;
 
 
   // ─── Toggle une catégorie (min 1 sélectionnée) ───

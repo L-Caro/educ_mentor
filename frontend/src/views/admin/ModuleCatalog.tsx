@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getModules, updateModule } from 'src/api/catalog.api';
+import { useGetModulesQuery, useUpdateModuleMutation } from 'src/store/api/api';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';
 import type { AppModule } from 'src/types';
 import { MODULES } from 'src/modules.manifest';
 
 export default function ModuleCatalog() {
-  const [modules, setModules] = useState<AppModule[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => { getModules().then(setModules).finally(() => setLoading(false)); }, []);
+  const { data: modules = [], isLoading: loading } = useGetModulesQuery();
+  const [updateModule] = useUpdateModuleMutation();
 
   async function toggleActive(mod: AppModule) {
-    const updated = await updateModule(mod.id, { is_active: !mod.is_active });
-    setModules((prev) => prev.map((m) => (m.id === mod.id ? updated : m)));
+    await updateModule({ id: mod.id, payload: { is_active: !mod.is_active } });
   }
 
   if (loading) return <Spinner size="sm" />;

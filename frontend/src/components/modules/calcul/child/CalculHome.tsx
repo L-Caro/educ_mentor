@@ -1,6 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getSettingsMap } from 'src/api/settings.api';
+import { useGetSettingsQuery } from 'src/store/api/api';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
 import Spinner from 'src/components/common/Spinner';
@@ -14,12 +13,7 @@ function formatTimer(seconds: number): string {
 
 export default function CalculHome() {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getSettingsMap().then(setSettings).finally(() => setLoading(false));
-  }, []);
+  const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
 
   const minValue = parseInt(settings.calcul_min_value ?? '0', 10);
   const maxValue = parseInt(settings.calcul_max_value ?? '20', 10);

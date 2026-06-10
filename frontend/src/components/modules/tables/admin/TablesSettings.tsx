@@ -1,11 +1,12 @@
-import { useModuleSettings } from 'src/hook';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import Spinner from 'src/components/common/Spinner';
 
 const ALL_TABLES = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 const THRESHOLDS = [2, 3, 5];
 
 export default function TablesSettings() {
-  const { settings, loading, saving, save } = useModuleSettings();
+  const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
+  const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
   if (loading) return <Spinner size="sm" />;
 
@@ -19,7 +20,7 @@ export default function TablesSettings() {
     const next = knownTables.includes(t)
       ? knownTables.filter((x) => x !== t)
       : [...knownTables, t].sort((a, b) => a - b);
-    save('tables_known_tables', JSON.stringify(next));
+    updateSetting({ key: 'tables_known_tables', value: JSON.stringify(next) });
   }
 
   return (
@@ -43,7 +44,7 @@ export default function TablesSettings() {
                   name="tables-choice-count"
                   value={val}
                   checked={choiceCount === val}
-                  onChange={() => save('tables_choice_count', val)}
+                  onChange={() => updateSetting({ key: 'tables_choice_count', value: val })}
                 />
                 {label}
               </label>
@@ -62,7 +63,7 @@ export default function TablesSettings() {
                   name="tables-threshold"
                   value={val}
                   checked={threshold === val}
-                  onChange={() => save('tables_mastery_threshold', String(val))}
+                  onChange={() => updateSetting({ key: 'tables_mastery_threshold', value: String(val) })}
                 />
                 {val} bonne{val > 1 ? 's' : ''} réponse{val > 1 ? 's' : ''}
               </label>
@@ -78,7 +79,7 @@ export default function TablesSettings() {
               <input
                 type="checkbox"
                 checked={hintsEnabled}
-                onChange={(e) => save('tables_hints_enabled', String(e.target.checked))}
+                onChange={(e) => updateSetting({ key: 'tables_hints_enabled', value: String(e.target.checked) })}
               />
               <span>Afficher les indices (astuce ×9, ×5…)</span>
             </label>
@@ -86,7 +87,7 @@ export default function TablesSettings() {
               <input
                 type="checkbox"
                 checked={includeTrivial}
-                onChange={(e) => save('tables_include_trivial', String(e.target.checked))}
+                onChange={(e) => updateSetting({ key: 'tables_include_trivial', value: String(e.target.checked) })}
               />
               <span>Inclure ×0 et ×1 dans les sessions</span>
             </label>

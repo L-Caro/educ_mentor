@@ -1,4 +1,4 @@
-import { useModuleSettings } from 'src/hook';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import Spinner from 'src/components/common/Spinner';
 
 const THRESHOLDS = [2, 3, 5];
@@ -12,7 +12,8 @@ const OPERATION_TYPES = [
 ] as const;
 
 export default function CalculSettings() {
-  const { settings, loading, saving, save, saveMultiple } = useModuleSettings();
+  const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
+  const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
   if (loading) return <Spinner size="sm" />;
 
@@ -25,12 +26,12 @@ export default function CalculSettings() {
 
   function handleMinChange(v: number) {
     const safeMin = Math.min(v, maxValue - 1);
-    save('calcul_min_value', String(safeMin));
+    updateSetting({ key: 'calcul_min_value', value: String(safeMin) });
   }
 
   function handleMaxChange(v: number) {
     const safeMax = Math.max(v, minValue + 1);
-    save('calcul_max_value', String(safeMax));
+    updateSetting({ key: 'calcul_max_value', value: String(safeMax) });
   }
 
   function toggleOperationType(key: string, enabled: boolean) {
@@ -45,7 +46,7 @@ export default function CalculSettings() {
       updatedTypes = currentTypes.filter((operationType) => operationType !== key);
       if (updatedTypes.length === 0) return;
     }
-    save('calcul_operation_types', updatedTypes.join(','));
+    updateSetting({ key: 'calcul_operation_types', value: updatedTypes.join(',') });
   }
 
   return (
@@ -66,7 +67,10 @@ export default function CalculSettings() {
                 key={max}
                 type="button"
                 className={`CalculSettings__preset${minValue === parseInt(min) && maxValue === parseInt(max) ? ' CalculSettings__preset--active' : ''}`}
-                onClick={() => saveMultiple([['calcul_min_value', min], ['calcul_max_value', max]])}
+                onClick={() => {
+                  updateSetting({ key: 'calcul_min_value', value: min });
+                  updateSetting({ key: 'calcul_max_value', value: max });
+                }}
               >
                 → {max}
               </button>
@@ -126,7 +130,7 @@ export default function CalculSettings() {
                   type="radio"
                   name="calcul-threshold"
                   checked={threshold === v}
-                  onChange={() => save('calcul_mastery_threshold', String(v))}
+                  onChange={() => updateSetting({ key: 'calcul_mastery_threshold', value: String(v) })}
                 />
                 {v} bonne{v > 1 ? 's' : ''} réponse{v > 1 ? 's' : ''}
               </label>

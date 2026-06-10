@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getTableStatus } from 'src/api/module/tables.api.ts';
-import { getSettingsMap } from 'src/api/settings.api';
+import { useGetSettingsQuery } from 'src/store/api/api';
 import type { TableStatus } from 'src/types';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Button from 'src/components/common/Button';
@@ -26,23 +26,21 @@ function tableBadge(status: TableStatus): string {
 
 export default function TablesHome() {
   const navigate = useNavigate();
+  const { data: settings = {}, isLoading: settingsLoading } = useGetSettingsQuery();
   const [statuses, setStatuses] = useState<TableStatus[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([getTableStatus(), getSettingsMap()])
-      .then(([s, settingsMap]) => {
-        if (!isMounted) return;
-        setStatuses(s);
-        setSettings(settingsMap);
-      })
+    getTableStatus()
+      .then((s) => { if (isMounted) setStatuses(s); })
       .catch(console.error)
-      .finally(() => { if (isMounted) setLoading(false); });
+      .finally(() => { if (isMounted) setStatusLoading(false); });
     return () => { isMounted = false; };
   }, []);
+
+  const loading = settingsLoading || statusLoading;
 
   const excludeTrivial = settings.tables_include_trivial === 'false';
   const visibleStatuses = excludeTrivial

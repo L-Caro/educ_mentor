@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Header from 'src/components/layout/Header/Header';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Toggle from 'src/components/common/Toggle';
 import { useDevMode } from 'src/hook';
 import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext';
-import { getSettingsMap, updateSetting } from 'src/api/settings.api';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import InvitationsAdmin from 'src/views/admin/InvitationsAdmin';
 
 const DURATION_STEPS = [0, 1, 10, 15, 20, 30, 45, 60];
@@ -22,23 +22,18 @@ export default function Settings() {
   const { isDevMode, toggle } = useDevMode();
   const [isAccessOpen, setIsAccessOpen] = useState(false);
 
+  const { data: settings } = useGetSettingsQuery();
+  const [updateSetting] = useUpdateSettingMutation();
+
   const [duration, setDuration] = useState(() =>
     parseInt(localStorage.getItem(DURATION_KEY) ?? '0', 10)
   );
 
-  const [questionCount, setQuestionCount] = useState(10);
-  const [timerEnabled, setTimerEnabled] = useState(false);
-  const [timerSeconds, setTimerSeconds] = useState(30);
-
-  useEffect(() => {
-    getSettingsMap().then((settingsMap) => {
-      const count = parseInt(settingsMap.questions_per_session ?? '10', 10);
-      const timer = parseInt(settingsMap.question_timer_seconds ?? '0', 10);
-      setQuestionCount(count);
-      setTimerEnabled(timer > 0);
-      if (timer > 0) setTimerSeconds(timer);
-    });
-  }, []);
+  // Dérivés du cache settings — pas de miroir d'état local (cf. « you might not need an effect »)
+  const questionCount = parseInt(settings?.questions_per_session ?? '10', 10);
+  const savedTimer = parseInt(settings?.question_timer_seconds ?? '0', 10);
+  const timerEnabled = savedTimer > 0;
+  const timerSeconds = timerEnabled ? savedTimer : 30;
 
   function handleDurationChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = DURATION_STEPS[parseInt(event.target.value, 10)];
@@ -48,19 +43,15 @@ export default function Settings() {
   }
 
   async function handleQuestionCountChange(count: number) {
-    setQuestionCount(count);
-    await updateSetting('questions_per_session', String(count));
+    await updateSetting({ key: 'questions_per_session', value: String(count) });
   }
 
   async function handleTimerToggle() {
-    const newEnabled = !timerEnabled;
-    setTimerEnabled(newEnabled);
-    await updateSetting('question_timer_seconds', newEnabled ? String(timerSeconds) : '0');
+    await updateSetting({ key: 'question_timer_seconds', value: timerEnabled ? '0' : String(timerSeconds) });
   }
 
   async function handleTimerSecondsChange(seconds: number) {
-    setTimerSeconds(seconds);
-    await updateSetting('question_timer_seconds', String(seconds));
+    await updateSetting({ key: 'question_timer_seconds', value: String(seconds) });
   }
 
   const sliderIndex = DURATION_STEPS.indexOf(duration) === -1 ? 0 : DURATION_STEPS.indexOf(duration);
