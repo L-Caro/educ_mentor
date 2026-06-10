@@ -20,6 +20,7 @@ import ModuleCatalog from 'src/views/admin/ModuleCatalog';
 import Settings from 'src/views/settings/Settings';
 
 import ModulePreSetup from 'src/components/common/Game/ModulePreSetup';
+import GameEngine from 'src/components/common/Game/GameEngine';
 
 // Source unique des modules
 import { MODULES, type ModuleManifest } from 'src/modules.manifest';
@@ -33,12 +34,23 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   const Result = module.child.Result;
   const handle = { title: module.label };
 
-  // Home dédié si déclaré, sinon écran de pré-jeu générique piloté par setupOptions.
-  const homeElement = Home ? <Home /> : module.setupOptions ? <ModulePreSetup module={module} /> : <Game />;
+  // Jeu : spec déclarative via <GameEngine>, sinon composant Game dédié (non encore migré).
+  const playElement = module.gameSpec
+    ? <GameEngine spec={module.gameSpec} moduleId={module.id} />
+    : Game
+      ? <Game />
+      : null;
+
+  // Pré-jeu : Home dédié si déclaré, sinon écran générique piloté par setupOptions.
+  const homeElement = Home
+    ? <Home />
+    : module.setupOptions
+      ? <ModulePreSetup module={module} />
+      : playElement;
 
   return [
     { path: `/module/${module.id}`, element: homeElement, handle },
-    { path: `/module/${module.id}/play`, element: <Game />, handle },
+    { path: `/module/${module.id}/play`, element: playElement, handle },
     { path: `/module/${module.id}/result`, element: <Result />, handle },
   ];
 }

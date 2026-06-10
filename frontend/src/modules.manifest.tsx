@@ -2,13 +2,14 @@ import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
+import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 import { IMAGIER_SETUP_OPTIONS } from 'src/components/modules/imagier/imagier.setup';
 import { TABLES_SETUP_OPTIONS } from 'src/components/modules/tables/tables.setup';
+import { tablesGameSpec } from 'src/components/modules/tables/tables.game';
 
 // ─── Composants enfant (jeu) ──────────────────────────────────────────────────
 import ImagierGame from 'src/components/modules/imagier/child/ImagierGame';
 import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
-import TablesGame from 'src/components/modules/tables/child/TablesGame';
 import TablesResult from 'src/components/modules/tables/child/TablesResult';
 import CalculGame from 'src/components/modules/calcul/child/CalculGame';
 import CalculResult from 'src/components/modules/calcul/child/CalculResult';
@@ -42,9 +43,13 @@ export interface ModuleManifest {
   label: string;         // titre affiché (header enfant + admin)
   icon: string;
   setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
+  // Spec de jeu déclarative (remplace child.Game, rendue par <GameEngine>). Registre hétérogène de
+  // specs → `any` assumé/documenté : chaque spec est typée concrètement dans son fichier `<id>.game.tsx`.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  gameSpec?: GameModuleSpec<any, any, any>;
   child: {
     Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
-    Game: ComponentType;
+    Game?: ComponentType;   // composant de jeu dédié (sinon gameSpec via <GameEngine>)
     Result: ComponentType;
   };
   adminTabs: Tab[];
@@ -114,7 +119,8 @@ export const MODULES: ModuleManifest[] = [
     label: 'Tables de multiplication',
     icon: '✖️',
     setupOptions: TABLES_SETUP_OPTIONS,
-    child: { Game: TablesGame, Result: TablesResult },
+    gameSpec: tablesGameSpec,
+    child: { Result: TablesResult },
     adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <TablesSettings /> }],
     progression: { getStats: getTablesProgression, reset: resetTablesProgression },
