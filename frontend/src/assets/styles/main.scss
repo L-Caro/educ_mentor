@@ -10,14 +10,6 @@
 @use '_layout/header';
 @use '_layout/pageContainer';
 
-@use './_modules/_imagier/imagierAdmin';
-
-@use './_modules/_tables/tablesAdmin';
-
-@use './_modules/_calcul/calculAdmin';
-
-@use './_modules/_monnaie/monnaieAdmin';
-
 @use './_components/button';
 @use './_components/gameFooter';
 @use './_components/gameResult';
@@ -28,6 +20,7 @@
 @use './_components/gameProgressBar';
 @use './_components/gameTimerBar';
 @use './_components/gameCard';
+@use './_components/gameSettings';
 @use './_components/gameStateView';
 @use './_components/gamePrompt';
 @use './_components/gamePreSetup';

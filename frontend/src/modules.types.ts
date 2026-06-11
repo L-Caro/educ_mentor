@@ -1,8 +1,8 @@
 import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav';
-import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
-import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
+import type { SetupOption } from 'src/components/game/GamePreSetup';
+import type { GameModuleSpec } from 'src/components/game/GameEngine';
 
 /** Forme normalisée d'une ligne de progression, telle que consommée par le tableau de bord. */
 export interface ProgressionStat {

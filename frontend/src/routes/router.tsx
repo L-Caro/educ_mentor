@@ -19,9 +19,9 @@ import AdminDashboard from 'src/views/admin/AdminDashboard';
 import ModuleCatalog from 'src/views/admin/ModuleCatalog';
 import Settings from 'src/views/settings/Settings';
 
-import ModulePreSetup from 'src/components/common/Game/ModulePreSetup';
-import LazyGame from 'src/components/common/Game/LazyGame';
-import GameResultView from 'src/components/common/Game/GameResultView';
+import ModulePreSetup from 'src/components/game/ModulePreSetup';
+import LazyGame from 'src/components/game/LazyGame';
+import GameResultView from 'src/components/game/GameResultView';
 
 // Source unique des modules
 import { MODULES, type ModuleManifest } from 'src/modules.manifest';
@@ -35,7 +35,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   const Result = module.child.Result;
   const handle = { moduleId: module.id };
 
-  // Jeu : spec chargée en lazy via <LazyGame> (code-splitting), sinon composant Game dédié.
+  // Jeu : spec chargée en lazy via <LazyGame> (code-splitting), sinon composant game dédié.
   const playElement = module.loadGameSpec
     ? <LazyGame load={module.loadGameSpec} moduleId={module.id} />
     : Game
