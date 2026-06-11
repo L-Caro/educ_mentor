@@ -20,8 +20,6 @@ const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
 
 export const monnaieModule: ModuleManifest = {
   id: 'monnaie',
-  label: 'Monnaie',
-  icon: '💶',
   setupOptions: MONNAIE_SETUP_OPTIONS,
   gameSpec: monnaieGameSpec,
   child: {},

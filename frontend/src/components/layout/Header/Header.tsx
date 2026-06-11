@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { useMatches, useNavigate } from 'react-router-dom';
 import { ThemeContext } from 'src/context/ThemeContext';
+import { useModuleMeta } from 'src/hooks/useModuleMeta';
 import dark from 'src/assets/images/dark-theme.svg';
 import light from 'src/assets/images/light-theme.svg';
 import { MAIN_TITLE } from "src/routes/router.tsx";
@@ -8,16 +9,22 @@ import GearButton from 'src/components/auth/GearButton';
 
 interface RouteHandle {
   title?: string;
+  moduleId?: string;
 }
 
 function Header() {
   const { theme, toggleTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const matches = useMatches();
+  const getModuleMeta = useModuleMeta();
 
-  const handle = matches[matches.length - 1]?.handle as RouteHandle | undefined;
-  const title = handle?.title ?? MAIN_TITLE;
-  const isHome = title === MAIN_TITLE && matches[matches.length - 1]?.pathname === '/';
+  const lastMatch = matches[matches.length - 1];
+  const handle = lastMatch?.handle as RouteHandle | undefined;
+  // Routes module → titre = nom backend (source unique) ; routes transverses → titre statique.
+  const title = handle?.moduleId
+    ? (getModuleMeta(handle.moduleId)?.name ?? '')
+    : (handle?.title ?? MAIN_TITLE);
+  const isHome = !handle?.moduleId && title === MAIN_TITLE && lastMatch?.pathname === '/';
 
   useEffect(() => {
     document.documentElement.setAttribute('class', theme);

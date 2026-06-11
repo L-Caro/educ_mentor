@@ -7,8 +7,6 @@ import TablesSettings from './admin/TablesSettings';
 
 export const tablesModule: ModuleManifest = {
   id: 'tables',
-  label: 'Tables de multiplication',
-  icon: '✖️',
   setupOptions: TABLES_SETUP_OPTIONS,
   gameSpec: tablesGameSpec,
   child: {},

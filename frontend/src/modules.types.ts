@@ -12,9 +12,7 @@ export interface ProgressionStat {
 }
 
 export interface ModuleManifest {
-  id: string;            // = AppModule.id (backend) et segment d'URL
-  label: string;         // titre affiché (header enfant + admin) — single-source backend reporté à EM-5.3
-  icon: string;
+  id: string;            // = AppModule.id (backend) et segment d'URL ; label/icon = catalogue backend (useModuleMeta)
   setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
   // Spec de jeu déclarative (rendue par <GameEngine>). Registre hétérogène de specs → `any`
   // assumé/documenté : chaque spec est typée concrètement dans son fichier `<id>.game.tsx`.

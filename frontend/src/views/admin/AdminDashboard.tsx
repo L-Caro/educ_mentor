@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from 'src/components/common/Spinner';
+import { useModuleMeta } from 'src/hooks';
 import { MODULES } from 'src/modules.manifest';
 import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest';
 
@@ -26,6 +27,7 @@ function computeStats(items: ProgressionStat[]): ProgressionSummary {
 }
 
 export default function AdminDashboard() {
+  const getModuleMeta = useModuleMeta();
   const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +48,8 @@ export default function AdminDashboard() {
 
   async function handleReset(module: ModuleManifest) {
     if (!module.progression) return;
-    if (!confirm(`Réinitialiser toute la progression ${module.label} ? Action irréversible.`)) return;
+    const moduleName = getModuleMeta(module.id)?.name ?? module.id;
+    if (!confirm(`Réinitialiser toute la progression ${moduleName} ? Action irréversible.`)) return;
     await module.progression.reset();
     await loadAll();
   }
@@ -82,8 +85,8 @@ export default function AdminDashboard() {
               return (
                 <div key={module.id} className="AdminDashboard__module">
                   <div className="AdminDashboard__moduleHeader">
-                    <span className="AdminDashboard__moduleIcon">{module.icon}</span>
-                    <p className="AdminDashboard__moduleLabel">{module.label}</p>
+                    <span className="AdminDashboard__moduleIcon">{getModuleMeta(module.id)?.icon}</span>
+                    <p className="AdminDashboard__moduleLabel">{getModuleMeta(module.id)?.name ?? module.id}</p>
                   </div>
 
                   {hasData ? (

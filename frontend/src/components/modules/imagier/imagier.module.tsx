@@ -10,8 +10,6 @@ import ImagierSettings from './admin/ImagierSettings';
 
 export const imagierModule: ModuleManifest = {
   id: 'imagier',
-  label: 'Imagier Anglais',
-  icon: '🇬🇧',
   setupOptions: IMAGIER_SETUP_OPTIONS,
   gameSpec: imagierGameSpec,
   child: {},

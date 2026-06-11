@@ -33,7 +33,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   const Home = module.child.Home;
   const Game = module.child.Game;
   const Result = module.child.Result;
-  const handle = { title: module.label };
+  const handle = { moduleId: module.id };
 
   // Jeu : spec déclarative via <GameEngine>, sinon composant Game dédié (non encore migré).
   const playElement = module.gameSpec
@@ -67,7 +67,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
 function buildAdminRoute(module: ModuleManifest): RouteObject {
   return {
     path: module.id,
-    element: <ModuleAdminLayout title={module.label} tabs={module.adminTabs} />,
+    element: <ModuleAdminLayout moduleId={module.id} tabs={module.adminTabs} />,
     children: module.adminRoutes,
   };
 }

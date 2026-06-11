@@ -22,8 +22,6 @@ const CALCUL_SETUP_OPTIONS: SetupOption[] = [
 
 export const calculModule: ModuleManifest = {
   id: 'calcul-mental',
-  label: 'Calcul Mental',
-  icon: '🧮',
   setupOptions: CALCUL_SETUP_OPTIONS,
   gameSpec: calculGameSpec,
   child: {},
