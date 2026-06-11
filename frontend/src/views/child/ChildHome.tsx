@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useGetModulesQuery } from 'src/store/api/api';
-import ModuleCard from 'src/components/common/Game/ModuleCard.tsx';
+import ModuleCard from 'src/components/common/ModuleCard.tsx';
 import Spinner from 'src/components/common/Spinner';
 import SessionTimerDisplay from 'src/components/common/SessionTimerDisplay';
 

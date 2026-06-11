@@ -2,7 +2,7 @@
 import {isRouteErrorResponse, useRouteError} from "react-router-dom";
 
 //? Components
-import ErrorPage from "src/components/Error/pages/ErrorPage.tsx";
+import ErrorPage from "src/components/error/pages/ErrorPage.tsx";
 
 
 //* On crée notre fonction de gestion d'erreur

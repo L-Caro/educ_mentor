@@ -11,7 +11,7 @@ import InvitePage from 'src/views/invite/InvitePage';
 import AdminAccessPage from 'src/views/invite/AdminAccessPage';
 
 // Error
-import ErrorRouter from 'src/components/Error/ErrorRouter';
+import ErrorRouter from 'src/components/error/ErrorRouter';
 
 // Vues
 import ChildHome from 'src/views/child/ChildHome';
