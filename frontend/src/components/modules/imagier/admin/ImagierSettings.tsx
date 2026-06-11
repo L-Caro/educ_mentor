@@ -1,17 +1,15 @@
 import { useState } from 'react';
-import { normalizeCategories } from 'src/api/module/imagier.api.ts';
+import { useNormalizeImagierCategoriesMutation } from '../imagier.api';
 import Spinner from 'src/components/common/Spinner';
 
 export default function ImagierSettings() {
-  const [normalizing, setNormalizing] = useState(false);
+  const [normalizeCategories, { isLoading: normalizing }] = useNormalizeImagierCategoriesMutation();
   const [normalizeResult, setNormalizeResult] = useState<number | null>(null);
 
   async function handleNormalizeCategories() {
-    setNormalizing(true);
     setNormalizeResult(null);
-    const result = await normalizeCategories();
+    const result = await normalizeCategories().unwrap();
     setNormalizeResult(result.updated);
-    setNormalizing(false);
   }
 
   return (

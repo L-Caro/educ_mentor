@@ -46,4 +46,5 @@ export const {
   useUpdateSettingMutation,
   useGetModulesQuery,
   useUpdateModuleMutation,
+  useGetImagierCategoriesQuery,
 } = sharedApi;

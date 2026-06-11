@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { createWord, uploadWordImage } from 'src/api/module/imagier.api.ts';
+import { useCreateImagierWordMutation, useUploadImagierWordImageMutation } from '../imagier.api';
 import Spinner from 'src/components/common/Spinner';
 import { lookupWord, filenameToFr } from 'src/components/modules/imagier/constants/lookupWord';
 
@@ -154,10 +154,12 @@ function WordDraftCard({ draft, onChange, onRemove }: CardProps) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function ImagierImageImport() {
-  const [drafts, setDrafts]     = useState<WordDraft[]>([]);
+  const [createWord] = useCreateImagierWordMutation();
+  const [uploadImage] = useUploadImagierWordImageMutation();
+  const [drafts, setDrafts] = useState<WordDraft[]>([]);
   const [dragOver, setDragOver] = useState(false);
-  const dragCounter             = useRef(0);
-  const fileRef                 = useRef<HTMLInputElement>(null);
+  const dragCounter = useRef(0);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // ── File handling ──────────────────────────────────────────────────────────
 
@@ -230,7 +232,7 @@ export default function ImagierImageImport() {
   // ── Save ──────────────────────────────────────────────────────────────────
 
   async function saveAll() {
-    const pending = drafts.filter((d) => d.status === 'pending');
+    const pending = drafts.filter((draft) => draft.status === 'pending');
     for (const draft of pending) {
       if (!draft.fr.trim() || !draft.category.trim()) {
         updateDraft(draft.uid, { status: 'error', errorMsg: 'FR et catégorie requis' });
@@ -244,8 +246,8 @@ export default function ImagierImageImport() {
           category: draft.category.trim(),
           subcategory: draft.subcategory.trim() || undefined,
           is_active: draft.is_active,
-        });
-        await uploadWordImage(saved.id, draft.file);
+        }).unwrap();
+        await uploadImage({ wordId: saved.id, file: draft.file }).unwrap();
         updateDraft(draft.uid, { status: 'done' });
       } catch {
         updateDraft(draft.uid, { status: 'error', errorMsg: 'Erreur serveur' });

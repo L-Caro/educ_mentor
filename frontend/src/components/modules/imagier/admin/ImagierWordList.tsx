@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getWords, updateWord, deleteWord } from 'src/api/module/imagier.api.ts';
+import { useGetImagierWordsQuery, useUpdateImagierWordMutation, useDeleteImagierWordMutation } from '../imagier.api';
 import Badge from 'src/components/common/Badge';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';
@@ -9,38 +9,30 @@ import type { ImagierWord } from 'src/types';
 const FILTER_LABELS = { all: 'Tous', active: 'Actifs', inactive: 'Inactifs' } as const;
 
 export default function ImagierWordList() {
-  const [words, setWords] = useState<ImagierWord[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: words = [], isLoading } = useGetImagierWordsQuery();
+  const [updateWord] = useUpdateImagierWordMutation();
+  const [deleteWord] = useDeleteImagierWordMutation();
   const [search, setSearch] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
   const [filterCategory, setFilterCategory] = useState('');
-  const [categories, setCategories] = useState<string[]>([]);
 
-  useEffect(() => {
-    getWords().then((data) => {
-      setWords(data);
-      setCategories([...new Set(data.map((w) => w.category))].sort());
-      setLoading(false);
-    });
-  }, []);
+  const categories = [...new Set(words.map((word) => word.category))].sort();
 
   async function toggleActive(word: ImagierWord) {
-    const updated = await updateWord(word.id, { is_active: !word.is_active });
-    setWords((prev) => prev.map((w) => (w.id === word.id ? updated : w)));
+    await updateWord({ id: word.id, is_active: !word.is_active });
   }
 
   async function handleDelete(id: string) {
     if (!confirm('Supprimer ce mot et sa progression ?')) return;
     await deleteWord(id);
-    setWords((prev) => prev.filter((w) => w.id !== id));
   }
 
-  const filtered = words.filter((w) => {
-    if (filterCategory && w.category !== filterCategory) return false;
-    if (filterActive === 'active' && !w.is_active) return false;
-    if (filterActive === 'inactive' && w.is_active) return false;
+  const filtered = words.filter((word) => {
+    if (filterCategory && word.category !== filterCategory) return false;
+    if (filterActive === 'active' && !word.is_active) return false;
+    if (filterActive === 'inactive' && word.is_active) return false;
     const searchTerm = search.toLowerCase();
-    if (searchTerm && !w.fr.toLowerCase().includes(searchTerm) && !w.en.toLowerCase().includes(searchTerm)) return false;
+    if (searchTerm && !word.fr.toLowerCase().includes(searchTerm) && !word.en.toLowerCase().includes(searchTerm)) return false;
     return true;
   });
 
@@ -72,19 +64,19 @@ export default function ImagierWordList() {
           {categories.map((category) => <option key={category} value={category}>{category}</option>)}
         </select>
         <div className="ImagierWordList__filterGroup">
-          {(['all', 'active', 'inactive'] as const).map((v) => (
+          {(['all', 'active', 'inactive'] as const).map((filterValue) => (
             <button
-              key={v}
-              onClick={() => setFilterActive(v)}
-              className={`ImagierWordList__filterBtn${filterActive === v ? ' ImagierWordList__filterBtn--active' : ''}`}
+              key={filterValue}
+              onClick={() => setFilterActive(filterValue)}
+              className={`ImagierWordList__filterBtn${filterActive === filterValue ? ' ImagierWordList__filterBtn--active' : ''}`}
             >
-              {FILTER_LABELS[v]}
+              {FILTER_LABELS[filterValue]}
             </button>
           ))}
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <Spinner size="sm" />
       ) : (
         <div className="AdminTable">
