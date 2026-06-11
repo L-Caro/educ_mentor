@@ -2,8 +2,6 @@ import store from 'src/store';
 import { api } from 'src/store/api/api';
 import type { ModuleManifest } from 'src/modules.types';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
-import { calculGameSpec } from './calcul.game';
-import CalculSettings from './admin/CalculSettings';
 
 const CALCUL_SETUP_OPTIONS: SetupOption[] = [
   {
@@ -23,10 +21,12 @@ const CALCUL_SETUP_OPTIONS: SetupOption[] = [
 export const calculModule: ModuleManifest = {
   id: 'calcul-mental',
   setupOptions: CALCUL_SETUP_OPTIONS,
-  gameSpec: calculGameSpec,
+  loadGameSpec: () => import('./calcul.game').then((module) => module.calculGameSpec),
   child: {},
   adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
-  adminRoutes: [{ index: true, element: <CalculSettings /> }],
+  adminRoutes: [
+    { index: true, lazy: () => import('./admin/CalculSettings').then((module) => ({ Component: module.default })) },
+  ],
   progression: {
     getStats: () =>
       store.dispatch(api.endpoints.getCalculProgression.initiate(undefined, { forceRefetch: true })).unwrap(),

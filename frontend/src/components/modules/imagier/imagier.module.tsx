@@ -1,17 +1,12 @@
 import store from 'src/store';
 import { api } from 'src/store/api/api';
 import type { ModuleManifest } from 'src/modules.types';
-import { imagierGameSpec } from './imagier.game';
 import { IMAGIER_SETUP_OPTIONS } from './imagier.setup';
-import ImagierWordList from './admin/ImagierWordList';
-import ImagierWordForm from './admin/ImagierWordForm';
-import ImagierImageImport from './admin/ImagierImageImport';
-import ImagierSettings from './admin/ImagierSettings';
 
 export const imagierModule: ModuleManifest = {
   id: 'imagier',
   setupOptions: IMAGIER_SETUP_OPTIONS,
-  gameSpec: imagierGameSpec,
+  loadGameSpec: () => import('./imagier.game').then((module) => module.imagierGameSpec),
   child: {},
   adminTabs: [
     { to: '/admin/imagier', label: 'Mots', end: true },
@@ -19,10 +14,10 @@ export const imagierModule: ModuleManifest = {
     { to: '/admin/imagier/settings', label: 'Paramètres' },
   ],
   adminRoutes: [
-    { index: true, element: <ImagierWordList /> },
-    { path: 'images', element: <ImagierImageImport /> },
-    { path: 'settings', element: <ImagierSettings /> },
-    { path: 'mots/:id', element: <ImagierWordForm /> },
+    { index: true, lazy: () => import('./admin/ImagierWordList').then((module) => ({ Component: module.default })) },
+    { path: 'images', lazy: () => import('./admin/ImagierImageImport').then((module) => ({ Component: module.default })) },
+    { path: 'settings', lazy: () => import('./admin/ImagierSettings').then((module) => ({ Component: module.default })) },
+    { path: 'mots/:id', lazy: () => import('./admin/ImagierWordForm').then((module) => ({ Component: module.default })) },
   ],
   progression: {
     getStats: () =>

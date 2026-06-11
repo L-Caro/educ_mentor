@@ -20,7 +20,7 @@ import ModuleCatalog from 'src/views/admin/ModuleCatalog';
 import Settings from 'src/views/settings/Settings';
 
 import ModulePreSetup from 'src/components/common/Game/ModulePreSetup';
-import GameEngine from 'src/components/common/Game/GameEngine';
+import LazyGame from 'src/components/common/Game/LazyGame';
 import GameResultView from 'src/components/common/Game/GameResultView';
 
 // Source unique des modules
@@ -35,9 +35,9 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   const Result = module.child.Result;
   const handle = { moduleId: module.id };
 
-  // Jeu : spec déclarative via <GameEngine>, sinon composant Game dédié (non encore migré).
-  const playElement = module.gameSpec
-    ? <GameEngine spec={module.gameSpec} moduleId={module.id} />
+  // Jeu : spec chargée en lazy via <LazyGame> (code-splitting), sinon composant Game dédié.
+  const playElement = module.loadGameSpec
+    ? <LazyGame load={module.loadGameSpec} moduleId={module.id} />
     : Game
       ? <Game />
       : null;
@@ -52,7 +52,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   // Résultats : composant dédié si déclaré, sinon écran générique piloté par la spec.
   const resultElement = Result
     ? <Result />
-    : module.gameSpec
+    : module.loadGameSpec
       ? <GameResultView moduleId={module.id} />
       : null;
 

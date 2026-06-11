@@ -2,8 +2,6 @@ import store from 'src/store';
 import { api } from 'src/store/api/api';
 import type { ModuleManifest } from 'src/modules.types';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
-import { monnaieGameSpec } from './monnaie.game';
-import MonnaieSettings from './admin/MonnaieSettings';
 
 const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
   {
@@ -21,10 +19,12 @@ const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
 export const monnaieModule: ModuleManifest = {
   id: 'monnaie',
   setupOptions: MONNAIE_SETUP_OPTIONS,
-  gameSpec: monnaieGameSpec,
+  loadGameSpec: () => import('./monnaie.game').then((module) => module.monnaieGameSpec),
   child: {},
   adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
-  adminRoutes: [{ index: true, element: <MonnaieSettings /> }],
+  adminRoutes: [
+    { index: true, lazy: () => import('./admin/MonnaieSettings').then((module) => ({ Component: module.default })) },
+  ],
   progression: {
     getStats: () =>
       store.dispatch(api.endpoints.getMonnaieProgression.initiate(undefined, { forceRefetch: true })).unwrap(),

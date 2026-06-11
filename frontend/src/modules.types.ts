@@ -14,10 +14,10 @@ export interface ProgressionStat {
 export interface ModuleManifest {
   id: string;            // = AppModule.id (backend) et segment d'URL ; label/icon = catalogue backend (useModuleMeta)
   setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
-  // Spec de jeu déclarative (rendue par <GameEngine>). Registre hétérogène de specs → `any`
-  // assumé/documenté : chaque spec est typée concrètement dans son fichier `<id>.game.tsx`.
+  // Import dynamique de la spec de jeu (code-splitting) : la spec n'est chargée qu'à l'entrée en jeu,
+  // pas dans le bundle initial. Registre hétérogène → `any` assumé (spec typée dans `<id>.game.tsx`).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  gameSpec?: GameModuleSpec<any, any>;
+  loadGameSpec?: () => Promise<GameModuleSpec<any, any>>;
   child: {
     Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
     Game?: ComponentType;   // composant de jeu dédié (sinon gameSpec via <GameEngine>)
