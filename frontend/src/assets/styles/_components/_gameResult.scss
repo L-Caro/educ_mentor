@@ -5,43 +5,43 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 1.5rem;
-  gap: 1.5rem;
+  padding: v.$space-8 v.$space-7;
+  gap: v.$space-7;
 
   // ─── Score ────────────────────────────────────────────────────────────────
   &__score {
     background: var(--color-base-100);
     border-radius: v.$border-radius;
     box-shadow: var(--shadow-md);
-    padding: 2rem 2.5rem;
+    padding: v.$space-8 v.$space-9;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.625rem;
+    gap: v.$space-4;
     width: 100%;
     max-width: 22rem;
   }
 
   &__emoji {
-    font-size: 4rem;
+    font-size: 4rem; // décoratif (hors échelle de rythme)
     line-height: 1;
   }
 
   &__stars {
-    font-size: 1.5rem;
+    font-size: v.$font-size-xl;
     letter-spacing: 0.15rem;
     color: var(--color-warning);
   }
 
   &__fraction {
-    font-size: 2.5rem;
+    font-size: 2.5rem; // gros affichage (hors échelle de rythme)
     font-weight: 700;
     color: var(--color-primary);
     margin: 0;
   }
 
   &__pct {
-    font-size: 1rem;
+    font-size: v.$font-size-base;
     color: var(--color-base-content);
     opacity: 0.5;
     margin: 0;
@@ -58,8 +58,8 @@
   }
 
   &__errorsTitle {
-    padding: 0.875rem 1.25rem;
-    font-size: 0.875rem;
+    padding: v.$space-5 v.$space-6;
+    font-size: v.$font-size-sm;
     font-weight: 600;
     color: var(--color-base-content);
     opacity: 0.5;
@@ -77,39 +77,23 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 0.875rem;
-    padding: 0.75rem 1.25rem;
+    gap: v.$space-5;
+    padding: v.$space-4 v.$space-6;
     border-bottom: 1px solid var(--color-base-200);
 
     &:last-child { border-bottom: none; }
   }
 
-  // ─── Éléments d'erreur — Tables ───────────────────────────────────────────
-  &__errorFact {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-base-content);
-    font-variant-numeric: tabular-nums;
-    min-width: 4.5rem;
-  }
-
-  &__errorArrow {
-    color: var(--color-base-content);
-    opacity: 0.3;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
-
-  // ─── Éléments d'erreur — Calcul / Monnaie ─────────────────────────────────
+  // ─── Énoncé (Calcul / Monnaie / Tables) ───────────────────────────────────
   &__errorLeft {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: v.$space-1;
     min-width: 0;
   }
 
   &__errorOp {
-    font-size: 1rem;
+    font-size: v.$font-size-base;
     font-weight: 600;
     color: var(--color-base-content);
     font-variant-numeric: tabular-nums;
@@ -120,23 +104,23 @@
 
   &__errorGiven,
   &__errorTimeout {
-    font-size: 0.78rem;
+    font-size: v.$font-size-xs;
     color: var(--color-base-content);
     opacity: 0.5;
   }
 
-  // ─── Éléments d'erreur — Imagier ──────────────────────────────────────────
+  // ─── Vignette (Imagier) ───────────────────────────────────────────────────
   &__errorThumb {
     width: 3rem;
     height: 3rem;
-    border-radius: 0.625rem;
+    border-radius: v.$radius-sm;
     background: var(--color-base-200);
     overflow: hidden;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
+    font-size: v.$font-size-lg;
 
     img {
       width: 100%;
@@ -145,22 +129,9 @@
     }
   }
 
-  &__errorFr {
-    font-weight: 600;
-    color: var(--color-base-content);
-    margin: 0;
-    font-size: 0.9375rem;
-  }
-
-  &__errorEn {
-    font-size: 0.875rem;
-    color: var(--color-primary);
-    margin: 0;
-  }
-
   // ─── Réponse correcte (tous modules) ─────────────────────────────────────
   &__errorAnswer {
-    font-size: 1.25rem;
+    font-size: v.$font-size-lg;
     font-weight: 800;
     color: var(--color-success);
     flex-shrink: 0;
@@ -172,9 +143,9 @@
     max-width: 20rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: v.$space-4;
     margin-top: auto;
-    padding-bottom: 0.5rem;
+    padding-bottom: v.$space-3;
   }
 
   &__btnOutline {
@@ -182,12 +153,12 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding: 1rem 2rem;
+    padding: v.$space-5 v.$space-8;
     border-radius: v.$border-radius;
     background: transparent;
     border: 2px solid var(--color-primary);
     color: var(--color-primary);
-    font-size: 1.25rem;
+    font-size: v.$font-size-lg;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;

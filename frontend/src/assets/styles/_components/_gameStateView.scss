@@ -1,17 +1,19 @@
+@use '../_abstracts/variables' as v;
+
 .GameStateView {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
-  padding: 2rem;
+  gap: v.$space-7;
+  padding: v.$space-8;
   text-align: center;
 
   &__msg {
     color: var(--color-base-content);
     opacity: 0.6;
-    font-size: 1.125rem;
+    font-size: v.$font-size-md;
     margin: 0;
   }
 }

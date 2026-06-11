@@ -9,13 +9,13 @@
 
 // Titre « overline » des cartes de réglages admin
 @mixin overline-label {
-	font-size: 0.8rem;
+	font-size: v.$font-size-xs;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	color: var(--color-base-content);
 	opacity: 0.5;
-	margin: 0 0 v.$space-4;
+	margin: 0 0 v.$space-5;
 }
 
 @mixin xs {

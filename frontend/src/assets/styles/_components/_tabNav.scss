@@ -1,15 +1,17 @@
+@use '../_abstracts/variables' as v;
+
 .TabNav {
 	display: flex;
 	border-bottom: 2px solid var(--color-base-300);
-	margin-bottom: 1.5rem;
+	margin-bottom: v.$space-7;
 
 	&__tab {
-		padding: 0.625rem 1.25rem;
+		padding: v.$space-4 v.$space-6;
 		text-decoration: none;
 		color: var(--color-base-content);
 		opacity: 0.5;
 		font-weight: 500;
-		font-size: 0.9375rem;
+		font-size: v.$font-size-base;
 		border-bottom: 2px solid transparent;
 		margin-bottom: -2px;
 		transition: color 0.15s, border-color 0.15s, opacity 0.15s;

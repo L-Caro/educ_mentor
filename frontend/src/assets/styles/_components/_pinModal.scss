@@ -11,22 +11,22 @@
   }
 
   .modal-body {
-    padding: 2.4rem 2rem 2rem;
+    padding: v.$space-9 v.$space-8 v.$space-8;
   }
 
   &__title {
     text-align: center;
     color: var(--color-base-content);
     font-weight: 600;
-    margin-bottom: 2rem;
-    font-size: 2rem;
+    margin-bottom: v.$space-8;
+    font-size: v.$font-size-2xl;
   }
 
   &__dots {
     display: flex;
     justify-content: center;
-    gap: 1.2rem;
-    margin-bottom: 2rem;
+    gap: v.$space-6;
+    margin-bottom: v.$space-8;
   }
 
   &__dot {
@@ -46,8 +46,8 @@
   &__error {
     text-align: center;
     color: var(--color-error);
-    font-size: 1rem;
-    margin-bottom: 1.2rem;
+    font-size: v.$font-size-base;
+    margin-bottom: v.$space-6;
 	letter-spacing: 0.3rem;
     min-height: 1.25rem;
   }
@@ -55,12 +55,12 @@
   &__keypad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
+    gap: v.$space-3;
   }
 
   &__key {
     height: 3.5rem;
-    font-size: 1.2rem;
+    font-size: v.$font-size-lg;
     font-weight: 500;
     border-radius: v.$border-radius;
 

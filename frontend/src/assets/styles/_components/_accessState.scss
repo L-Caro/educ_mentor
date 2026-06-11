@@ -1,3 +1,5 @@
+@use '../_abstracts/variables' as v;
+
 // Écrans d'état plein écran (accès / invitation) — remplace les classes utilitaires Bootstrap.
 .AccessState {
   display: flex;
@@ -5,17 +7,17 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
+  gap: v.$space-5;
+  padding: v.$space-8 v.$space-7;
   text-align: center;
 
   &__emoji {
-    font-size: 3.5rem;
+    font-size: 3.5rem; // décoratif (hors échelle de rythme)
     margin: 0;
   }
 
   &__title {
-    font-size: 1.5rem;
+    font-size: v.$font-size-xl;
     margin: 0;
   }
 

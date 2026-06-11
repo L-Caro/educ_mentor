@@ -1,13 +1,15 @@
+@use '../_abstracts/variables' as v;
+
 .GameFooter {
 	width: 100%;
-	padding: 1rem 1rem 1.5rem;
+	padding: v.$space-5 v.$space-5 v.$space-7;
 	margin-top: auto;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 1rem;
+	gap: v.$space-5;
 
 	@media (min-width: 600px) {
-		padding: 1.25rem 1rem 2rem;
+		padding: v.$space-6 v.$space-5 v.$space-8;
 	}
 }

@@ -32,33 +32,39 @@
 
 // Fonts
 // TODO: ajouter l'import Google Fonts (ex: Nunito) dans index.html
-$font-special    : 'Nunito', system-ui, sans-serif;
-$font-family     : 'Nunito', system-ui, sans-serif;
+$font-special: 'Nunito', system-ui, sans-serif;
+$font-family: 'Nunito', system-ui, sans-serif;
 
 // Border radius
-$border-radius   : 1.5rem;
-$border-radius-2 : 0.8rem;
+$border-radius: 1.5rem;
+$border-radius-2: 0.8rem;
 
 // Gutter
-$gutter          : 1rem;
+$gutter: 1rem;
 
-// ── Échelles (Lot 1) ───────────────────────────────────────────────────────────
-// Espacement
-$space-1: 0.25rem;
-$space-2: 0.5rem;
-$space-3: 0.75rem;
-$space-4: 1rem;
-$space-5: 1.5rem;
-$space-6: 2rem;
-$space-8: 3rem;
+// ── Échelles de rythme (Lot 6) ───────────────────────────────────────────────
+// NB : html est à 62.5% → 1rem = 10px. Les px ci-dessous tiennent compte de cette base.
+// Espacement (padding / margin / gap)
+$space-1: 0.25rem;   // 2.5px
+$space-2: 0.375rem;  // 3.75
+$space-3: 0.5rem;    // 5
+$space-4: 0.75rem;   // 7.5
+$space-5: 1rem;      // 10
+$space-6: 1.25rem;   // 12.5
+$space-7: 1.5rem;    // 15
+$space-8: 2rem;      // 20
+$space-9: 2.5rem;    // 25
+$space-10: 3rem;     // 30
 
 // Tailles de police
-$font-size-xs: 0.75rem;
-$font-size-sm: 0.875rem;
-$font-size-base: 1rem;
-$font-size-lg: 1.25rem;
-$font-size-xl: 2rem;
-$font-size-2xl: 3rem;
+$font-size-xs: 0.75rem;    // 7.5px
+$font-size-sm: 0.875rem;   // 8.75
+$font-size-base: 1rem;     // 10
+$font-size-md: 1.125rem;   // 11.25
+$font-size-lg: 1.25rem;    // 12.5
+$font-size-xl: 1.5rem;     // 15
+$font-size-2xl: 2rem;      // 20
+$font-size-3xl: 3rem;      // 30
 
 // Rayons (alias des valeurs historiques pour cohérence)
 $radius-sm: 0.5rem;

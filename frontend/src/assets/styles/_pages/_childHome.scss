@@ -3,7 +3,7 @@
 
 .ChildHome {
 	flex: 1;
-	padding: 3rem 2rem;
+	padding: v.$space-10 v.$space-8;
 
 	&__loading {
 		min-height: 40vh;
@@ -18,22 +18,22 @@
 		border: 1px solid var(--color-base-300);
 		box-shadow: var(--shadow-md);
 		color: var(--color-base-content);
-		padding: 2rem;
+		padding: v.$space-8;
 		text-align: center;
-		margin: 2rem 0;
+		margin: v.$space-8 0;
 	}
 
 	&__timerRow {
 		display: flex;
 		justify-content: flex-end;
-		margin-bottom: 1rem;
+		margin-bottom: v.$space-5;
 		min-height: 2rem; // reserve space even when timer is hidden
 	}
 
 	&__grid {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		gap: 1rem;
+		gap: v.$space-5;
 
 		@include m.lg-lt {
 			grid-template-columns: repeat(3, 1fr);
@@ -48,4 +48,3 @@
 		display: flex;
 	}
 }
-

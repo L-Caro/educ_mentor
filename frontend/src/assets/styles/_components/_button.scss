@@ -4,17 +4,17 @@
 .Button {
 	display: inline-flex;
 	align-items: center;
-	gap: 0.4rem;
+	gap: v.$space-2;
 	cursor: pointer;
 	justify-content: center;
 	width: 100%;
 	max-width: 20rem;
-	padding: 1rem 2rem;
+	padding: v.$space-5 v.$space-8;
 	border-radius: v.$border-radius;
 	background: var(--color-primary);
 	color: var(--color-primary-content);
 	border: none;
-	font-size: 1.5rem;
+	font-size: v.$font-size-xl;
 	font-weight: 600;
 	box-shadow: var(--shadow-sm);
 	transition:
@@ -49,7 +49,7 @@
 	}
 
 	&__icon {
-		font-size: 1.5rem;
+		font-size: v.$font-size-xl;
 		line-height: 1;
 	}
 

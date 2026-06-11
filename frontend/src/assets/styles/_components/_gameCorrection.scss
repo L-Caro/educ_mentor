@@ -1,5 +1,7 @@
+@use '../_abstracts/variables' as v;
+
 .GameCorrection {
-  font-size: 1rem;
+  font-size: v.$font-size-base;
   color: var(--color-base-content);
   opacity: 0.7;
   margin: 0;
@@ -7,6 +9,6 @@
 
   strong {
     color: var(--color-success);
-    font-size: 1.125rem;
+    font-size: v.$font-size-md;
   }
 }

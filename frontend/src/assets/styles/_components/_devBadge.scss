@@ -1,13 +1,15 @@
+@use '../_abstracts/variables' as v;
+
 .DevBadge {
 	position: fixed;
-	top: 0.5rem;
-	right: 0.5rem;
+	top: v.$space-3;
+	right: v.$space-3;
 	z-index: 1000;
-	padding: 0.25rem 0.75rem;
-	border-radius: 999px;
+	padding: v.$space-1 v.$space-4;
+	border-radius: v.$radius-pill;
 	background: #f59e0b;
 	color: #1c1917;
-	font-size: 0.7rem;
+	font-size: v.$font-size-xs;
 	font-weight: 700;
 	letter-spacing: 0.05em;
 	text-transform: uppercase;
