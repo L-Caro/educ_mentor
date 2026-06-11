@@ -7,10 +7,12 @@ import { CalculSession } from './entities/calcul-session.entity';
 import { SettingsService } from '../settings/settings.service';
 import type { RecordCalculAnswerDto, StartCalculSessionDto } from './dto/calcul.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
+import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 
 export interface CalculQuestion {
   operation: string;
   answer: number;
+  choices: number[]; // QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface CalculSessionResult {
@@ -51,7 +53,10 @@ export class CalculService {
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
 
-    const questions = this.generateQuestions(count, minValue, maxValue, operationTypes);
+    // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
+    const choicesCount = qcmChoiceCount(normalizeDifficulty(dto.difficulty));
+
+    const questions = this.generateQuestions(count, minValue, maxValue, operationTypes, choicesCount);
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
@@ -125,6 +130,7 @@ export class CalculService {
     minValue: number,
     maxValue: number,
     types: OperationType[],
+    choicesCount: number,
   ): CalculQuestion[] {
     const questions: CalculQuestion[] = [];
     let lastOperation = '';
@@ -146,11 +152,49 @@ export class CalculService {
 
       if (operation) {
         lastOperation = operation;
-        questions.push({ operation, answer });
+        // QCM (choicesCount > 0) : distracteurs plausibles ; saisie libre : aucun choix.
+        const choices = choicesCount > 0 ? this.buildChoices(answer, choicesCount - 1) : [];
+        questions.push({ operation, answer, choices });
       }
     }
 
     return questions;
+  }
+
+  /** Distracteurs plausibles autour de la réponse (±1, ±2, ±5, ±10) pour le QCM. */
+  private buildChoices(answer: number, distractorCount: number): number[] {
+    const candidates = new Set<number>([
+      answer + 1, answer - 1,
+      answer + 2, answer - 2,
+      answer + 5, answer - 5,
+      answer + 10, answer - 10,
+    ]);
+    candidates.delete(answer);
+
+    const distractors: number[] = [];
+    for (const value of this.shuffle([...candidates])) {
+      if (value >= 0) {
+        distractors.push(value);
+        if (distractors.length >= distractorCount) break;
+      }
+    }
+    // Filet de sécurité si trop peu de candidats valides (petits nombres)
+    let fallback = answer + 3;
+    while (distractors.length < distractorCount) {
+      if (fallback !== answer && fallback >= 0) distractors.push(fallback);
+      fallback++;
+    }
+
+    return this.shuffle([answer, ...distractors.slice(0, distractorCount)]);
+  }
+
+  private shuffle<T>(arr: T[]): T[] {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 
   private generateForType(

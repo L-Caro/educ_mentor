@@ -8,7 +8,7 @@ export class MonnaieGameController {
 
   @Post('session')
   startSession(@Body() dto: StartMonnaieSessionDto) {
-    return this.monnaieService.startSession(dto.exercise_type);
+    return this.monnaieService.startSession(dto);
   }
 
   @Post('session/:id/answer')

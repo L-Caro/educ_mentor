@@ -1,10 +1,15 @@
-import { IsArray, IsBoolean, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export class StartCalculSessionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   operation_types?: string[];
+
+  @IsOptional()
+  @IsIn(DIFFICULTIES)
+  difficulty?: Difficulty;
 }
 
 export class RecordCalculAnswerDto {

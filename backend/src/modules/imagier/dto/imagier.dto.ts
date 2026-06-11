@@ -4,8 +4,10 @@ import {
   IsString,
   IsArray,
   IsNumber,
+  IsIn,
 } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export class CreateWordDto {
   @IsString()
@@ -60,6 +62,10 @@ export class StartSessionDto {
     typeof value === 'string' ? value.split(',').filter(Boolean) : value,
   )
   categories?: string[];
+
+  @IsOptional()
+  @IsIn(DIFFICULTIES)
+  difficulty?: Difficulty;
 }
 
 export class RecordAnswerDto {

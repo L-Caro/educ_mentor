@@ -16,13 +16,18 @@ import type {
   UpdateWordDto,
 } from './dto/imagier.dto';
 import { masteryScore, isMastered, selectionWeight } from '../../common/mastery';
+import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+
+/** Taille d'un lot illimité (les pools finis sont rebouclés re-mélangés jusqu'à ce cap). */
+const UNLIMITED_BATCH_SIZE = 60;
 
 export interface ImagierQuestion {
   word_id: string;
   image_url: string | null;
   prompt: string;
-  choices: { id: string; label: string }[];
+  choices: { id: string; label: string }[]; // QCM : 2 ou 4 ; saisie libre : []
   correct_id: string;
+  answer: string; // libellé de la bonne réponse (valide la saisie libre sans choix)
   direction: 'fr_to_en' | 'en_to_fr';
 }
 
@@ -30,7 +35,7 @@ export interface SessionResult {
   session_id: string;
   questions: ImagierQuestion[];
   timer_seconds: number;
-  difficulty: string;
+  is_unlimited: boolean;
 }
 
 @Injectable()
@@ -59,10 +64,12 @@ export class ImagierService {
   async startSession(dto: StartSessionDto): Promise<SessionResult> {
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
     const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
-    const count = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-    const difficulty = (await this.settingsService.get('imagier_default_difficulty')) ?? 'level_1';
+    const perSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
     const mode = (await this.settingsService.get('imagier_default_mode')) ?? 'fr_to_en';
-    const choicesCount = difficulty === 'level_2' ? 2 : 4;
+
+    // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
+    const difficulty = normalizeDifficulty(dto.difficulty);
+    const choicesCount = qcmChoiceCount(difficulty);
 
     // Récupérer les mots actifs pour les catégories demandées
     const qb = this.wordRepo.createQueryBuilder('w').where('w.is_active = 1');
@@ -71,8 +78,10 @@ export class ImagierService {
     }
     const allWords = await qb.getMany();
 
+    const isUnlimited = perSession <= 0;
+
     if (allWords.length === 0) {
-      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds, difficulty };
+      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds, is_unlimited: isUnlimited };
     }
 
     // Joindre avec la progression pour pondérer la sélection
@@ -81,8 +90,10 @@ export class ImagierService {
     });
     const progMap = new Map(progressions.map((p) => [p.word_id, p]));
 
-    // Sélection pondérée par maîtrise (fréquence selon le score)
-    const selected = this.weightedSample(allWords, progMap, count, threshold);
+    // Illimité = on reboucle le pool re-mélangé jusqu'au cap ; sinon sélection pondérée par maîtrise.
+    const selected = isUnlimited
+      ? this.cycle(allWords, UNLIMITED_BATCH_SIZE)
+      : this.weightedSample(allWords, progMap, perSession, threshold);
 
     // Construire les questions
     const questions: ImagierQuestion[] = [];
@@ -91,25 +102,26 @@ export class ImagierService {
         ? Math.random() > 0.5 ? 'fr_to_en' : 'en_to_fr'
         : mode;
 
-      const distractors = this.pickDistractors(word, allWords, choicesCount - 1);
-      const correct = {
-        id: word.id,
-        label: resolvedMode === 'fr_to_en' ? word.en : word.fr,
-      };
-      const wrongChoices = distractors.map((d) => ({
-        id: d.id,
-        label: resolvedMode === 'fr_to_en' ? d.en : d.fr,
-      }));
+      const answer = resolvedMode === 'fr_to_en' ? word.en : word.fr;
 
-      const choices = this.shuffle([correct, ...wrongChoices]);
-      const image_url = this.buildImageUrl(word);
+      // QCM : la bonne réponse + des distracteurs ; saisie libre (choicesCount 0) : aucun choix.
+      const choices = choicesCount === 0
+        ? []
+        : this.shuffle([
+            { id: word.id, label: answer },
+            ...this.pickDistractors(word, allWords, choicesCount - 1).map((d) => ({
+              id: d.id,
+              label: resolvedMode === 'fr_to_en' ? d.en : d.fr,
+            })),
+          ]);
 
       questions.push({
         word_id: word.id,
-        image_url,
+        image_url: this.buildImageUrl(word),
         prompt: resolvedMode === 'fr_to_en' ? word.fr : word.en,
         choices,
         correct_id: word.id,
+        answer,
         direction: resolvedMode as 'fr_to_en' | 'en_to_fr',
       });
     }
@@ -122,7 +134,7 @@ export class ImagierService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds, difficulty };
+    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
   }
 
   async recordAnswer(sessionId: string, wordId: string, isCorrect: boolean): Promise<void> {
@@ -298,8 +310,7 @@ export class ImagierService {
     count: number,
     threshold: number,
   ): ImagierWord[] {
-    // count <= 0 = « illimité » → tout le pool de mots actifs.
-    if (count <= 0 || words.length <= count) return this.shuffle([...words]);
+    if (words.length <= count) return this.shuffle([...words]);
 
     // Tableau pondéré par maîtrise (fréquence selon le score)
     const weighted: ImagierWord[] = [];
@@ -355,6 +366,13 @@ export class ImagierService {
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  }
+
+  /** Reboucle un pool re-mélangé à chaque tour jusqu'à atteindre `count` (mode illimité). */
+  private cycle<T>(pool: T[], count: number): T[] {
+    const out: T[] = [];
+    while (out.length < count) out.push(...this.shuffle(pool));
+    return out.slice(0, count);
   }
 
   // ─── Upload image ─────────────────────────────────────────────────────────

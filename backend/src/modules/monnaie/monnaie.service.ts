@@ -5,8 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { MonnaieProgression } from './entities/monnaie-progression.entity';
 import { MonnaieSession } from './entities/monnaie-session.entity';
 import { SettingsService } from '../settings/settings.service';
-import type { RecordMonnaieAnswerDto } from './dto/monnaie.dto';
+import type { RecordMonnaieAnswerDto, StartMonnaieSessionDto } from './dto/monnaie.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
+import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 
 export type ExerciseType = 'reconnaitre' | 'total' | 'rendre';
 
@@ -17,13 +18,12 @@ export interface MonnaieQuestion {
   price?: number;     // centimes — prix de l'article (rendre)
   payment?: number;   // centimes — somme donnée (rendre)
   answer: number;     // centimes — réponse attendue
-  choices?: number[]; // centimes — 4 choix si mode QCM
+  choices: number[];  // centimes — QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface MonnaieSessionResult {
   session_id: string;
   questions: MonnaieQuestion[];
-  response_mode: 'free' | 'qcm';
   timer_seconds: number;
   is_unlimited: boolean;
 }
@@ -48,16 +48,18 @@ export class MonnaieService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(exerciseTypeRaw: string): Promise<MonnaieSessionResult> {
-    const exerciseType: ExerciseType = VALID_EXERCISE_TYPES.includes(exerciseTypeRaw as ExerciseType)
-      ? (exerciseTypeRaw as ExerciseType)
+  async startSession(dto: StartMonnaieSessionDto): Promise<MonnaieSessionResult> {
+    const exerciseType: ExerciseType = VALID_EXERCISE_TYPES.includes(dto.exercise_type as ExerciseType)
+      ? (dto.exercise_type as ExerciseType)
       : 'reconnaitre';
+
+    // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
+    const choicesCount = qcmChoiceCount(normalizeDifficulty(dto.difficulty));
 
     const denominationsRaw = (await this.settingsService.get('monnaie_denominations')) ?? '1,2,5,10,20,50,100,200,500,1000,2000,5000';
     const maxAmountEuros = parseInt((await this.settingsService.get('monnaie_max_amount')) ?? '10', 10);
     const wholeEuros = (await this.settingsService.get('monnaie_whole_euros')) === 'true';
     const itemCount = parseInt((await this.settingsService.get('monnaie_items_count')) ?? '3', 10);
-    const responseMode = ((await this.settingsService.get('monnaie_response_mode')) ?? 'free') as 'free' | 'qcm';
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
     const questionsPerSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
 
@@ -76,7 +78,7 @@ export class MonnaieService {
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
 
-    const questions = this.generateQuestions(count, exerciseType, activeDenominations, maxCents, wholeEuros, itemCount, responseMode);
+    const questions = this.generateQuestions(count, exerciseType, activeDenominations, maxCents, wholeEuros, itemCount, choicesCount);
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
@@ -85,7 +87,7 @@ export class MonnaieService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, response_mode: responseMode, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
   }
 
   async recordAnswer(sessionId: string, dto: RecordMonnaieAnswerDto): Promise<void> {
@@ -153,7 +155,7 @@ export class MonnaieService {
     maxCents: number,
     wholeEuros: boolean,
     itemCount: number,
-    responseMode: 'free' | 'qcm',
+    choicesCount: number,
   ): MonnaieQuestion[] {
     const questions: MonnaieQuestion[] = [];
 
@@ -168,8 +170,9 @@ export class MonnaieService {
 
       if (!generated) continue;
 
-      if (responseMode === 'qcm') {
-        generated.choices = this.generateChoices(generated.answer, maxCents);
+      // QCM (choicesCount > 0) : distracteurs proches ; saisie libre : aucun choix.
+      if (choicesCount > 0) {
+        generated.choices = this.generateChoices(generated.answer, maxCents, choicesCount);
       }
 
       questions.push(generated);
@@ -203,7 +206,7 @@ export class MonnaieService {
     const coins = this.decompose(target, denominations);
     if (!coins) return null;
 
-    return { type: 'reconnaitre', coins, answer: target };
+    return { type: 'reconnaitre', coins, answer: target, choices: [] };
   }
 
   /** Affiche N prix d'articles — calculer le total à payer. */
@@ -220,7 +223,7 @@ export class MonnaieService {
     const answer = prices.reduce((sum, price) => sum + price, 0);
     if (answer > maxCents) return null;
 
-    return { type: 'total', prices, answer };
+    return { type: 'total', prices, answer, choices: [] };
   }
 
   /** Prix + somme donnée — trouver la monnaie à rendre. */
@@ -233,7 +236,7 @@ export class MonnaieService {
     const payment = this.pickPaymentAmount(price, maxCents);
     if (!payment || payment - price <= 0) return null;
 
-    return { type: 'rendre', price, payment, answer: payment - price };
+    return { type: 'rendre', price, payment, answer: payment - price, choices: [] };
   }
 
   /** Sélectionne un montant de paiement "rond" (billet ou pièce entière) supérieur au prix. */
@@ -262,13 +265,13 @@ export class MonnaieService {
     return remaining === 0 ? coins : null;
   }
 
-  /** Génère 3 mauvaises réponses proches de la bonne pour le mode QCM. */
-  private generateChoices(correctAnswer: number, maxCents: number): number[] {
+  /** Génère `size` options (bonne réponse + distracteurs proches) pour le mode QCM. */
+  private generateChoices(correctAnswer: number, maxCents: number, size: number): number[] {
     const choices = new Set<number>([correctAnswer]);
     const offsets = [10, 20, 50, 100, 200, 500];
     let attempts = 0;
 
-    while (choices.size < 4 && attempts < 50) {
+    while (choices.size < size && attempts < 50) {
       const offset = offsets[this.rand(0, offsets.length - 1)];
       const direction = this.rand(0, 1) === 0 ? -1 : 1;
       const wrong = correctAnswer + direction * offset;

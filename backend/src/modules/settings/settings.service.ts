@@ -11,10 +11,8 @@ const DEFAULTS = {
   question_timer_seconds: '0',
   mastery_threshold: '10',
   // ── Imagier ────────────────────────────────────────────────────────────────
-  imagier_default_difficulty: 'level_1',
   imagier_default_mode: 'fr_to_en',
   // ── Tables de multiplication ───────────────────────────────────────────────
-  tables_choice_count: '4',
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────
   calcul_min_value: '0',
@@ -24,8 +22,17 @@ const DEFAULTS = {
   monnaie_max_amount: '10',
   monnaie_whole_euros: 'false',
   monnaie_items_count: '3',
-  monnaie_response_mode: 'free',
 };
+
+/**
+ * Clés rendues obsolètes par la difficulté unifiée (pré-jeu enfant easy/medium/hard).
+ * Supprimées au démarrage : le mode de réponse n'est plus un réglage admin par module.
+ */
+const OBSOLETE_KEYS = [
+  'imagier_default_difficulty',
+  'tables_choice_count',
+  'monnaie_response_mode',
+];
 
 @Injectable()
 export class SettingsService implements OnModuleInit {
@@ -54,6 +61,11 @@ export class SettingsService implements OnModuleInit {
       if (!exists) {
         await this.repo.save({ key, value });
       }
+    }
+
+    // Nettoyage des clés obsolètes
+    for (const key of OBSOLETE_KEYS) {
+      await this.repo.delete({ key });
     }
   }
 

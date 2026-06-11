@@ -1,8 +1,13 @@
-import { IsBoolean, IsInt, IsString } from 'class-validator';
+import { IsBoolean, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export class StartMonnaieSessionDto {
   @IsString()
   exercise_type: string;
+
+  @IsOptional()
+  @IsIn(DIFFICULTIES)
+  difficulty?: Difficulty;
 }
 
 export class RecordMonnaieAnswerDto {

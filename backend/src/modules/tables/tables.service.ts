@@ -10,6 +10,10 @@ import type {
   RecordTablesAnswerDto,
 } from './dto/tables.dto';
 import { masteryScore, isMastered, selectionWeight } from '../../common/mastery';
+import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+
+/** Taille d'un lot illimité (le pool fini est rebouclé re-mélangé jusqu'à ce cap). */
+const UNLIMITED_BATCH_SIZE = 50;
 
 export interface TablesQuestion {
   // Normalized fact key (min×max)
@@ -18,13 +22,14 @@ export interface TablesQuestion {
   display_a: number;
   display_b: number;
   answer: number;
-  choices: number[];
+  choices: number[]; // QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface TablesSessionResult {
   session_id: string;
   questions: TablesQuestion[];
   timer_seconds: number;
+  is_unlimited: boolean;
 }
 
 @Injectable()
@@ -44,8 +49,10 @@ export class TablesService {
     const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
     const rawCount = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
     const excludeTrivial = (await this.settingsService.get('tables_include_trivial')) === 'false';
-    const choiceSetting = (await this.settingsService.get('tables_choice_count')) ?? '4';
-    const choicesCount = choiceSetting === 'free' ? 0 : parseInt(choiceSetting, 10);
+
+    // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
+    const difficulty = normalizeDifficulty(dto.difficulty);
+    const choicesCount = qcmChoiceCount(difficulty);
 
     // Aucune table sélectionnée = toutes (filtrées par excludeTrivial dans la boucle).
     const selectedTables = dto.selected_tables.length > 0
@@ -68,49 +75,55 @@ export class TablesService {
       }
     }
 
+    const isUnlimited = rawCount <= 0;
+
     if (factSet.size === 0) {
-      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds };
+      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds, is_unlimited: isUnlimited };
     }
 
-    // count <= 0 = « illimité » → tout le pool de faits.
-    const count = rawCount <= 0 ? factSet.size : rawCount;
-    const factKeys = [...factSet.keys()];
-
-    // Load all progression (max 66 facts) and build lookup map
-    const allProgressions = await this.progressionRepo.find();
-    const progMap = new Map(
-      allProgressions.map((p) => [`${p.factor_a}x${p.factor_b}`, p]),
-    );
-
-    // Sélection pondérée par maîtrise (fréquence selon le score)
     const factEntries = [...factSet.entries()];
-    const weighted: string[] = [];
-    for (const [key] of factEntries) {
-      const prog = progMap.get(key);
-      const score = prog ? masteryScore(prog.correct_count, prog.incorrect_count) : 0;
-      const weight = selectionWeight(score, threshold);
-      for (let i = 0; i < weight; i++) weighted.push(key);
-    }
+    let selectedKeys: string[];
 
-    const shuffledWeighted = this.shuffle(weighted);
-    const selectedKeys: string[] = [];
-    const usedKeys = new Set<string>();
-    for (const key of shuffledWeighted) {
-      if (usedKeys.has(key)) continue;
-      selectedKeys.push(key);
-      usedKeys.add(key);
-      if (selectedKeys.length >= count) break;
-    }
-    // Fill up if pool smaller than count
-    for (const [key] of factEntries) {
-      if (!usedKeys.has(key)) {
+    if (isUnlimited) {
+      // Illimité = on reboucle le pool de faits re-mélangé jusqu'au cap.
+      selectedKeys = this.cycle(factEntries.map(([key]) => key), UNLIMITED_BATCH_SIZE);
+    } else {
+      // Load all progression (max 66 facts) and build lookup map
+      const allProgressions = await this.progressionRepo.find();
+      const progMap = new Map(
+        allProgressions.map((p) => [`${p.factor_a}x${p.factor_b}`, p]),
+      );
+
+      // Sélection pondérée par maîtrise (fréquence selon le score)
+      const weighted: string[] = [];
+      for (const [key] of factEntries) {
+        const prog = progMap.get(key);
+        const score = prog ? masteryScore(prog.correct_count, prog.incorrect_count) : 0;
+        const weight = selectionWeight(score, threshold);
+        for (let i = 0; i < weight; i++) weighted.push(key);
+      }
+
+      const shuffledWeighted = this.shuffle(weighted);
+      const usedKeys = new Set<string>();
+      selectedKeys = [];
+      for (const key of shuffledWeighted) {
+        if (usedKeys.has(key)) continue;
         selectedKeys.push(key);
-        if (selectedKeys.length >= count) break;
+        usedKeys.add(key);
+        if (selectedKeys.length >= rawCount) break;
+      }
+      // Fill up if pool smaller than count
+      for (const [key] of factEntries) {
+        if (!usedKeys.has(key)) {
+          selectedKeys.push(key);
+          if (selectedKeys.length >= rawCount) break;
+        }
       }
     }
 
-    // Build questions
-    const questions: TablesQuestion[] = this.shuffle(selectedKeys).map((key) => {
+    // Build questions (l'ordre illimité est déjà mélangé par tour ; on ne re-mélange que le fini).
+    const orderedKeys = isUnlimited ? selectedKeys : this.shuffle(selectedKeys);
+    const questions: TablesQuestion[] = orderedKeys.map((key) => {
       const { a, b, selectedTable } = factSet.get(key)!;
       const answer = a * b;
 
@@ -132,7 +145,7 @@ export class TablesService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds };
+    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
   }
 
   async recordAnswer(
@@ -239,5 +252,12 @@ export class TablesService {
       [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
+  }
+
+  /** Reboucle un pool re-mélangé à chaque tour jusqu'à atteindre `count` (mode illimité). */
+  private cycle<T>(pool: T[], count: number): T[] {
+    const out: T[] = [];
+    while (out.length < count) out.push(...this.shuffle(pool));
+    return out.slice(0, count);
   }
 }

@@ -1,5 +1,6 @@
-import { IsArray, IsBoolean, IsInt, IsNumber, Max, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export class StartTablesSessionDto {
   @IsArray()
@@ -12,6 +13,10 @@ export class StartTablesSessionDto {
       : value,
   )
   selected_tables: number[];
+
+  @IsOptional()
+  @IsIn(DIFFICULTIES)
+  difficulty?: Difficulty;
 }
 
 export class RecordTablesAnswerDto {
