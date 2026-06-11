@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Spinner from 'src/components/common/Spinner';
 
 type AccessStatus = 'loading' | 'redirecting' | 'invalid' | 'error';
 
@@ -29,17 +30,17 @@ const AdminAccessPage = () => {
 
   if (accessStatus === 'loading' || accessStatus === 'redirecting') {
     return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border text-primary" role="status" />
+      <div className="AccessState">
+        <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center vh-100 text-center px-4">
-      <p className="display-3">🔐</p>
-      <h1 className="h3 mb-3">Token invalide</h1>
-      <p className="text-muted">Vérifie que le lien est complet et réessaie.</p>
+    <div className="AccessState">
+      <p className="AccessState__emoji">🔐</p>
+      <h1 className="AccessState__title">Token invalide</h1>
+      <p className="AccessState__text">Vérifie que le lien est complet et réessaie.</p>
     </div>
   );
 };

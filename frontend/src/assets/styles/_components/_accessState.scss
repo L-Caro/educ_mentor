@@ -1,0 +1,27 @@
+// Écrans d'état plein écran (accès / invitation) — remplace les classes utilitaires Bootstrap.
+.AccessState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 1rem;
+  padding: 2rem 1.5rem;
+  text-align: center;
+
+  &__emoji {
+    font-size: 3.5rem;
+    margin: 0;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  &__text {
+    color: var(--color-base-content);
+    opacity: 0.6;
+    margin: 0;
+  }
+}

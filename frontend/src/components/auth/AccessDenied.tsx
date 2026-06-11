@@ -1,11 +1,11 @@
 const AccessDenied = () => (
-  <div className="d-flex flex-column align-items-center justify-content-center vh-100 text-center px-4">
-    <p className="display-3">🔒</p>
-    <h1 className="h3 mb-3">Accès non autorisé</h1>
-    <p className="text-muted">
+  <div className="AccessState">
+    <p className="AccessState__emoji">🔒</p>
+    <h1 className="AccessState__title">Accès non autorisé</h1>
+    <p className="AccessState__text">
       Cet appareil n'a pas encore été invité à accéder à ÉducMentor.
     </p>
-    <p className="text-muted">
+    <p className="AccessState__text">
       Demande un lien d'invitation à l'administrateur du site.
     </p>
   </div>

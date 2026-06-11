@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import Spinner from 'src/components/common/Spinner';
 
 type InviteStatus = 'loading' | 'redirecting' | 'invalid' | 'already_used' | 'error';
 
@@ -32,8 +33,8 @@ const InvitePage = () => {
 
   if (inviteStatus === 'loading' || inviteStatus === 'redirecting') {
     return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border text-primary" role="status" />
+      <div className="AccessState">
+        <Spinner />
       </div>
     );
   }
@@ -56,10 +57,10 @@ const InvitePage = () => {
   const { title, detail } = messages[inviteStatus];
 
   return (
-    <div className="d-flex flex-column align-items-center justify-content-center vh-100 text-center px-4">
-      <p className="display-3">❌</p>
-      <h1 className="h3 mb-3">{title}</h1>
-      <p className="text-muted">{detail}</p>
+    <div className="AccessState">
+      <p className="AccessState__emoji">❌</p>
+      <h1 className="AccessState__title">{title}</h1>
+      <p className="AccessState__text">{detail}</p>
     </div>
   );
 };

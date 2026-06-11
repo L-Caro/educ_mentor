@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import AccessDenied from './AccessDenied';
+import Spinner from 'src/components/common/Spinner';
 
 type AccessStatus = 'loading' | 'authorized' | 'denied';
 
@@ -32,8 +33,8 @@ const AccessGate = ({ children }: { children: React.ReactNode }) => {
 
   if (accessStatus === 'loading') {
     return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border text-primary" role="status" />
+      <div className="AccessState">
+        <Spinner />
       </div>
     );
   }
