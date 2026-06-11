@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components -- contexte : provider + hook + constantes co-localisés. */
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -42,7 +43,7 @@ export function SessionTimerProvider({ children }: { children: ReactNode }) {
     }
     const id = setInterval(() => setRemaining(computeRemaining(duration)), 1000);
     return () => clearInterval(id);
-  }, [duration]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [duration]);
 
   function resetTimer() {
     localStorage.setItem(START_KEY, String(Date.now()));

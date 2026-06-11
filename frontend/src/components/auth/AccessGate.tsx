@@ -7,29 +7,26 @@ type AccessStatus = 'loading' | 'authorized' | 'denied';
 /** Vérifie au démarrage que l'appareil est autorisé (cookie access_token valide côté backend).
  * Impossible de lire le cookie httpOnly en JS — on le détecte via un appel API :
  * 200 = cookie présent et valide, 401 = accès refusé. */
+/** Cas résolus synchroniquement (dev, pages publiques) → état initial ; sinon on vérifie via l'API. */
+function initialAccessStatus(): AccessStatus {
+  // En dev, le système d'invitation n'a aucun intérêt — on bypass entièrement.
+  if (import.meta.env.DEV) return 'authorized';
+  // Sur /invite/:token et /admin-access, l'app n'a pas encore de cookie — ces pages le posent.
+  if (window.location.pathname.startsWith('/invite/') || window.location.pathname === '/admin-access') {
+    return 'authorized';
+  }
+  return 'loading';
+}
+
 const AccessGate = ({ children }: { children: React.ReactNode }) => {
-  const [accessStatus, setAccessStatus] = useState<AccessStatus>('loading');
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>(initialAccessStatus);
 
   useEffect(() => {
-    // En dev, le système d'invitation n'a aucun intérêt — on bypass entièrement.
-    if (import.meta.env.DEV) {
-      setAccessStatus('authorized');
-      return;
-    }
-
-    // Sur /invite/:token, l'app n'a pas encore de cookie — c'est InvitePage qui le pose.
-    // On laisse passer : InvitePage fera un rechargement complet après succès.
-    if (window.location.pathname.startsWith('/invite/') || window.location.pathname === '/admin-access') {
-      setAccessStatus('authorized');
-      return;
-    }
-
+    if (accessStatus !== 'loading') return;
     fetch('/api/auth/check')
-      .then(response => {
-        setAccessStatus(response.ok ? 'authorized' : 'denied');
-      })
+      .then(response => setAccessStatus(response.ok ? 'authorized' : 'denied'))
       .catch(() => setAccessStatus('denied'));
-  }, []);
+  }, [accessStatus]);
 
   if (accessStatus === 'loading') {
     return (

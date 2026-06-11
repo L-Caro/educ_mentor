@@ -30,10 +30,15 @@ export default function TimerOverlay() {
     }
   }
 
-  submitRef.current = handleSubmit;
+  // Garde la dernière version de handleSubmit accessible depuis l'écouteur clavier.
+  useEffect(() => { submitRef.current = handleSubmit; });
+
+  // Vide le PIN à l'ouverture/fermeture de l'overlay (synchro légitime sur showOverlay).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPin(''); setError(''); }, [showOverlay]);
 
   useEffect(() => {
-    if (!showOverlay) { setPin(''); setError(''); return; }
+    if (!showOverlay) return;
     function onKeyDown(e: KeyboardEvent) {
       if (/^[0-9]$/.test(e.key))  setPin(p => p.length < PIN_LENGTH ? p + e.key : p);
       else if (e.key === 'Backspace') setPin(p => p.slice(0, -1));

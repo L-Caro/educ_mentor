@@ -16,15 +16,13 @@ export default function ImagierWordList() {
   const [filterCategory, setFilterCategory] = useState('');
   const [categories, setCategories] = useState<string[]>([]);
 
-  useEffect(() => { load(); }, []);
-
-  async function load() {
-    setLoading(true);
-    const data = await getWords();
-    setWords(data);
-    setCategories([...new Set(data.map((w) => w.category))].sort());
-    setLoading(false);
-  }
+  useEffect(() => {
+    getWords().then((data) => {
+      setWords(data);
+      setCategories([...new Set(data.map((w) => w.category))].sort());
+      setLoading(false);
+    });
+  }, []);
 
   async function toggleActive(word: ImagierWord) {
     const updated = await updateWord(word.id, { is_active: !word.is_active });

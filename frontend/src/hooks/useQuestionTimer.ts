@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseQuestionTimerResult {
   timeRemaining: number;
@@ -25,15 +25,16 @@ export function useQuestionTimer(timerSeconds: number, onTimeout: () => void): U
   useEffect(() => { timerSecondsRef.current = timerSeconds; }, [timerSeconds]);
   useEffect(() => { onTimeoutRef.current = onTimeout; }, [onTimeout]);
 
-  useEffect(() => () => { stopTimer(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  function stopTimer() {
+  const stopTimer = useCallback(() => {
     isRunningRef.current = false;
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-  }
+  }, []);
+
+  // Nettoyage à l'unmount.
+  useEffect(() => stopTimer, [stopTimer]);
 
   function startTimer() {
     const seconds = timerSecondsRef.current;

@@ -7,14 +7,13 @@ type AccessStatus = 'loading' | 'redirecting' | 'invalid' | 'error';
  * https://educmentor.lionelcaro.fr/admin-access?token=SECRET
  * Pose le cookie access_token via l'API, puis redirige vers /admin. */
 const AdminAccessPage = () => {
-  const [accessStatus, setAccessStatus] = useState<AccessStatus>('loading');
+  const [accessStatus, setAccessStatus] = useState<AccessStatus>(() =>
+    new URLSearchParams(window.location.search).get('token') ? 'loading' : 'invalid',
+  );
 
   useEffect(() => {
     const token = new URLSearchParams(window.location.search).get('token');
-    if (!token) {
-      setAccessStatus('invalid');
-      return;
-    }
+    if (!token) return;
 
     fetch(`/api/auth/admin-access?token=${encodeURIComponent(token)}`)
       .then(response => {

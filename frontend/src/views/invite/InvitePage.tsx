@@ -8,13 +8,10 @@ type InviteStatus = 'loading' | 'redirecting' | 'invalid' | 'already_used' | 'er
  * puis redirige vers / — l'AccessGate laissera passer au prochain check. */
 const InvitePage = () => {
   const { token } = useParams<{ token: string }>();
-  const [inviteStatus, setInviteStatus] = useState<InviteStatus>('loading');
+  const [inviteStatus, setInviteStatus] = useState<InviteStatus>(() => (token ? 'loading' : 'invalid'));
 
   useEffect(() => {
-    if (!token) {
-      setInviteStatus('invalid');
-      return;
-    }
+    if (!token) return;
 
     fetch(`/api/auth/invite/${token}`)
       .then(async response => {

@@ -19,9 +19,9 @@ interface PinModalProps {
 export default function PinModal({ show, onSubmit, error }: PinModalProps) {
   const [pin, setPin] = useState('');
 
-  // Reset à l'ouverture ou sur erreur
-  useEffect(() => { if (show) setPin(''); }, [show]);
-  useEffect(() => { if (error) setPin(''); }, [error]);
+  // Vide le champ PIN à l'ouverture du modal et après une erreur (synchro légitime sur props).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPin(''); }, [show, error]);
 
   // Support clavier : chiffres, Backspace, Enter
   useEffect(() => {

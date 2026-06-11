@@ -4,6 +4,7 @@
  dans le composant qui aura besoin du context
  */
 
+/* eslint-disable react-refresh/only-export-components -- contexte : provider + hook + context co-localisés. */
 import { createContext, useContext, useState, type ReactNode } from "react";
 
 

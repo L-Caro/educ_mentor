@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from 'src/components/common/Spinner';
 import { useModuleMeta } from 'src/hooks';
@@ -31,10 +31,7 @@ export default function AdminDashboard() {
   const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { loadAll(); }, []);
-
-  async function loadAll() {
-    setLoading(true);
+  const fetchStats = useCallback(async (): Promise<Partial<Record<string, ProgressionSummary>>> => {
     const entries = await Promise.all(
       MODULES.map(async (module): Promise<[string, ProgressionSummary | undefined]> => {
         if (!module.progression) return [module.id, undefined];
@@ -42,16 +39,19 @@ export default function AdminDashboard() {
         return [module.id, computeStats(items)];
       }),
     );
-    setStatsMap(Object.fromEntries(entries));
-    setLoading(false);
-  }
+    return Object.fromEntries(entries);
+  }, []);
+
+  useEffect(() => {
+    fetchStats().then((map) => { setStatsMap(map); setLoading(false); });
+  }, [fetchStats]);
 
   async function handleReset(module: ModuleManifest) {
     if (!module.progression) return;
     const moduleName = getModuleMeta(module.id)?.name ?? module.id;
     if (!confirm(`Réinitialiser toute la progression ${moduleName} ? Action irréversible.`)) return;
     await module.progression.reset();
-    await loadAll();
+    setStatsMap(await fetchStats());
   }
 
   return (
