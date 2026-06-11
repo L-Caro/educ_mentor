@@ -40,7 +40,7 @@ export interface ModuleManifest {
   // Spec de jeu déclarative (remplace child.Game, rendue par <GameEngine>). Registre hétérogène de
   // specs → `any` assumé/documenté : chaque spec est typée concrètement dans son fichier `<id>.game.tsx`.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  gameSpec?: GameModuleSpec<any, any, any>;
+  gameSpec?: GameModuleSpec<any, any>;
   child: {
     Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
     Game?: ComponentType;   // composant de jeu dédié (sinon gameSpec via <GameEngine>)

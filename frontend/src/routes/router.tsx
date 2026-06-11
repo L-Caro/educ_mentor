@@ -11,7 +11,7 @@ import InvitePage from 'src/views/invite/InvitePage';
 import AdminAccessPage from 'src/views/invite/AdminAccessPage';
 
 // Error
-import ErrorPage from 'src/components/Error/pages/ErrorPage';
+import ErrorRouter from 'src/components/Error/ErrorRouter';
 
 // Vues
 import ChildHome from 'src/views/child/ChildHome';
@@ -76,7 +76,7 @@ const Router = createBrowserRouter([
   // ── Vue enfant (ChildLayout : header contextuel + Outlet) ─────────────────
   {
     element: <ChildLayout />,
-    errorElement: <ErrorPage />,
+    errorElement: <ErrorRouter />,
     children: [
       { path: '/', element: <ChildHome />, handle: { title: MAIN_TITLE } },
       ...MODULES.flatMap(buildChildRoutes),

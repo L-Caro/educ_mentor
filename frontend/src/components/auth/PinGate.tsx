@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useAuth } from 'src/hook/useAuth';
 import PinModal from './PinModal';
 

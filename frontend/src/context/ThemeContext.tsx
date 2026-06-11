@@ -4,7 +4,7 @@
  dans le composant qui aura besoin du context
  */
 
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 
 
 //? Typage
