@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Header from "src/components/layout/Header/Header.tsx";
 import { useAuth } from 'src/hooks/useAuth';
-import { useModuleMeta } from 'src/hooks';
-import { MODULES } from 'src/modules.manifest';
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Tableau de bord", icon: "🏠", end: true },
@@ -13,7 +11,6 @@ const NAV_ITEMS = [
 export default function AdminLayout() {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const getModuleMeta = useModuleMeta();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   function closeMobileMenu() {
@@ -50,25 +47,6 @@ export default function AdminLayout() {
                 </NavLink>
               </li>
             ))}
-
-            {/* Un lien par module, piloté par le manifest — plus de module « oublié ». */}
-            {MODULES.map((module) => {
-              const meta = getModuleMeta(module.id);
-              return (
-                <li key={module.id}>
-                  <NavLink
-                    to={`/admin/${module.id}`}
-                    className={({ isActive }) =>
-                      `AdminLayout__navLink${isActive ? ' AdminLayout__navLink--active' : ''}`
-                    }
-                    onClick={closeMobileMenu}
-                  >
-                    <span>{meta?.icon}</span>
-                    {meta?.name ?? module.id}
-                  </NavLink>
-                </li>
-              );
-            })}
           </ul>
 
           <ul className="AdminLayout__navFooter">
