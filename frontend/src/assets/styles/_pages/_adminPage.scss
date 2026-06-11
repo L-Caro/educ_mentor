@@ -1,6 +1,6 @@
 @use '../_abstracts/variables' as v;
 
-.AdminLayout {
+.AdminPage {
 	display: flex;
 	min-height: calc(100vh - 6rem); // 6rem = hauteur Header
 	background-color: var(--color-base-200);
@@ -144,16 +144,5 @@
 		&__main {
 			padding: v.$space-6 v.$space-5;
 		}
-	}
-}
-
-// ─── ModuleAdminLayout ────────────────────────────────────────────────────────
-
-.ModuleAdminLayout {
-	&__title {
-		font-size: v.$font-size-xl;
-		font-weight: 700;
-		color: var(--color-base-content);
-		margin: 0 0 v.$space-4;
 	}
 }

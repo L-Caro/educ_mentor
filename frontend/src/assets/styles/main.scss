@@ -5,11 +5,11 @@
 @use './_base/reset';
 @use './_base/typography';
 
-@use '_layout/childLayout';
-@use '_layout/adminLayout';
+@use '_pages/homePage';
 @use '_layout/header';
 @use '_layout/pageContainer';
 
+@use './_components/admin';
 @use './_components/button';
 @use './_components/gameFooter';
 @use './_components/gameResult';
@@ -30,14 +30,14 @@
 @use './_components/spinner';
 @use './_components/accessState';
 @use './_components/toggle';
+@use '_components/settings';
 @use './_components/tabNav';
 @use './_components/devBadge';
 @use './_components/timerOverlay';
 @use './_components/sessionTimerDisplay';
 
-@use '_pages/admin';
-@use '_pages/childHome';
-@use '_pages/settings';
+@use '_layout/homeLayout';
+@use './_pages/adminPage';
 @use './_pages/error';
 
 @use './_themes/dark';

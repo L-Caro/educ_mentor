@@ -11,7 +11,7 @@
 |---|---|---|
 | Phase 1 — Scaffolding & Infrastructure | ✅ Terminée | Monorepo, NestJS, React/Vite, SCSS+BEM, Docker |
 | Phase 2 — Core backend | ✅ Terminée | Settings, Auth PIN+JWT, CatalogModule |
-| Phase 3 — Core frontend | ✅ Terminée | ChildHome, AdminLayout, Settings, Header, GearButton |
+| Phase 3 — Core frontend | ✅ Terminée | ChildHome, AdminPage, Settings, Header, GearButton |
 | Phase 4 — Module Imagier Anglais | ✅ Terminée | Backend + toutes les vues child et admin |
 | Phase 4b — Module Tables de multiplication | ✅ Terminée | Backend + toutes les vues child et admin |
 | Phase 5 — Déploiement NAS | 🔜 À faire | Docker, Synology Container Manager, Tailscale |
@@ -116,7 +116,7 @@ educmentor/
 │   │   │   ├── layout/
 │   │   │   │   ├── Header/Header.tsx     # toggle dark/light + GearButton + bouton home
 │   │   │   │   ├── PageContainer/PageContainer.tsx
-│   │   │   │   └── ChildLayout/ChildLayout.tsx  # Header + Outlet pour vues enfant
+│   │   │   │   └── HomePage/HomePage.tsx  # Header + Outlet pour vues enfant
 │   │   │   ├── auth/
 │   │   │   │   ├── PinModal.tsx          # clavier numérique tactile
 │   │   │   │   ├── PinGate.tsx           # HOC protège une route par PIN
@@ -145,7 +145,7 @@ educmentor/
 │   │   │   ├── child/
 │   │   │   │   └── ChildHome.tsx         # accueil tablette : liste modules actifs
 │   │   │   ├── admin/
-│   │   │   │   ├── AdminLayout.tsx       # Header + sidebar BEM + Outlet
+│   │   │   │   ├── AdminPage.tsx       # Header + sidebar BEM + Outlet
 │   │   │   │   ├── AdminDashboard.tsx
 │   │   │   │   └── ModuleCatalog.tsx
 │   │   │   └── settings/
@@ -277,14 +277,14 @@ En prod : ADMIN_PIN_ENABLED=true → PIN obligatoire
 ## Routing frontend
 
 ```
-/                          ChildLayout > ChildHome
-/module/imagier            ChildLayout > ImagierHome
-/module/imagier/play       ChildLayout > ImagierGame
-/module/imagier/result     ChildLayout > ImagierResult
+/                          HomePage > ChildHome
+/module/imagier            HomePage > ImagierHome
+/module/imagier/play       HomePage > ImagierGame
+/module/imagier/result     HomePage > ImagierResult
 
 /settings                  PinGate > Settings
 
-/admin                     PinGate > AdminLayout
+/admin                     PinGate > AdminPage
 /admin/                    (index) AdminDashboard
 /admin/modules             ModuleCatalog
 /admin/imagier             ImagierAdmin > (index) ImagierWordList
@@ -438,12 +438,12 @@ Volume `./data:/app/data` pour SQLite + images persistés sur le NAS.
 - SCSS 7-1 + variables CSS (dark/light via ThemeContext)
 - Redux store + authSlice
 - Composants communs : Button, ModuleCard, PageContainer
-- ChildLayout (Header + Outlet)
+- HomePage (Header + Outlet)
 - Header : toggle thème + GearButton + bouton home
 - GearButton : modale PIN → /admin
 - ChildHome : liste des modules actifs (CatalogAPI)
 - Settings : page placeholder pour futurs modules
-- AdminLayout : Header + sidebar BEM + Outlet
+- AdminPage : Header + sidebar BEM + Outlet
 - AdminDashboard, ModuleCatalog
 
 ---

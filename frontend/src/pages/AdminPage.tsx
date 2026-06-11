@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Header from "src/components/layout/Header/Header.tsx";
-import { useAuth } from 'src/hooks/useAuth';
+import { useAuth } from 'src/hooks/useAuth.ts';
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Tableau de bord", icon: "🏠", end: true },
   { to: "/admin/modules", label: "Modules", icon: "🧩", end: false },
 ];
 
-export default function AdminLayout() {
+export default function AdminPage() {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -20,25 +20,25 @@ export default function AdminLayout() {
   return (
     <>
       <Header />
-      <div className="AdminLayout">
+      <div className="AdminPage">
         {isMobileMenuOpen && (
-          <div className="AdminLayout__overlay" onClick={closeMobileMenu} />
+          <div className="AdminPage__overlay" onClick={closeMobileMenu} />
         )}
 
-        <aside className={`AdminLayout__sidebar${isMobileMenuOpen ? ' AdminLayout__sidebar--open' : ''}`}>
-          <div className="AdminLayout__brand">
-            <p className="AdminLayout__brandTitle">ÉducMentor</p>
-            <p className="AdminLayout__brandSub">Administration</p>
+        <aside className={`AdminPage__sidebar${isMobileMenuOpen ? ' AdminPage__sidebar--open' : ''}`}>
+          <div className="AdminPage__brand">
+            <p className="AdminPage__brandTitle">ÉducMentor</p>
+            <p className="AdminPage__brandSub">Administration</p>
           </div>
 
-          <ul className="AdminLayout__nav">
+          <ul className="AdminPage__nav">
             {NAV_ITEMS.map((navItem) => (
               <li key={navItem.to}>
                 <NavLink
                   to={navItem.to}
                   end={navItem.end}
                   className={({ isActive }) =>
-                    `AdminLayout__navLink${isActive ? ' AdminLayout__navLink--active' : ''}`
+                    `AdminPage__navLink${isActive ? ' AdminPage__navLink--active' : ''}`
                   }
                   onClick={closeMobileMenu}
                 >
@@ -49,12 +49,12 @@ export default function AdminLayout() {
             ))}
           </ul>
 
-          <ul className="AdminLayout__navFooter">
+          <ul className="AdminPage__navFooter">
             <li>
               <NavLink
                 to="/settings"
                 className={({ isActive }) =>
-                  `AdminLayout__navLink${isActive ? ' AdminLayout__navLink--active' : ''}`
+                  `AdminPage__navLink${isActive ? ' AdminPage__navLink--active' : ''}`
                 }
                 onClick={closeMobileMenu}
               >
@@ -63,7 +63,7 @@ export default function AdminLayout() {
             </li>
             <li>
               <button
-                className="AdminLayout__navButton"
+                className="AdminPage__navButton"
                 onClick={() => { closeMobileMenu(); logout(); navigate('/'); }}
               >
                 <span>🚪</span> Retour accueil
@@ -72,9 +72,9 @@ export default function AdminLayout() {
           </ul>
         </aside>
 
-        <main className="AdminLayout__main">
+        <main className="AdminPage__main">
           <button
-            className="AdminLayout__hamburger"
+            className="AdminPage__hamburger"
             onClick={() => setIsMobileMenuOpen((previousIsOpen) => !previousIsOpen)}
             aria-label={isMobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
           >

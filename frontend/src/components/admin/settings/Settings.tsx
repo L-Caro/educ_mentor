@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import Header from 'src/components/layout/Header/Header';
-import PageContainer from 'src/components/layout/PageContainer/PageContainer';
-import Toggle from 'src/components/common/Toggle';
+import Header from 'src/components/layout/Header/Header.tsx';
+import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
+import Toggle from 'src/components/common/Toggle.tsx';
 import { useDevMode } from 'src/hooks';
-import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext';
-import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi';
-import InvitationsAdmin from 'src/views/admin/InvitationsAdmin';
+import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext.tsx';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
+import InvitationsAdmin from 'src/components/admin/settings/InvitationsAdmin.tsx';
 
 const DURATION_STEPS = [0, 1, 10, 15, 20, 30, 45, 60];
 const QUESTION_COUNTS = [5, 10, 15, 20];

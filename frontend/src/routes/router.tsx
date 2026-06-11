@@ -1,23 +1,23 @@
 import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 
 // Layouts
-import ChildLayout from 'src/components/layout/ChildLayout/ChildLayout';
-import ModuleAdminLayout from 'src/components/layout/ModuleAdminLayout/ModuleAdminLayout';
-import AdminLayout from 'src/views/admin/AdminLayout';
+import HomePage from 'src/pages/HomePage.tsx';
+import AdminLayout from 'src/components/layout/AdminLayout.tsx';
+import AdminPage from 'src/pages/AdminPage.tsx';
 
 // Auth
 import PinGate from 'src/components/auth/PinGate';
-import InvitePage from 'src/views/invite/InvitePage';
-import AdminAccessPage from 'src/views/invite/AdminAccessPage';
+import InvitePage from 'src/pages/invite/InvitePage';
+import AdminAccessPage from 'src/pages/invite/AdminAccessPage';
 
 // Error
 import ErrorRouter from 'src/components/error/ErrorRouter';
 
 // Vues
-import ChildHome from 'src/views/child/ChildHome';
-import AdminDashboard from 'src/views/admin/AdminDashboard';
-import ModuleCatalog from 'src/views/admin/ModuleCatalog';
-import Settings from 'src/views/settings/Settings';
+import HomeLayout from 'src/components/layout/HomeLayout.tsx';
+import AdminDashboard from 'src/components/admin/AdminDashboard';
+import ModuleCatalog from 'src/components/admin/ModuleCatalog';
+import Settings from 'src/components/admin/settings/Settings';
 
 import ModulePreSetup from 'src/components/game/ModulePreSetup';
 import LazyGame from 'src/components/game/LazyGame';
@@ -67,18 +67,18 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
 function buildAdminRoute(module: ModuleManifest): RouteObject {
   return {
     path: module.id,
-    element: <ModuleAdminLayout moduleId={module.id} tabs={module.adminTabs} />,
+    element: <AdminLayout moduleId={module.id} tabs={module.adminTabs} />,
     children: module.adminRoutes,
   };
 }
 
 const Router = createBrowserRouter([
-  // ── Vue enfant (ChildLayout : header contextuel + Outlet) ─────────────────
+  // ── Vue enfant (HomePage : header contextuel + Outlet) ─────────────────
   {
-    element: <ChildLayout />,
+    element: <HomePage />,
     errorElement: <ErrorRouter />,
     children: [
-      { path: '/', element: <ChildHome />, handle: { title: MAIN_TITLE } },
+      { path: '/', element: <HomeLayout />, handle: { title: MAIN_TITLE } },
       ...MODULES.flatMap(buildChildRoutes),
     ],
   },
@@ -97,7 +97,7 @@ const Router = createBrowserRouter([
   // ── Admin (protégé PIN, layout sidebar) ───────────────────────────────────
   {
     path: '/admin',
-    element: <PinGate><AdminLayout /></PinGate>,
+    element: <PinGate><AdminPage /></PinGate>,
     children: [
       { index: true, element: <AdminDashboard />, handle: { title: 'Tableau de bord admin' } },
       { path: 'modules', element: <ModuleCatalog /> },

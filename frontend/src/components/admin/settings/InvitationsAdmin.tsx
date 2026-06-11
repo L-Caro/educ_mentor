@@ -3,8 +3,8 @@ import {
   useGetInvitationsQuery,
   useCreateInvitationMutation,
   useDeleteInvitationMutation,
-} from 'src/store/api/authApi';
-import Spinner from 'src/components/common/Spinner';
+} from 'src/store/api/authApi.ts';
+import Spinner from 'src/components/common/Spinner.tsx';
 
 const InvitationsAdmin = () => {
   const { data: invitations = [], isLoading } = useGetInvitationsQuery();

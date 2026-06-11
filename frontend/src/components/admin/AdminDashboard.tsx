@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Spinner from 'src/components/common/Spinner';
+import Spinner from 'src/components/common/Spinner.tsx';
 import { useModuleMeta } from 'src/hooks';
-import { MODULES } from 'src/modules.manifest';
-import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest';
+import { MODULES } from 'src/modules.manifest.tsx';
+import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest.tsx';
 
 const SHORTCUTS = [
   { to: '/admin/modules', icon: '🧩', label: 'Modules', desc: 'Activer / désactiver les modules' },

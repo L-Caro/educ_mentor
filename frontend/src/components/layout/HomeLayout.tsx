@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
-import { useGetModulesQuery } from 'src/store/api/sharedApi';
+import { useGetModulesQuery } from 'src/store/api/sharedApi.ts';
 import ModuleCard from 'src/components/common/ModuleCard.tsx';
-import Spinner from 'src/components/common/Spinner';
-import SessionTimerDisplay from 'src/components/common/SessionTimerDisplay';
+import Spinner from 'src/components/common/Spinner.tsx';
+import SessionTimerDisplay from 'src/components/common/SessionTimerDisplay.tsx';
 
-export default function ChildHome() {
+export default function HomeLayout() {
   const { data: modules = [], isLoading: loading } = useGetModulesQuery({ onlyActive: true });
 
   const hasModules = useMemo(() => modules.length > 0, [modules]);
 
   if (loading) {
     return (
-      <div className="ChildHome">
-        <div className="ChildHome__loading">
+      <div className="HomeLayout">
+        <div className="HomeLayout__loading">
           <Spinner />
         </div>
       </div>
@@ -21,8 +21,8 @@ export default function ChildHome() {
 
   if (!hasModules) {
     return (
-      <div className="ChildHome">
-        <p className="ChildHome__empty">
+      <div className="HomeLayout">
+        <p className="HomeLayout__empty">
           Aucun module activé pour l&apos;instant.
         </p>
       </div>
@@ -30,13 +30,13 @@ export default function ChildHome() {
   }
 
   return (
-    <div className="ChildHome">
-      <div className="ChildHome__timerRow">
+    <div className="HomeLayout">
+      <div className="HomeLayout__timerRow">
         <SessionTimerDisplay />
       </div>
-      <div className="ChildHome__grid">
+      <div className="HomeLayout__grid">
         {modules.map((mod) => (
-          <div key={mod.id} className="ChildHome__col">
+          <div key={mod.id} className="HomeLayout__col">
             <ModuleCard module={mod} />
           </div>
         ))}

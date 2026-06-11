@@ -1,7 +1,7 @@
 @use '../_abstracts/variables' as v;
 @use '../_abstracts/mixins' as m;
 
-.ChildHome {
+.HomeLayout {
 	flex: 1;
 	padding: v.$space-10 v.$space-8;
 

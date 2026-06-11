@@ -1,7 +1,7 @@
 @use '../_abstracts/variables' as v;
 @use '../_abstracts/mixins' as m;
 
-.ChildLayout {
+.HomePage {
   display: flex;
   flex-direction: column;
   min-height: 100vh;

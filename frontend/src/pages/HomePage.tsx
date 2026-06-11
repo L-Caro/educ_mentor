@@ -1,14 +1,14 @@
 import { Outlet } from 'react-router-dom';
 import Header from 'src/components/layout/Header/Header.tsx';
-import { SessionTimerProvider } from 'src/context/SessionTimerContext';
-import TimerOverlay from 'src/components/common/TimerOverlay';
+import { SessionTimerProvider } from 'src/context/SessionTimerContext.tsx';
+import TimerOverlay from 'src/components/common/TimerOverlay.tsx';
 
-export default function ChildLayout() {
+export default function HomePage() {
   return (
     <SessionTimerProvider>
-      <div className="ChildLayout">
+      <div className="HomePage">
         <Header />
-        <main className="ChildLayout__main">
+        <main className="HomePage__main">
           <Outlet />
         </main>
         <TimerOverlay />
