@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { calculApi } from './calcul.api';
 import type { ModuleManifest } from 'src/modules.types';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 
@@ -29,9 +29,9 @@ export const calculModule: ModuleManifest = {
   ],
   progression: {
     getStats: () =>
-      store.dispatch(api.endpoints.getCalculProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
+      store.dispatch(calculApi.endpoints.getCalculProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
     reset: async () => {
-      await store.dispatch(api.endpoints.resetCalculProgression.initiate()).unwrap();
+      await store.dispatch(calculApi.endpoints.resetCalculProgression.initiate()).unwrap();
     },
   },
 };

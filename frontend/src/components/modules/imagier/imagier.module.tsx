@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { imagierApi } from './imagier.api';
 import type { ModuleManifest } from 'src/modules.types';
 import { IMAGIER_SETUP_OPTIONS } from './imagier.setup';
 
@@ -21,9 +21,9 @@ export const imagierModule: ModuleManifest = {
   ],
   progression: {
     getStats: () =>
-      store.dispatch(api.endpoints.getImagierProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
+      store.dispatch(imagierApi.endpoints.getImagierProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
     reset: async () => {
-      await store.dispatch(api.endpoints.resetImagierProgression.initiate()).unwrap();
+      await store.dispatch(imagierApi.endpoints.resetImagierProgression.initiate()).unwrap();
     },
   },
 };

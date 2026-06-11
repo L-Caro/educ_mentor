@@ -1,4 +1,4 @@
-import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi';
 import Spinner from 'src/components/common/Spinner';
 
 const MAX_AMOUNT_PRESETS = [5, 10, 20, 50, 100, 500];

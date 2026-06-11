@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { tablesApi } from './tables.api';
 import type { ModuleManifest } from 'src/modules.types';
 import { TABLES_SETUP_OPTIONS } from './tables.setup';
 
@@ -14,9 +14,9 @@ export const tablesModule: ModuleManifest = {
   ],
   progression: {
     getStats: () =>
-      store.dispatch(api.endpoints.getTablesProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
+      store.dispatch(tablesApi.endpoints.getTablesProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
     reset: async () => {
-      await store.dispatch(api.endpoints.resetTablesProgression.initiate()).unwrap();
+      await store.dispatch(tablesApi.endpoints.resetTablesProgression.initiate()).unwrap();
     },
   },
 };

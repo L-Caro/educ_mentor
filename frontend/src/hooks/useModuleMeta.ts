@@ -1,4 +1,4 @@
-import { useGetModulesQuery } from 'src/store/api/api';
+import { useGetModulesQuery } from 'src/store/api/sharedApi';
 
 export interface ModuleMeta {
   name: string;

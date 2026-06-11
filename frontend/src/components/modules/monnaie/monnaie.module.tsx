@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { monnaieApi } from './monnaie.api';
 import type { ModuleManifest } from 'src/modules.types';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 
@@ -27,9 +27,9 @@ export const monnaieModule: ModuleManifest = {
   ],
   progression: {
     getStats: () =>
-      store.dispatch(api.endpoints.getMonnaieProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
+      store.dispatch(monnaieApi.endpoints.getMonnaieProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
     reset: async () => {
-      await store.dispatch(api.endpoints.resetMonnaieProgression.initiate()).unwrap();
+      await store.dispatch(monnaieApi.endpoints.resetMonnaieProgression.initiate()).unwrap();
     },
   },
 };

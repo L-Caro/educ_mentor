@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { sharedApi } from 'src/store/api/sharedApi';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 
 /**
@@ -7,7 +7,7 @@ import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
  * (lu via le cache RTK Query, sans hook). Exécuté par <ModulePreSetup>.
  */
 async function loadTables() {
-  const settings = await store.dispatch(api.endpoints.getSettings.initiate()).unwrap();
+  const settings = await store.dispatch(sharedApi.endpoints.getSettings.initiate()).unwrap();
   const includeTrivial = settings.tables_include_trivial !== 'false';
   return Array.from({ length: 11 }, (_, table) => table)
     .filter((table) => includeTrivial || table > 1)

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useGetModulesQuery, useUpdateModuleMutation } from 'src/store/api/api';
+import { useGetModulesQuery, useUpdateModuleMutation } from 'src/store/api/sharedApi';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';
 import type { AppModule } from 'src/types';

@@ -1,4 +1,4 @@
-import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi';
 import Spinner from 'src/components/common/Spinner';
 
 export default function TablesSettings() {

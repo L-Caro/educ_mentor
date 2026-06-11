@@ -1,5 +1,5 @@
 import store from 'src/store';
-import { api } from 'src/store/api/api';
+import { sharedApi } from 'src/store/api/sharedApi';
 import { getCategoryConfig } from 'src/components/modules/imagier/constants/categories';
 import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
 
@@ -8,7 +8,7 @@ import type { SetupOption } from 'src/components/common/Game/GamePreSetup';
  * Exécuté à la demande par <ModulePreSetup> quand l'enfant ouvre le pré-jeu Imagier.
  */
 async function loadCategories() {
-  const categories = await store.dispatch(api.endpoints.getImagierCategories.initiate()).unwrap();
+  const categories = await store.dispatch(sharedApi.endpoints.getImagierCategories.initiate()).unwrap();
   return categories
     .filter((category) => category.active_count > 0)
     .map((category) => {

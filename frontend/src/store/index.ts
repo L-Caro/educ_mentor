@@ -1,20 +1,20 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slice/authSlice";
 import gameSetupReducer from "./slice/gameSetupSlice";
-import { api } from "./api/api";
+import { baseApi } from "./api/baseApi";
 
 //? Reducers
 const rootReducers = {
   auth: authReducer,
   gameSetup: gameSetupReducer,
-  [api.reducerPath]: api.reducer,
+  [baseApi.reducerPath]: baseApi.reducer,
 };
 
 
 //? Store
 const store = configureStore( {
   reducer: rootReducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(api.middleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
 } );
 
 export default store;
