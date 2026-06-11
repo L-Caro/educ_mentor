@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from 'src/hook';
+import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { setModuleSetup, selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 import GamePreSetup, { type SetupOption, type SetupValues } from 'src/components/common/Game/GamePreSetup';
 import GameStateView from 'src/components/common/Game/GameStateView';

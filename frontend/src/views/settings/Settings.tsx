@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Header from 'src/components/layout/Header/Header';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer';
 import Toggle from 'src/components/common/Toggle';
-import { useDevMode } from 'src/hook';
+import { useDevMode } from 'src/hooks';
 import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext';
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import InvitationsAdmin from 'src/views/admin/InvitationsAdmin';

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import Header from "src/components/layout/Header/Header.tsx";
-import { useAuth } from 'src/hook/useAuth';
+import { useAuth } from 'src/hooks/useAuth';
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Tableau de bord", icon: "🏠", end: true },
