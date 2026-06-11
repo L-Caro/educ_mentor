@@ -8,7 +8,6 @@ interface GameResultPageProps {
   onReplay: () => void;
   onHome: () => void;
   homeLabel?: string;
-  withStars?: boolean;
   errorCount?: number;
   children?: ReactNode;
 }
@@ -19,7 +18,6 @@ export default function GameResultPage({
   onReplay,
   onHome,
   homeLabel = 'Accueil',
-  withStars = true,
   errorCount = 0,
   children,
 }: GameResultPageProps) {
@@ -31,11 +29,9 @@ export default function GameResultPage({
     <PageContainer className="GameResult">
       <div className="GameResult__score">
         <span className="GameResult__emoji">{emoji}</span>
-        {withStars && (
-          <div className="GameResult__stars">
-            {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
-          </div>
-        )}
+        <div className="GameResult__stars">
+          {'★'.repeat(filledStars)}{'☆'.repeat(5 - filledStars)}
+        </div>
         <p className="GameResult__fraction">{correctCount} / {total}</p>
         <p className="GameResult__pct">{percentage}% de bonnes réponses</p>
       </div>

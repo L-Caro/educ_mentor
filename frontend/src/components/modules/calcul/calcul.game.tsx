@@ -1,6 +1,5 @@
 import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/module/calcul.api';
 import type { CalculSessionResponse, CalculQuestion } from 'src/types';
-import type { CalculHistoryEntry } from './child/CalculResult';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
 import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 
@@ -12,7 +11,7 @@ function renderOperation(operation: string) {
   );
 }
 
-export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestion, CalculHistoryEntry> = {
+export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestion> = {
   loadSession: (setup) =>
     startCalculSession(setup.operationTypes as string[] | undefined, setup.difficulty as string | undefined),
 
@@ -37,14 +36,16 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
 
   recordAnswer: (sessionId, question, correct) => recordCalculAnswer(sessionId, question.answer, correct),
   completeSession: completeCalculSession,
-  buildResultEntry: (question, given, correct, timeout) => ({
-    operation: question.operation,
-    answer: question.answer,
-    given: typeof given === 'number' ? given : null,
-    correct,
-    timeout,
-  }),
-  buildResultsState: (correctCount, total, history) => ({ correctCount, total, history }),
+  buildResultEntry: (question, given, correct, timeout) => {
+    const value = given == null ? null : Number(given);
+    return {
+      label: question.operation.replace('?', '___'),
+      given: value === null || Number.isNaN(value) ? null : value,
+      expected: question.answer,
+      correct,
+      timeout,
+    };
+  },
 
   showQuestionTag: true,
 };

@@ -4,16 +4,18 @@ import { capitalize } from 'src/utils/capitilize';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
 import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 
-type ImagierResult = { question: ImagierQuestion; wasCorrect: boolean };
-
 /** Comparaison insensible à la casse et aux accents (saisie libre, niveau difficile). */
 function normalize(text: string): string {
   return text.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
-export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQuestion, ImagierResult> = {
+export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQuestion> = {
   loadSession: (setup) =>
-    startSession(setup.categories as string[] | undefined, setup.difficulty as string | undefined),
+    startSession(
+      setup.categories as string[] | undefined,
+      setup.difficulty as string | undefined,
+      setup.mode as string | undefined,
+    ),
 
   renderPrompt: (question, answerState) => {
     const hideImage = question.direction === 'en_to_fr' && answerState === 'idle';
@@ -41,7 +43,19 @@ export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQues
 
   recordAnswer: (sessionId, question, correct) => recordAnswer(sessionId, question.word_id, correct),
   completeSession: completeSession,
-  buildResultEntry: (question, _given, correct) => ({ question, wasCorrect: correct }),
+  buildResultEntry: (question, given, correct, timeout) => {
+    const givenLabel = given == null
+      ? null
+      : question.choices.find((choice) => choice.id === given)?.label ?? String(given);
+    return {
+      label: capitalize(question.prompt),
+      given: givenLabel ? capitalize(givenLabel) : null,
+      expected: capitalize(question.answer),
+      correct,
+      timeout,
+      thumbUrl: question.image_url,
+    };
+  },
 
   emptyError: "Aucun mot disponible. Active des mots dans l'administration.",
 };

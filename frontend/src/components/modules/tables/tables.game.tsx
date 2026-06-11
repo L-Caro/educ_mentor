@@ -3,9 +3,7 @@ import type { TablesQuestion, TablesSessionResponse } from 'src/types';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
 import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 
-type TablesResult = { question: TablesQuestion; wasCorrect: boolean };
-
-export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion, TablesResult> = {
+export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion> = {
   loadSession: (setup) => {
     const tables = ((setup.tables as string[] | undefined) ?? []).map(Number).filter((value) => !isNaN(value));
     return startTablesSession(tables, setup.difficulty as string | undefined);
@@ -35,7 +33,16 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
   recordAnswer: (sessionId, question, correct) =>
     recordTablesAnswer(sessionId, question.display_a, question.display_b, correct),
   completeSession: completeTablesSession,
-  buildResultEntry: (question, _given, correct) => ({ question, wasCorrect: correct }),
+  buildResultEntry: (question, given, correct, timeout) => {
+    const value = given == null ? null : Number(given);
+    return {
+      label: `${question.display_a} × ${question.display_b}`,
+      given: value === null || Number.isNaN(value) ? null : value,
+      expected: question.answer,
+      correct,
+      timeout,
+    };
+  },
 
   emptyError: 'Aucune question disponible. Sélectionne au moins une table.',
   showStreak: true,

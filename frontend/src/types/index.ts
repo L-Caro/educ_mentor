@@ -12,8 +12,6 @@ export interface Setting {
   value: string;
 }
 
-export type ImagierMode = 'fr_to_en' | 'en_to_fr' | 'random';
-
 export interface ImagierWord {
   id: string;
   slug: string;

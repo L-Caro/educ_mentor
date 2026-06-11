@@ -66,6 +66,11 @@ export class StartSessionDto {
   @IsOptional()
   @IsIn(DIFFICULTIES)
   difficulty?: Difficulty;
+
+  // Sens de traduction = choix de pré-jeu enfant.
+  @IsOptional()
+  @IsIn(['fr_to_en', 'en_to_fr', 'random'])
+  mode?: string;
 }
 
 export class RecordAnswerDto {

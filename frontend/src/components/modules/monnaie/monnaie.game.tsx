@@ -1,6 +1,5 @@
 import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/module/monnaie.api';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
-import type { MonnaieHistoryEntry } from './child/MonnaieResult';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from './constants/denominations';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
 import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
@@ -10,6 +9,15 @@ const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   total: 'Quel est le total à payer ?',
   rendre: 'Combien rend-on ?',
 };
+
+/** Résumé textuel de l'énoncé pour la liste d'erreurs. */
+function questionSummary(question: MonnaieQuestion): string {
+  switch (question.type) {
+    case 'reconnaitre': return `${(question.coins ?? []).length} pièce(s)/billet(s)`;
+    case 'total': return `Total de ${(question.prices ?? []).map(formatCents).join(' + ')}`;
+    case 'rendre': return `${formatCents(question.price ?? 0)} → tu donnes ${formatCents(question.payment ?? 0)}`;
+  }
+}
 
 function renderQuestion(question: MonnaieQuestion) {
   switch (question.type) {
@@ -52,7 +60,7 @@ function renderQuestion(question: MonnaieQuestion) {
   }
 }
 
-export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQuestion, MonnaieHistoryEntry> = {
+export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQuestion> = {
   loadSession: (setup) => {
     const exerciseType = setup.exerciseType as MonnaieExerciseType | undefined;
     if (!exerciseType) return Promise.reject(new Error("Type d'exercice manquant."));
@@ -81,13 +89,16 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
 
   recordAnswer: (sessionId, question, correct) => recordMonnaieAnswer(sessionId, question.type, question.answer, correct),
   completeSession: completeMonnaieSession,
-  buildResultEntry: (question, given, correct, timeout) => ({
-    question,
-    given: typeof given === 'number' ? given : null,
-    correct,
-    timeout,
-  }),
-  buildResultsState: (correctCount, total, history) => ({ correctCount, total, history }),
+  buildResultEntry: (question, given, correct, timeout) => {
+    const cents = given == null ? null : Number(given);
+    return {
+      label: questionSummary(question),
+      given: cents === null || Number.isNaN(cents) || cents < 0 ? null : formatCents(cents),
+      expected: formatCents(question.answer),
+      correct,
+      timeout,
+    };
+  },
 
   showQuestionTag: true,
 };

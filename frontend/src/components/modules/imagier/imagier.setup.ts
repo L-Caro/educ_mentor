@@ -18,5 +18,15 @@ async function loadCategories() {
 }
 
 export const IMAGIER_SETUP_OPTIONS: SetupOption[] = [
+  {
+    key: 'mode',
+    type: 'single',
+    label: 'Dans quel sens ?',
+    choices: [
+      { value: 'fr_to_en', icon: '🇫🇷', label: 'Français → Anglais' },
+      { value: 'en_to_fr', icon: '🇬🇧', label: 'Anglais → Français' },
+      { value: 'random', icon: '🔀', label: 'Aléatoire' },
+    ],
+  },
   { key: 'categories', type: 'multi', label: 'Choisis les thèmes !', loader: loadCategories },
 ];

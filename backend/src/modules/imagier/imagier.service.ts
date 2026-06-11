@@ -65,7 +65,9 @@ export class ImagierService {
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
     const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
     const perSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-    const mode = (await this.settingsService.get('imagier_default_mode')) ?? 'fr_to_en';
+
+    // Sens de traduction = choix de pré-jeu enfant (fr_to_en / en_to_fr / random).
+    const mode = ['fr_to_en', 'en_to_fr', 'random'].includes(dto.mode ?? '') ? dto.mode! : 'fr_to_en';
 
     // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
     const difficulty = normalizeDifficulty(dto.difficulty);

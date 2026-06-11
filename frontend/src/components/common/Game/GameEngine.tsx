@@ -14,6 +14,7 @@ import GameTimerBar from './GameTimerBar';
 import GameCard from './GameCard';
 import GameStateView from './GameStateView';
 import DevBadge from 'src/components/common/DevBadge';
+import type { GameResultEntry } from './gameResult';
 
 export interface GameChoice {
   key: string;
@@ -26,7 +27,7 @@ export interface GameChoice {
  * progression, dev mode, navigation). Le mode (QCM vs saisie libre) est dérivé de la
  * présence de choix sur la question.
  */
-export interface GameModuleSpec<TSession, TQuestion, TResult> {
+export interface GameModuleSpec<TSession, TQuestion> {
   loadSession: (setup: ModuleSetup) => Promise<TSession>;
   getQuestions?: (session: TSession) => TQuestion[];
   getSessionId?: (session: TSession) => string;
@@ -46,23 +47,22 @@ export interface GameModuleSpec<TSession, TQuestion, TResult> {
 
   recordAnswer: (sessionId: string, question: TQuestion, correct: boolean, given: unknown) => Promise<void>;
   completeSession: (sessionId: string, correct: number, total: number) => Promise<void>;
-  buildResultEntry: (question: TQuestion, given: unknown, correct: boolean, timeout: boolean) => TResult;
-  buildResultsState?: (correct: number, total: number, results: TResult[]) => object;
+  buildResultEntry: (question: TQuestion, given: unknown, correct: boolean, timeout: boolean) => GameResultEntry;
 
   emptyError?: string;
   showStreak?: boolean;
   showQuestionTag?: boolean;
 }
 
-interface GameEngineProps<TSession, TQuestion, TResult> {
-  spec: GameModuleSpec<TSession, TQuestion, TResult>;
+interface GameEngineProps<TSession, TQuestion> {
+  spec: GameModuleSpec<TSession, TQuestion>;
   moduleId: string;
 }
 
-export default function GameEngine<TSession, TQuestion, TResult>({
+export default function GameEngine<TSession, TQuestion>({
   spec,
   moduleId,
-}: GameEngineProps<TSession, TQuestion, TResult>) {
+}: GameEngineProps<TSession, TQuestion>) {
   const navigate = useNavigate();
   const { isDevMode } = useDevMode();
   const setup = useAppSelector(selectModuleSetup(moduleId)) ?? {};
@@ -82,7 +82,7 @@ export default function GameEngine<TSession, TQuestion, TResult>({
   const {
     loading, error, session, currentIdx, answerState, correctCount,
     timeRemaining, timerPct, isUrgent, submitAnswer, handleTerminate,
-  } = useGameSession<TSession, TQuestion, TResult>({
+  } = useGameSession<TSession, TQuestion, GameResultEntry>({
     loader: () => spec.loadSession(setup),
     homePath,
     resultsPath,
@@ -90,7 +90,7 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     getSessionId,
     getTimerSeconds,
     onComplete: (sessionId, correct, total) => spec.completeSession(sessionId, correct, total),
-    buildResultsState: spec.buildResultsState ?? ((correct, total, results) => ({ correctCount: correct, total, results })),
+    buildResultsState: (correct, total, results) => ({ correctCount: correct, total, results }),
     buildTimeoutResult: (question) => spec.buildResultEntry(question, null, false, true),
     recordTimeout: (sessionId, question) => spec.recordAnswer(sessionId, question, false, null),
     onQuestionChange: () => { setSelectedKey(null); setFreeInput(''); },

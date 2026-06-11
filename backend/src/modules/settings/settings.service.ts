@@ -10,8 +10,6 @@ const DEFAULTS = {
   questions_per_session: '10',
   question_timer_seconds: '0',
   mastery_threshold: '10',
-  // ── Imagier ────────────────────────────────────────────────────────────────
-  imagier_default_mode: 'fr_to_en',
   // ── Tables de multiplication ───────────────────────────────────────────────
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────
@@ -25,11 +23,12 @@ const DEFAULTS = {
 };
 
 /**
- * Clés rendues obsolètes par la difficulté unifiée (pré-jeu enfant easy/medium/hard).
- * Supprimées au démarrage : le mode de réponse n'est plus un réglage admin par module.
+ * Réglages admin par-module devenus des choix de pré-jeu enfant (difficulté, sens de
+ * traduction Imagier, mode de réponse). Supprimés en base au démarrage.
  */
 const OBSOLETE_KEYS = [
   'imagier_default_difficulty',
+  'imagier_default_mode',
   'tables_choice_count',
   'monnaie_response_mode',
 ];

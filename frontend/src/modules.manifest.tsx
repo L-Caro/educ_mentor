@@ -10,12 +10,6 @@ import { imagierGameSpec } from 'src/components/modules/imagier/imagier.game';
 import { calculGameSpec } from 'src/components/modules/calcul/calcul.game';
 import { monnaieGameSpec } from 'src/components/modules/monnaie/monnaie.game';
 
-// ─── Composants enfant (jeu) ──────────────────────────────────────────────────
-import ImagierResult from 'src/components/modules/imagier/child/ImagierResult';
-import TablesResult from 'src/components/modules/tables/child/TablesResult';
-import CalculResult from 'src/components/modules/calcul/child/CalculResult';
-import MonnaieResult from 'src/components/modules/monnaie/child/MonnaieResult';
-
 // ─── Composants admin ─────────────────────────────────────────────────────────
 import ImagierWordList from 'src/components/modules/imagier/admin/ImagierWordList';
 import ImagierWordForm from 'src/components/modules/imagier/admin/ImagierWordForm';
@@ -50,7 +44,7 @@ export interface ModuleManifest {
   child: {
     Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
     Game?: ComponentType;   // composant de jeu dédié (sinon gameSpec via <GameEngine>)
-    Result: ComponentType;
+    Result?: ComponentType; // écran de résultats dédié (sinon <GameResultView> générique)
   };
   adminTabs: Tab[];
   adminRoutes: RouteObject[];
@@ -95,7 +89,7 @@ export const MODULES: ModuleManifest[] = [
     icon: '🇬🇧',
     setupOptions: IMAGIER_SETUP_OPTIONS,
     gameSpec: imagierGameSpec,
-    child: { Result: ImagierResult },
+    child: {},
     adminTabs: [
       { to: '/admin/imagier', label: 'Mots', end: true },
       { to: '/admin/imagier/images', label: 'Images' },
@@ -121,7 +115,7 @@ export const MODULES: ModuleManifest[] = [
     icon: '✖️',
     setupOptions: TABLES_SETUP_OPTIONS,
     gameSpec: tablesGameSpec,
-    child: { Result: TablesResult },
+    child: {},
     adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <TablesSettings /> }],
     progression: { getStats: getTablesProgression, reset: resetTablesProgression },
@@ -132,7 +126,7 @@ export const MODULES: ModuleManifest[] = [
     icon: '🧮',
     setupOptions: CALCUL_SETUP_OPTIONS,
     gameSpec: calculGameSpec,
-    child: { Result: CalculResult },
+    child: {},
     adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <CalculSettings /> }],
     progression: { getStats: getCalculProgression, reset: resetCalculProgression },
@@ -143,7 +137,7 @@ export const MODULES: ModuleManifest[] = [
     icon: '💶',
     setupOptions: MONNAIE_SETUP_OPTIONS,
     gameSpec: monnaieGameSpec,
-    child: { Result: MonnaieResult },
+    child: {},
     adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
     adminRoutes: [{ index: true, element: <MonnaieSettings /> }],
     progression: { getStats: getMonnaieProgression, reset: resetMonnaieProgression },

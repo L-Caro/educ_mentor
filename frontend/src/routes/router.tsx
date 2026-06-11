@@ -21,6 +21,7 @@ import Settings from 'src/views/settings/Settings';
 
 import ModulePreSetup from 'src/components/common/Game/ModulePreSetup';
 import GameEngine from 'src/components/common/Game/GameEngine';
+import GameResultView from 'src/components/common/Game/GameResultView';
 
 // Source unique des modules
 import { MODULES, type ModuleManifest } from 'src/modules.manifest';
@@ -48,10 +49,17 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
       ? <ModulePreSetup module={module} />
       : playElement;
 
+  // Résultats : composant dédié si déclaré, sinon écran générique piloté par la spec.
+  const resultElement = Result
+    ? <Result />
+    : module.gameSpec
+      ? <GameResultView moduleId={module.id} />
+      : null;
+
   return [
     { path: `/module/${module.id}`, element: homeElement, handle },
     { path: `/module/${module.id}/play`, element: playElement, handle },
-    { path: `/module/${module.id}/result`, element: <Result />, handle },
+    { path: `/module/${module.id}/result`, element: resultElement, handle },
   ];
 }
 
