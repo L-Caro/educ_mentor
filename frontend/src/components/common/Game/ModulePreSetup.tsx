@@ -7,6 +7,21 @@ import GameStateView from 'src/components/common/Game/GameStateView';
 import type { ModuleManifest } from 'src/modules.manifest';
 
 /**
+ * Difficulté : option de pré-jeu commune à TOUS les modules (easy/medium/hard →
+ * QCM 2 / QCM 4 / saisie libre côté backend). Injectée ici pour qu'aucun module ne l'oublie.
+ */
+const DIFFICULTY_OPTION: SetupOption = {
+  key: 'difficulty',
+  type: 'single',
+  label: 'Quel niveau ?',
+  choices: [
+    { value: 'easy', icon: '🟢', label: 'Facile', description: '2 choix' },
+    { value: 'medium', icon: '🟡', label: 'Moyen', description: '4 choix' },
+    { value: 'hard', icon: '🔴', label: 'Difficile', description: 'Saisie libre' },
+  ],
+};
+
+/**
  * Écran de pré-jeu générique, piloté par le manifest : résout les `loader` des options
  * (choix dynamiques, via le cache RTK Query), rend `GamePreSetup`, mémorise la sélection
  * dans `gameSetup` et lance la partie. Remplace les composants Home par module.
@@ -46,5 +61,5 @@ export default function ModulePreSetup({ module }: { module: ModuleManifest }) {
     return <GameStateView loading onBack={() => navigate('/')} />;
   }
 
-  return <GamePreSetup options={resolved} initialValues={lastSetup} onStart={handleStart} />;
+  return <GamePreSetup options={[DIFFICULTY_OPTION, ...resolved]} initialValues={lastSetup} onStart={handleStart} />;
 }

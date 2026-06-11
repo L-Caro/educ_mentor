@@ -8,7 +8,7 @@ type TablesResult = { question: TablesQuestion; wasCorrect: boolean };
 export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion, TablesResult> = {
   loadSession: (setup) => {
     const tables = ((setup.tables as string[] | undefined) ?? []).map(Number).filter((value) => !isNaN(value));
-    return startTablesSession(tables);
+    return startTablesSession(tables, setup.difficulty as string | undefined);
   },
 
   renderPrompt: (question) => (

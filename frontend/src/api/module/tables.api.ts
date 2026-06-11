@@ -3,9 +3,10 @@ import type { TablesSessionResponse, TablesProgression } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 
-export async function startTablesSession(selectedTables: number[]): Promise<TablesSessionResponse> {
+export async function startTablesSession(selectedTables: number[], difficulty?: string): Promise<TablesSessionResponse> {
   const { data } = await client.post<TablesSessionResponse>('/tables/session', {
     selected_tables: selectedTables,
+    difficulty,
   });
   return data;
 }

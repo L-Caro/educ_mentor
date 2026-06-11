@@ -1,8 +1,8 @@
 import client from '../client.ts';
 import type { MonnaieSessionResponse, MonnaieProgression, MonnaieSession } from 'src/types';
 
-export async function startMonnaieSession(exerciseType: string): Promise<MonnaieSessionResponse> {
-  const { data } = await client.post<MonnaieSessionResponse>('/monnaie/session', { exercise_type: exerciseType });
+export async function startMonnaieSession(exerciseType: string, difficulty?: string): Promise<MonnaieSessionResponse> {
+  const { data } = await client.post<MonnaieSessionResponse>('/monnaie/session', { exercise_type: exerciseType, difficulty });
   return data;
 }
 

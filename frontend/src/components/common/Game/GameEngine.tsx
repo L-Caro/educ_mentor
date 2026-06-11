@@ -52,10 +52,6 @@ export interface GameModuleSpec<TSession, TQuestion, TResult> {
   emptyError?: string;
   showStreak?: boolean;
   showQuestionTag?: boolean;
-  /** Mode libre déterminé par le module (sinon dérivé de l'absence de choix). */
-  isFreeMode?: (session: TSession, question: TQuestion) => boolean;
-  /** Session « illimitée » : masque la progression, total affiché = nombre répondu. */
-  isUnlimited?: (session: TSession) => boolean;
 }
 
 interface GameEngineProps<TSession, TQuestion, TResult> {
@@ -102,9 +98,9 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     emptySessionError: spec.emptyError,
   });
 
-  function isFree(currentSession: TSession, question: TQuestion): boolean {
-    if (spec.isFreeMode) return spec.isFreeMode(currentSession, question);
-    return !(spec.qcm && spec.qcm.getChoices(question).length > 0);
+  // Mode dérivé des seuls choix : aucun choix = saisie libre, sinon QCM.
+  function isFree(question: TQuestion): boolean {
+    return !spec.qcm || spec.qcm.getChoices(question).length === 0;
   }
 
   function handleValidate() {
@@ -114,7 +110,7 @@ export default function GameEngine<TSession, TQuestion, TResult>({
     let correct: boolean;
     let given: unknown;
 
-    if (!isFree(session, question)) {
+    if (!isFree(question)) {
       if (selectedKey === null) return;
       given = selectedKey;
       correct = selectedKey === spec.qcm!.correctKey(question);
@@ -142,8 +138,8 @@ export default function GameEngine<TSession, TQuestion, TResult>({
 
   const questions = getQuestions(session);
   const question = questions[currentIdx];
-  const qcm = !isFree(session, question);
-  const unlimited = spec.isUnlimited?.(session) ?? false;
+  const qcm = !isFree(question);
+  const unlimited = (session as { is_unlimited?: boolean }).is_unlimited ?? false;
   const timerSeconds = getTimerSeconds(session);
   const total = questions.length;
   const progress = (currentIdx / total) * 100;

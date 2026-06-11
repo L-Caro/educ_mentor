@@ -45,7 +45,6 @@ export default function MonnaieSettings() {
   const maxAmount = parseInt(settings.monnaie_max_amount ?? '10', 10);
   const wholeEuros = settings.monnaie_whole_euros === 'true';
   const itemsCount = parseInt(settings.monnaie_items_count ?? '3', 10);
-  const responseMode = settings.monnaie_response_mode ?? 'free';
 
   return (
     <div className="MonnaieSettings">
@@ -126,31 +125,6 @@ export default function MonnaieSettings() {
               className="MonnaieSettings__range"
             />
             <span className="MonnaieSettings__rangeValue">{itemsCount}</span>
-          </div>
-        </div>
-
-        {/* Mode de réponse */}
-        <div className="AdminCard MonnaieSettings__card">
-          <p className="MonnaieSettings__cardTitle">Mode de réponse</p>
-          <div className="MonnaieSettings__radios">
-            <label className="MonnaieSettings__radio">
-              <input
-                type="radio"
-                name="monnaie-mode"
-                checked={responseMode === 'free'}
-                onChange={() => updateSetting({ key: 'monnaie_response_mode', value: 'free' })}
-              />
-              Saisie libre
-            </label>
-            <label className="MonnaieSettings__radio">
-              <input
-                type="radio"
-                name="monnaie-mode"
-                checked={responseMode === 'qcm'}
-                onChange={() => updateSetting({ key: 'monnaie_response_mode', value: 'qcm' })}
-              />
-              QCM (4 choix)
-            </label>
           </div>
         </div>
       </div>

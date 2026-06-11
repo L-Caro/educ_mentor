@@ -3,8 +3,8 @@ import type { ImagierWord, ImagierSessionResponse } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 
-export async function startSession(categories?: string[]): Promise<ImagierSessionResponse> {
-  const { data } = await client.post<ImagierSessionResponse>('/imagier/session', { categories });
+export async function startSession(categories?: string[], difficulty?: string): Promise<ImagierSessionResponse> {
+  const { data } = await client.post<ImagierSessionResponse>('/imagier/session', { categories, difficulty });
   return data;
 }
 

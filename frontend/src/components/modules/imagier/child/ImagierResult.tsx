@@ -27,22 +27,19 @@ export default function ImagierResult() {
       withStars={false}
       errorCount={errors.length}
     >
-      {errors.map(({ question }) => {
-        const correctLabel = question.choices.find((choice) => choice.id === question.correct_id)?.label;
-        return (
-          <li key={question.word_id} className="GameResult__errorItem">
-            <div className="GameResult__errorThumb">
-              {question.image_url
-                ? <img src={question.image_url} alt={question.prompt} />
-                : <span>❓</span>}
-            </div>
-            <div>
-              <p className="GameResult__errorFr">{question.prompt}</p>
-              {correctLabel && <p className="GameResult__errorEn">{correctLabel}</p>}
-            </div>
-          </li>
-        );
-      })}
+      {errors.map(({ question }) => (
+        <li key={question.word_id} className="GameResult__errorItem">
+          <div className="GameResult__errorThumb">
+            {question.image_url
+              ? <img src={question.image_url} alt={question.prompt} />
+              : <span>❓</span>}
+          </div>
+          <div>
+            <p className="GameResult__errorFr">{question.prompt}</p>
+            {question.answer && <p className="GameResult__errorEn">{question.answer}</p>}
+          </div>
+        </li>
+      ))}
     </GameResultPage>
   );
 }

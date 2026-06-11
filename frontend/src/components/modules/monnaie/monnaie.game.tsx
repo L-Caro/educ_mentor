@@ -56,9 +56,8 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
   loadSession: (setup) => {
     const exerciseType = setup.exerciseType as MonnaieExerciseType | undefined;
     if (!exerciseType) return Promise.reject(new Error("Type d'exercice manquant."));
-    return startMonnaieSession(exerciseType);
+    return startMonnaieSession(exerciseType, setup.difficulty as string | undefined);
   },
-  isUnlimited: (session) => session.is_unlimited,
 
   renderPrompt: (question) => (
     <GamePrompt>
@@ -68,7 +67,7 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
   ),
 
   qcm: {
-    getChoices: (question) => (question.choices ?? []).map((choice) => ({ key: String(choice), label: formatCents(choice) })),
+    getChoices: (question) => question.choices.map((choice) => ({ key: String(choice), label: formatCents(choice) })),
     correctKey: (question) => String(question.answer),
   },
 

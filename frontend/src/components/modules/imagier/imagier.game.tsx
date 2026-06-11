@@ -6,19 +6,14 @@ import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
 
 type ImagierResult = { question: ImagierQuestion; wasCorrect: boolean };
 
-function correctLabel(question: ImagierQuestion): string {
-  return question.choices.find((choice) => choice.id === question.correct_id)?.label ?? '';
-}
-
-/** Comparaison insensible à la casse et aux accents (saisie libre, niveau 3). */
+/** Comparaison insensible à la casse et aux accents (saisie libre, niveau difficile). */
 function normalize(text: string): string {
   return text.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
 export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQuestion, ImagierResult> = {
-  loadSession: (setup) => startSession(setup.categories as string[] | undefined),
-  // Le mode libre dépend de la difficulté de session (les choix restent présents en base).
-  isFreeMode: (session) => session.difficulty === 'level_3',
+  loadSession: (setup) =>
+    startSession(setup.categories as string[] | undefined, setup.difficulty as string | undefined),
 
   renderPrompt: (question, answerState) => {
     const hideImage = question.direction === 'en_to_fr' && answerState === 'idle';
@@ -38,11 +33,11 @@ export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQues
 
   free: {
     parse: (raw) => raw.trim(),
-    isCorrect: (question, given) => normalize(String(given)) === normalize(correctLabel(question)),
+    isCorrect: (question, given) => normalize(String(given)) === normalize(question.answer),
     inputProps: { variant: 'text', placeholder: 'Tape la réponse…' },
   },
 
-  correctionLabel: (question) => capitalize(correctLabel(question)),
+  correctionLabel: (question) => capitalize(question.answer),
 
   recordAnswer: (sessionId, question, correct) => recordAnswer(sessionId, question.word_id, correct),
   completeSession: completeSession,

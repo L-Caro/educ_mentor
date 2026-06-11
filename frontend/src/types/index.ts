@@ -12,7 +12,6 @@ export interface Setting {
   value: string;
 }
 
-export type ImagierDifficulty = 'level_1' | 'level_2' | 'level_3';
 export type ImagierMode = 'fr_to_en' | 'en_to_fr' | 'random';
 
 export interface ImagierWord {
@@ -40,8 +39,9 @@ export interface ImagierQuestion {
   word_id: string;
   image_url: string | null;
   prompt: string;
-  choices: { id: string; label: string }[];
+  choices: { id: string; label: string }[]; // QCM : 2 ou 4 ; saisie libre : []
   correct_id: string;
+  answer: string; // libellé de la bonne réponse (valide la saisie libre sans choix)
   direction: 'fr_to_en' | 'en_to_fr';
 }
 
@@ -49,7 +49,7 @@ export interface ImagierSessionResponse {
   session_id: string;
   questions: ImagierQuestion[];
   timer_seconds: number;
-  difficulty: string;
+  is_unlimited: boolean;
 }
 
 // ── Tables de multiplication ───────────────────────────────────────────────
@@ -66,6 +66,7 @@ export interface TablesSessionResponse {
   session_id: string;
   questions: TablesQuestion[];
   timer_seconds: number;
+  is_unlimited: boolean;
 }
 
 export interface TablesProgression {
@@ -84,6 +85,7 @@ export interface TablesProgression {
 export interface CalculQuestion {
   operation: string;
   answer: number;
+  choices: number[]; // QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface CalculSessionResponse {
@@ -126,13 +128,12 @@ export interface MonnaieQuestion {
   price?: number;      // centimes — prix de l'article (rendre)
   payment?: number;    // centimes — somme donnée (rendre)
   answer: number;      // centimes — réponse attendue
-  choices?: number[];  // centimes — 4 options si mode QCM
+  choices: number[];   // centimes — QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface MonnaieSessionResponse {
   session_id: string;
   questions: MonnaieQuestion[];
-  response_mode: 'free' | 'qcm';
   timer_seconds: number;
   is_unlimited: boolean;
 }

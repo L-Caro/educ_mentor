@@ -7,7 +7,6 @@ export default function TablesSettings() {
 
   if (loading) return <Spinner size="sm" />;
 
-  const choiceCount    = settings.tables_choice_count ?? '4';
   const includeTrivial = settings.tables_include_trivial !== 'false';
 
   return (
@@ -20,25 +19,6 @@ export default function TablesSettings() {
       </div>
 
       <div className="TablesSettings__grid">
-        {/* Mode de réponse */}
-        <div className="AdminCard TablesSettings__card">
-          <p className="TablesSettings__cardTitle">Mode de réponse</p>
-          <div className="TablesSettings__radios">
-            {([['4', '4 choix (facile)'], ['2', '2 choix (intermédiaire)'], ['free', 'Saisie libre (difficile)']] as const).map(([val, label]) => (
-              <label key={val} className="TablesSettings__radio">
-                <input
-                  type="radio"
-                  name="tables-choice-count"
-                  value={val}
-                  checked={choiceCount === val}
-                  onChange={() => updateSetting({ key: 'tables_choice_count', value: val })}
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-        </div>
-
         {/* Options */}
         <div className="AdminCard TablesSettings__card">
           <p className="TablesSettings__cardTitle">Options</p>

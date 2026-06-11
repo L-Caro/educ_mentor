@@ -13,14 +13,19 @@ function renderOperation(operation: string) {
 }
 
 export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestion, CalculHistoryEntry> = {
-  loadSession: (setup) => startCalculSession(setup.operationTypes as string[] | undefined),
-  isUnlimited: (session) => session.is_unlimited,
+  loadSession: (setup) =>
+    startCalculSession(setup.operationTypes as string[] | undefined, setup.difficulty as string | undefined),
 
   renderPrompt: (question) => (
     <GamePrompt>
       <p className="CalculGame__operation">{renderOperation(question.operation)}</p>
     </GamePrompt>
   ),
+
+  qcm: {
+    getChoices: (question) => question.choices.map((choice) => ({ key: String(choice), label: choice })),
+    correctKey: (question) => String(question.answer),
+  },
 
   free: {
     parse: (raw) => parseInt(raw.trim(), 10),

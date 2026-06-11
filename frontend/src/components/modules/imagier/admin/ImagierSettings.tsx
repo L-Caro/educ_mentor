@@ -2,18 +2,12 @@ import { useState } from 'react';
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/api';
 import { normalizeCategories } from 'src/api/module/imagier.api.ts';
 import Spinner from 'src/components/common/Spinner';
-import type { ImagierDifficulty, ImagierMode } from 'src/types';
+import type { ImagierMode } from 'src/types';
 
 const MODES: [ImagierMode, string][] = [
   ['fr_to_en', '🇫🇷 → 🇬🇧  Français vers Anglais'],
   ['en_to_fr', '🇬🇧 → 🇫🇷  Anglais vers Français'],
   ['random',   '🔀  Aléatoire'],
-];
-
-const DIFFICULTIES: [ImagierDifficulty, string][] = [
-  ['level_1', 'Niveau 1 — Image + 4 choix'],
-  ['level_2', 'Niveau 2 — Image + 2 choix'],
-  ['level_3', 'Niveau 3 — Image + saisie libre'],
 ];
 
 export default function ImagierSettings() {
@@ -32,8 +26,7 @@ export default function ImagierSettings() {
 
   if (loading) return <Spinner size="sm" />;
 
-  const difficulty = (settings.imagier_default_difficulty ?? 'level_1') as ImagierDifficulty;
-  const mode          = (settings.imagier_default_mode ?? 'fr_to_en') as ImagierMode;
+  const mode = (settings.imagier_default_mode ?? 'fr_to_en') as ImagierMode;
 
   return (
     <div className="ImagierSettings">
@@ -64,24 +57,6 @@ export default function ImagierSettings() {
           </div>
         </div>
 
-        {/* Niveau */}
-        <div className="AdminCard ImagierSettings__card">
-          <p className="ImagierSettings__cardTitle">Niveau</p>
-          <div className="ImagierSettings__radios">
-            {DIFFICULTIES.map(([val, label]) => (
-              <label key={val} className="ImagierSettings__radio">
-                <input
-                  type="radio"
-                  name="imagier-difficulty"
-                  value={val}
-                  checked={difficulty === val}
-                  onChange={() => updateSetting({ key: 'imagier_default_difficulty', value: val })}
-                />
-                {label}
-              </label>
-            ))}
-          </div>
-        </div>
         {/* Maintenance */}
         <div className="AdminCard ImagierSettings__card">
           <p className="ImagierSettings__cardTitle">Maintenance</p>
