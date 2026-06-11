@@ -1,4 +1,5 @@
-import { startMonnaieSession, recordMonnaieAnswer, completeMonnaieSession } from 'src/api/module/monnaie.api';
+import store from 'src/store';
+import { monnaieApi } from './monnaie.api';
 import type { MonnaieSessionResponse, MonnaieQuestion, MonnaieExerciseType } from 'src/types';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from './constants/denominations';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
@@ -64,7 +65,10 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
   loadSession: (setup) => {
     const exerciseType = setup.exerciseType as MonnaieExerciseType | undefined;
     if (!exerciseType) return Promise.reject(new Error("Type d'exercice manquant."));
-    return startMonnaieSession(exerciseType, setup.difficulty as string | undefined);
+    return store.dispatch(monnaieApi.endpoints.startMonnaieSession.initiate({
+      exerciseType,
+      difficulty: setup.difficulty as string | undefined,
+    })).unwrap();
   },
 
   renderPrompt: (question) => (
@@ -87,8 +91,14 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
 
   correctionLabel: (question) => formatCents(question.answer),
 
-  recordAnswer: (sessionId, question, correct) => recordMonnaieAnswer(sessionId, question.type, question.answer, correct),
-  completeSession: completeMonnaieSession,
+  recordAnswer: (sessionId, question, correct) =>
+    store.dispatch(monnaieApi.endpoints.recordMonnaieAnswer.initiate({
+      sessionId, exerciseType: question.type, answerValue: question.answer, isCorrect: correct,
+    })).unwrap(),
+  completeSession: (sessionId, correctAnswers, totalQuestions) =>
+    store.dispatch(monnaieApi.endpoints.completeMonnaieSession.initiate({
+      sessionId, correctAnswers, totalQuestions,
+    })).unwrap(),
   buildResultEntry: (question, given, correct, timeout) => {
     const cents = given == null ? null : Number(given);
     return {

@@ -1,4 +1,5 @@
-import { startCalculSession, recordCalculAnswer, completeCalculSession } from 'src/api/module/calcul.api';
+import store from 'src/store';
+import { calculApi } from './calcul.api';
 import type { CalculSessionResponse, CalculQuestion } from 'src/types';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
 import type { GameModuleSpec } from 'src/components/common/Game/GameEngine';
@@ -13,7 +14,10 @@ function renderOperation(operation: string) {
 
 export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestion> = {
   loadSession: (setup) =>
-    startCalculSession(setup.operationTypes as string[] | undefined, setup.difficulty as string | undefined),
+    store.dispatch(calculApi.endpoints.startCalculSession.initiate({
+      operationTypes: setup.operationTypes as string[] | undefined,
+      difficulty: setup.difficulty as string | undefined,
+    })).unwrap(),
 
   renderPrompt: (question) => (
     <GamePrompt>
@@ -34,8 +38,14 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
 
   correctionLabel: (question) => question.answer,
 
-  recordAnswer: (sessionId, question, correct) => recordCalculAnswer(sessionId, question.answer, correct),
-  completeSession: completeCalculSession,
+  recordAnswer: (sessionId, question, correct) =>
+    store.dispatch(calculApi.endpoints.recordCalculAnswer.initiate({
+      sessionId, answerValue: question.answer, isCorrect: correct,
+    })).unwrap(),
+  completeSession: (sessionId, correctAnswers, totalQuestions) =>
+    store.dispatch(calculApi.endpoints.completeCalculSession.initiate({
+      sessionId, correctAnswers, totalQuestions,
+    })).unwrap(),
   buildResultEntry: (question, given, correct, timeout) => {
     const value = given == null ? null : Number(given);
     return {

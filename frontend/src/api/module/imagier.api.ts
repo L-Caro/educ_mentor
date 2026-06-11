@@ -1,34 +1,5 @@
 import client from '../client.ts';
-import type { ImagierWord, ImagierSessionResponse } from '../../types';
-
-// ─── Session (jeu) ────────────────────────────────────────────────────────────
-
-export async function startSession(categories?: string[], difficulty?: string, mode?: string): Promise<ImagierSessionResponse> {
-  const { data } = await client.post<ImagierSessionResponse>('/imagier/session', { categories, difficulty, mode });
-  return data;
-}
-
-export async function recordAnswer(
-  sessionId: string,
-  wordId: string,
-  isCorrect: boolean,
-): Promise<void> {
-  await client.post(`/imagier/session/${sessionId}/answer`, {
-    word_id: wordId,
-    is_correct: isCorrect,
-  });
-}
-
-export async function completeSession(
-  sessionId: string,
-  correctAnswers: number,
-  totalQuestions: number,
-): Promise<void> {
-  await client.post(`/imagier/session/${sessionId}/complete`, {
-    correct_answers: correctAnswers,
-    total_questions: totalQuestions,
-  });
-}
+import type { ImagierWord } from '../../types';
 
 // ─── Admin ────────────────────────────────────────────────────────────────────
 

@@ -1,4 +1,5 @@
-import { startSession, recordAnswer, completeSession } from 'src/api/module/imagier.api';
+import store from 'src/store';
+import { imagierApi } from './imagier.api';
 import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
 import { capitalize } from 'src/utils/capitilize';
 import GamePrompt from 'src/components/common/Game/GamePrompt';
@@ -11,11 +12,11 @@ function normalize(text: string): string {
 
 export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQuestion> = {
   loadSession: (setup) =>
-    startSession(
-      setup.categories as string[] | undefined,
-      setup.difficulty as string | undefined,
-      setup.mode as string | undefined,
-    ),
+    store.dispatch(imagierApi.endpoints.startImagierSession.initiate({
+      categories: setup.categories as string[] | undefined,
+      difficulty: setup.difficulty as string | undefined,
+      mode: setup.mode as string | undefined,
+    })).unwrap(),
 
   renderPrompt: (question, answerState) => {
     const hideImage = question.direction === 'en_to_fr' && answerState === 'idle';
@@ -41,8 +42,14 @@ export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQues
 
   correctionLabel: (question) => capitalize(question.answer),
 
-  recordAnswer: (sessionId, question, correct) => recordAnswer(sessionId, question.word_id, correct),
-  completeSession: completeSession,
+  recordAnswer: (sessionId, question, correct) =>
+    store.dispatch(imagierApi.endpoints.recordImagierAnswer.initiate({
+      sessionId, wordId: question.word_id, isCorrect: correct,
+    })).unwrap(),
+  completeSession: (sessionId, correctAnswers, totalQuestions) =>
+    store.dispatch(imagierApi.endpoints.completeImagierSession.initiate({
+      sessionId, correctAnswers, totalQuestions,
+    })).unwrap(),
   buildResultEntry: (question, given, correct, timeout) => {
     const givenLabel = given == null
       ? null
