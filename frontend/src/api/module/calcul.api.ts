@@ -1,5 +1,5 @@
 import client from '../client.ts';
-import type { CalculSessionResponse, CalculProgression, CalculSession } from 'src/types';
+import type { CalculSessionResponse, CalculSession } from 'src/types';
 
 export async function startCalculSession(operationTypes?: string[], difficulty?: string): Promise<CalculSessionResponse> {
   const { data } = await client.post<CalculSessionResponse>('/calcul/session', { operation_types: operationTypes, difficulty });
@@ -28,16 +28,7 @@ export async function completeCalculSession(
   });
 }
 
-export async function getCalculProgression(): Promise<CalculProgression[]> {
-  const { data } = await client.get<CalculProgression[]>('/calcul/progression');
-  return data;
-}
-
 export async function getCalculSessions(): Promise<CalculSession[]> {
   const { data } = await client.get<CalculSession[]>('/calcul/sessions');
   return data;
-}
-
-export async function resetCalculProgression(): Promise<void> {
-  await client.delete('/calcul/progression');
 }

@@ -1,5 +1,5 @@
 import client from '../client.ts';
-import type { MonnaieSessionResponse, MonnaieProgression, MonnaieSession } from 'src/types';
+import type { MonnaieSessionResponse, MonnaieSession } from 'src/types';
 
 export async function startMonnaieSession(exerciseType: string, difficulty?: string): Promise<MonnaieSessionResponse> {
   const { data } = await client.post<MonnaieSessionResponse>('/monnaie/session', { exercise_type: exerciseType, difficulty });
@@ -30,16 +30,7 @@ export async function completeMonnaieSession(
   });
 }
 
-export async function getMonnaieProgression(): Promise<MonnaieProgression[]> {
-  const { data } = await client.get<MonnaieProgression[]>('/monnaie/progression');
-  return data;
-}
-
 export async function getMonnaieSessions(): Promise<MonnaieSession[]> {
   const { data } = await client.get<MonnaieSession[]>('/monnaie/sessions');
   return data;
-}
-
-export async function resetMonnaieProgression(): Promise<void> {
-  await client.delete('/monnaie/progression');
 }

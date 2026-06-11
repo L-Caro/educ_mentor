@@ -81,23 +81,6 @@ export async function importJson(
   return data;
 }
 
-export async function getProgression(): Promise<
-  (ImagierWord & {
-    progression: {
-      correct_count: number;
-      incorrect_count: number;
-      is_mastered: boolean;
-    } | null;
-  })[]
-> {
-  const { data } = await client.get('/imagier/progression');
-  return data;
-}
-
-export async function resetProgression(): Promise<void> {
-  await client.delete('/imagier/progression');
-}
-
 export async function normalizeCategories(): Promise<{ updated: number }> {
   const { data } = await client.patch<{ updated: number }>('/imagier/normalize-categories');
   return data;

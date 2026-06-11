@@ -1,5 +1,5 @@
 import client from '../client.ts';
-import type { TablesSessionResponse, TablesProgression } from '../../types';
+import type { TablesSessionResponse } from '../../types';
 
 // ─── Session (jeu) ────────────────────────────────────────────────────────────
 
@@ -35,13 +35,3 @@ export async function completeTablesSession(
   });
 }
 
-// ─── Admin ────────────────────────────────────────────────────────────────────
-
-export async function getTablesProgression(): Promise<TablesProgression[]> {
-  const { data } = await client.get<TablesProgression[]>('/tables/progression');
-  return data;
-}
-
-export async function resetTablesProgression(): Promise<void> {
-  await client.delete('/tables/progression');
-}

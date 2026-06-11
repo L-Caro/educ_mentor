@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import type { AppModule, Setting } from 'src/types';
+import type { ProgressionStat } from 'src/modules.types';
 
 /**
  * Source unique des données serveur *cacheables* (settings, catalogue) : un seul
@@ -16,7 +17,7 @@ export const api = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Settings', 'Catalog', 'ImagierCategories'],
+  tagTypes: ['Settings', 'Catalog', 'ImagierCategories', 'Progression'],
   endpoints: (builder) => ({
     getSettings: builder.query<Record<string, string>, void>({
       query: () => '/settings',
@@ -48,6 +49,46 @@ export const api = createApi({
     >({
       query: () => '/imagier/categories',
       providesTags: ['ImagierCategories'],
+    }),
+
+    // ─── Progression par module (normalisée → ProgressionStat[]) ──────────────
+    getImagierProgression: builder.query<ProgressionStat[], void>({
+      query: () => '/imagier/progression',
+      // L'API Imagier renvoie les mots + leur progression (ou null) → on normalise ici.
+      transformResponse: (rows: { progression: ProgressionStat | null }[]) =>
+        rows.filter((row) => row.progression !== null).map((row) => row.progression!),
+      providesTags: [{ type: 'Progression', id: 'imagier' }],
+    }),
+    resetImagierProgression: builder.mutation<void, void>({
+      query: () => ({ url: '/imagier/progression', method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Progression', id: 'imagier' }],
+    }),
+
+    getTablesProgression: builder.query<ProgressionStat[], void>({
+      query: () => '/tables/progression',
+      providesTags: [{ type: 'Progression', id: 'tables' }],
+    }),
+    resetTablesProgression: builder.mutation<void, void>({
+      query: () => ({ url: '/tables/progression', method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Progression', id: 'tables' }],
+    }),
+
+    getCalculProgression: builder.query<ProgressionStat[], void>({
+      query: () => '/calcul/progression',
+      providesTags: [{ type: 'Progression', id: 'calcul' }],
+    }),
+    resetCalculProgression: builder.mutation<void, void>({
+      query: () => ({ url: '/calcul/progression', method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Progression', id: 'calcul' }],
+    }),
+
+    getMonnaieProgression: builder.query<ProgressionStat[], void>({
+      query: () => '/monnaie/progression',
+      providesTags: [{ type: 'Progression', id: 'monnaie' }],
+    }),
+    resetMonnaieProgression: builder.mutation<void, void>({
+      query: () => ({ url: '/monnaie/progression', method: 'DELETE' }),
+      invalidatesTags: [{ type: 'Progression', id: 'monnaie' }],
     }),
   }),
 });
