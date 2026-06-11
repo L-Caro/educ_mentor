@@ -1,16 +1,17 @@
 import { useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from './redux';
 import { setToken, clearToken, selectIsAuthenticated } from 'src/store/slice/authSlice';
-import { verifyPin } from 'src/api/auth/auth.api.ts';
+import { useVerifyPinMutation } from 'src/store/api/authApi';
 
 export function useAuth() {
   const dispatch = useAppDispatch();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const [verifyPin] = useVerifyPinMutation();
 
   const login = useCallback(async (pin: string): Promise<void> => {
-    const token = await verifyPin(pin);
+    const { token } = await verifyPin({ pin }).unwrap();
     dispatch(setToken(token));
-  }, [dispatch]);
+  }, [dispatch, verifyPin]);
 
   const logout = useCallback((): void => {
     dispatch(clearToken());

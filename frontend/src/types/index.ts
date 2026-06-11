@@ -155,3 +155,17 @@ export interface MonnaieSession {
   started_at: string;
   completed_at: string | null;
 }
+
+// ── Auth / Invitations ────────────────────────────────────────────────────────
+
+export interface Invitation {
+  id: string;
+  token: string;
+  label: string;
+  created_at: string;
+  used_at: string | null;
+}
+
+export interface InvitationWithLink extends Invitation {
+  link: string;
+}

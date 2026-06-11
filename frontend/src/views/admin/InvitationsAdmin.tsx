@@ -1,33 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
-import { createInvitation, deleteInvitation, fetchInvitations, type Invitation } from 'src/api/auth/invitation.api.ts';
+import { useRef, useState } from 'react';
+import {
+  useGetInvitationsQuery,
+  useCreateInvitationMutation,
+  useDeleteInvitationMutation,
+} from 'src/store/api/authApi';
 import Spinner from 'src/components/common/Spinner';
 
 const InvitationsAdmin = () => {
-  const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [creating, setCreating] = useState(false);
+  const { data: invitations = [], isLoading } = useGetInvitationsQuery();
+  const [createInvitation, { isLoading: creating }] = useCreateInvitationMutation();
+  const [deleteInvitation] = useDeleteInvitationMutation();
   const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const labelInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    fetchInvitations()
-      .then(setInvitations)
-      .finally(() => setLoading(false));
-  }, []);
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
     const label = labelInputRef.current?.value.trim();
     if (!label) return;
-    setCreating(true);
     setGeneratedLink(null);
     setCopied(false);
-    const invitation = await createInvitation(label);
-    setInvitations(previous => [invitation, ...previous]);
+    const invitation = await createInvitation({ label }).unwrap();
     setGeneratedLink(invitation.link);
     if (labelInputRef.current) labelInputRef.current.value = '';
-    setCreating(false);
   }
 
   function handleCopy() {
@@ -37,10 +32,9 @@ const InvitationsAdmin = () => {
 
   async function handleDelete(invitationId: string) {
     await deleteInvitation(invitationId);
-    setInvitations(previous => previous.filter(invitation => invitation.id !== invitationId));
   }
 
-  if (loading) return <Spinner size="sm" />;
+  if (isLoading) return <Spinner size="sm" />;
 
   return (
     <div className="InvitationsAdmin">
@@ -81,7 +75,7 @@ const InvitationsAdmin = () => {
         <div className="Settings__section">
           <p className="Settings__cardTitle">Appareils ({invitations.length})</p>
           <ul className="InvitationsAdmin__list">
-            {invitations.map(invitation => (
+            {invitations.map((invitation) => (
               <li key={invitation.id} className="InvitationsAdmin__item">
                 <span className="InvitationsAdmin__itemLabel">{invitation.label}</span>
                 <span className="InvitationsAdmin__itemMeta">
