@@ -1,17 +1,16 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slice/authSlice";
 import gameSetupReducer from "./slice/gameSetupSlice";
+import devModeReducer from "./slice/devModeSlice";
 import { baseApi } from "./api/baseApi";
 
-//? Reducers
 const rootReducers = {
   auth: authReducer,
   gameSetup: gameSetupReducer,
+  devMode: devModeReducer,
   [baseApi.reducerPath]: baseApi.reducer,
 };
 
-
-//? Store
 const store = configureStore( {
   reducer: rootReducers,
   middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),

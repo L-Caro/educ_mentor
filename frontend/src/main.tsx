@@ -2,13 +2,10 @@ import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { createRoot } from 'react-dom/client'
 
-//? Style
 import "bootstrap/dist/css/bootstrap.min.css";
 
-//? Context
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 
-//? Provider
 import Router from "./routes/router.tsx";
 import store from "./store";
 import AccessGate from "./components/auth/AccessGate.tsx";

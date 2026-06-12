@@ -46,10 +46,8 @@ export default function GameResultPage({
       )}
 
       <div className="GameResult__actions">
-        <Button title="Rejouer 🔄" onClick={onReplay} />
-        <button className="GameResult__btnOutline" onClick={onHome}>
-          {homeLabel}
-        </button>
+        <Button title="Rejouer" onClick={onReplay} />
+        <Button title={homeLabel} className="GameResult__btnOutline" onClick={onHome} />
       </div>
     </PageContainer>
   );

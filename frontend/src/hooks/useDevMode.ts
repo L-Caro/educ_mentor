@@ -1,16 +1,9 @@
-import { useState } from 'react';
-
-const STORAGE_KEY = 'maeve_dev_mode';
+import { useAppDispatch, useAppSelector } from 'src/hooks/redux';
+import { toggleDevMode, selectIsDevMode } from 'src/store/slice/devModeSlice';
 
 export function useDevMode() {
-  const [isDevMode, setIsDevMode] = useState(() => localStorage.getItem(STORAGE_KEY) === 'true');
-
-  const toggle = () =>
-    setIsDevMode((prev) => {
-      const next = !prev;
-      localStorage.setItem(STORAGE_KEY, String(next));
-      return next;
-    });
-
+  const dispatch = useAppDispatch();
+  const isDevMode = useAppSelector(selectIsDevMode);
+  const toggle = () => dispatch(toggleDevMode());
   return { isDevMode, toggle };
 }

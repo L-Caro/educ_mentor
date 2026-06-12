@@ -1,6 +1,6 @@
-import store from 'src/store';
 import { monnaieApi } from './monnaie.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
+import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import type { SetupOption } from 'src/types/game.types.ts';
 
 const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
@@ -24,11 +24,8 @@ export const monnaieModule: ModuleManifest = {
   adminRoutes: [
     { index: true, lazy: () => import('./MonnaieSettings.tsx').then((module) => ({ Component: module.default })) },
   ],
-  progression: {
-    getStats: () =>
-      store.dispatch(monnaieApi.endpoints.getMonnaieProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
-    reset: async () => {
-      await store.dispatch(monnaieApi.endpoints.resetMonnaieProgression.initiate()).unwrap();
-    },
-  },
+  progression: buildProgressionEntry({
+    getEndpoint: monnaieApi.endpoints.getMonnaieProgression,
+    resetEndpoint: monnaieApi.endpoints.resetMonnaieProgression,
+  }),
 };

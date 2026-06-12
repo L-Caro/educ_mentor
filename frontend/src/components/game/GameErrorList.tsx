@@ -4,8 +4,8 @@ import type { GameResultEntry } from './GameResult.ts';
 export default function GameErrorList({ errors }: { errors: GameResultEntry[] }) {
   return (
     <>
-      {errors.map((entry, entryIndex) => (
-        <li key={entryIndex} className="GameResult__errorItem">
+      {errors.map((entry) => (
+        <li key={entry.thumbUrl} className="GameResult__errorItem">
           {entry.thumbUrl !== undefined && (
             <div className="GameResult__errorThumb">
               {entry.thumbUrl ? <img src={entry.thumbUrl} alt="" /> : <span>❓</span>}

@@ -1,6 +1,6 @@
-import store from 'src/store';
 import { imagierApi } from './imagier.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
+import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import { IMAGIER_SETUP_OPTIONS } from './imagier.setup.ts';
 
 export const imagierModule: ModuleManifest = {
@@ -18,11 +18,8 @@ export const imagierModule: ModuleManifest = {
     { path: 'settings', lazy: () => import('./ImagierSettings.tsx').then((module) => ({ Component: module.default })) },
     { path: 'mots/:id', lazy: () => import('./admin/ImagierWordForm.tsx').then((module) => ({ Component: module.default })) },
   ],
-  progression: {
-    getStats: () =>
-      store.dispatch(imagierApi.endpoints.getImagierProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
-    reset: async () => {
-      await store.dispatch(imagierApi.endpoints.resetImagierProgression.initiate()).unwrap();
-    },
-  },
+  progression: buildProgressionEntry({
+    getEndpoint: imagierApi.endpoints.getImagierProgression,
+    resetEndpoint: imagierApi.endpoints.resetImagierProgression,
+  }),
 };

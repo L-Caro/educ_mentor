@@ -3,14 +3,14 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { useLocation } from 'react-router-dom';
 
 export const DURATION_KEY = 'maeve_session_duration'; // minutes, 0 = disabled
-export const START_KEY    = 'maeve_session_start';    // timestamp ms
+export const START_KEY = 'maeve_session_start';    // timestamp ms
 
 interface SessionTimerContextValue {
-  remaining:   number;  // seconds, -1 if disabled
-  isExpired:   boolean;
+  remaining: number;  // seconds, -1 if disabled
+  isExpired: boolean;
   showOverlay: boolean;
-  resetTimer:  () => void;
-  duration:    number;  // minutes, 0 = disabled
+  resetTimer: () => void;
+  duration: number;  // minutes, 0 = disabled
 }
 
 const SessionTimerContext = createContext<SessionTimerContextValue>({

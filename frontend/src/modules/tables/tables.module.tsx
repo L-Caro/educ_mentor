@@ -1,6 +1,6 @@
-import store from 'src/store';
 import { tablesApi } from './tables.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
+import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import { TABLES_SETUP_OPTIONS } from './tables.setup.ts';
 
 export const tablesModule: ModuleManifest = {
@@ -11,11 +11,8 @@ export const tablesModule: ModuleManifest = {
   adminRoutes: [
     { index: true, lazy: () => import('./TablesSettings.tsx').then((module) => ({ Component: module.default })) },
   ],
-  progression: {
-    getStats: () =>
-      store.dispatch(tablesApi.endpoints.getTablesProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
-    reset: async () => {
-      await store.dispatch(tablesApi.endpoints.resetTablesProgression.initiate()).unwrap();
-    },
-  },
+  progression: buildProgressionEntry({
+    getEndpoint: tablesApi.endpoints.getTablesProgression,
+    resetEndpoint: tablesApi.endpoints.resetTablesProgression,
+  }),
 };

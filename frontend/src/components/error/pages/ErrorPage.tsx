@@ -1,10 +1,8 @@
-//? Typage
 type NotFoundProps = {
   errorMessage: string;
   errorStatus: string | number;
 };
 
-/** Présentationnel : reçoit message/status (calculés par <ErrorRouter>). */
 export default function ErrorPage({ errorMessage, errorStatus }: NotFoundProps) {
   return (
     <div className="error">

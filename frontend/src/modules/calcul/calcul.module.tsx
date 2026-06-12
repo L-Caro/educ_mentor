@@ -1,7 +1,7 @@
-import store from 'src/store';
 import { calculApi } from './calcul.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import type { SetupOption } from 'src/types/game.types.ts';
+import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 
 const CALCUL_SETUP_OPTIONS: SetupOption[] = [
   {
@@ -26,11 +26,8 @@ export const calculModule: ModuleManifest = {
   adminRoutes: [
     { index: true, lazy: () => import('./CalculSettings.tsx').then((module) => ({ Component: module.default })) },
   ],
-  progression: {
-    getStats: () =>
-      store.dispatch(calculApi.endpoints.getCalculProgression.initiate(undefined, { forceRefetch: true })).unwrap(),
-    reset: async () => {
-      await store.dispatch(calculApi.endpoints.resetCalculProgression.initiate()).unwrap();
-    },
-  },
+  progression: buildProgressionEntry({
+    getEndpoint: calculApi.endpoints.getCalculProgression,
+    resetEndpoint: calculApi.endpoints.resetCalculProgression,
+  }),
 };
