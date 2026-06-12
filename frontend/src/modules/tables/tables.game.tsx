@@ -15,7 +15,7 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
 
   renderPrompt: (question) => (
     <GamePrompt>
-      <p className="TablesGame__question">
+      <p>
         {question.display_a} × {question.display_b} = ?
       </p>
     </GamePrompt>

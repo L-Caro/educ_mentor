@@ -1,6 +1,6 @@
+import type { ImagierQuestion, ImagierSessionResponse } from "src/modules/imagier/imagier.type.ts";
 import store from 'src/store';
 import { imagierApi } from './imagier.api.ts';
-import type { ImagierQuestion, ImagierSessionResponse } from 'src/types';
 import { capitalize } from 'src/utils/capitilize.ts';
 import GamePrompt from 'src/components/game/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/components/game/GameEngine.tsx';
@@ -22,8 +22,8 @@ export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQues
     const hideImage = question.direction === 'en_to_fr' && answerState === 'idle';
     return (
       <GamePrompt imageUrl={question.image_url} imageHidden={hideImage} imageAlt={question.prompt}>
-        <div className="ImagierGame__promptCard">
-          <p className="ImagierGame__prompt">{capitalize(question.prompt)}</p>
+        <div>
+          <p>{capitalize(question.prompt)}</p>
         </div>
       </GamePrompt>
     );

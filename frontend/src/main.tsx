@@ -3,7 +3,6 @@ import { RouterProvider } from "react-router-dom";
 import { createRoot } from 'react-dom/client'
 
 //? Style
-import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 //? Context

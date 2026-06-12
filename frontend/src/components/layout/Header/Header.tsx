@@ -1,6 +1,6 @@
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useMatches, useNavigate } from 'react-router-dom';
-import { ThemeContext } from 'src/context/ThemeContext';
+import { useTheme } from 'src/context/ThemeContext';
 import { useModuleMeta } from 'src/hooks/useModuleMeta';
 import dark from 'src/assets/images/dark-theme.svg';
 import light from 'src/assets/images/light-theme.svg';
@@ -13,7 +13,7 @@ interface RouteHandle {
 }
 
 function Header() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const matches = useMatches();
   const getModuleMeta = useModuleMeta();

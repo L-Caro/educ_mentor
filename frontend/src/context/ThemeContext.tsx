@@ -1,44 +1,50 @@
-/*
- Il suffit de faire :
- const { theme, toggleTheme } = useTheme();
- dans le composant qui aura besoin du context
- */
-
-/* eslint-disable react-refresh/only-export-components -- contexte : provider + hook + context co-localisés. */
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, type ReactNode } from "react";
 
+// ─── Constante pour éviter les fautes de frappe sur la clé localStorage ───────
+const THEME_STORAGE_KEY = "theme";
 
-//? Typage
+// ─── Typage ───────────────────────────────────────────────────────────────────
 interface ThemeContextInterface {
   theme: string;
   toggleTheme: () => void;
 }
 
+// ─── Context ──────────────────────────────────────────────────────────────────
+// La valeur par défaut n'est utilisée QUE si un composant consomme le context
+// sans être enveloppé dans le Provider (cas d'erreur).
+export const ThemeContext = createContext<ThemeContextInterface>({
+  theme: "dark",
+  toggleTheme: () => {},
+});
 
-//? Hook d'import
-export const useTheme = () => {
-  // Permet d'importer cette fonction en déstructurant ce qu'on a besoin plutôt que de faire import useContext(context)
-  // à chaque fois
-  return useContext( ThemeContext );
-};
+// ─── Hook d'accès simplifié ───────────────────────────────────────────────────
+// Avantage : les composants font juste `useTheme()` sans importer useContext + ThemeContext
+export const useTheme = () => useContext(ThemeContext);
 
-//? Context
-export const ThemeContext = createContext<ThemeContextInterface>( {
-  theme: "light",
-  toggleTheme: () => {}
-} );
+// ─── Provider ─────────────────────────────────────────────────────────────────
+export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
-//? Provider
-export const ThemeProvider = ( { children }: { children: ReactNode } ) => {
-  const [ theme, setTheme ] = useState( "dark" );
+  // ✅ La fonction passée à useState n'est exécutée QU'UNE FOIS (initialisation)
+  // C'est ce qu'on appelle une "lazy initial state" — parfait pour lire localStorage
+  const [theme, setTheme] = useState<string>(
+    () => localStorage.getItem(THEME_STORAGE_KEY) ?? "dark"
+  );
 
   const toggleTheme = () => {
-    setTheme( theme === "light" ? "dark" : "light" );
+    // On calcule le nouveau thème depuis l'état React (pas depuis localStorage)
+    const nextTheme = theme === "light" ? "dark" : "light";
+
+    // 1. On persiste dans localStorage pour survivre au rechargement
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+
+    // 2. On met à jour le state React → déclenche le re-render
+    setTheme(nextTheme);
   };
 
   return (
-    <ThemeContext.Provider value={ { theme, toggleTheme } }>
-      { children }
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
     </ThemeContext.Provider>
   );
 };

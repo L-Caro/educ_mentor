@@ -24,7 +24,7 @@ function renderQuestion(question: MonnaieQuestion) {
   switch (question.type) {
     case 'reconnaitre':
       return (
-        <div className="MonnaieGame__coins">
+        <div>
           {(question.coins ?? []).map((coin, coinIndex) => (
             <img
               key={coinIndex}
@@ -37,9 +37,9 @@ function renderQuestion(question: MonnaieQuestion) {
       );
     case 'total':
       return (
-        <div className="MonnaieGame__prices">
+        <div>
           {(question.prices ?? []).map((price, priceIndex) => (
-            <span key={priceIndex} className="MonnaieGame__priceTag">
+            <span key={priceIndex}>
               {formatCents(price)}
             </span>
           ))}
@@ -47,14 +47,14 @@ function renderQuestion(question: MonnaieQuestion) {
       );
     case 'rendre':
       return (
-        <div className="MonnaieGame__scenario">
-          <div className="MonnaieGame__scenarioLine">
-            <span className="MonnaieGame__scenarioLabel">Article</span>
-            <span className="MonnaieGame__scenarioValue">{formatCents(question.price ?? 0)}</span>
+        <div>
+          <div>
+            <span>Article</span>
+            <span>{formatCents(question.price ?? 0)}</span>
           </div>
-          <div className="MonnaieGame__scenarioLine">
-            <span className="MonnaieGame__scenarioLabel">Tu donnes</span>
-            <span className="MonnaieGame__scenarioValue">{formatCents(question.payment ?? 0)}</span>
+          <div>
+            <span>Tu donnes</span>
+            <span>{formatCents(question.payment ?? 0)}</span>
           </div>
         </div>
       );
@@ -73,7 +73,7 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
 
   renderPrompt: (question) => (
     <GamePrompt>
-      <p className="MonnaieGame__prompt">{EXERCISE_PROMPTS[question.type]}</p>
+      <p>{EXERCISE_PROMPTS[question.type]}</p>
       {renderQuestion(question)}
     </GamePrompt>
   ),

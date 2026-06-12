@@ -8,7 +8,7 @@ function renderOperation(operation: string) {
   const parts = operation.split('?');
   if (parts.length !== 2) return <>{operation}</>;
   return (
-    <>{parts[0]}<span className="CalculGame__blank">?</span>{parts[1]}</>
+    <>{parts[0]}<span>?</span>{parts[1]}</>
   );
 }
 
@@ -21,7 +21,7 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
 
   renderPrompt: (question) => (
     <GamePrompt>
-      <p className="CalculGame__operation">{renderOperation(question.operation)}</p>
+      <p>{renderOperation(question.operation)}</p>
     </GamePrompt>
   ),
 
