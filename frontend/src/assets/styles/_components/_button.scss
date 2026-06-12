@@ -53,6 +53,19 @@
 		line-height: 1;
 	}
 
+	&--outline {
+		background: transparent;
+		border: 2px solid var(--color-primary);
+		color: var(--color-primary);
+		box-shadow: none;
+
+		&:hover:not(:disabled) {
+			background: var(--color-primary);
+			color: var(--color-primary-content);
+			opacity: 1;
+		}
+	}
+
 	&--ghost {
 		background: transparent;
 

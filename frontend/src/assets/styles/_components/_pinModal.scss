@@ -1,16 +1,23 @@
 @use '../_abstracts/variables' as v;
 
 .PinModal {
-  .modal-content {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  &__content {
     border-radius: v.$border-radius;
     background: var(--color-base-100);
     border: 1px solid var(--color-base-300);
     box-shadow: var(--shadow-md);
-	max-width: 30rem;
-	margin: 0 auto;
-  }
-
-  .modal-body {
+    max-width: 30rem;
+    width: 100%;
     padding: v.$space-9 v.$space-8 v.$space-8;
   }
 
@@ -48,7 +55,7 @@
     color: var(--color-error);
     font-size: v.$font-size-base;
     margin-bottom: v.$space-6;
-	letter-spacing: 0.3rem;
+    letter-spacing: 0.3rem;
     min-height: 1.25rem;
   }
 
@@ -56,23 +63,12 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: v.$space-3;
-  }
 
-  &__key {
-    height: 3.5rem;
-    font-size: v.$font-size-lg;
-    font-weight: 500;
-    border-radius: v.$border-radius;
-
-    &.btn-outline-primary {
-      color: var(--color-primary);
-      border-color: var(--color-primary);
-
-      &:hover, &:active {
-        background: var(--color-primary);
-        border-color: var(--color-primary);
-        color: var(--color-primary-content);
-      }
+    .Button {
+      height: 3.5rem;
+      font-size: v.$font-size-lg;
+      font-weight: 500;
+      max-width: unset;
     }
   }
 }

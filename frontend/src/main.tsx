@@ -2,8 +2,6 @@ import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { createRoot } from 'react-dom/client'
 
-import "bootstrap/dist/css/bootstrap.min.css";
-
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 
 import Router from "./routes/router.tsx";

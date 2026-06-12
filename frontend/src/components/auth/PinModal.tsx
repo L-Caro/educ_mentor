@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import Button from 'src/components/common/Button';
 
 const PIN_LENGTH = 4;
 
@@ -27,13 +27,13 @@ export default function PinModal({ show, onSubmit, error }: PinModalProps) {
   useEffect(() => {
     if (!show) return;
 
-    function onKeyDown(e: KeyboardEvent) {
-      if (/^[0-9]$/.test(e.key)) {
-        setPin(p => p.length < PIN_LENGTH ? p + e.key : p);
-      } else if (e.key === 'Backspace') {
-        setPin(p => p.slice(0, -1));
-      } else if (e.key === 'Enter') {
-        setPin(p => { if (p.length === PIN_LENGTH) onSubmit(p); return p; });
+    function onKeyDown(event: KeyboardEvent) {
+      if (/^[0-9]$/.test(event.key)) {
+        setPin(currentPin => currentPin.length < PIN_LENGTH ? currentPin + event.key : currentPin);
+      } else if (event.key === 'Backspace') {
+        setPin(currentPin => currentPin.slice(0, -1));
+      } else if (event.key === 'Enter') {
+        setPin(currentPin => { if (currentPin.length === PIN_LENGTH) onSubmit(currentPin); return currentPin; });
       }
     }
 
@@ -43,24 +43,26 @@ export default function PinModal({ show, onSubmit, error }: PinModalProps) {
 
   function handleKey(key: string) {
     if (key === '⌫') {
-      setPin(p => p.slice(0, -1));
+      setPin(currentPin => currentPin.slice(0, -1));
     } else if (key === '✓') {
       if (pin.length === PIN_LENGTH) onSubmit(pin);
     } else {
-      setPin(p => p.length < PIN_LENGTH ? p + key : p);
+      setPin(currentPin => currentPin.length < PIN_LENGTH ? currentPin + key : currentPin);
     }
   }
 
+  if (!show) return null;
+
   return (
-    <Modal show={show} centered backdrop="static" keyboard={false} className="PinModal">
-      <Modal.Body>
+    <div className="PinModal__overlay">
+      <div className="PinModal__content">
         <h5 className="PinModal__title">Code PIN</h5>
 
         <div className="PinModal__dots">
-          {Array.from({ length: PIN_LENGTH }).map((_, i) => (
+          {Array.from({ length: PIN_LENGTH }).map((_, dotIndex) => (
             <span
-              key={i}
-              className={`PinModal__dot${i < pin.length ? ' PinModal__dot--filled' : ''}`}
+              key={dotIndex}
+              className={`PinModal__dot${dotIndex < pin.length ? ' PinModal__dot--filled' : ''}`}
             />
           ))}
         </div>
@@ -71,16 +73,15 @@ export default function PinModal({ show, onSubmit, error }: PinModalProps) {
           {KEYPAD.flat().map((key) => (
             <Button
               key={key}
-              variant={key === '⌫' ? 'outline-secondary' : 'outline-primary'}
+              variant={key === '✓' ? 'primary' : key === '⌫' ? 'primary' : 'outline'}
               disabled={key === '✓' && pin.length < PIN_LENGTH}
               onClick={() => handleKey(key)}
-              className="PinModal__key"
             >
               {key}
             </Button>
           ))}
         </div>
-      </Modal.Body>
-    </Modal>
+      </div>
+    </div>
   );
 }
