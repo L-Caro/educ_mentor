@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import GameResultPage from './GameResultPage.tsx';
 import GameErrorList from './GameErrorList.tsx';
-import type { GameResultEntry } from './gameResult.ts';
+import type { GameResultEntry } from './GameResult.ts';
 
 interface ResultState {
   correctCount: number;

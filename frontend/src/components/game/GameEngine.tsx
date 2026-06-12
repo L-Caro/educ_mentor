@@ -14,7 +14,7 @@ import GameTimerBar from './GameTimerBar.tsx';
 import GameCard from './GameCard.tsx';
 import GameStateView from './GameStateView.tsx';
 import DevBadge from 'src/components/common/DevBadge.tsx';
-import type { GameResultEntry } from './gameResult.ts';
+import type { GameResultEntry } from './GameResult.ts';
 
 export interface GameChoice {
   key: string;

@@ -1,4 +1,4 @@
-import type { GameResultEntry } from './gameResult.ts';
+import type { GameResultEntry } from './GameResult.ts';
 
 /** Liste uniforme des erreurs à retravailler. Slot vignette optionnel (Imagier). */
 export default function GameErrorList({ errors }: { errors: GameResultEntry[] }) {
