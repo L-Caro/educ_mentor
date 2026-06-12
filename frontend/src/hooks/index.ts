@@ -3,3 +3,4 @@ export * from "./useDevMode";
 export * from "./useQuestionTimer";
 export * from "./useGameSession";
 export * from "./useModuleMeta";
+export * from "./useAuth.ts"

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuestionTimer } from 'src/hooks/useQuestionTimer';
+import { useQuestionTimer } from 'src/hooks';
 
 export type GameAnswerState = 'idle' | 'correct' | 'wrong' | 'timeout';
 

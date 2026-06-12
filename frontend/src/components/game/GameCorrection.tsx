@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
+import type { GameAnswerState } from 'src/hooks';
 
 interface GameCorrectionProps {
   answerState: GameAnswerState;

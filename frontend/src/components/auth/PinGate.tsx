@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { useAuth } from 'src/hooks/useAuth';
+import { useAuth } from 'src/hooks';
 import PinModal from './PinModal';
 
 interface PinGateProps {

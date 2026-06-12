@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useSessionTimer } from 'src/context/SessionTimerContext';
-import { useAuth } from 'src/hooks/useAuth';
+import { useAuth } from 'src/hooks';
 
 const PIN_LENGTH = 4;
 const KEYPAD = [

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
-import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
+import type { GameAnswerState } from 'src/hooks';
 
 interface GameInputProps {
   value: string;

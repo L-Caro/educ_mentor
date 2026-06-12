@@ -1,7 +1,7 @@
 import { useRef, useState, type ReactNode, type ComponentProps } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDevMode, useGameSession, useAppSelector } from 'src/hooks';
-import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
+import type { GameAnswerState } from 'src/hooks';
 import { selectModuleSetup, type ModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 import GameFooter from './GameFooter.tsx';

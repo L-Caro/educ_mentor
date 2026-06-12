@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from 'src/hooks/useAuth';
+import { useAuth } from 'src/hooks';
 import PinModal from './PinModal';
 
 /**
