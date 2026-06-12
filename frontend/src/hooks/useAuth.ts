@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from './redux';
+import { useAppDispatch, useAppSelector } from './redux.ts';
 import { setToken, clearToken, selectIsAuthenticated } from 'src/store/slice/authSlice';
 import { useVerifyPinMutation } from 'src/store/api/authApi';
 
