@@ -10,7 +10,7 @@ export interface ModuleMeta {
  * Les surfaces (header, layout admin, dashboard, sidebar) résolvent leur libellé ainsi
  * plutôt que de le redéclarer côté front.
  */
-export function useModuleMeta() {
+export function useModuleMetaResolver() {
   const { data: modules } = useGetModulesQuery();
   return (id: string): ModuleMeta | undefined => {
     const found = modules?.find((module) => module.id === id);

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from 'src/components/common/Spinner.tsx';
-import { useModuleMeta } from 'src/hooks';
+import { useModuleMetaResolver } from 'src/hooks';
 import { MODULES } from 'src/modules.manifest.tsx';
 import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest.tsx';
 
@@ -27,7 +27,7 @@ function computeStats(items: ProgressionStat[]): ProgressionSummary {
 }
 
 export default function AdminDashboard() {
-  const getModuleMeta = useModuleMeta();
+  const getModuleMeta = useModuleMetaResolver();
   const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
 

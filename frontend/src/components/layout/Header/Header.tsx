@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useMatches, useNavigate } from 'react-router-dom';
 import { useTheme } from 'src/context/ThemeContext';
-import { useModuleMeta } from 'src/hooks';
+import { useModuleMetaResolver } from 'src/hooks';
 import dark from 'src/assets/images/dark-theme.svg';
 import light from 'src/assets/images/light-theme.svg';
 import { MAIN_TITLE } from "src/routes/router.tsx";
@@ -16,7 +16,7 @@ function Header() {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const matches = useMatches();
-  const getModuleMeta = useModuleMeta();
+  const getModuleMeta = useModuleMetaResolver();
 
   const lastMatch = matches[matches.length - 1];
   const handle = lastMatch?.handle as RouteHandle | undefined;
