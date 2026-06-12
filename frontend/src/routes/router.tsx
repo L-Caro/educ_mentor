@@ -30,9 +30,9 @@ export const MAIN_TITLE = 'Maëve';
 
 /** Routes enfant d'un module : sélection (ou jeu direct), jeu, résultats. */
 function buildChildRoutes(module: ModuleManifest): RouteObject[] {
-  const Home = module.child.Home;
-  const Game = module.child.Game;
-  const Result = module.child.Result;
+  const Home = module.child?.Home;
+  const Game = module.child?.Game;
+  const Result = module.child?.Result;
   const handle = { moduleId: module.id };
 
   // Jeu : spec chargée en lazy via <LazyGame> (code-splitting), sinon composant game dédié.

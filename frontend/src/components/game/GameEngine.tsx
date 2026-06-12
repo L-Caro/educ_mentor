@@ -1,8 +1,9 @@
-import { useRef, useState, type ReactNode, type ComponentProps } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDevMode, useGameSession, useAppSelector } from 'src/hooks';
 import type { GameAnswerState } from 'src/hooks';
-import { selectModuleSetup, type ModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
+import type { GameModuleSpec, GameResultEntry } from 'src/types/game.types.ts';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 import GameFooter from './GameFooter.tsx';
 import GameChoices from './GameChoices.tsx';
@@ -14,45 +15,6 @@ import GameTimerBar from './GameTimerBar.tsx';
 import GameCard from './GameCard.tsx';
 import GameStateView from './GameStateView.tsx';
 import DevBadge from 'src/components/common/DevBadge.tsx';
-import type { GameResultEntry } from './GameResult.ts';
-
-export interface GameChoice {
-  key: string;
-  label: ReactNode;
-}
-
-/**
- * Contrat d'un module de jeu « question → réponse ». Le module ne déclare que SES
- * différences ; `<GameEngine>` fournit tout le squelette commun (timer, score, étoiles,
- * progression, dev mode, navigation). Le mode (QCM vs saisie libre) est dérivé de la
- * présence de choix sur la question.
- */
-export interface GameModuleSpec<TSession, TQuestion> {
-  loadSession: (setup: ModuleSetup) => Promise<TSession>;
-  getQuestions?: (session: TSession) => TQuestion[];
-  getSessionId?: (session: TSession) => string;
-  getTimerSeconds?: (session: TSession) => number;
-
-  renderPrompt: (question: TQuestion, answerState: GameAnswerState) => ReactNode;
-  qcm?: {
-    getChoices: (question: TQuestion) => GameChoice[];
-    correctKey: (question: TQuestion) => string;
-  };
-  free?: {
-    parse: (raw: string) => unknown;
-    isCorrect: (question: TQuestion, given: unknown) => boolean;
-    inputProps?: Partial<ComponentProps<typeof GameInput>>;
-  };
-  correctionLabel: (question: TQuestion) => ReactNode;
-
-  recordAnswer: (sessionId: string, question: TQuestion, correct: boolean, given: unknown) => Promise<void>;
-  completeSession: (sessionId: string, correct: number, total: number) => Promise<void>;
-  buildResultEntry: (question: TQuestion, given: unknown, correct: boolean, timeout: boolean) => GameResultEntry;
-
-  emptyError?: string;
-  showStreak?: boolean;
-  showQuestionTag?: boolean;
-}
 
 interface GameEngineProps<TSession, TQuestion> {
   spec: GameModuleSpec<TSession, TQuestion>;

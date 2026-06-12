@@ -3,7 +3,7 @@ import store from 'src/store';
 import { monnaieApi } from './monnaie.api.ts';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from './constants/denominations.ts';
 import GamePrompt from 'src/components/game/GamePrompt.tsx';
-import type { GameModuleSpec } from 'src/components/game/GameEngine.tsx';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   reconnaitre: 'Combien y a-t-il en tout ?',

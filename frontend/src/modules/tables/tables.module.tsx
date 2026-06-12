@@ -1,13 +1,12 @@
 import store from 'src/store';
 import { tablesApi } from './tables.api.ts';
-import type { ModuleManifest } from 'src/modules.types.ts';
+import type { ModuleManifest } from 'src/types/modules.types.ts';
 import { TABLES_SETUP_OPTIONS } from './tables.setup.ts';
 
 export const tablesModule: ModuleManifest = {
   id: 'tables',
   setupOptions: TABLES_SETUP_OPTIONS,
   loadGameSpec: () => import('./tables.game.tsx').then((module) => module.tablesGameSpec),
-  child: {},
   adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
   adminRoutes: [
     { index: true, lazy: () => import('./TablesSettings.tsx').then((module) => ({ Component: module.default })) },

@@ -1,7 +1,7 @@
 import store from 'src/store';
 import { monnaieApi } from './monnaie.api.ts';
-import type { ModuleManifest } from 'src/modules.types.ts';
-import type { SetupOption } from 'src/components/game/GamePreSetup.tsx';
+import type { ModuleManifest } from 'src/types/modules.types.ts';
+import type { SetupOption } from 'src/types/game.types.ts';
 
 const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
   {
@@ -20,7 +20,6 @@ export const monnaieModule: ModuleManifest = {
   id: 'monnaie',
   setupOptions: MONNAIE_SETUP_OPTIONS,
   loadGameSpec: () => import('./monnaie.game.tsx').then((module) => module.monnaieGameSpec),
-  child: {},
   adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
   adminRoutes: [
     { index: true, lazy: () => import('./MonnaieSettings.tsx').then((module) => ({ Component: module.default })) },

@@ -1,23 +1,7 @@
 import { useState } from 'react';
 import Button from 'src/components/common/Button.tsx';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
-
-export interface SetupChoice {
-  value: string;
-  label: string;
-  icon?: string;
-  description?: string;
-}
-
-/**
- * Une option de pré-jeu : choix unique (`single`) ou multiple (`multi`).
- * `choices` statiques OU `loader` async (résolu par <ModulePreSetup> avant rendu).
- */
-export type SetupOption =
-  | { key: string; type: 'single'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> }
-  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> };
-
-export type SetupValues = Record<string, string | string[]>;
+import type { SetupChoice, SetupOption, SetupValues } from 'src/types/game.types.ts';
 
 interface GamePreSetupProps {
   subtitle?: string;

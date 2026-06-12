@@ -1,8 +1,7 @@
 import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
-import type { Tab } from 'src/components/common/TabNav';
-import type { SetupOption } from 'src/components/game/GamePreSetup';
-import type { GameModuleSpec } from 'src/components/game/GameEngine';
+import type { Tab } from 'src/components/common/TabNav.tsx';
+import type { SetupOption, GameModuleSpec } from 'src/types/game.types.ts';
 
 /** Forme normalisée d'une ligne de progression, telle que consommée par le tableau de bord. */
 export interface ProgressionStat {
@@ -18,10 +17,14 @@ export interface ModuleManifest {
   // pas dans le bundle initial. Registre hétérogène → `any` assumé (spec typée dans `<id>.game.tsx`).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   loadGameSpec?: () => Promise<GameModuleSpec<any, any>>;
-  child: {
-    Home?: ComponentType;   // page de sélection optionnelle (sinon <ModulePreSetup> générique)
-    Game?: ComponentType;   // composant de jeu dédié (sinon gameSpec via <GameEngine>)
-    Result?: ComponentType; // écran de résultats dédié (sinon <GameResultView> générique)
+  /** Composants de rendu dédiés. Tous les champs sont optionnels ; `child` lui-même peut
+   * être omis pour les modules entièrement pilotés par `loadGameSpec`.
+   * `Game` est la porte de sortie pour les modules hors-moule (ex : Snake) : déclarer un
+   * composant ici court-circuite <LazyGame> + <GameEngine> — c'est un composant de route libre. */
+  child?: {
+    Home?: ComponentType;
+    Game?: ComponentType;
+    Result?: ComponentType;
   };
   adminTabs: Tab[];
   adminRoutes: RouteObject[];

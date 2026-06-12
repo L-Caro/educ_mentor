@@ -1,4 +1,4 @@
-import type { ProgressionStat } from 'src/modules.types.ts';
+import type { ProgressionStat } from 'src/types/modules.types.ts';
 import type { MonnaieSessionResponse } from "src/modules/monnaie/monnaie.type.ts";
 import { baseApi } from 'src/store/api/baseApi.ts';
 

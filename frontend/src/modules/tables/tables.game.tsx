@@ -2,7 +2,7 @@ import type { TablesQuestion, TablesSessionResponse } from "src/modules/tables/t
 import store from 'src/store';
 import { tablesApi } from './tables.api.ts';
 import GamePrompt from 'src/components/game/GamePrompt.tsx';
-import type { GameModuleSpec } from 'src/components/game/GameEngine.tsx';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
 
 export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion> = {
   loadSession: (setup) => {
