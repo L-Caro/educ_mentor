@@ -20,12 +20,14 @@ const BILLET_DENOMINATIONS = [
   { value: 5000, label: '50€' },
 ];
 
+const MONNAIE_DENOMINATION = '1,2,5,10,20,50,100,200,500,1000,2000,5000'
+
 export default function MonnaieSettings() {
   const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
   const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
   function toggleDenomination(denominationValue: number, enabled: boolean) {
-    const current = (settings.monnaie_denominations ?? '1,2,5,10,20,50,100,200,500,1000,2000,5000')
+    const current = (settings.monnaie_denominations ?? MONNAIE_DENOMINATION)
       .split(',').map((rawValue) => parseInt(rawValue.trim(), 10)).filter(Boolean);
     let updated: number[];
     if (enabled) {
@@ -39,7 +41,7 @@ export default function MonnaieSettings() {
 
   if (loading) return <Spinner size="sm" />;
 
-  const activeDenominations = (settings.monnaie_denominations ?? '1,2,5,10,20,50,100,200,500,1000,2000,5000')
+  const activeDenominations = (settings.monnaie_denominations ?? MONNAIE_DENOMINATION)
     .split(',').map((rawValue) => parseInt(rawValue.trim(), 10));
   const maxAmount = parseInt(settings.monnaie_max_amount ?? '10', 10);
   const wholeEuros = settings.monnaie_whole_euros === 'true';
