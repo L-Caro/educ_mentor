@@ -157,7 +157,7 @@ export function useGameSession<TSession, TQuestion>({
    * @param record - Fonction zéro-argument qui appelle l'API d'enregistrement.
    *                 N'est pas appelée si skipApiCalls est actif.
    */
-  function submitAnswer(isCorrect: boolean, resultEntry: TResult, record: () => Promise<void>) {
+  function submitAnswer(isCorrect: boolean, resultEntry: GameResultEntry, record: () => Promise<void>) {
     const currentSession = sessionRef.current;
     const idx = currentIdxRef.current;
     if (!currentSession || answerStateRef.current !== 'idle') return;

@@ -1,9 +1,8 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDevMode, useGameSession, useAppSelector } from 'src/hooks';
-import type { GameAnswerState } from 'src/hooks';
 import { selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
-import type { GameModuleSpec, GameResultEntry } from 'src/types/game.types.ts';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 import GameFooter from './components/GameFooter.tsx';
 import GameChoices from './components/GameChoices.tsx';

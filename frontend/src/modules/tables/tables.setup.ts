@@ -1,6 +1,6 @@
 import store from 'src/store';
 import { sharedApi } from 'src/store/api/sharedApi.ts';
-import type { SetupOption } from 'src/components/game/setup/GamePreSetup.tsx';
+import type { SetupOption } from 'src/types/game.types.ts';
 
 /**
  * Liste des tables à proposer (0→10), filtrée par le réglage `tables_include_trivial`

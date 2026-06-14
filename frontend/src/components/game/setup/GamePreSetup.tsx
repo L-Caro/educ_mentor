@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Button from 'src/components/common/Button.tsx';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
-import type { SetupChoice, SetupOption, SetupValues } from 'src/types/game.types.ts';
+import type { SetupOption, SetupValues } from 'src/types/game.types.ts';
 
 interface GamePreSetupProps {
   subtitle?: string;

@@ -84,7 +84,7 @@ export default function SnakeGame() {
     state.active = true;
 
     function render() {
-      drawMap(ctx, canvas.width, canvas.height, borderWidth, theme.mapColor, theme.borderColor);
+      drawMap(ctx, canvas!.width, canvas!.height, borderWidth, theme.mapColor, theme.borderColor);
       drawSnake(ctx, state.snake, gridSize, state.direction, sprites);
       drawFruit(ctx, state.fruit, gridSize, fruitKey, sprites);
       drawScore(ctx, state.score, gridSize, theme.scoreColor);
@@ -116,8 +116,8 @@ export default function SnakeGame() {
         state.direction,
         state.fruit,
         state.score,
-        canvas.width,
-        canvas.height,
+        canvas!.width,
+        canvas!.height,
         gridSize,
         borderWidth,
       );

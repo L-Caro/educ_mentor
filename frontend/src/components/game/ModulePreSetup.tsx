@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { setModuleSetup, selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
-import GamePreSetup, { type SetupOption, type SetupValues } from 'src/components/game/setup/GamePreSetup.tsx';
+import GamePreSetup from 'src/components/game/setup/GamePreSetup.tsx';
+import type { SetupOption, SetupValues } from 'src/types/game.types.ts';
 import GameStateView from 'src/components/game/engine/GameStateView.tsx';
 import type { ModuleManifest } from 'src/modules.manifest.tsx';
 

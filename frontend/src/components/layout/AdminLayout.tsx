@@ -6,7 +6,7 @@ interface ModuleAdminLayoutProps {
   tabs: Tab[];
 }
 
-export default function AdminLayout({ moduleId, tabs }: ModuleAdminLayoutProps) {
+export default function AdminLayout({ tabs }: ModuleAdminLayoutProps) {
 
   return (
     <div>
