@@ -30,9 +30,7 @@ export const MAIN_TITLE = 'Maëve';
 
 /** Routes enfant d'un module : sélection (ou jeu direct), jeu, résultats. */
 function buildChildRoutes(module: ModuleManifest): RouteObject[] {
-  const Home = module.child?.Home;
   const Game = module.child?.Game;
-  const Result = module.child?.Result;
   const handle = { moduleId: module.id };
 
   // Jeu : spec chargée en lazy via <LazyGame> (code-splitting), sinon composant game dédié.
@@ -42,19 +40,15 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
       ? <Game />
       : null;
 
-  // Pré-jeu : Home dédié si déclaré, sinon écran générique piloté par setupOptions.
-  const homeElement = Home
-    ? <Home />
-    : module.setupOptions
-      ? <ModulePreSetup module={module} />
-      : playElement;
+  // Pré-jeu : écran générique piloté par setupOptions, ou direct vers le jeu si aucune option.
+  const homeElement = module.setupOptions
+    ? <ModulePreSetup module={module} />
+    : playElement;
 
-  // Résultats : composant dédié si déclaré, sinon écran générique piloté par la spec.
-  const resultElement = Result
-    ? <Result />
-    : module.loadGameSpec
-      ? <GameResultView moduleId={module.id} />
-      : null;
+  // Résultats : tous les modules avec un jeu (spec ou composant dédié) passent par GameResultView.
+  const resultElement = (module.loadGameSpec || Game)
+    ? <GameResultView moduleId={module.id} />
+    : null;
 
   return [
     { path: `/module/${module.id}`, element: homeElement, handle },

@@ -17,14 +17,11 @@ export interface ModuleManifest {
   // pas dans le bundle initial. Registre hétérogène → `any` assumé (spec typée dans `<id>.game.tsx`).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   loadGameSpec?: () => Promise<GameModuleSpec<any, any>>;
-  /** Composants de rendu dédiés. Tous les champs sont optionnels ; `child` lui-même peut
-   * être omis pour les modules entièrement pilotés par `loadGameSpec`.
-   * `Game` est la porte de sortie pour les modules hors-moule (ex : Snake) : déclarer un
-   * composant ici court-circuite <LazyGame> + <GameEngine> — c'est un composant de route libre. */
+  /** Porte de sortie pour les modules hors-moule (ex : Snake) : déclarer `Game` ici
+   * court-circuite <LazyGame> + <GameEngine> — c'est un composant de route libre.
+   * Le résultat passe par <GameResultView> (store Redux) comme les autres modules. */
   child?: {
-    Home?: ComponentType;
     Game?: ComponentType;
-    Result?: ComponentType;
   };
   adminTabs: Tab[];
   adminRoutes: RouteObject[];

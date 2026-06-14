@@ -19,13 +19,14 @@ export default function GameResultView({ moduleId }: { moduleId: string }) {
 
   if (!gameResult) { navigate(`/module/${moduleId}`); return null; }
 
-  const { correctCount, total, results } = gameResult;
+  const { correctCount, total, scoreLabel, results } = gameResult;
   const errors = results.filter((entry) => !entry.correct);
 
   return (
     <GameResultPage
       correctCount={correctCount}
       total={total}
+      scoreLabel={scoreLabel}
       onReplay={() => navigate(`/module/${moduleId}/play`)}
       onHome={() => navigate('/')}
       errorCount={errors.length}

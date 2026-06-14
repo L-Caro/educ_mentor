@@ -5,7 +5,8 @@ import type { RootState } from 'src/store';
 
 export interface GameResult {
   correctCount: number;
-  total: number;
+  total?: number;
+  scoreLabel?: string;
   results: GameResultEntry[];
 }
 
