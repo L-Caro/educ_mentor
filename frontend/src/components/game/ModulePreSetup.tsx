@@ -61,5 +61,9 @@ export default function ModulePreSetup({ module }: { module: ModuleManifest }) {
     return <GameStateView loading onBack={() => navigate('/')} />;
   }
 
-  return <GamePreSetup options={[DIFFICULTY_OPTION, ...resolved]} initialValues={lastSetup} onStart={handleStart} />;
+  // Ne pas injecter l'option commune si le module déclare déjà sa propre clé 'difficulty'.
+  const hasDifficultyOption = options.some((option) => option.key === 'difficulty');
+  const allOptions = hasDifficultyOption ? resolved : [DIFFICULTY_OPTION, ...resolved];
+
+  return <GamePreSetup options={allOptions} initialValues={lastSetup} onStart={handleStart} />;
 }
