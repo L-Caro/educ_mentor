@@ -1,0 +1,86 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+.MonnaieGame {
+
+  // ─── reconnaitre : pièces et billets ─────────────────────────────────────────
+
+  &__coins {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: v.$space-5;
+  }
+
+  &__coin {
+    width: 7rem;
+    height: 7rem;
+    object-fit: contain;
+    border-radius: 50%;
+    background: var(--color-base-200);
+    box-shadow: var(--shadow-md);
+
+    &--billet {
+      width: 15rem;
+      height: 7.5rem;
+      border-radius: v.$radius-md;
+    }
+  }
+
+  // ─── total : étiquettes de prix ───────────────────────────────────────────────
+
+  &__prices {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: v.$space-5;
+  }
+
+  &__price-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: v.$space-4 v.$space-7;
+    background: var(--color-base-200);
+    border-radius: v.$radius-md;
+    box-shadow: var(--shadow-sm);
+    font-size: v.$font-size-2xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+  }
+
+  // ─── rendre : ticket de caisse ────────────────────────────────────────────────
+
+  &__receipt {
+    background: var(--color-base-100);
+    border-radius: v.$radius-md;
+    box-shadow: var(--shadow-md);
+    padding: v.$space-5 v.$space-8;
+    min-width: 22rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: v.$space-5 0;
+
+    & + & {
+      border-top: 1px solid var(--color-base-300);
+    }
+  }
+
+  &__receipt-label {
+    font-size: v.$font-size-md;
+    color: var(--color-base-content);
+    opacity: 0.55;
+  }
+
+  &__receipt-value {
+    font-size: v.$font-size-xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+  }
+}
