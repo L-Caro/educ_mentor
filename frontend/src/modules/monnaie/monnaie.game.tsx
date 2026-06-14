@@ -4,6 +4,7 @@ import { monnaieApi } from './monnaie.api.ts';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from './constants/denominations.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import './monnaie.scss';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
   reconnaitre: 'Combien y a-t-il en tout ?',
@@ -24,7 +25,7 @@ function renderQuestion(question: MonnaieQuestion) {
   switch (question.type) {
     case 'reconnaitre':
       return (
-        <div>
+        <div className="MonnaieGame__coins">
           {(question.coins ?? []).map((coin, coinIndex) => (
             <img
               key={coinIndex}
@@ -37,9 +38,9 @@ function renderQuestion(question: MonnaieQuestion) {
       );
     case 'total':
       return (
-        <div>
+        <div className="MonnaieGame__prices">
           {(question.prices ?? []).map((price, priceIndex) => (
-            <span key={priceIndex}>
+            <span key={priceIndex} className="MonnaieGame__price-tag">
               {formatCents(price)}
             </span>
           ))}
@@ -47,14 +48,14 @@ function renderQuestion(question: MonnaieQuestion) {
       );
     case 'rendre':
       return (
-        <div>
-          <div>
-            <span>Article</span>
-            <span>{formatCents(question.price ?? 0)}</span>
+        <div className="MonnaieGame__receipt">
+          <div className="MonnaieGame__receipt-row">
+            <span className="MonnaieGame__receipt-label">Article</span>
+            <span className="MonnaieGame__receipt-value">{formatCents(question.price ?? 0)}</span>
           </div>
-          <div>
-            <span>Tu donnes</span>
-            <span>{formatCents(question.payment ?? 0)}</span>
+          <div className="MonnaieGame__receipt-row">
+            <span className="MonnaieGame__receipt-label">Tu donnes</span>
+            <span className="MonnaieGame__receipt-value">{formatCents(question.payment ?? 0)}</span>
           </div>
         </div>
       );
