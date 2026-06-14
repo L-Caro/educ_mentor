@@ -5,14 +5,14 @@ import type { GameAnswerState } from 'src/hooks';
 import { selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
 import type { GameModuleSpec, GameResultEntry } from 'src/types/game.types.ts';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
-import GameFooter from './GameFooter.tsx';
-import GameChoices from './GameChoices.tsx';
-import GameInput from './GameInput.tsx';
-import GameCorrection from './GameCorrection.tsx';
-import GameScoreBar from './GameScoreBar.tsx';
-import GameProgressBar from './GameProgressBar.tsx';
-import GameTimerBar from './GameTimerBar.tsx';
-import GameCard from './GameCard.tsx';
+import GameFooter from './components/GameFooter.tsx';
+import GameChoices from './components/GameChoices.tsx';
+import GameInput from './components/GameInput.tsx';
+import GameCorrection from './components/GameCorrection.tsx';
+import GameScoreBar from './components/GameScoreBar.tsx';
+import GameProgressBar from './components/GameProgressBar.tsx';
+import GameTimerBar from './components/GameTimerBar.tsx';
+import GameCard from './components/GameCard.tsx';
 import GameStateView from './GameStateView.tsx';
 import DevBadge from 'src/components/common/DevBadge.tsx';
 
@@ -44,7 +44,7 @@ export default function GameEngine<TSession, TQuestion>({
   const {
     loading, error, session, currentIdx, answerState, correctCount,
     timeRemaining, timerPct, isUrgent, submitAnswer, handleTerminate,
-  } = useGameSession<TSession, TQuestion, GameResultEntry>({
+  } = useGameSession<TSession, TQuestion>({
     loader: () => spec.loadSession(setup),
     homePath,
     resultsPath,
@@ -52,7 +52,6 @@ export default function GameEngine<TSession, TQuestion>({
     getSessionId,
     getTimerSeconds,
     onComplete: (sessionId, correct, total) => spec.completeSession(sessionId, correct, total),
-    buildResultsState: (correct, total, results) => ({ correctCount: correct, total, results }),
     buildTimeoutResult: (question) => spec.buildResultEntry(question, null, false, true),
     recordTimeout: (sessionId, question) => spec.recordAnswer(sessionId, question, false, null),
     onQuestionChange: () => { setSelectedKey(null); setFreeInput(''); },

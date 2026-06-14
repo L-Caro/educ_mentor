@@ -1,0 +1,150 @@
+/* Variables */
+:root {
+    --primary-color: #6B7481;
+    --secondary-color: #BFBDBD;
+    --danger-color: #E74C3C;
+	--dark-color: #333333;
+	--light-color: #DDDDDD;
+	--border-radius: 1rem;
+}
+
+/* Global */
+
+* {
+	margin     : 0;
+	padding    : 0;
+	box-sizing : border-box;
+}
+
+body {
+	height          : 100%;
+	display         : flex;
+	flex-wrap       : wrap;
+	justify-content : center;
+	align-items     : center;
+	background      : white;
+}
+
+/* Typos */
+
+h2 {
+	font-size: 2.5rem;
+	text-align : center;
+}
+
+h3 {
+	font-size: 1.7rem;
+	margin : 2rem 0 1rem;
+}
+
+/* Boutons */
+
+.btn {
+	border-radius : var(--border-radius);
+	padding       : 1rem 1rem;
+	font-weight   : 700;
+	cursor        : pointer;
+	transition    : box-shadow 0.2s;
+	margin-left   : 0.5rem;
+	font-size    : 1rem;
+	border: 1px solid
+}
+
+.btn:hover {
+	box-shadow : 0 1px 2px 0 rgba(60, 64, 67, 0.3);
+	transition : box-shadow 0.2s;
+}
+
+.btn-primary {
+	background : var(--primary-color);
+	color      : var(--light-color);
+}
+
+.btn-secondary {
+	border     : var(--secondary-color);
+	background : var(--secondary-color);
+	color      : var(--dark-color);
+}
+
+.btn-danger {
+	border     : var(--danger-color);
+	background : white;
+	color      : var(--danger-color);
+}
+
+/* Canva */
+
+.calc {
+	width: 100vw;
+	position        : fixed;
+	top             : 0;
+	left            : 0;
+	height          : 100vh;
+	overflow-y: scroll;
+	background      : rgba(0, 0, 0, 0.8);
+	display         : flex;
+	justify-content : center;
+	align-items     : center;
+}
+
+/* Modal */
+
+.modal {
+	width: 100%;
+	background    : var(--dark-color);
+	color         : var(--light-color);
+	min-width     : 30rem;
+	border-radius : var(--border-radius);
+	padding       : 5rem;
+	box-shadow    : 0 1px 2px 0 rgba(60, 64, 67, 0.3);
+	text-align    : center;
+	line-height   : 1.5;
+	font-family   : Arial, sans-serif;
+}
+
+.modal_title {
+	margin : 1rem 0 3rem 0;
+}
+
+
+/* Settings */
+.modal_container {
+	display: flex; justify-content: space-between; margin-bottom: 2rem
+}
+.modal_difficulty {
+	margin-bottom : 3rem;
+}
+
+.difficulty_radio {
+	display : flex;
+	justify-content : space-between;
+}
+
+input[type='radio'] {
+	display : none;
+}
+
+input[type='radio'] + label {
+	background : var(--secondary-color);
+	color      : var(--dark-color);
+}
+
+input[type='radio']:checked + label {
+	background : var(--primary-color);
+	color      : var(--light-color);
+}
+
+#bg1, #bg2, #bg3, #bg4, #bg5, #bg6, #bg7, #bg8, #bg9, #bg10 {
+	width: 2rem;
+	height: 2rem;
+	cursor: pointer;
+}
+#fraise >img, #apple >img, #poire >img, #abricot >img {
+	cursor: pointer;
+	width: 3rem;
+	height: 3rem;
+}
+.item_selected {
+border: 3px solid var(--light-color);
+}
+

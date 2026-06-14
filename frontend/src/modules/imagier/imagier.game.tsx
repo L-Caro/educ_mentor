@@ -2,7 +2,7 @@ import type { ImagierQuestion, ImagierSessionResponse } from "src/modules/imagie
 import store from 'src/store';
 import { imagierApi } from './imagier.api.ts';
 import { capitalize } from 'src/utils/capitilize.ts';
-import GamePrompt from 'src/components/game/GamePrompt.tsx';
+import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 
 /** Comparaison insensible à la casse et aux accents (saisie libre, niveau difficile). */

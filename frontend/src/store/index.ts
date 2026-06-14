@@ -2,19 +2,25 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slice/authSlice";
 import gameSetupReducer from "./slice/gameSetupSlice";
 import devModeReducer from "./slice/devModeSlice";
+import gameResultReducer from "./slice/gameResultSlice";
 import { baseApi } from "./api/baseApi";
 
 const rootReducers = {
   auth: authReducer,
   gameSetup: gameSetupReducer,
   devMode: devModeReducer,
+  gameResult: gameResultReducer,
   [baseApi.reducerPath]: baseApi.reducer,
 };
 
-const store = configureStore( {
+const store = configureStore({
   reducer: rootReducers,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(baseApi.middleware),
-} );
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      // GameResultEntry contient des ReactNode (non-sérialisables) — même situation qu'avec location.state
+      serializableCheck: { ignoredPaths: ['gameResult.current'] },
+    }).concat(baseApi.middleware),
+});
 
 export default store;
 

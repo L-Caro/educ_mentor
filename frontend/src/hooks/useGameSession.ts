@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuestionTimer } from 'src/hooks';
+import { useAppDispatch, useQuestionTimer } from 'src/hooks';
+import { setGameResult } from 'src/store/slice/gameResultSlice';
+import type { GameResultEntry } from 'src/types/game.types';
 
 export type GameAnswerState = 'idle' | 'correct' | 'wrong' | 'timeout';
 
-interface UseGameSessionConfig<TSession, TQuestion, TResult> {
+interface UseGameSessionConfig<TSession, TQuestion> {
   loader: () => Promise<TSession>;
   homePath: string;
   resultsPath: string;
@@ -12,8 +14,7 @@ interface UseGameSessionConfig<TSession, TQuestion, TResult> {
   getSessionId: (session: TSession) => string;
   getTimerSeconds: (session: TSession) => number;
   onComplete: (sessionId: string, correctCount: number, total: number) => Promise<void>;
-  buildResultsState: (correctCount: number, total: number, results: TResult[]) => object;
-  buildTimeoutResult: (question: TQuestion) => TResult;
+  buildTimeoutResult: (question: TQuestion) => GameResultEntry;
   recordTimeout: (sessionId: string, question: TQuestion) => Promise<void>;
   onQuestionChange?: () => void;
   skipApiCalls?: boolean;
@@ -28,7 +29,7 @@ interface UseGameSessionConfig<TSession, TQuestion, TResult> {
  * et de ses états locaux (input, selectedChoice). Il appelle submitAnswer() quand
  * il a calculé isCorrect.
  */
-export function useGameSession<TSession, TQuestion, TResult>({
+export function useGameSession<TSession, TQuestion>({
   loader,
   homePath,
   resultsPath,
@@ -36,14 +37,14 @@ export function useGameSession<TSession, TQuestion, TResult>({
   getSessionId,
   getTimerSeconds,
   onComplete,
-  buildResultsState,
   buildTimeoutResult,
   recordTimeout,
   onQuestionChange,
   skipApiCalls = false,
   emptySessionError = 'Aucune question disponible.',
-}: UseGameSessionConfig<TSession, TQuestion, TResult>) {
+}: UseGameSessionConfig<TSession, TQuestion>) {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -57,7 +58,7 @@ export function useGameSession<TSession, TQuestion, TResult>({
   const currentIdxRef = useRef(0);
   const answerStateRef = useRef<GameAnswerState>('idle');
   const correctCountRef = useRef(0);
-  const resultsRef = useRef<TResult[]>([]);
+  const resultsRef = useRef<GameResultEntry[]>([]);
   // Ref sur le setTimeout d'avance automatique — permet son annulation depuis handleTerminate
   const pendingAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -69,13 +70,13 @@ export function useGameSession<TSession, TQuestion, TResult>({
   // aux valeurs fraîches (closures / batchs d'état) sans être recréés.
   const configRef = useRef({
     getQuestions, getSessionId, getTimerSeconds, onComplete,
-    buildResultsState, buildTimeoutResult, recordTimeout,
+    buildTimeoutResult, recordTimeout,
     onQuestionChange, skipApiCalls, homePath, resultsPath,
   });
   useEffect(() => {
     configRef.current = {
       getQuestions, getSessionId, getTimerSeconds, onComplete,
-      buildResultsState, buildTimeoutResult, recordTimeout,
+      buildTimeoutResult, recordTimeout,
       onQuestionChange, skipApiCalls, homePath, resultsPath,
     };
   });
@@ -139,9 +140,8 @@ export function useGameSession<TSession, TQuestion, TResult>({
         config.onComplete(sessionId, finalCorrectCount, answeredTotal).catch(console.error);
       }
 
-      navigate(config.resultsPath, {
-        state: config.buildResultsState(finalCorrectCount, answeredTotal, resultsRef.current),
-      });
+      dispatch(setGameResult({ correctCount: finalCorrectCount, total: answeredTotal, results: resultsRef.current }));
+      navigate(config.resultsPath);
     } else {
       setCurrentIdx(idx + 1);
       setAnswerState('idle');
@@ -209,9 +209,8 @@ export function useGameSession<TSession, TQuestion, TResult>({
       await config.onComplete(sessionId, finalCorrectCount, total).catch(console.error);
     }
 
-    navigate(config.resultsPath, {
-      state: config.buildResultsState(finalCorrectCount, total, resultsRef.current),
-    });
+    dispatch(setGameResult({ correctCount: finalCorrectCount, total, results: resultsRef.current }));
+    navigate(config.resultsPath);
   }
 
   return {

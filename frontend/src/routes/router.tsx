@@ -21,7 +21,7 @@ import Settings from 'src/components/admin/settings/Settings';
 
 import ModulePreSetup from 'src/components/game/ModulePreSetup';
 import LazyGame from 'src/components/game/LazyGame';
-import GameResultView from 'src/components/game/GameResultView';
+import GameResultView from 'src/components/game/result/GameResultView.tsx';
 
 // Source unique des modules
 import { MODULES, type ModuleManifest } from 'src/modules.manifest';

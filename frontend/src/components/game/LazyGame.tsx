@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GameEngine, { type GameModuleSpec } from './GameEngine.tsx';
-import GameStateView from './GameStateView.tsx';
+import GameEngine, { type GameModuleSpec } from './engine/GameEngine.tsx';
+import GameStateView from './engine/GameStateView.tsx';
 
 interface LazyGameProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

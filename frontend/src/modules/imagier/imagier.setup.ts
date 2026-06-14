@@ -1,7 +1,7 @@
 import store from 'src/store';
 import { sharedApi } from 'src/store/api/sharedApi.ts';
 import { getCategoryConfig } from 'src/modules/imagier/constants/categories.ts';
-import type { SetupOption } from 'src/components/game/GamePreSetup.tsx';
+import type { SetupOption } from 'src/components/game/setup/GamePreSetup.tsx';
 
 /**
  * Charge les catégories actives via le cache RTK Query (`initiate` = cache sans hook).

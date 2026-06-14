@@ -1,7 +1,7 @@
 import type { CalculQuestion, CalculSessionResponse } from "src/modules/calcul/calcul.type.ts";
 import store from 'src/store';
 import { calculApi } from './calcul.api.ts';
-import GamePrompt from 'src/components/game/GamePrompt.tsx';
+import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 
 function renderOperation(operation: string) {
