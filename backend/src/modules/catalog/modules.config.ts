@@ -35,4 +35,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 4,
   },
+  {
+    id: 'heure',
+    name: 'Lire l\'heure',
+    description: 'Lire l\'heure sur une horloge à aiguilles, distinguer matin et après-midi',
+    icon: '🕐',
+    is_active: false,
+    display_order: 5,
+  },
 ];

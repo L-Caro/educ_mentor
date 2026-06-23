@@ -10,7 +10,8 @@ export interface GameChoice {
 /** Sous-ensemble configurable par le module pour le champ de saisie libre.
  * Les props de contrôle (value, onChange, onSubmit, answerState) sont gérées par <GameEngine>. */
 export interface GameInputConfig {
-  variant?: 'number' | 'text';
+  variant?: 'number' | 'text' | 'time';
+  timeSeparator?: ':' | 'h';  // uniquement pour variant='time' : caractère affiché entre HH et MM
   placeholder?: string;
   maxLength?: number;
   numeric?: boolean;

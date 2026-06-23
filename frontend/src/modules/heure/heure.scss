@@ -1,0 +1,95 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Horloge SVG ─────────────────────────────────────────────────────────────
+
+.ClockFace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-5;
+  padding: v.$space-4 0;
+
+  &__svg {
+    width: 20rem;
+    height: 20rem;
+    max-width: 80vw;
+    overflow: visible;
+  }
+
+  &__shadow {
+    fill: var(--color-base-300);
+  }
+
+  &__face {
+    fill: var(--color-base-100);
+    stroke: var(--color-base-300);
+    stroke-width: 1.5;
+  }
+
+  &__tick {
+    stroke: var(--color-base-content);
+    stroke-width: 1;
+    opacity: 0.25;
+    stroke-linecap: round;
+
+    &--hour {
+      stroke-width: 2;
+      opacity: 0.55;
+    }
+  }
+
+  &__number {
+    fill: var(--color-base-content);
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-family: v.$font-family;
+    font-weight: 700;
+  }
+
+  &__hand {
+    stroke: var(--color-neutral);
+    stroke-linecap: round;
+
+    &--hour {
+      stroke-width: 5.5;
+    }
+
+    &--minute {
+      stroke-width: 3;
+      stroke: color-mix(in srgb, var(--color-neutral) 75%, transparent);
+    }
+  }
+
+  &__center {
+    fill: var(--color-neutral);
+  }
+
+  &__center-dot {
+    fill: var(--color-base-100);
+  }
+
+  &__period {
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+  }
+
+  &__period-icon {
+    font-size: v.$font-size-2xl;
+    line-height: 1;
+  }
+
+  &__period-label {
+    font-size: v.$font-size-xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+    opacity: 0.7;
+  }
+
+  @media (min-width: 600px) {
+    &__svg {
+      width: 24rem;
+      height: 24rem;
+    }
+  }
+}

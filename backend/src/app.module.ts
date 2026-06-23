@@ -15,6 +15,7 @@ import { ImagierModule } from './modules/imagier/imagier.module';
 import { TablesModule } from './modules/tables/tables.module';
 import { CalculModule } from './modules/calcul/calcul.module';
 import { MonnaieModule } from './modules/monnaie/monnaie.module';
+import { HeureModule } from './modules/heure/heure.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { AccessGuard } from './modules/invitation/access.guard';
 
@@ -50,6 +51,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     TablesModule,
     CalculModule,
     MonnaieModule,
+    HeureModule,
     InvitationModule,
   ],
   providers: [
