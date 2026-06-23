@@ -82,6 +82,11 @@
   &--mini {
     padding: 0;
     gap: 0;
+
+    .ClockFace__svg {
+      width: 18rem;
+      height: 18rem;
+    }
   }
 
   &__period-label {
