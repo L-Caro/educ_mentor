@@ -14,5 +14,6 @@ export interface HeureSessionResponse {
   questions: HeureQuestion[];
   timer_seconds: number;
   is_unlimited: boolean;
-  separator: ':' | 'h';  // injecté côté frontend par loadSession
+  separator: ':' | 'h';       // injecté côté frontend par loadSession
+  questionMode: 'digital' | 'expression';  // injecté côté frontend par loadSession
 }

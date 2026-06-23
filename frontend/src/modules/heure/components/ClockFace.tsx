@@ -4,6 +4,7 @@ interface ClockFaceProps {
   hour: number;     // 0-23
   minute: number;   // 0-59
   numeralType: NumeralType;
+  mini?: boolean;   // masque le label matin/soir, utilisé dans les choix QCM expression
 }
 
 const ARABIC  = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
@@ -26,7 +27,7 @@ function clockPoint(radius: number, angleDeg: number) {
   };
 }
 
-export default function ClockFace({ hour, minute, numeralType }: ClockFaceProps) {
+export default function ClockFace({ hour, minute, numeralType, mini = false }: ClockFaceProps) {
   const isAM = hour < 12;
 
   const minuteAngle = minute * 6;
@@ -40,7 +41,7 @@ export default function ClockFace({ hour, minute, numeralType }: ClockFaceProps)
   const labels = numeralType === 'roman' ? ROMAN : ARABIC;
 
   return (
-    <div className="ClockFace">
+    <div className={`ClockFace${mini ? ' ClockFace--mini' : ''}`}>
       <svg
         viewBox="0 0 200 200"
         className="ClockFace__svg"
@@ -102,10 +103,12 @@ export default function ClockFace({ hour, minute, numeralType }: ClockFaceProps)
         <circle cx={CX} cy={CY} r={2} className="ClockFace__center-dot" />
       </svg>
 
-      <div className="ClockFace__period">
-        <span className="ClockFace__period-icon">{isAM ? '☀️' : '🌙'}</span>
-        <span className="ClockFace__period-label">{isAM ? 'matin' : 'après midi'}</span>
-      </div>
+      {!mini && (
+        <div className="ClockFace__period">
+          <span className="ClockFace__period-icon">{isAM ? '☀️' : '🌙'}</span>
+          <span className="ClockFace__period-label">{isAM ? 'matin' : 'après midi'}</span>
+        </div>
+      )}
     </div>
   );
 }

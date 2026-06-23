@@ -53,10 +53,28 @@
     }
   }
 
-  @media (min-width: 600px) {
+	&--grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: v.$space-7;
+		width: fit-content;
+
+		.GameChoices__choice {
+			padding: v.$space-2;
+			aspect-ratio: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+	@media (min-width: 600px) {
     &__choice {
       font-size: v.$font-size-2xl;
       padding: v.$space-6 v.$space-7;
     }
+
+	&--grid .GameChoices__choice {
+	  padding: v.$space-3;
+	}
   }
 }

@@ -9,6 +9,10 @@ export class StartHeureSessionDto {
   @IsOptional()
   @IsString()
   numeral_type?: string;
+
+  @IsOptional()
+  @IsIn(['digital', 'expression'])
+  question_mode?: 'digital' | 'expression';
 }
 
 export class RecordHeureAnswerDto {

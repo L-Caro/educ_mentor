@@ -27,6 +27,7 @@ export interface HeureSessionResult {
 }
 
 const DISTRACTOR_OFFSETS = [5, 10, 15, 30, 60, 90];
+const EXPRESSION_MINUTES = [0, 15, 30, 40, 45, 50, 55];
 
 @Injectable()
 export class HeureService {
@@ -42,7 +43,9 @@ export class HeureService {
 
   async startSession(dto: StartHeureSessionDto): Promise<HeureSessionResult> {
     const difficulty = normalizeDifficulty(dto.difficulty);
-    const choicesCount = qcmChoiceCount(difficulty);
+    const isExpression = dto.question_mode === 'expression';
+    // Expression mode : toujours 4 choix (la saisie libre n'a pas de sens)
+    const choicesCount = isExpression ? 4 : qcmChoiceCount(difficulty);
     const numeralTypeSetting = dto.numeral_type ?? 'arabic';
 
     const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
@@ -51,7 +54,7 @@ export class HeureService {
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
 
-    const questions = this.generateQuestions(count, numeralTypeSetting, choicesCount);
+    const questions = this.generateQuestions(count, numeralTypeSetting, choicesCount, isExpression);
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
@@ -117,15 +120,18 @@ export class HeureService {
 
   // ─── Génération ───────────────────────────────────────────────────────────
 
-  private generateQuestions(count: number, numeralTypeSetting: string, choicesCount: number): HeureQuestion[] {
+  private generateQuestions(count: number, numeralTypeSetting: string, choicesCount: number, expressionMode = false): HeureQuestion[] {
     const questions: HeureQuestion[] = [];
     const usedValues = new Set<number>();
     let attempts = 0;
 
     while (questions.length < count && attempts < count * 5) {
       attempts++;
-      const hour = this.rand(0, 23);
-      const minute = this.rand(0, 59);
+      // Expression mode : cycle 12h uniquement (1-12), minutes expressives seulement
+      const hour   = expressionMode ? this.rand(1, 12) : this.rand(0, 23);
+      const minute = expressionMode
+        ? EXPRESSION_MINUTES[this.rand(0, EXPRESSION_MINUTES.length - 1)]
+        : this.rand(0, 59);
       const answerValue = hour * 60 + minute;
 
       if (usedValues.has(answerValue)) continue;
@@ -136,12 +142,31 @@ export class HeureService {
           ? this.rand(0, 1) === 0 ? 'arabic' : 'roman'
           : numeralTypeSetting === 'roman' ? 'roman' : 'arabic';
 
-      const choices = choicesCount > 0 ? this.generateChoices(answerValue, choicesCount) : [];
+      const choices = choicesCount > 0
+        ? (expressionMode ? this.generateExpressionChoices(answerValue, choicesCount) : this.generateChoices(answerValue, choicesCount))
+        : [];
 
       questions.push({ hour, minute, answer_value: answerValue, numeral_type: numeralType, choices });
     }
 
     return questions;
+  }
+
+  /** Choix pour le mode expression : tous les distracteurs ont une minute dans EXPRESSION_MINUTES
+   * pour que chaque horloge proposée corresponde à une expression française valide. */
+  private generateExpressionChoices(correctValue: number, size: number): number[] {
+    const choices = new Set<number>([correctValue]);
+
+    let attempts = 0;
+    while (choices.size < size && attempts < 200) {
+      attempts++;
+      // Cycle 12h uniquement : même univers que les questions expression
+      const hour = this.rand(1, 12);
+      const minute = EXPRESSION_MINUTES[this.rand(0, EXPRESSION_MINUTES.length - 1)];
+      choices.add(hour * 60 + minute);
+    }
+
+    return [...choices].sort(() => Math.random() - 0.5);
   }
 
   /** Génère `size` choix QCM. Le miroir AM/PM est systématiquement inclus comme premier distracteur

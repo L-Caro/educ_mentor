@@ -7,12 +7,12 @@ export const heureApi = baseApi.injectEndpoints({
     // ─── Jeu ────────────────────────────────────────────────────────────────
     startHeureSession: builder.mutation<
       HeureSessionResponse,
-      { difficulty?: string; numeralType?: string }
+      { difficulty?: string; numeralType?: string; questionMode?: string }
     >({
-      query: ({ difficulty, numeralType }) => ({
+      query: ({ difficulty, numeralType, questionMode }) => ({
         url: '/heure/session',
         method: 'POST',
-        body: { difficulty, numeral_type: numeralType },
+        body: { difficulty, numeral_type: numeralType, question_mode: questionMode },
       }),
     }),
 

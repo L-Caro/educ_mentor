@@ -12,6 +12,7 @@ interface GameChoicesProps {
   correctKey: string;
   answerState: GameAnswerState;
   onSelect: (key: string) => void;
+  layout?: 'list' | 'grid'
 }
 
 /**
@@ -19,7 +20,7 @@ interface GameChoicesProps {
  * idle → le choix cliqué passe en `--selected` ; après validation → `--correct`,
  * `--wrong` (le choix erroné de l'élève) et `--faded` (les autres).
  */
-export default function GameChoices({ options, selectedKey, correctKey, answerState, onSelect }: GameChoicesProps) {
+export default function GameChoices({ options, selectedKey, correctKey, answerState,  onSelect, layout }: GameChoicesProps) {
   function choiceClass(key: string): string {
     const base = 'GameChoices__choice';
     if (answerState === 'idle') {
@@ -31,7 +32,7 @@ export default function GameChoices({ options, selectedKey, correctKey, answerSt
   }
 
   return (
-    <div className="GameChoices">
+    <div className={`GameChoices${layout === 'grid' ? ' GameChoices--grid' : ''}`}>
       {options.map((option) => (
         <button
           key={option.key}

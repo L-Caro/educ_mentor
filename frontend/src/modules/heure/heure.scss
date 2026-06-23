@@ -79,6 +79,11 @@
     line-height: 1;
   }
 
+  &--mini {
+    padding: 0;
+    gap: 0;
+  }
+
   &__period-label {
     font-size: v.$font-size-xl;
     font-weight: 700;
@@ -90,6 +95,29 @@
     &__svg {
       width: 24rem;
       height: 24rem;
+    }
+  }
+}
+
+// ─── Prompt mode expression ───────────────────────────────────────────────────
+
+.HeureExpression {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$space-8 v.$space-4;
+
+  &__expr {
+    font-size: v.$font-size-2xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+    text-align: center;
+    margin: 0;
+  }
+
+  @media (min-width: 600px) {
+    &__expr {
+      font-size: v.$font-size-3xl;
     }
   }
 }

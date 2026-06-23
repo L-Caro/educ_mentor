@@ -5,6 +5,15 @@ import type { SetupOption } from 'src/types/game.types.ts';
 
 const HEURE_SETUP_OPTIONS: SetupOption[] = [
   {
+    key: 'questionMode',
+    type: 'single',
+    label: 'Mode de jeu',
+    choices: [
+      { value: 'digital',    icon: '🕐', label: 'Heure digitale', description: 'Lire l\'heure exacte' },
+      { value: 'expression', icon: '💬', label: 'Expressions',    description: 'et quart, et demie, moins le quart…' },
+    ],
+  },
+  {
     key: 'numeralType',
     type: 'single',
     label: 'Chiffres sur le cadran',

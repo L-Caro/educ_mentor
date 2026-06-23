@@ -33,6 +33,7 @@ export interface GameModuleSpec<TSession, TQuestion> {
   qcm?: {
     getChoices: (question: TQuestion) => GameChoice[];
     correctKey: (question: TQuestion) => string;
+    layout?: 'list' | 'grid'
   };
   free?: {
     parse: (raw: string) => unknown;

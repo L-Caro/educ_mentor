@@ -140,6 +140,7 @@ export default function GameEngine<TSession, TQuestion>({
             correctKey={spec.qcm!.correctKey(question)}
             answerState={answerState}
             onSelect={setSelectedKey}
+            layout={spec.qcm!.layout}
           />
         ) : (
           <GameInput
