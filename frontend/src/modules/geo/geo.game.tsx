@@ -1,0 +1,86 @@
+import store from 'src/store';
+import { geoApi } from './geo.api.ts';
+import type { GeoQuestion, GeoSessionResponse } from './geo.type.ts';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
+import './geo.scss';
+
+export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
+
+  loadSession: async (setup) => {
+    return store.dispatch(geoApi.endpoints.startGeoSession.initiate({
+      difficulty:       setup.difficulty    as string | undefined,
+      questionTypes:    setup.questionTypes as string[] | undefined,
+      continents:       setup.continents    as string[] | undefined,
+      capitalDirection: setup.capitalDirection as string | undefined,
+    })).unwrap();
+  },
+
+  getQuestions: (session) => session.questions,
+
+  renderPrompt: (question) => {
+    if (question.display_type === 'flag') {
+      return (
+        <div className="GeoPrompt">
+          <p className="GeoPrompt__flag">{question.display}</p>
+          <p className="GeoPrompt__label">{question.prompt}</p>
+        </div>
+      );
+    }
+    return (
+      <div className="GeoPrompt">
+        <p className="GeoPrompt__display">{question.display}</p>
+        <p className="GeoPrompt__label">{question.prompt}</p>
+      </div>
+    );
+  },
+
+  qcm: {
+    getChoices: (q) => q.choices.map((c) => ({ key: c, label: c })),
+    // Mode single si answer est renseigné, multi si answers est renseigné
+    correctKey:  (q) => q.answer  ?? '',
+    correctKeys: (q) => q.answers ?? [],
+    layout: 'list',
+  },
+
+  correctionLabel: (question) => {
+    if (question.answers !== null) {
+      return question.answers.join(', ');
+    }
+    return question.answer ?? '';
+  },
+
+  recordAnswer: (sessionId, question, correct) =>
+    store.dispatch(geoApi.endpoints.recordGeoAnswer.initiate({
+      sessionId,
+      itemKey: question.item_key,
+      isCorrect: correct,
+    })).unwrap(),
+
+  completeSession: (sessionId, correctAnswers, totalQuestions) =>
+    store.dispatch(geoApi.endpoints.completeGeoSession.initiate({
+      sessionId, correctAnswers, totalQuestions,
+    })).unwrap(),
+
+  buildResultEntry: (question, given, correct, timeout) => {
+    const isMulti = question.answers !== null;
+    if (isMulti) {
+      const givenArr = Array.isArray(given) ? (given as string[]) : [];
+      return {
+        label:    question.prompt,
+        given:    givenArr.length > 0 ? givenArr.join(', ') : null,
+        expected: (question.answers ?? []).join(', '),
+        correct,
+        timeout,
+      };
+    }
+    return {
+      label:    question.prompt,
+      given:    typeof given === 'string' ? given : null,
+      expected: question.answer ?? '',
+      correct,
+      timeout,
+    };
+  },
+
+  showQuestionTag: true,
+};

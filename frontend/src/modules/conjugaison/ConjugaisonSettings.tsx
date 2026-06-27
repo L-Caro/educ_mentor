@@ -68,7 +68,7 @@ export default function ConjugaisonSettings() {
             <div key={groupe} className="AdminCard GameSettings__card">
               <p className="GameSettings__cardTitle">{GROUP_LABELS[groupe]}</p>
 
-              <div className="ConjugaisonGroupActions">
+              <div className="GroupActions">
                 <button type="button" onClick={() => selectGroup(groupe)}>Tous</button>
                 <button type="button" onClick={() => deselectGroup(groupe)}>Aucun</button>
               </div>

@@ -51,4 +51,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 6,
   },
+  {
+    id: 'geo',
+    name: 'Géographie',
+    description: 'Capitales, drapeaux, continents, océans — explorer le monde',
+    icon: '🌍',
+    is_active: false,
+    display_order: 7,
+  },
 ];

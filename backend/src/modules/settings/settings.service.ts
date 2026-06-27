@@ -12,6 +12,9 @@ const DEFAULTS = {
   mastery_threshold: '10',
   // ── Français (conjugaison, orthographe…) ──────────────────────────────────
   accent_tolerance: 'false',
+  // ── Géographie ────────────────────────────────────────────────────────────
+  geo_countries_filter: '',
+  geo_question_types_filter: '',
   // ── Tables de multiplication ───────────────────────────────────────────────
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────

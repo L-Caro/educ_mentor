@@ -29,6 +29,7 @@ export default function GameEngine<TSession, TQuestion>({
   const setup = useAppSelector(selectModuleSetup(moduleId)) ?? {};
 
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [freeInput, setFreeInput] = useState('');
   const [streak, setStreak] = useState(0);
   const streakRef = useRef(0);
@@ -53,7 +54,7 @@ export default function GameEngine<TSession, TQuestion>({
     onComplete: (sessionId, correct, total) => spec.completeSession(sessionId, correct, total),
     buildTimeoutResult: (question) => spec.buildResultEntry(question, null, false, true),
     recordTimeout: (sessionId, question) => spec.recordAnswer(sessionId, question, false, null),
-    onQuestionChange: () => { setSelectedKey(null); setFreeInput(''); },
+    onQuestionChange: () => { setSelectedKey(null); setSelectedKeys(new Set()); setFreeInput(''); },
     skipApiCalls: isDevMode,
     emptySessionError: spec.emptyError,
   });
@@ -63,17 +64,35 @@ export default function GameEngine<TSession, TQuestion>({
     return !spec.qcm || spec.qcm.getChoices(question).length === 0;
   }
 
+  function handleToggleKey(key: string) {
+    setSelectedKeys(prev => {
+      const next = new Set(prev);
+      next.has(key) ? next.delete(key) : next.add(key);
+      return next;
+    });
+  }
+
   function handleValidate() {
     if (!session || answerState !== 'idle') return;
     const question = getQuestions(session)[currentIdx];
+    // Multi si correctKeys est défini ET retourne des réponses pour cette question (per-question)
+    const isMulti = !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
 
     let correct: boolean;
     let given: unknown;
 
     if (!isFree(question)) {
-      if (selectedKey === null) return;
-      given = selectedKey;
-      correct = selectedKey === spec.qcm!.correctKey(question);
+      if (isMulti) {
+        if (selectedKeys.size === 0) return;
+        const expected = new Set(spec.qcm!.correctKeys!(question));
+        correct = expected.size === selectedKeys.size &&
+                  [...selectedKeys].every(k => expected.has(k));
+        given = [...selectedKeys];
+      } else {
+        if (selectedKey === null) return;
+        given = selectedKey;
+        correct = selectedKey === spec.qcm!.correctKey!(question);
+      }
     } else {
       if (!spec.free || freeInput.trim() === '') return;
       given = spec.free.parse(freeInput);
@@ -99,6 +118,8 @@ export default function GameEngine<TSession, TQuestion>({
   const questions = getQuestions(session);
   const question = questions[currentIdx];
   const qcm = !isFree(question);
+  // Per-question : multi si correctKeys est défini ET retourne des réponses pour cette question
+  const isMulti = !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
   const unlimited = (session as { is_unlimited?: boolean }).is_unlimited ?? false;
   const timerSeconds = getTimerSeconds(session);
   const total = questions.length;
@@ -107,7 +128,11 @@ export default function GameEngine<TSession, TQuestion>({
   const filledStars = Math.min(5, answeredCount === 0 ? 0 : Math.floor((correctCount / answeredCount) * 5));
   const showUrgent = isUrgent && answerState === 'idle';
   const validateDisabled =
-    answerState !== 'idle' || (qcm ? selectedKey === null : freeInput.trim() === '');
+    answerState !== 'idle' || (
+      qcm
+        ? (isMulti ? selectedKeys.size === 0 : selectedKey === null)
+        : freeInput.trim() === ''
+    );
 
   return (
     <PageContainer className="GameEngine">
@@ -134,14 +159,25 @@ export default function GameEngine<TSession, TQuestion>({
         {spec.renderPrompt(question, answerState)}
 
         {qcm ? (
-          <GameChoices
-            options={spec.qcm!.getChoices(question)}
-            selectedKey={selectedKey}
-            correctKey={spec.qcm!.correctKey(question)}
-            answerState={answerState}
-            onSelect={setSelectedKey}
-            layout={spec.qcm!.layout}
-          />
+          isMulti ? (
+            <GameChoices
+              options={spec.qcm!.getChoices(question)}
+              selectedKeys={selectedKeys}
+              correctKeys={spec.qcm!.correctKeys!(question)}
+              onToggle={handleToggleKey}
+              answerState={answerState}
+              layout={spec.qcm!.layout}
+            />
+          ) : (
+            <GameChoices
+              options={spec.qcm!.getChoices(question)}
+              selectedKey={selectedKey}
+              correctKey={spec.qcm!.correctKey!(question)}
+              onSelect={setSelectedKey}
+              answerState={answerState}
+              layout={spec.qcm!.layout}
+            />
+          )
         ) : (
           <GameInput
             {...(spec.free?.inputProps ?? {})}

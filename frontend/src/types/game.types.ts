@@ -32,8 +32,9 @@ export interface GameModuleSpec<TSession, TQuestion> {
   renderPrompt: (question: TQuestion, answerState: GameAnswerState) => ReactNode;
   qcm?: {
     getChoices: (question: TQuestion) => GameChoice[];
-    correctKey: (question: TQuestion) => string;
-    layout?: 'list' | 'grid'
+    correctKey?:  (question: TQuestion) => string;        // single-select (existant)
+    correctKeys?: (question: TQuestion) => string[];      // multi-select (nouveau)
+    layout?: 'list' | 'grid';
   };
   free?: {
     parse: (raw: string) => unknown;

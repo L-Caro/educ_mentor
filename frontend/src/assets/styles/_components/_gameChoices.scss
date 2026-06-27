@@ -33,10 +33,25 @@
       box-shadow: var(--shadow-md);
     }
 
+    // Mode multi-select : sélectionné avant validation
+    &--checked {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 18%, var(--color-base-100));
+      box-shadow: var(--shadow-md);
+    }
+
     &--correct {
       border-color: var(--color-success);
       background: color-mix(in srgb, var(--color-success) 20%, var(--color-base-100));
       color: var(--color-success);
+      cursor: default;
+    }
+
+    // Mode multi-select : bonne réponse non sélectionnée ("oublié")
+    &--missed {
+      border-color: var(--color-warning);
+      background: color-mix(in srgb, var(--color-warning) 18%, var(--color-base-100));
+      color: var(--color-warning);
       cursor: default;
     }
 

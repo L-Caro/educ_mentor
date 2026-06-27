@@ -67,8 +67,6 @@
 	}
 
 	&--ghost {
-		background: transparent;
-
 		&:hover:not(:disabled) {
 			opacity: 0.7;
 			transform: none;
@@ -79,5 +77,25 @@
 			transform: none;
 			box-shadow: none;
 		}
+	}
+}
+
+.GroupActions {
+	display: flex;
+	gap: v.$space-2;
+	margin-top: v.$space-3;
+
+	button {
+		font-size: v.$font-size-xs;
+		padding: v.$space-1 v.$space-3;
+		border: 1px solid var(--color-base-300);
+		border-radius: v.$radius-pill;
+		background: transparent;
+		color: var(--color-base-content);
+		opacity: 0.6;
+		cursor: pointer;
+		font-family: inherit;
+
+		&:hover { opacity: 1; border-color: var(--color-primary); }
 	}
 }

@@ -22,7 +22,12 @@
 		gap: v.$space-5;
 	}
 
-	&__card { padding: v.$space-6; }
+	&__card {
+    padding: v.$space-6;
+
+      // Carte pleine largeur (ex : section types Géo)
+      &--full { grid-column: 1 / -1; }
+    }
 
 	&__cardTitle {
 		@include m.overline-label;

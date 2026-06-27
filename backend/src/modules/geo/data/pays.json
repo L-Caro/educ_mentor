@@ -1,0 +1,224 @@
+{
+  "pays": [
+    {
+      "code": "FR",
+      "nom": "France",
+      "drapeau": "🇫🇷",
+      "capitale": "Paris",
+      "continent": "Europe",
+      "oceans": ["Atlantique"],
+      "mers": ["Méditerranée"],
+      "voisins": ["ES", "IT", "DE", "BE", "CH"],
+      "langues": ["Français"]
+    },
+    {
+      "code": "ES",
+      "nom": "Espagne",
+      "drapeau": "🇪🇸",
+      "capitale": "Madrid",
+      "continent": "Europe",
+      "oceans": ["Atlantique"],
+      "mers": ["Méditerranée"],
+      "voisins": ["FR", "PT"],
+      "langues": ["Espagnol"]
+    },
+    {
+      "code": "IT",
+      "nom": "Italie",
+      "drapeau": "🇮🇹",
+      "capitale": "Rome",
+      "continent": "Europe",
+      "oceans": [],
+      "mers": ["Méditerranée"],
+      "voisins": ["FR", "CH"],
+      "langues": ["Italien"]
+    },
+    {
+      "code": "DE",
+      "nom": "Allemagne",
+      "drapeau": "🇩🇪",
+      "capitale": "Berlin",
+      "continent": "Europe",
+      "oceans": [],
+      "mers": ["Mer du Nord"],
+      "voisins": ["FR", "BE", "CH"],
+      "langues": ["Allemand"]
+    },
+    {
+      "code": "GB",
+      "nom": "Royaume-Uni",
+      "drapeau": "🇬🇧",
+      "capitale": "Londres",
+      "continent": "Europe",
+      "oceans": ["Atlantique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Anglais"]
+    },
+    {
+      "code": "PT",
+      "nom": "Portugal",
+      "drapeau": "🇵🇹",
+      "capitale": "Lisbonne",
+      "continent": "Europe",
+      "oceans": ["Atlantique"],
+      "mers": [],
+      "voisins": ["ES"],
+      "langues": ["Portugais"]
+    },
+    {
+      "code": "BE",
+      "nom": "Belgique",
+      "drapeau": "🇧🇪",
+      "capitale": "Bruxelles",
+      "continent": "Europe",
+      "oceans": [],
+      "mers": ["Mer du Nord"],
+      "voisins": ["FR", "DE"],
+      "langues": ["Français", "Néerlandais"]
+    },
+    {
+      "code": "CH",
+      "nom": "Suisse",
+      "drapeau": "🇨🇭",
+      "capitale": "Berne",
+      "continent": "Europe",
+      "oceans": [],
+      "mers": [],
+      "voisins": ["FR", "DE", "IT"],
+      "langues": ["Français", "Allemand", "Italien"]
+    },
+    {
+      "code": "RU",
+      "nom": "Russie",
+      "drapeau": "🇷🇺",
+      "capitale": "Moscou",
+      "continent": "Europe",
+      "oceans": ["Arctique", "Pacifique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Russe"]
+    },
+    {
+      "code": "US",
+      "nom": "États-Unis",
+      "drapeau": "🇺🇸",
+      "capitale": "Washington D.C.",
+      "continent": "Amérique du Nord",
+      "oceans": ["Atlantique", "Pacifique"],
+      "mers": [],
+      "voisins": ["CA", "MX"],
+      "langues": ["Anglais"]
+    },
+    {
+      "code": "CA",
+      "nom": "Canada",
+      "drapeau": "🇨🇦",
+      "capitale": "Ottawa",
+      "continent": "Amérique du Nord",
+      "oceans": ["Atlantique", "Pacifique", "Arctique"],
+      "mers": [],
+      "voisins": ["US"],
+      "langues": ["Français", "Anglais"]
+    },
+    {
+      "code": "MX",
+      "nom": "Mexique",
+      "drapeau": "🇲🇽",
+      "capitale": "Mexico",
+      "continent": "Amérique du Nord",
+      "oceans": ["Atlantique", "Pacifique"],
+      "mers": [],
+      "voisins": ["US"],
+      "langues": ["Espagnol"]
+    },
+    {
+      "code": "BR",
+      "nom": "Brésil",
+      "drapeau": "🇧🇷",
+      "capitale": "Brasília",
+      "continent": "Amérique du Sud",
+      "oceans": ["Atlantique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Portugais"]
+    },
+    {
+      "code": "MA",
+      "nom": "Maroc",
+      "drapeau": "🇲🇦",
+      "capitale": "Rabat",
+      "continent": "Afrique",
+      "oceans": ["Atlantique"],
+      "mers": ["Méditerranée"],
+      "voisins": [],
+      "langues": ["Arabe", "Français"]
+    },
+    {
+      "code": "SN",
+      "nom": "Sénégal",
+      "drapeau": "🇸🇳",
+      "capitale": "Dakar",
+      "continent": "Afrique",
+      "oceans": ["Atlantique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Français"]
+    },
+    {
+      "code": "EG",
+      "nom": "Égypte",
+      "drapeau": "🇪🇬",
+      "capitale": "Le Caire",
+      "continent": "Afrique",
+      "oceans": [],
+      "mers": ["Méditerranée", "Mer Rouge"],
+      "voisins": [],
+      "langues": ["Arabe"]
+    },
+    {
+      "code": "CN",
+      "nom": "Chine",
+      "drapeau": "🇨🇳",
+      "capitale": "Pékin",
+      "continent": "Asie",
+      "oceans": ["Pacifique"],
+      "mers": [],
+      "voisins": ["RU"],
+      "langues": ["Mandarin"]
+    },
+    {
+      "code": "JP",
+      "nom": "Japon",
+      "drapeau": "🇯🇵",
+      "capitale": "Tokyo",
+      "continent": "Asie",
+      "oceans": ["Pacifique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Japonais"]
+    },
+    {
+      "code": "IN",
+      "nom": "Inde",
+      "drapeau": "🇮🇳",
+      "capitale": "New Delhi",
+      "continent": "Asie",
+      "oceans": ["Indien"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Hindi", "Anglais"]
+    },
+    {
+      "code": "AU",
+      "nom": "Australie",
+      "drapeau": "🇦🇺",
+      "capitale": "Canberra",
+      "continent": "Océanie",
+      "oceans": ["Indien", "Pacifique"],
+      "mers": [],
+      "voisins": [],
+      "langues": ["Anglais"]
+    }
+  ]
+}
