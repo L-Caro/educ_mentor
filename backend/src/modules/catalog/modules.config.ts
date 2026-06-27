@@ -43,4 +43,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 5,
   },
+  {
+    id: 'conjugaison',
+    name: 'Conjugaison',
+    description: 'Conjuguer les verbes aux temps du présent, de l\'imparfait et du futur simple',
+    icon: '✍️',
+    is_active: false,
+    display_order: 6,
+  },
 ];

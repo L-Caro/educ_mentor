@@ -10,6 +10,8 @@ const DEFAULTS = {
   questions_per_session: '10',
   question_timer_seconds: '0',
   mastery_threshold: '10',
+  // ── Français (conjugaison, orthographe…) ──────────────────────────────────
+  accent_tolerance: 'false',
   // ── Tables de multiplication ───────────────────────────────────────────────
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────

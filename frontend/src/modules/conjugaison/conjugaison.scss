@@ -1,0 +1,105 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+.ConjugaisonPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: v.$space-4;
+  padding: v.$space-8 v.$space-4;
+  text-align: center;
+
+  &__verb,
+  &__conjugated {
+    font-size: v.$font-size-3xl;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 0;
+    line-height: 1.1;
+  }
+
+  &__pronoun {
+    font-size: v.$font-size-xl;
+    font-weight: 600;
+    color: var(--color-base-content);
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  &__tense {
+    font-size: v.$font-size-sm;
+    font-weight: 600;
+    color: var(--color-base-content);
+    opacity: 0.45;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
+  }
+
+  @media (min-width: 600px) {
+    &__verb,
+    &__conjugated {
+      font-size: 4rem;
+    }
+
+    &__pronoun {
+      font-size: v.$font-size-2xl;
+    }
+  }
+}
+
+// ─── Admin verbes ─────────────────────────────────────────────────────────────
+
+.ConjugaisonVerbGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: v.$space-2;
+  margin-top: v.$space-4;
+}
+
+.ConjugaisonVerbChip {
+  padding: v.$space-2 v.$space-4;
+  border: 1.5px solid var(--color-base-300);
+  border-radius: v.$radius-pill;
+  background: var(--color-base-200);
+  color: var(--color-base-content);
+  font-family: inherit;
+  font-size: v.$font-size-sm;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s, color 0.12s;
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+
+  &--active {
+    border-color: var(--color-primary);
+    background: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100));
+    color: var(--color-primary);
+  }
+
+  &--inactive {
+    opacity: 0.4;
+  }
+}
+
+.ConjugaisonGroupActions {
+  display: flex;
+  gap: v.$space-2;
+  margin-top: v.$space-3;
+
+  button {
+    font-size: v.$font-size-xs;
+    padding: v.$space-1 v.$space-3;
+    border: 1px solid var(--color-base-300);
+    border-radius: v.$radius-pill;
+    background: transparent;
+    color: var(--color-base-content);
+    opacity: 0.6;
+    cursor: pointer;
+    font-family: inherit;
+
+    &:hover { opacity: 1; border-color: var(--color-primary); }
+  }
+}

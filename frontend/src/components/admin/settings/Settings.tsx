@@ -35,6 +35,7 @@ export default function Settings() {
   const timerEnabled = savedTimer > 0;
   const timerSeconds = timerEnabled ? savedTimer : 30;
   const masteryThreshold = parseInt(settings?.mastery_threshold ?? '10', 10);
+  const accentTolerance = settings?.accent_tolerance === 'true';
 
   function handleDurationChange(event: React.ChangeEvent<HTMLInputElement>) {
     const value = DURATION_STEPS[parseInt(event.target.value, 10)];
@@ -149,6 +150,18 @@ export default function Settings() {
               </div>
             </>
           )}
+        </div>
+
+        <div className="Settings__section">
+          <p className="Settings__cardTitle">🇫🇷 Tolérance aux accents</p>
+          <div className="Settings__label">
+            <span>{accentTolerance ? 'Les accents manquants sont acceptés' : 'Les accents sont obligatoires'}</span>
+            <Toggle
+              checked={accentTolerance}
+              onChange={() => updateSetting({ key: 'accent_tolerance', value: accentTolerance ? 'false' : 'true' })}
+            />
+          </div>
+          <p className="Settings__hint">S'applique à tous les modules de français en saisie libre.</p>
         </div>
 
         <div className="Settings__section">
