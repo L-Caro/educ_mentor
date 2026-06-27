@@ -112,8 +112,8 @@
 	}
 }
 
-@media (max-width: 767px) {
-	.AdminLayout {
+@media (max-width: 1023px) {
+	.AdminPage {
 		&__sidebar {
 			position: fixed;
 			top: 6rem;
