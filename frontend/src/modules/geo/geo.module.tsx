@@ -1,7 +1,7 @@
 import store from 'src/store';
 import { geoApi } from './geo.api.ts';
 import { sharedApi } from 'src/store/api/sharedApi.ts';
-import type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts';
+import type { ModuleManifest } from 'src/types/modules.types.ts';
 import type { SetupChoice } from 'src/types/game.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 

@@ -379,8 +379,8 @@ export class GeoService {
       type: 'country_to_language',
       item_key: `${p.code}_lang`,
       prompt: `Quelle langue parle-t-on principalement en ${p.nom} ?`,
-      display: `${p.drapeau} ${p.nom}`,
-      display_type: 'text',
+      display: p.drapeau,
+      display_type: 'flag',
       choices: this.freeQcm(correct, pool, choicesCount),
       answer: correct,
       answers: null,
@@ -391,6 +391,14 @@ export class GeoService {
 
   private distractorCount(difficulty: Difficulty): number {
     if (difficulty === 'easy') return 2;
+    if (difficulty === 'hard') return 6;
+    return 4;
+  }
+
+  // Limite les bonnes réponses affichées dans les QCM multi (continent, langue)
+  // pour éviter de submerger l'enfant quand la langue/continent a trop de pays.
+  private correctCountCap(difficulty: Difficulty): number {
+    if (difficulty === 'easy') return 3;
     if (difficulty === 'hard') return 6;
     return 4;
   }
@@ -416,7 +424,8 @@ export class GeoService {
     if (validContinents.length === 0) return null;
 
     const continent = validContinents[this.rand(0, validContinents.length - 1)];
-    const correct = pays.filter((p) => p.continent === continent).map((p) => p.nom);
+    const allCorrect = pays.filter((p) => p.continent === continent).map((p) => p.nom);
+    const correct = this.shuffle(allCorrect).slice(0, this.correctCountCap(difficulty));
     const distractors = this.shuffle(pays.filter((p) => p.continent !== continent).map((p) => p.nom))
       .slice(0, this.distractorCount(difficulty));
 
@@ -461,7 +470,8 @@ export class GeoService {
     if (validLangs.length === 0) return null;
 
     const lang = validLangs[this.rand(0, validLangs.length - 1)];
-    const correct = pays.filter((p) => p.langues.includes(lang)).map((p) => p.nom);
+    const allCorrect = pays.filter((p) => p.langues.includes(lang)).map((p) => p.nom);
+    const correct = this.shuffle(allCorrect).slice(0, this.correctCountCap(difficulty));
     const distractors = this.shuffle(pays.filter((p) => !p.langues.includes(lang)).map((p) => p.nom))
       .slice(0, this.distractorCount(difficulty));
 
