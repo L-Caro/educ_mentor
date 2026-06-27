@@ -1,7 +1,6 @@
 @use '../_abstracts/variables' as v;
 
 .GameFooter {
-	width: 100%;
 	padding: v.$space-5 v.$space-5 v.$space-7;
 	margin-top: auto;
 	display: flex;
