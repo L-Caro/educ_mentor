@@ -2,6 +2,8 @@
 // === Palette ÉducMentor ===
 // Light mode (défaut) — surchargé par html.dark dans _themes/_dark.scss
 :root {
+  color-scheme: light;
+
   // Couleurs principales
   --color-primary:           #7d8cc4;
   --color-primary-content:   #ffffff;

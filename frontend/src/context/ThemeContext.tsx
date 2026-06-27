@@ -2,15 +2,16 @@ import { createContext, useContext, useState, type ReactNode } from "react";
 
 const THEME_STORAGE_KEY = "theme";
 
-// ─── Typage ───────────────────────────────────────────────────────────────────
+export type Theme = 'light' | 'dark' | 'system';
+
+// ─── Context ──────────────────────────────────────────────────────────────────
 interface ThemeContextInterface {
-  theme: string;
+  theme: Theme;
   toggleTheme: () => void;
 }
 
-// ─── Context ──────────────────────────────────────────────────────────────────
 export const ThemeContext = createContext<ThemeContextInterface>({
-  theme: "dark",
+  theme: "system",
   toggleTheme: () => {},
 });
 
@@ -20,15 +21,13 @@ export const useTheme = () => useContext(ThemeContext);
 // ─── Provider ─────────────────────────────────────────────────────────────────
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
-  const [theme, setTheme] = useState<string>(
-    () => localStorage.getItem(THEME_STORAGE_KEY) ?? "dark"
+  const [theme, setTheme] = useState<Theme>(
+    () => (localStorage.getItem(THEME_STORAGE_KEY) as Theme | null) ?? "system"
   );
 
   const toggleTheme = () => {
-    const nextTheme = theme === "light" ? "dark" : "light";
-
+    const nextTheme: Theme = theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light';
     localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-
     setTheme(nextTheme);
   };
 

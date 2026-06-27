@@ -62,7 +62,12 @@ function Header() {
           onClick={toggleTheme}
           aria-label="Changer le thème"
         >
-          <img src={theme === 'dark' ? dark as string : light as string} alt={theme} />
+          <img
+            src={(theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches))
+              ? dark as string
+              : light as string}
+            alt={theme}
+          />
         </button>
       </div>
     </header>

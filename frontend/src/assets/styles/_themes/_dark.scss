@@ -1,5 +1,6 @@
 // Dark mode — surcharge les variables CSS définies dans :root
 html.dark {
+  color-scheme: dark;
   --color-primary:           #9aabda;
   --color-primary-content:   #ffffff;
   --color-secondary:         #ffb5c2;
