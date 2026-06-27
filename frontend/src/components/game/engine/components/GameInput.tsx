@@ -115,6 +115,10 @@ export default function GameInput({
     onChange(numeric ? raw.replace(/\D/g, '') : raw);
   }
 
+  const textSize = variant === 'text'
+    ? Math.max(6, Math.max(value.length, placeholder?.length ?? 0) + 2)
+    : undefined;
+
   const field = (
     <input
       ref={inputRef}
@@ -128,6 +132,7 @@ export default function GameInput({
       disabled={isLocked}
       placeholder={placeholder}
       maxLength={maxLength}
+      size={textSize}
       autoComplete="off"
       autoCorrect="off"
       spellCheck={false}
@@ -135,7 +140,7 @@ export default function GameInput({
   );
 
   return (
-    <div className="GameInput">
+    <div className={`GameInput${variant === 'text' ? ' GameInput--text-mode' : ''}`}>
       {suffix ? (
         <div className="GameInput__wrap">
           {field}

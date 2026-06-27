@@ -36,10 +36,22 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
 
   qcm: {
     getChoices: (q) => q.choices.map((c) => ({ key: c, label: c })),
-    // Mode single si answer est renseigné, multi si answers est renseigné
     correctKey:  (q) => q.answer  ?? '',
     correctKeys: (q) => q.answers ?? [],
     layout: 'list',
+  },
+
+  free: {
+    parse: (raw) => raw.trim(),
+    isCorrect: (q, given) => {
+      if (typeof given !== 'string' || !given) return false;
+      const normalize = (s: string) =>
+        s.trim().toLowerCase()
+         .normalize('NFD').replace(/[̀-ͯ]/g, '')
+         .replace(/\./g, ''); // tolérance accents + ponctuation (D.C. → DC)
+      return normalize(given) === normalize(q.answer ?? '');
+    },
+    inputProps: { variant: 'text', placeholder: '…', maxLength: 50 },
   },
 
   correctionLabel: (question) => {
