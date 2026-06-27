@@ -1,0 +1,35 @@
+// Thème système — suit la préférence OS via prefers-color-scheme.
+// Les variables light viennent de :root ; seul le dark est surchargé ici.
+html.system {
+  color-scheme: light dark;
+  background-color: var(--color-base-200);
+}
+
+@media (prefers-color-scheme: dark) {
+  html.system {
+    --color-primary:           #9aabda;
+    --color-primary-content:   #ffffff;
+    --color-secondary:         #ffb5c2;
+    --color-secondary-content: #2a2a2a;
+    --color-accent:            #aab8e8;
+    --color-accent-content:    #1e2235;
+    --color-neutral:           #e2e8f0;
+    --color-neutral-content:   #1e2235;
+
+    --color-base-100:          #1e2235;
+    --color-base-200:          #252a40;
+    --color-base-300:          #2d3352;
+    --color-base-content:      #e2e8f0;
+
+    --color-info:              #9aabda;
+    --color-success:           #7ecab8;
+    --color-warning:           #f4a261;
+    --color-error:             #e76f51;
+
+    --shadow-sm:  0 1px 3px 0 rgba(0, 0, 0, 0.35), 0 1px 5px 0 rgba(0, 0, 0, 0.25);
+    --shadow-md:  0 4px 16px 0 rgba(0, 0, 0, 0.40);
+    --shadow-nav: 0 2px 18px 0 rgba(0, 0, 0, 0.50);
+
+    background-color: var(--color-base-200);
+  }
+}
