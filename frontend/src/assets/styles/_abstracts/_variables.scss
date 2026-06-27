@@ -2,34 +2,34 @@
 // === Palette ÉducMentor ===
 // Light mode (défaut) — surchargé par html.dark dans _themes/_dark.scss
 :root {
-  color-scheme: light;
+	color-scheme: light;
 
-  // Couleurs principales
-  --color-primary:           #7d8cc4;
-  --color-primary-content:   #ffffff;
-  --color-secondary:         #ffb5c2;
-  --color-secondary-content: #4a4a4a;
-  --color-accent:            #bcc8f2;
-  --color-accent-content:    #4a4a4a;
-  --color-neutral:           #4a4a4a;
-  --color-neutral-content:   #ffffff;
+	// Couleurs principales — thème clair chaud (crème & pêche)
+	--color-primary:           #E07B54;
+	--color-primary-content:   #ffffff;
+	--color-secondary:         #F9B8C0;
+	--color-secondary-content: #3D2B1F;
+	--color-accent:            #F4A261;
+	--color-accent-content:    #3D2B1F;
+	--color-neutral:           #5C3D2A;
+	--color-neutral-content:   #ffffff;
 
-  // Surfaces
-  --color-base-100:          #ffffff;
-  --color-base-200:          #f5f7fa;
-  --color-base-300:          #e8ecf5;
-  --color-base-content:      #4a4a4a;
+	// Surfaces
+	--color-base-100:          #FFF8F0;
+	--color-base-200:          #FDF6EC;
+	--color-base-300:          #F5E6D3;
+	--color-base-content:      #3D2B1F;
 
-  // Feedback
-  --color-info:              #7d8cc4;
-  --color-success:           #68b09f;
-  --color-warning:           #f4a261;
-  --color-error:             #e76f51;
+	// Feedback
+	--color-info:              #5B8DB8;
+	--color-success:           #5EA382;
+	--color-warning:           #F4A261;
+	--color-error:             #D65C3D;
 
-  // Ombres — redéfinies par html.dark pour visibilité sur fond sombre
-  --shadow-sm:  0 1px 2px 0 rgba(0, 0, 0, 0.08), 0 1px 4px 0 rgba(0, 0, 0, 0.06);
-  --shadow-md:  0 4px 16px 0 rgba(0, 0, 0, 0.10);
-  --shadow-nav: 0 2px 18px 0 rgba(0, 0, 0, 0.12);
+	// Ombres — teinte chaude, plus visibles qu'un noir neutre
+	--shadow-sm:  0 1px 3px 0 rgba(100, 50, 20, 0.12), 0 2px 6px 0 rgba(100, 50, 20, 0.08);
+	--shadow-md:  0 4px 16px 0 rgba(100, 50, 20, 0.16);
+	--shadow-nav: 0 2px 18px 0 rgba(100, 50, 20, 0.20);
 }
 
 // Fonts
