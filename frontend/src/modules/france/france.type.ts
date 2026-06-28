@@ -15,7 +15,8 @@ export type FranceQuestionType =
   | 'summit_altitude'
   | 'dept_gentile'
   | 'identify_dept'
-  | 'identify_region';
+  | 'identify_region'
+  | 'locate_city';
 
 export interface FranceQuestion {
   type: FranceQuestionType;
@@ -26,6 +27,8 @@ export interface FranceQuestion {
   answer: string | null;
   answers: string[] | null;
   is_map?: boolean;
+  dept_code?: string;
+  threshold_km?: number;
 }
 
 export interface FranceSessionResponse {

@@ -31,6 +31,7 @@ export default function GameEngine<TSession, TQuestion>({
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [freeInput, setFreeInput] = useState('');
+  const [pointClick, setPointClick] = useState<{ svgX: number; svgY: number; distanceKm: number } | null>(null);
   const [streak, setStreak] = useState(0);
   const streakRef = useRef(0);
 
@@ -54,7 +55,7 @@ export default function GameEngine<TSession, TQuestion>({
     onComplete: (sessionId, correct, total) => spec.completeSession(sessionId, correct, total),
     buildTimeoutResult: (question) => spec.buildResultEntry(question, null, false, true),
     recordTimeout: (sessionId, question) => spec.recordAnswer(sessionId, question, false, null),
-    onQuestionChange: () => { setSelectedKey(null); setSelectedKeys(new Set()); setFreeInput(''); },
+    onQuestionChange: () => { setSelectedKey(null); setSelectedKeys(new Set()); setFreeInput(''); setPointClick(null); },
     skipApiCalls: isDevMode,
     emptySessionError: spec.emptyError,
   });
@@ -83,7 +84,13 @@ export default function GameEngine<TSession, TQuestion>({
     let correct: boolean;
     let given: unknown;
 
-    if (isMapMulti) {
+    const isPointMap = !!spec.pointMap && spec.pointMap.isPointMapQuestion(question);
+
+    if (isPointMap) {
+      if (!pointClick) return;
+      correct = spec.pointMap!.isCorrect(question, pointClick.distanceKm);
+      given = pointClick.distanceKm;
+    } else if (isMapMulti) {
       if (selectedKeys.size === 0) return;
       const expected = new Set(spec.map!.correctKeys(question));
       given = [...selectedKeys];
@@ -129,11 +136,12 @@ export default function GameEngine<TSession, TQuestion>({
 
   const questions = getQuestions(session);
   const question = questions[currentIdx];
-  const isMap = !!spec.map && spec.map.isMapQuestion(question);
+  const isPointMap = !!spec.pointMap && spec.pointMap.isPointMapQuestion(question);
+  const isMap = !isPointMap && !!spec.map && spec.map.isMapQuestion(question);
   const isMapMulti = isMap && spec.map!.isMultiSelect(question);
-  const qcm = !isMap && !isFree(question);
+  const qcm = !isPointMap && !isMap && !isFree(question);
   // Per-question : multi QCM si correctKeys est défini ET retourne des réponses pour cette question
-  const isMulti = !isMap && !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
+  const isMulti = !isMap && !isPointMap && !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
   const unlimited = (session as { is_unlimited?: boolean }).is_unlimited ?? false;
   const timerSeconds = getTimerSeconds(session);
   const total = questions.length;
@@ -143,9 +151,11 @@ export default function GameEngine<TSession, TQuestion>({
   const showUrgent = isUrgent && answerState === 'idle';
   const mapCorrectKeys = isMap ? spec.map!.correctKeys(question) : [];
   const MapComponent = isMap ? spec.map!.getComponent(question) : null;
+  const PointMapComponent = isPointMap ? spec.pointMap!.getComponent(question) : null;
   const validateDisabled =
     answerState !== 'idle' || (
-      isMapMulti ? selectedKeys.size === 0
+      isPointMap ? pointClick === null
+      : isMapMulti ? selectedKeys.size === 0
       : isMap    ? selectedKey === null
       : qcm      ? (isMulti ? selectedKeys.size === 0 : selectedKey === null)
       : freeInput.trim() === ''
@@ -175,7 +185,15 @@ export default function GameEngine<TSession, TQuestion>({
 
         {spec.renderPrompt(question, answerState)}
 
-        {isMap && MapComponent ? (
+        {isPointMap && PointMapComponent ? (
+          <PointMapComponent
+            targetSvgPoint={spec.pointMap!.targetSvgPoint(question)}
+            onPointClick={(result) => { if (answerState === 'idle') setPointClick(result); }}
+            clickedSvgPoint={pointClick ? { x: pointClick.svgX, y: pointClick.svgY } : null}
+            distanceKm={answerState !== 'idle' ? pointClick?.distanceKm ?? null : null}
+            answerState={answerState}
+          />
+        ) : isMap && MapComponent ? (
           <MapComponent
             onSelect={isMapMulti ? undefined : (key) => { if (answerState === 'idle') setSelectedKey(key); }}
             onToggle={isMapMulti ? (key) => { if (answerState === 'idle') handleToggleKey(key); } : undefined}
@@ -215,7 +233,13 @@ export default function GameEngine<TSession, TQuestion>({
           />
         )}
 
-        <GameCorrection answerState={answerState} answer={spec.correctionLabel(question)} />
+        <GameCorrection
+          answerState={answerState}
+          answer={spec.correctionLabel(question)}
+          message={isPointMap && pointClick
+            ? <>Vous étiez à <strong>{Math.round(pointClick.distanceKm)} km</strong> de {spec.correctionLabel(question)}</>
+            : undefined}
+        />
       </GameCard>
 
       <GameFooter

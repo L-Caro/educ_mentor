@@ -75,6 +75,49 @@
   }
 }
 
+// Carte ville — fond neutre, pas de clic dept
+.FranceCityMap {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto v.$space-4;
+  touch-action: manipulation;
+
+  &__dept {
+    fill: var(--color-base-content);
+    stroke: var(--color-base-100);
+    stroke-width: 0.8;
+    opacity: 0.20;
+    pointer-events: none;
+  }
+
+  &__pin {
+    pointer-events: none;
+
+    &--click {
+      fill: var(--color-primary);
+      stroke: var(--color-primary);
+      stroke-width: 2;
+    }
+
+    &--correct { fill: var(--color-success, #22c55e); }
+    &--wrong   { fill: var(--color-error, #ef4444); }
+
+    &--target {
+      fill: var(--color-success, #22c55e);
+      stroke: var(--color-success, #22c55e);;
+      stroke-width: 2;
+    }
+  }
+
+  &__line {
+    stroke: var(--color-warning, #f59e0b);
+    stroke-width: 3;
+    stroke-dasharray: 4 3;
+    pointer-events: none;
+  }
+}
+
 .FrancePrompt {
   display: flex;
   flex-direction: column;

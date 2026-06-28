@@ -19,6 +19,7 @@ export const ALL_FRANCE_QUESTION_TYPES = [
   'dept_gentile',
   'identify_dept',
   'identify_region',
+  'locate_city',
 ] as const;
 
 export type FranceQuestionType = typeof ALL_FRANCE_QUESTION_TYPES[number];

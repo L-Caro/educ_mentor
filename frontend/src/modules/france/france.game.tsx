@@ -5,13 +5,18 @@ import type { FranceQuestion, FranceSessionResponse } from './france.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 import FranceDeptMap from './FranceDeptMap.tsx';
 import FranceRegionMap from './FranceRegionMap.tsx';
+import FranceCityMap from './FranceCityMap.tsx';
 import regionData from './data/france_regions.json';
+import citiesData from './data/france_cities.json';
 import './france.scss';
 
 const NUMBER_TYPES = new Set(['dept_to_number', 'number_to_dept']);
 const deptNameMap = new Map(france.locations.map((l) => [l.id, l.name]));
 const regionNameMap = new Map(
   Object.entries(regionData.regions as Record<string, { name: string }>).map(([code, r]) => [code, r.name])
+);
+const cityIndex = new Map(
+  citiesData.cities.map((c) => [`${c.nom}|${c.dept}`, { x: c.svgX, y: c.svgY }])
 );
 
 export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestion> = {
@@ -53,6 +58,14 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
     isCorrect: (q, clicked) => clicked === q.answer,
   },
 
+  pointMap: {
+    getComponent: () => FranceCityMap,
+    isPointMapQuestion: (q) => q.type === 'locate_city',
+    targetSvgPoint: (q) => cityIndex.get(`${q.display}|${q.dept_code}`) ?? { x: 300, y: 290 },
+    isCorrect: (q, distanceKm) => distanceKm <= (q.threshold_km ?? 20),
+    feedbackLabel: (d) => d < 1 ? 'Parfait !' : `À ${Math.round(d)} km`,
+  },
+
   free: {
     parse: (raw) => raw.trim(),
     isCorrect: (q, given) => {
@@ -68,6 +81,7 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
   },
 
   correctionLabel: (question) => {
+    if (question.type === 'locate_city') return question.display;
     if (question.is_map) {
       if (question.answers !== null) {
         // Hard mode : liste des depts de la région
@@ -94,6 +108,17 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
     })).unwrap(),
 
   buildResultEntry: (question, given, correct, timeout) => {
+    if (question.type === 'locate_city') {
+      const dist = typeof given === 'number' ? given : null;
+      const threshold = question.threshold_km ?? 20;
+      return {
+        label:    question.display,
+        given:    dist !== null ? (dist < 1 ? 'Parfait !' : `${Math.round(dist)} km`) : null,
+        expected: `< ${threshold} km`,
+        correct,
+        timeout,
+      };
+    }
     if (question.is_map) {
       // Hard mode : multi-select depts
       if (Array.isArray(given)) {

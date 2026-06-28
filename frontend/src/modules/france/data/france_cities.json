@@ -1,0 +1,1289 @@
+{
+  "kmsPerSvgUnit": 1.7702,
+  "cities": [
+    {
+      "nom": "Troyes",
+      "dept": "10",
+      "svgX": 385.4,
+      "svgY": 177.4
+    },
+    {
+      "nom": "Narbonne",
+      "dept": "11",
+      "svgX": 338.2,
+      "svgY": 483.7
+    },
+    {
+      "nom": "Carcassonne",
+      "dept": "11",
+      "svgX": 311,
+      "svgY": 482
+    },
+    {
+      "nom": "Rodez",
+      "dept": "12",
+      "svgX": 320.9,
+      "svgY": 413.8
+    },
+    {
+      "nom": "Millau",
+      "dept": "12",
+      "svgX": 341.7,
+      "svgY": 428.8
+    },
+    {
+      "nom": "Marseille",
+      "dept": "13",
+      "svgX": 436.7,
+      "svgY": 476.7
+    },
+    {
+      "nom": "Aix-en-Provence",
+      "dept": "13",
+      "svgX": 439.7,
+      "svgY": 462.8
+    },
+    {
+      "nom": "Arles",
+      "dept": "13",
+      "svgX": 405.9,
+      "svgY": 454
+    },
+    {
+      "nom": "Caen",
+      "dept": "14",
+      "svgX": 201.8,
+      "svgY": 124.8
+    },
+    {
+      "nom": "Lisieux",
+      "dept": "14",
+      "svgX": 226.2,
+      "svgY": 126.9
+    },
+    {
+      "nom": "Bayeux",
+      "dept": "14",
+      "svgX": 187.8,
+      "svgY": 119.2
+    },
+    {
+      "nom": "Aurillac",
+      "dept": "15",
+      "svgX": 315.9,
+      "svgY": 379.3
+    },
+    {
+      "nom": "Angoulême",
+      "dept": "16",
+      "svgX": 221.4,
+      "svgY": 336.3
+    },
+    {
+      "nom": "Cognac",
+      "dept": "16",
+      "svgX": 201.5,
+      "svgY": 333.7
+    },
+    {
+      "nom": "La Rochelle",
+      "dept": "17",
+      "svgX": 167.4,
+      "svgY": 305.8
+    },
+    {
+      "nom": "Saintes",
+      "dept": "17",
+      "svgX": 179.7,
+      "svgY": 339.1
+    },
+    {
+      "nom": "Rochefort",
+      "dept": "17",
+      "svgX": 175.2,
+      "svgY": 319.2
+    },
+    {
+      "nom": "Royan",
+      "dept": "17",
+      "svgX": 172.2,
+      "svgY": 337.9
+    },
+    {
+      "nom": "Bourges",
+      "dept": "18",
+      "svgX": 315.2,
+      "svgY": 250.3
+    },
+    {
+      "nom": "Brive-la-Gaillarde",
+      "dept": "19",
+      "svgX": 278.3,
+      "svgY": 365.6
+    },
+    {
+      "nom": "Tulle",
+      "dept": "19",
+      "svgX": 288.2,
+      "svgY": 359
+    },
+    {
+      "nom": "Dijon",
+      "dept": "21",
+      "svgX": 425,
+      "svgY": 235.7
+    },
+    {
+      "nom": "Beaune",
+      "dept": "21",
+      "svgX": 416.4,
+      "svgY": 253.6
+    },
+    {
+      "nom": "Saint-Brieuc",
+      "dept": "22",
+      "svgX": 102,
+      "svgY": 165
+    },
+    {
+      "nom": "Lannion",
+      "dept": "22",
+      "svgX": 73.2,
+      "svgY": 152
+    },
+    {
+      "nom": "Dinan",
+      "dept": "22",
+      "svgX": 131.5,
+      "svgY": 168.5
+    },
+    {
+      "nom": "Guéret",
+      "dept": "23",
+      "svgX": 292.8,
+      "svgY": 305
+    },
+    {
+      "nom": "Périgueux",
+      "dept": "24",
+      "svgX": 244.4,
+      "svgY": 364.1
+    },
+    {
+      "nom": "Bergerac",
+      "dept": "24",
+      "svgX": 234.7,
+      "svgY": 383.9
+    },
+    {
+      "nom": "Sarlat-la-Canéda",
+      "dept": "24",
+      "svgX": 264.9,
+      "svgY": 381.8
+    },
+    {
+      "nom": "Besançon",
+      "dept": "25",
+      "svgX": 465.7,
+      "svgY": 240.7
+    },
+    {
+      "nom": "Montbéliard",
+      "dept": "25",
+      "svgX": 497.9,
+      "svgY": 224.3
+    },
+    {
+      "nom": "Pontarlier",
+      "dept": "25",
+      "svgX": 479.2,
+      "svgY": 260.6
+    },
+    {
+      "nom": "Valence",
+      "dept": "26",
+      "svgX": 417.5,
+      "svgY": 378.8
+    },
+    {
+      "nom": "Romans-sur-Isère",
+      "dept": "26",
+      "svgX": 424.2,
+      "svgY": 372
+    },
+    {
+      "nom": "Montélimar",
+      "dept": "26",
+      "svgX": 411.4,
+      "svgY": 401.2
+    },
+    {
+      "nom": "Évreux",
+      "dept": "27",
+      "svgX": 264.5,
+      "svgY": 133.9
+    },
+    {
+      "nom": "Vernon",
+      "dept": "27",
+      "svgX": 278.5,
+      "svgY": 129.9
+    },
+    {
+      "nom": "Chartres",
+      "dept": "28",
+      "svgX": 278.2,
+      "svgY": 168.8
+    },
+    {
+      "nom": "Dreux",
+      "dept": "28",
+      "svgX": 273.4,
+      "svgY": 151.3
+    },
+    {
+      "nom": "Brest",
+      "dept": "29",
+      "svgX": 30.4,
+      "svgY": 172.5
+    },
+    {
+      "nom": "Quimper",
+      "dept": "29",
+      "svgX": 46.1,
+      "svgY": 196.1
+    },
+    {
+      "nom": "Concarneau",
+      "dept": "29",
+      "svgX": 53.5,
+      "svgY": 203.3
+    },
+    {
+      "nom": "Nîmes",
+      "dept": "30",
+      "svgX": 394.8,
+      "svgY": 444.4
+    },
+    {
+      "nom": "Alès",
+      "dept": "30",
+      "svgX": 383.5,
+      "svgY": 427.2
+    },
+    {
+      "nom": "Toulouse",
+      "dept": "31",
+      "svgX": 273.7,
+      "svgY": 458.6
+    },
+    {
+      "nom": "Blagnac",
+      "dept": "31",
+      "svgX": 271.8,
+      "svgY": 456.8
+    },
+    {
+      "nom": "Auch",
+      "dept": "32",
+      "svgX": 238.1,
+      "svgY": 456.2
+    },
+    {
+      "nom": "Bordeaux",
+      "dept": "33",
+      "svgX": 190.4,
+      "svgY": 384.7
+    },
+    {
+      "nom": "Libourne",
+      "dept": "33",
+      "svgX": 204.5,
+      "svgY": 380.4
+    },
+    {
+      "nom": "Montpellier",
+      "dept": "34",
+      "svgX": 374.6,
+      "svgY": 458
+    },
+    {
+      "nom": "Béziers",
+      "dept": "34",
+      "svgX": 346.9,
+      "svgY": 474.1
+    },
+    {
+      "nom": "Sète",
+      "dept": "34",
+      "svgX": 367,
+      "svgY": 470.6
+    },
+    {
+      "nom": "Rennes",
+      "dept": "35",
+      "svgX": 146.6,
+      "svgY": 189
+    },
+    {
+      "nom": "Saint-Malo",
+      "dept": "35",
+      "svgX": 132.5,
+      "svgY": 156.8
+    },
+    {
+      "nom": "Fougères",
+      "dept": "35",
+      "svgX": 166.8,
+      "svgY": 174.7
+    },
+    {
+      "nom": "Châteauroux",
+      "dept": "36",
+      "svgX": 285.1,
+      "svgY": 266
+    },
+    {
+      "nom": "Tours",
+      "dept": "37",
+      "svgX": 244.5,
+      "svgY": 232
+    },
+    {
+      "nom": "Amboise",
+      "dept": "37",
+      "svgX": 256.7,
+      "svgY": 230.7
+    },
+    {
+      "nom": "Grenoble",
+      "dept": "38",
+      "svgX": 452.6,
+      "svgY": 363.5
+    },
+    {
+      "nom": "Vienne",
+      "dept": "38",
+      "svgX": 417.1,
+      "svgY": 343.3
+    },
+    {
+      "nom": "Lons-le-Saunier",
+      "dept": "39",
+      "svgX": 446.1,
+      "svgY": 274.5
+    },
+    {
+      "nom": "Dole",
+      "dept": "39",
+      "svgX": 443.6,
+      "svgY": 249.4
+    },
+    {
+      "nom": "Dax",
+      "dept": "40",
+      "svgX": 170.2,
+      "svgY": 452.6
+    },
+    {
+      "nom": "Mont-de-Marsan",
+      "dept": "40",
+      "svgX": 193.2,
+      "svgY": 441.6
+    },
+    {
+      "nom": "Blois",
+      "dept": "41",
+      "svgX": 271.3,
+      "svgY": 220.1
+    },
+    {
+      "nom": "Vendôme",
+      "dept": "41",
+      "svgX": 260.3,
+      "svgY": 207.8
+    },
+    {
+      "nom": "Saint-Étienne",
+      "dept": "42",
+      "svgX": 396.8,
+      "svgY": 348.5
+    },
+    {
+      "nom": "Roanne",
+      "dept": "42",
+      "svgX": 384.1,
+      "svgY": 312.9
+    },
+    {
+      "nom": "Le Puy-en-Velay",
+      "dept": "43",
+      "svgX": 375.8,
+      "svgY": 372.1
+    },
+    {
+      "nom": "Nantes",
+      "dept": "44",
+      "svgX": 151.3,
+      "svgY": 242.5
+    },
+    {
+      "nom": "Saint-Nazaire",
+      "dept": "44",
+      "svgX": 124,
+      "svgY": 239.2
+    },
+    {
+      "nom": "Orléans",
+      "dept": "45",
+      "svgX": 295.3,
+      "svgY": 201.2
+    },
+    {
+      "nom": "Montargis",
+      "dept": "45",
+      "svgX": 329.5,
+      "svgY": 195.4
+    },
+    {
+      "nom": "Cahors",
+      "dept": "46",
+      "svgX": 273.8,
+      "svgY": 408
+    },
+    {
+      "nom": "Figeac",
+      "dept": "46",
+      "svgX": 298.7,
+      "svgY": 398.4
+    },
+    {
+      "nom": "Agen",
+      "dept": "47",
+      "svgX": 239.7,
+      "svgY": 422.9
+    },
+    {
+      "nom": "Villeneuve-sur-Lot",
+      "dept": "47",
+      "svgX": 243.5,
+      "svgY": 410.7
+    },
+    {
+      "nom": "Mende",
+      "dept": "48",
+      "svgX": 359.4,
+      "svgY": 403.7
+    },
+    {
+      "nom": "Angers",
+      "dept": "49",
+      "svgX": 193.1,
+      "svgY": 227.1
+    },
+    {
+      "nom": "Cholet",
+      "dept": "49",
+      "svgX": 179.2,
+      "svgY": 251.8
+    },
+    {
+      "nom": "Saumur",
+      "dept": "49",
+      "svgX": 212.6,
+      "svgY": 239.9
+    },
+    {
+      "nom": "Cherbourg-en-Cotentin",
+      "dept": "50",
+      "svgX": 149.7,
+      "svgY": 97.3
+    },
+    {
+      "nom": "Saint-Lô",
+      "dept": "50",
+      "svgX": 171.6,
+      "svgY": 128.8
+    },
+    {
+      "nom": "Reims",
+      "dept": "51",
+      "svgX": 384.2,
+      "svgY": 119.9
+    },
+    {
+      "nom": "Châlons-en-Champagne",
+      "dept": "51",
+      "svgX": 397.7,
+      "svgY": 137.9
+    },
+    {
+      "nom": "Épernay",
+      "dept": "51",
+      "svgX": 380.8,
+      "svgY": 132.8
+    },
+    {
+      "nom": "Saint-Dizier",
+      "dept": "52",
+      "svgX": 421.8,
+      "svgY": 157
+    },
+    {
+      "nom": "Chaumont",
+      "dept": "52",
+      "svgX": 429.5,
+      "svgY": 188.4
+    },
+    {
+      "nom": "Langres",
+      "dept": "52",
+      "svgX": 437.4,
+      "svgY": 203.2
+    },
+    {
+      "nom": "Laval",
+      "dept": "53",
+      "svgX": 184.2,
+      "svgY": 191.4
+    },
+    {
+      "nom": "Nancy",
+      "dept": "54",
+      "svgX": 473.1,
+      "svgY": 153.5
+    },
+    {
+      "nom": "Lunéville",
+      "dept": "54",
+      "svgX": 485.8,
+      "svgY": 159.6
+    },
+    {
+      "nom": "Verdun",
+      "dept": "55",
+      "svgX": 440.3,
+      "svgY": 125.7
+    },
+    {
+      "nom": "Bar-le-Duc",
+      "dept": "55",
+      "svgX": 430.8,
+      "svgY": 148.9
+    },
+    {
+      "nom": "Lorient",
+      "dept": "56",
+      "svgX": 76.5,
+      "svgY": 210.9
+    },
+    {
+      "nom": "Vannes",
+      "dept": "56",
+      "svgX": 101.6,
+      "svgY": 216.2
+    },
+    {
+      "nom": "Metz",
+      "dept": "57",
+      "svgX": 473,
+      "svgY": 128
+    },
+    {
+      "nom": "Thionville",
+      "dept": "57",
+      "svgX": 472.8,
+      "svgY": 113.7
+    },
+    {
+      "nom": "Sarreguemines",
+      "dept": "57",
+      "svgX": 510.1,
+      "svgY": 128.5
+    },
+    {
+      "nom": "Nevers",
+      "dept": "58",
+      "svgX": 346.7,
+      "svgY": 255.9
+    },
+    {
+      "nom": "Lille",
+      "dept": "59",
+      "svgX": 344.8,
+      "svgY": 37.4
+    },
+    {
+      "nom": "Roubaix",
+      "dept": "59",
+      "svgX": 349.4,
+      "svgY": 34.1
+    },
+    {
+      "nom": "Tourcoing",
+      "dept": "59",
+      "svgX": 348.8,
+      "svgY": 32.2
+    },
+    {
+      "nom": "Valenciennes",
+      "dept": "59",
+      "svgX": 363.7,
+      "svgY": 54
+    },
+    {
+      "nom": "Dunkerque",
+      "dept": "59",
+      "svgX": 316.5,
+      "svgY": 13.6
+    },
+    {
+      "nom": "Compiègne",
+      "dept": "60",
+      "svgX": 334.2,
+      "svgY": 110.4
+    },
+    {
+      "nom": "Beauvais",
+      "dept": "60",
+      "svgX": 303.4,
+      "svgY": 109.7
+    },
+    {
+      "nom": "Senlis",
+      "dept": "60",
+      "svgX": 324.1,
+      "svgY": 123.1
+    },
+    {
+      "nom": "Alençon",
+      "dept": "61",
+      "svgX": 220.2,
+      "svgY": 169.7
+    },
+    {
+      "nom": "Calais",
+      "dept": "62",
+      "svgX": 294.8,
+      "svgY": 18.6
+    },
+    {
+      "nom": "Boulogne-sur-Mer",
+      "dept": "62",
+      "svgX": 284.6,
+      "svgY": 32.2
+    },
+    {
+      "nom": "Lens",
+      "dept": "62",
+      "svgX": 335,
+      "svgY": 49.8
+    },
+    {
+      "nom": "Arras",
+      "dept": "62",
+      "svgX": 332.7,
+      "svgY": 58.1
+    },
+    {
+      "nom": "Clermont-Ferrand",
+      "dept": "63",
+      "svgX": 342.8,
+      "svgY": 328.4
+    },
+    {
+      "nom": "Riom",
+      "dept": "63",
+      "svgX": 344.2,
+      "svgY": 321.4
+    },
+    {
+      "nom": "Thiers",
+      "dept": "63",
+      "svgX": 362.2,
+      "svgY": 323.6
+    },
+    {
+      "nom": "Pau",
+      "dept": "64",
+      "svgX": 198.3,
+      "svgY": 477.3
+    },
+    {
+      "nom": "Bayonne",
+      "dept": "64",
+      "svgX": 152.6,
+      "svgY": 465.5
+    },
+    {
+      "nom": "Biarritz",
+      "dept": "64",
+      "svgX": 149.3,
+      "svgY": 466.9
+    },
+    {
+      "nom": "Hendaye",
+      "dept": "64",
+      "svgX": 140.6,
+      "svgY": 473.3
+    },
+    {
+      "nom": "Tarbes",
+      "dept": "65",
+      "svgX": 216.8,
+      "svgY": 481
+    },
+    {
+      "nom": "Lourdes",
+      "dept": "65",
+      "svgX": 211.6,
+      "svgY": 489.3
+    },
+    {
+      "nom": "Perpignan",
+      "dept": "66",
+      "svgX": 333.4,
+      "svgY": 512.8
+    },
+    {
+      "nom": "Canet-en-Roussillon",
+      "dept": "66",
+      "svgX": 338.2,
+      "svgY": 512.4
+    },
+    {
+      "nom": "Argelès-sur-Mer",
+      "dept": "66",
+      "svgX": 338.7,
+      "svgY": 521.8
+    },
+    {
+      "nom": "Strasbourg",
+      "dept": "67",
+      "svgX": 538.1,
+      "svgY": 159.9
+    },
+    {
+      "nom": "Haguenau",
+      "dept": "67",
+      "svgX": 541.6,
+      "svgY": 144.6
+    },
+    {
+      "nom": "Sélestat",
+      "dept": "67",
+      "svgX": 525.6,
+      "svgY": 179.4
+    },
+    {
+      "nom": "Mulhouse",
+      "dept": "68",
+      "svgX": 520.5,
+      "svgY": 210.1
+    },
+    {
+      "nom": "Colmar",
+      "dept": "68",
+      "svgX": 521.5,
+      "svgY": 190.2
+    },
+    {
+      "nom": "Lyon",
+      "dept": "69",
+      "svgX": 415.4,
+      "svgY": 329.4
+    },
+    {
+      "nom": "Vesoul",
+      "dept": "70",
+      "svgX": 471.3,
+      "svgY": 217.8
+    },
+    {
+      "nom": "Chalon-sur-Saône",
+      "dept": "71",
+      "svgX": 416.9,
+      "svgY": 268
+    },
+    {
+      "nom": "Mâcon",
+      "dept": "71",
+      "svgX": 415.7,
+      "svgY": 296.7
+    },
+    {
+      "nom": "Le Creusot",
+      "dept": "71",
+      "svgX": 399.3,
+      "svgY": 266.7
+    },
+    {
+      "nom": "Le Mans",
+      "dept": "72",
+      "svgX": 224.4,
+      "svgY": 195.1
+    },
+    {
+      "nom": "Chambéry",
+      "dept": "73",
+      "svgX": 460.5,
+      "svgY": 340.8
+    },
+    {
+      "nom": "Aix-les-Bains",
+      "dept": "73",
+      "svgX": 460.3,
+      "svgY": 333.4
+    },
+    {
+      "nom": "Albertville",
+      "dept": "73",
+      "svgX": 480.1,
+      "svgY": 334.2
+    },
+    {
+      "nom": "Annecy",
+      "dept": "74",
+      "svgX": 469.3,
+      "svgY": 320.8
+    },
+    {
+      "nom": "Thonon-les-Bains",
+      "dept": "74",
+      "svgX": 484,
+      "svgY": 292.4
+    },
+    {
+      "nom": "Annemasse",
+      "dept": "74",
+      "svgX": 473.8,
+      "svgY": 303.2
+    },
+    {
+      "nom": "Cluses",
+      "dept": "74",
+      "svgX": 488.1,
+      "svgY": 311.1
+    },
+    {
+      "nom": "Paris",
+      "dept": "75",
+      "svgX": 312.9,
+      "svgY": 143.9
+    },
+    {
+      "nom": "Le Havre",
+      "dept": "76",
+      "svgX": 221.5,
+      "svgY": 106.1
+    },
+    {
+      "nom": "Rouen",
+      "dept": "76",
+      "svgX": 262.4,
+      "svgY": 109.2
+    },
+    {
+      "nom": "Dieppe",
+      "dept": "76",
+      "svgX": 262.1,
+      "svgY": 80.2
+    },
+    {
+      "nom": "Meaux",
+      "dept": "77",
+      "svgX": 336.1,
+      "svgY": 137.9
+    },
+    {
+      "nom": "Melun",
+      "dept": "77",
+      "svgX": 326.9,
+      "svgY": 163
+    },
+    {
+      "nom": "Versailles",
+      "dept": "78",
+      "svgX": 304.9,
+      "svgY": 147.2
+    },
+    {
+      "nom": "Mantes-la-Jolie",
+      "dept": "78",
+      "svgX": 287.9,
+      "svgY": 136.2
+    },
+    {
+      "nom": "Rambouillet",
+      "dept": "78",
+      "svgX": 292,
+      "svgY": 156.7
+    },
+    {
+      "nom": "Niort",
+      "dept": "79",
+      "svgX": 196,
+      "svgY": 295.9
+    },
+    {
+      "nom": "Amiens",
+      "dept": "80",
+      "svgX": 312.5,
+      "svgY": 81.9
+    },
+    {
+      "nom": "Abbeville",
+      "dept": "80",
+      "svgX": 293.5,
+      "svgY": 69.3
+    },
+    {
+      "nom": "Albi",
+      "dept": "81",
+      "svgX": 303.1,
+      "svgY": 439.2
+    },
+    {
+      "nom": "Castres",
+      "dept": "81",
+      "svgX": 306.8,
+      "svgY": 458.5
+    },
+    {
+      "nom": "Montauban",
+      "dept": "82",
+      "svgX": 270.2,
+      "svgY": 433.9
+    },
+    {
+      "nom": "Moissac",
+      "dept": "82",
+      "svgX": 259.1,
+      "svgY": 428.7
+    },
+    {
+      "nom": "Toulon",
+      "dept": "83",
+      "svgX": 459.5,
+      "svgY": 486.9
+    },
+    {
+      "nom": "Fréjus",
+      "dept": "83",
+      "svgX": 493.1,
+      "svgY": 468.4
+    },
+    {
+      "nom": "Hyères",
+      "dept": "83",
+      "svgX": 467.8,
+      "svgY": 487.2
+    },
+    {
+      "nom": "Avignon",
+      "dept": "84",
+      "svgX": 413.3,
+      "svgY": 437.7
+    },
+    {
+      "nom": "Orange",
+      "dept": "84",
+      "svgX": 413.5,
+      "svgY": 426.4
+    },
+    {
+      "nom": "Carpentras",
+      "dept": "84",
+      "svgX": 423.5,
+      "svgY": 431.3
+    },
+    {
+      "nom": "La Roche-sur-Yon",
+      "dept": "85",
+      "svgX": 156.3,
+      "svgY": 275.3
+    },
+    {
+      "nom": "Les Sables-d'Olonne",
+      "dept": "85",
+      "svgX": 142.1,
+      "svgY": 283.9
+    },
+    {
+      "nom": "Poitiers",
+      "dept": "86",
+      "svgX": 229.6,
+      "svgY": 280.5
+    },
+    {
+      "nom": "Châtellerault",
+      "dept": "86",
+      "svgX": 238.2,
+      "svgY": 266.3
+    },
+    {
+      "nom": "Limoges",
+      "dept": "87",
+      "svgX": 267.5,
+      "svgY": 325
+    },
+    {
+      "nom": "Épinal",
+      "dept": "88",
+      "svgX": 483.9,
+      "svgY": 184.5
+    },
+    {
+      "nom": "Gérardmer",
+      "dept": "88",
+      "svgX": 501.6,
+      "svgY": 190.7
+    },
+    {
+      "nom": "Auxerre",
+      "dept": "89",
+      "svgX": 364.2,
+      "svgY": 207.4
+    },
+    {
+      "nom": "Sens",
+      "dept": "89",
+      "svgX": 352.5,
+      "svgY": 183.4
+    },
+    {
+      "nom": "Belfort",
+      "dept": "90",
+      "svgX": 500.7,
+      "svgY": 216.6
+    },
+    {
+      "nom": "Évry-Courcouronnes",
+      "dept": "91",
+      "svgX": 317.7,
+      "svgY": 157.6
+    },
+    {
+      "nom": "Corbeil-Essonnes",
+      "dept": "91",
+      "svgX": 319.5,
+      "svgY": 158.6
+    },
+    {
+      "nom": "Boulogne-Billancourt",
+      "dept": "92",
+      "svgX": 309.6,
+      "svgY": 145.3
+    },
+    {
+      "nom": "Nanterre",
+      "dept": "92",
+      "svgX": 308.3,
+      "svgY": 141.9
+    },
+    {
+      "nom": "Rueil-Malmaison",
+      "dept": "92",
+      "svgX": 307.2,
+      "svgY": 142.8
+    },
+    {
+      "nom": "Saint-Denis",
+      "dept": "93",
+      "svgX": 314.8,
+      "svgY": 139.1
+    },
+    {
+      "nom": "Montreuil",
+      "dept": "93",
+      "svgX": 318,
+      "svgY": 143.7
+    },
+    {
+      "nom": "Créteil",
+      "dept": "94",
+      "svgX": 318.4,
+      "svgY": 148.8
+    },
+    {
+      "nom": "Cergy",
+      "dept": "95",
+      "svgX": 301.4,
+      "svgY": 132.3
+    },
+    {
+      "nom": "Argenteuil",
+      "dept": "95",
+      "svgX": 310,
+      "svgY": 138.6
+    },
+    {
+      "nom": "Bourg-en-Bresse",
+      "dept": "01",
+      "svgX": 432,
+      "svgY": 302.6
+    },
+    {
+      "nom": "Gex",
+      "dept": "01",
+      "svgX": 466.6,
+      "svgY": 294.8
+    },
+    {
+      "nom": "Saint-Quentin",
+      "dept": "02",
+      "svgX": 353.6,
+      "svgY": 84.7
+    },
+    {
+      "nom": "Soissons",
+      "dept": "02",
+      "svgX": 355,
+      "svgY": 112.4
+    },
+    {
+      "nom": "Laon",
+      "dept": "02",
+      "svgX": 367.3,
+      "svgY": 101.5
+    },
+    {
+      "nom": "Vichy",
+      "dept": "03",
+      "svgX": 357.1,
+      "svgY": 307.6
+    },
+    {
+      "nom": "Montluçon",
+      "dept": "03",
+      "svgX": 323.5,
+      "svgY": 294.7
+    },
+    {
+      "nom": "Moulins",
+      "dept": "03",
+      "svgX": 353.7,
+      "svgY": 281.1
+    },
+    {
+      "nom": "Manosque",
+      "dept": "04",
+      "svgX": 453.8,
+      "svgY": 444.5
+    },
+    {
+      "nom": "Digne-les-Bains",
+      "dept": "04",
+      "svgX": 472.7,
+      "svgY": 429
+    },
+    {
+      "nom": "Gap",
+      "dept": "05",
+      "svgX": 466.6,
+      "svgY": 400.9
+    },
+    {
+      "nom": "Briançon",
+      "dept": "05",
+      "svgX": 490.1,
+      "svgY": 380.7
+    },
+    {
+      "nom": "Nice",
+      "dept": "06",
+      "svgX": 515.3,
+      "svgY": 452.4
+    },
+    {
+      "nom": "Antibes",
+      "dept": "06",
+      "svgX": 509.3,
+      "svgY": 459.5
+    },
+    {
+      "nom": "Cannes",
+      "dept": "06",
+      "svgX": 504.7,
+      "svgY": 461.3
+    },
+    {
+      "nom": "Grasse",
+      "dept": "06",
+      "svgX": 501,
+      "svgY": 454.9
+    },
+    {
+      "nom": "Annonay",
+      "dept": "07",
+      "svgX": 408.3,
+      "svgY": 360.4
+    },
+    {
+      "nom": "Aubenas",
+      "dept": "07",
+      "svgX": 396.5,
+      "svgY": 397.5
+    },
+    {
+      "nom": "Charleville-Mézières",
+      "dept": "08",
+      "svgX": 413,
+      "svgY": 88.9
+    },
+    {
+      "nom": "Sedan",
+      "dept": "08",
+      "svgX": 422.2,
+      "svgY": 93.1
+    },
+    {
+      "nom": "Pamiers",
+      "dept": "09",
+      "svgX": 280.2,
+      "svgY": 487.9
+    },
+    {
+      "nom": "Foix",
+      "dept": "09",
+      "svgX": 280,
+      "svgY": 497
+    },
+    {
+      "nom": "Ajaccio",
+      "dept": "2A",
+      "svgX": 575.3,
+      "svgY": 558.5
+    },
+    {
+      "nom": "Porto-Vecchio",
+      "dept": "2A",
+      "svgX": 597.6,
+      "svgY": 578.5
+    },
+    {
+      "nom": "Bonifacio",
+      "dept": "2A",
+      "svgX": 592.5,
+      "svgY": 590.7
+    },
+    {
+      "nom": "Bastia",
+      "dept": "2B",
+      "svgX": 605.3,
+      "svgY": 512.3
+    },
+    {
+      "nom": "Corte",
+      "dept": "2B",
+      "svgX": 592.7,
+      "svgY": 535.8
+    },
+    {
+      "nom": "Calvi",
+      "dept": "2B",
+      "svgX": 576.5,
+      "svgY": 520.1
+    }
+  ]
+}

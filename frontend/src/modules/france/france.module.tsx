@@ -23,6 +23,7 @@ const ALL_TYPE_CHOICES: SetupChoice[] = [
   { value: 'dept_gentile',         icon: '👤', label: 'Gentilé du département' },
   { value: 'identify_dept',        icon: '🖱️', label: 'Localiser un département (carte)' },
   { value: 'identify_region',      icon: '🗾', label: 'Région sur la carte' },
+  { value: 'locate_city',          icon: '📍', label: 'Placer une ville sur la carte' },
 ];
 
 async function loadEnabledTypes(): Promise<SetupChoice[]> {

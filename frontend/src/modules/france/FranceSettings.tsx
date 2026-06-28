@@ -21,6 +21,7 @@ const QUESTION_TYPES = [
   { value: 'dept_gentile',         icon: '👤', label: 'Gentilé du département',       description: 'Comment appelle-t-on un habitant de la Gironde ?' },
   { value: 'identify_dept',        icon: '🖱️', label: 'Localiser un département',     description: 'Cliquer sur la Gironde sur la carte' },
   { value: 'identify_region',      icon: '🗾', label: 'Région sur la carte',          description: 'Cliquer sur un département de Bretagne' },
+  { value: 'locate_city',          icon: '📍', label: 'Placer une ville',             description: 'Cliquer à l\'endroit de Lyon sur la carte' },
 ] as const;
 
 const ALL_TYPE_VALUES = QUESTION_TYPES.map((t) => t.value);
@@ -136,6 +137,24 @@ export default function FranceSettings() {
             );
           })}
         </div>
+      </div>
+
+      <div className="AdminCard GameSettings__card">
+        <p className="GameSettings__cardTitle">Seuil « Placer une ville »</p>
+        <p className="GameSettings__hint">Distance maximale (en km) pour valider un clic comme correct.</p>
+        <input
+          type="number"
+          min={5}
+          max={100}
+          step={5}
+          defaultValue={parseInt(settings.france_city_threshold_km ?? '20', 10)}
+          className="GameSettings__numberInput"
+          onBlur={(e) => {
+            const v = Math.max(5, Math.min(100, parseInt(e.target.value, 10) || 20));
+            updateSetting({ key: 'france_city_threshold_km', value: String(v) });
+          }}
+        />
+        <span className="GameSettings__unit"> km</span>
       </div>
     </div>
   );

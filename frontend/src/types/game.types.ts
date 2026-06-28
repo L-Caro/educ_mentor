@@ -2,6 +2,16 @@ import type { ComponentType, ReactNode } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
 import type { ModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
 
+/** Props injectées dans un composant de carte à placement de point (locate_city).
+ * Le composant reçoit la cible post-réponse et émet un clic avec la distance calculée. */
+export interface PointMapInteractionProps {
+  targetSvgPoint:  { x: number; y: number };
+  onPointClick:    (result: { svgX: number; svgY: number; distanceKm: number }) => void;
+  clickedSvgPoint: { x: number; y: number } | null;
+  distanceKm:      number | null;
+  answerState:     GameAnswerState;
+}
+
 /** Props injectées par le moteur dans tout composant de carte interactive.
  * Mode single : onSelect + selectedKey.
  * Mode multi  : onToggle + selectedKeys. */
@@ -61,6 +71,13 @@ export interface GameModuleSpec<TSession, TQuestion> {
     isMultiSelect: (question: TQuestion) => boolean;
     correctKeys: (question: TQuestion) => string[];
     isCorrect: (question: TQuestion, clicked: string) => boolean;
+  };
+  pointMap?: {
+    getComponent: (question: TQuestion) => ComponentType<PointMapInteractionProps>;
+    isPointMapQuestion: (question: TQuestion) => boolean;
+    targetSvgPoint: (question: TQuestion) => { x: number; y: number };
+    isCorrect: (question: TQuestion, distanceKm: number) => boolean;
+    feedbackLabel: (distanceKm: number) => string;
   };
   correctionLabel: (question: TQuestion) => ReactNode;
 

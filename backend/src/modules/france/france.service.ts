@@ -86,6 +86,8 @@ export interface FranceQuestion {
   answer: string | null;
   answers: string[] | null;
   is_map?: boolean;
+  dept_code?: string;    // locate_city : pour lookup SVG dans le frontend
+  threshold_km?: number; // locate_city : seuil de validation
 }
 
 export interface FranceSessionResult {
@@ -108,6 +110,7 @@ export class FranceService {
   private readonly deptByCode: Map<string, Departement & { code: string }>;
   private readonly regionByCode: Map<string, Region & { code: string }>;
   private readonly coastalCodes: Set<string>;
+  private readonly curatedCities: { nom: string; dept: string }[];
 
   constructor(
     @InjectRepository(FranceProgression)
@@ -118,6 +121,9 @@ export class FranceService {
   ) {
     const jsonPath = path.join(__dirname, 'data', 'france_geo.json');
     this.data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as FranceGeoData;
+
+    const citiesPath = path.join(__dirname, 'data', 'france_cities_list.json');
+    this.curatedCities = JSON.parse(fs.readFileSync(citiesPath, 'utf-8')) as { nom: string; dept: string }[];
 
     this.allRegions = Object.entries(this.data.regions).map(([code, r]) => ({ ...r, code }));
     this.allDepts   = Object.entries(this.data.departements).map(([code, d]) => ({ ...d, code }));
@@ -161,8 +167,9 @@ export class FranceService {
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
+    const cityThresholdKm = parseInt((await this.settingsService.get('france_city_threshold_km')) ?? '20', 10);
 
-    const questions = this.generateQuestions(activeDepts, activeTypes, difficulty, choicesCount, count);
+    const questions = this.generateQuestions(activeDepts, activeTypes, difficulty, choicesCount, count, cityThresholdKm);
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
@@ -238,6 +245,7 @@ export class FranceService {
     difficulty: Difficulty,
     choicesCount: number,
     count: number,
+    cityThresholdKm: number,
   ): FranceQuestion[] {
     const questions: FranceQuestion[] = [];
     const usedKeys = new Set<string>();
@@ -246,7 +254,7 @@ export class FranceService {
     while (questions.length < count && attempts < count * 20) {
       attempts++;
       const type = activeTypes[this.rand(0, activeTypes.length - 1)];
-      const q = this.generateOne(type, activeDepts, difficulty, choicesCount);
+      const q = this.generateOne(type, activeDepts, difficulty, choicesCount, cityThresholdKm);
       if (!q || usedKeys.has(q.item_key)) continue;
       usedKeys.add(q.item_key);
       questions.push(q);
@@ -260,6 +268,7 @@ export class FranceService {
     activeDepts: (Departement & { code: string })[],
     difficulty: Difficulty,
     choicesCount: number,
+    cityThresholdKm: number,
   ): FranceQuestion | null {
     switch (type) {
       case 'dept_to_number':       return this.genDeptToNumber(activeDepts, choicesCount);
@@ -279,6 +288,7 @@ export class FranceService {
       case 'dept_gentile':         return this.genDeptGentile(activeDepts, choicesCount);
       case 'identify_dept':        return this.genIdentifyDept(activeDepts);
       case 'identify_region':      return this.genIdentifyRegion(activeDepts, difficulty);
+      case 'locate_city':          return this.genLocateCity(activeDepts, difficulty, cityThresholdKm);
       default: return null;
     }
   }
@@ -656,6 +666,29 @@ export class FranceService {
     };
   }
 
+  private genLocateCity(
+    activeDepts: (Departement & { code: string })[],
+    _difficulty: Difficulty,
+    thresholdKm: number,
+  ): FranceQuestion | null {
+    const activeCodes = new Set(activeDepts.map((d) => d.code));
+    const eligible = this.curatedCities.filter((c) => activeCodes.has(c.dept));
+    const city = this.pick(eligible);
+    if (!city) return null;
+
+    return {
+      type:         'locate_city',
+      item_key:     `locate_city_${city.nom.replace(/\s/g, '_')}`,
+      prompt:       'Cliquez sur cette ville sur la carte',
+      display:      city.nom,
+      choices:      [],
+      answer:       null,
+      answers:      null,
+      dept_code:    city.dept,
+      threshold_km: thresholdKm,
+    };
+  }
+
   // ─── Normalisation des types ─────────────────────────────────────────────────
 
   private normalizeTypes(raw: FranceQuestionType[] | undefined, depts: (Departement & { code: string })[]): FranceQuestionType[] {
@@ -680,6 +713,9 @@ export class FranceService {
       if (t === 'identify_dept') return depts.some((d) => this.isMetroDept(d.code));
       if (t === 'identify_region') return this.allRegions.some(
         (r) => activeRegionCodes.has(r.code) && r.departements.some((c) => this.isMetroDept(c)),
+      );
+      if (t === 'locate_city') return depts.some(
+        (d) => this.isMetroDept(d.code) && d.plus_grandes_villes?.length > 0,
       );
       return true;
     });

@@ -3,20 +3,17 @@ import type { GameAnswerState } from 'src/hooks';
 
 interface GameCorrectionProps {
   answerState: GameAnswerState;
-  answer: ReactNode;   // la bonne réponse, déjà formatée par le module
+  answer: ReactNode;
+  message?: ReactNode; // remplace entièrement "La réponse était [answer]" si fourni
 }
 
-/**
- * Message de correction partagé : s'affiche après une mauvaise réponse ou un timeout,
- * avec un texte unique pour tous les modules.
- */
-export default function GameCorrection({ answerState, answer }: GameCorrectionProps) {
+export default function GameCorrection({ answerState, answer, message }: GameCorrectionProps) {
   if (answerState !== 'wrong' && answerState !== 'timeout') return null;
 
   return (
     <p className="GameCorrection">
       {answerState === 'timeout' && '⏰ Trop tard ! '}
-      La réponse était <strong>{answer}</strong>
+      {message ?? <>La réponse était <strong>{answer}</strong></>}
     </p>
   );
 }

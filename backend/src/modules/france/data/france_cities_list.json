@@ -1,0 +1,858 @@
+[
+  {
+    "nom": "Troyes",
+    "dept": "10"
+  },
+  {
+    "nom": "Narbonne",
+    "dept": "11"
+  },
+  {
+    "nom": "Carcassonne",
+    "dept": "11"
+  },
+  {
+    "nom": "Rodez",
+    "dept": "12"
+  },
+  {
+    "nom": "Millau",
+    "dept": "12"
+  },
+  {
+    "nom": "Marseille",
+    "dept": "13"
+  },
+  {
+    "nom": "Aix-en-Provence",
+    "dept": "13"
+  },
+  {
+    "nom": "Arles",
+    "dept": "13"
+  },
+  {
+    "nom": "Caen",
+    "dept": "14"
+  },
+  {
+    "nom": "Lisieux",
+    "dept": "14"
+  },
+  {
+    "nom": "Bayeux",
+    "dept": "14"
+  },
+  {
+    "nom": "Aurillac",
+    "dept": "15"
+  },
+  {
+    "nom": "Angoulême",
+    "dept": "16"
+  },
+  {
+    "nom": "Cognac",
+    "dept": "16"
+  },
+  {
+    "nom": "La Rochelle",
+    "dept": "17"
+  },
+  {
+    "nom": "Saintes",
+    "dept": "17"
+  },
+  {
+    "nom": "Rochefort",
+    "dept": "17"
+  },
+  {
+    "nom": "Royan",
+    "dept": "17"
+  },
+  {
+    "nom": "Bourges",
+    "dept": "18"
+  },
+  {
+    "nom": "Brive-la-Gaillarde",
+    "dept": "19"
+  },
+  {
+    "nom": "Tulle",
+    "dept": "19"
+  },
+  {
+    "nom": "Dijon",
+    "dept": "21"
+  },
+  {
+    "nom": "Beaune",
+    "dept": "21"
+  },
+  {
+    "nom": "Saint-Brieuc",
+    "dept": "22"
+  },
+  {
+    "nom": "Lannion",
+    "dept": "22"
+  },
+  {
+    "nom": "Dinan",
+    "dept": "22"
+  },
+  {
+    "nom": "Guéret",
+    "dept": "23"
+  },
+  {
+    "nom": "Périgueux",
+    "dept": "24"
+  },
+  {
+    "nom": "Bergerac",
+    "dept": "24"
+  },
+  {
+    "nom": "Sarlat-la-Canéda",
+    "dept": "24"
+  },
+  {
+    "nom": "Besançon",
+    "dept": "25"
+  },
+  {
+    "nom": "Montbéliard",
+    "dept": "25"
+  },
+  {
+    "nom": "Pontarlier",
+    "dept": "25"
+  },
+  {
+    "nom": "Valence",
+    "dept": "26"
+  },
+  {
+    "nom": "Romans-sur-Isère",
+    "dept": "26"
+  },
+  {
+    "nom": "Montélimar",
+    "dept": "26"
+  },
+  {
+    "nom": "Évreux",
+    "dept": "27"
+  },
+  {
+    "nom": "Vernon",
+    "dept": "27"
+  },
+  {
+    "nom": "Chartres",
+    "dept": "28"
+  },
+  {
+    "nom": "Dreux",
+    "dept": "28"
+  },
+  {
+    "nom": "Brest",
+    "dept": "29"
+  },
+  {
+    "nom": "Quimper",
+    "dept": "29"
+  },
+  {
+    "nom": "Concarneau",
+    "dept": "29"
+  },
+  {
+    "nom": "Nîmes",
+    "dept": "30"
+  },
+  {
+    "nom": "Alès",
+    "dept": "30"
+  },
+  {
+    "nom": "Toulouse",
+    "dept": "31"
+  },
+  {
+    "nom": "Blagnac",
+    "dept": "31"
+  },
+  {
+    "nom": "Auch",
+    "dept": "32"
+  },
+  {
+    "nom": "Bordeaux",
+    "dept": "33"
+  },
+  {
+    "nom": "Libourne",
+    "dept": "33"
+  },
+  {
+    "nom": "Montpellier",
+    "dept": "34"
+  },
+  {
+    "nom": "Béziers",
+    "dept": "34"
+  },
+  {
+    "nom": "Sète",
+    "dept": "34"
+  },
+  {
+    "nom": "Rennes",
+    "dept": "35"
+  },
+  {
+    "nom": "Saint-Malo",
+    "dept": "35"
+  },
+  {
+    "nom": "Fougères",
+    "dept": "35"
+  },
+  {
+    "nom": "Châteauroux",
+    "dept": "36"
+  },
+  {
+    "nom": "Tours",
+    "dept": "37"
+  },
+  {
+    "nom": "Amboise",
+    "dept": "37"
+  },
+  {
+    "nom": "Grenoble",
+    "dept": "38"
+  },
+  {
+    "nom": "Vienne",
+    "dept": "38"
+  },
+  {
+    "nom": "Lons-le-Saunier",
+    "dept": "39"
+  },
+  {
+    "nom": "Dole",
+    "dept": "39"
+  },
+  {
+    "nom": "Dax",
+    "dept": "40"
+  },
+  {
+    "nom": "Mont-de-Marsan",
+    "dept": "40"
+  },
+  {
+    "nom": "Blois",
+    "dept": "41"
+  },
+  {
+    "nom": "Vendôme",
+    "dept": "41"
+  },
+  {
+    "nom": "Saint-Étienne",
+    "dept": "42"
+  },
+  {
+    "nom": "Roanne",
+    "dept": "42"
+  },
+  {
+    "nom": "Le Puy-en-Velay",
+    "dept": "43"
+  },
+  {
+    "nom": "Nantes",
+    "dept": "44"
+  },
+  {
+    "nom": "Saint-Nazaire",
+    "dept": "44"
+  },
+  {
+    "nom": "Orléans",
+    "dept": "45"
+  },
+  {
+    "nom": "Montargis",
+    "dept": "45"
+  },
+  {
+    "nom": "Cahors",
+    "dept": "46"
+  },
+  {
+    "nom": "Figeac",
+    "dept": "46"
+  },
+  {
+    "nom": "Agen",
+    "dept": "47"
+  },
+  {
+    "nom": "Villeneuve-sur-Lot",
+    "dept": "47"
+  },
+  {
+    "nom": "Mende",
+    "dept": "48"
+  },
+  {
+    "nom": "Angers",
+    "dept": "49"
+  },
+  {
+    "nom": "Cholet",
+    "dept": "49"
+  },
+  {
+    "nom": "Saumur",
+    "dept": "49"
+  },
+  {
+    "nom": "Cherbourg-en-Cotentin",
+    "dept": "50"
+  },
+  {
+    "nom": "Saint-Lô",
+    "dept": "50"
+  },
+  {
+    "nom": "Reims",
+    "dept": "51"
+  },
+  {
+    "nom": "Châlons-en-Champagne",
+    "dept": "51"
+  },
+  {
+    "nom": "Épernay",
+    "dept": "51"
+  },
+  {
+    "nom": "Saint-Dizier",
+    "dept": "52"
+  },
+  {
+    "nom": "Chaumont",
+    "dept": "52"
+  },
+  {
+    "nom": "Langres",
+    "dept": "52"
+  },
+  {
+    "nom": "Laval",
+    "dept": "53"
+  },
+  {
+    "nom": "Nancy",
+    "dept": "54"
+  },
+  {
+    "nom": "Lunéville",
+    "dept": "54"
+  },
+  {
+    "nom": "Verdun",
+    "dept": "55"
+  },
+  {
+    "nom": "Bar-le-Duc",
+    "dept": "55"
+  },
+  {
+    "nom": "Lorient",
+    "dept": "56"
+  },
+  {
+    "nom": "Vannes",
+    "dept": "56"
+  },
+  {
+    "nom": "Metz",
+    "dept": "57"
+  },
+  {
+    "nom": "Thionville",
+    "dept": "57"
+  },
+  {
+    "nom": "Sarreguemines",
+    "dept": "57"
+  },
+  {
+    "nom": "Nevers",
+    "dept": "58"
+  },
+  {
+    "nom": "Lille",
+    "dept": "59"
+  },
+  {
+    "nom": "Roubaix",
+    "dept": "59"
+  },
+  {
+    "nom": "Tourcoing",
+    "dept": "59"
+  },
+  {
+    "nom": "Valenciennes",
+    "dept": "59"
+  },
+  {
+    "nom": "Dunkerque",
+    "dept": "59"
+  },
+  {
+    "nom": "Compiègne",
+    "dept": "60"
+  },
+  {
+    "nom": "Beauvais",
+    "dept": "60"
+  },
+  {
+    "nom": "Senlis",
+    "dept": "60"
+  },
+  {
+    "nom": "Alençon",
+    "dept": "61"
+  },
+  {
+    "nom": "Calais",
+    "dept": "62"
+  },
+  {
+    "nom": "Boulogne-sur-Mer",
+    "dept": "62"
+  },
+  {
+    "nom": "Lens",
+    "dept": "62"
+  },
+  {
+    "nom": "Arras",
+    "dept": "62"
+  },
+  {
+    "nom": "Clermont-Ferrand",
+    "dept": "63"
+  },
+  {
+    "nom": "Riom",
+    "dept": "63"
+  },
+  {
+    "nom": "Thiers",
+    "dept": "63"
+  },
+  {
+    "nom": "Pau",
+    "dept": "64"
+  },
+  {
+    "nom": "Bayonne",
+    "dept": "64"
+  },
+  {
+    "nom": "Biarritz",
+    "dept": "64"
+  },
+  {
+    "nom": "Hendaye",
+    "dept": "64"
+  },
+  {
+    "nom": "Tarbes",
+    "dept": "65"
+  },
+  {
+    "nom": "Lourdes",
+    "dept": "65"
+  },
+  {
+    "nom": "Perpignan",
+    "dept": "66"
+  },
+  {
+    "nom": "Canet-en-Roussillon",
+    "dept": "66"
+  },
+  {
+    "nom": "Argelès-sur-Mer",
+    "dept": "66"
+  },
+  {
+    "nom": "Strasbourg",
+    "dept": "67"
+  },
+  {
+    "nom": "Haguenau",
+    "dept": "67"
+  },
+  {
+    "nom": "Sélestat",
+    "dept": "67"
+  },
+  {
+    "nom": "Mulhouse",
+    "dept": "68"
+  },
+  {
+    "nom": "Colmar",
+    "dept": "68"
+  },
+  {
+    "nom": "Lyon",
+    "dept": "69"
+  },
+  {
+    "nom": "Vesoul",
+    "dept": "70"
+  },
+  {
+    "nom": "Chalon-sur-Saône",
+    "dept": "71"
+  },
+  {
+    "nom": "Mâcon",
+    "dept": "71"
+  },
+  {
+    "nom": "Le Creusot",
+    "dept": "71"
+  },
+  {
+    "nom": "Le Mans",
+    "dept": "72"
+  },
+  {
+    "nom": "Chambéry",
+    "dept": "73"
+  },
+  {
+    "nom": "Aix-les-Bains",
+    "dept": "73"
+  },
+  {
+    "nom": "Albertville",
+    "dept": "73"
+  },
+  {
+    "nom": "Annecy",
+    "dept": "74"
+  },
+  {
+    "nom": "Thonon-les-Bains",
+    "dept": "74"
+  },
+  {
+    "nom": "Annemasse",
+    "dept": "74"
+  },
+  {
+    "nom": "Cluses",
+    "dept": "74"
+  },
+  {
+    "nom": "Paris",
+    "dept": "75"
+  },
+  {
+    "nom": "Le Havre",
+    "dept": "76"
+  },
+  {
+    "nom": "Rouen",
+    "dept": "76"
+  },
+  {
+    "nom": "Dieppe",
+    "dept": "76"
+  },
+  {
+    "nom": "Meaux",
+    "dept": "77"
+  },
+  {
+    "nom": "Melun",
+    "dept": "77"
+  },
+  {
+    "nom": "Versailles",
+    "dept": "78"
+  },
+  {
+    "nom": "Mantes-la-Jolie",
+    "dept": "78"
+  },
+  {
+    "nom": "Rambouillet",
+    "dept": "78"
+  },
+  {
+    "nom": "Niort",
+    "dept": "79"
+  },
+  {
+    "nom": "Amiens",
+    "dept": "80"
+  },
+  {
+    "nom": "Abbeville",
+    "dept": "80"
+  },
+  {
+    "nom": "Albi",
+    "dept": "81"
+  },
+  {
+    "nom": "Castres",
+    "dept": "81"
+  },
+  {
+    "nom": "Montauban",
+    "dept": "82"
+  },
+  {
+    "nom": "Moissac",
+    "dept": "82"
+  },
+  {
+    "nom": "Toulon",
+    "dept": "83"
+  },
+  {
+    "nom": "Fréjus",
+    "dept": "83"
+  },
+  {
+    "nom": "Hyères",
+    "dept": "83"
+  },
+  {
+    "nom": "Avignon",
+    "dept": "84"
+  },
+  {
+    "nom": "Orange",
+    "dept": "84"
+  },
+  {
+    "nom": "Carpentras",
+    "dept": "84"
+  },
+  {
+    "nom": "La Roche-sur-Yon",
+    "dept": "85"
+  },
+  {
+    "nom": "Les Sables-d'Olonne",
+    "dept": "85"
+  },
+  {
+    "nom": "Poitiers",
+    "dept": "86"
+  },
+  {
+    "nom": "Châtellerault",
+    "dept": "86"
+  },
+  {
+    "nom": "Limoges",
+    "dept": "87"
+  },
+  {
+    "nom": "Épinal",
+    "dept": "88"
+  },
+  {
+    "nom": "Gérardmer",
+    "dept": "88"
+  },
+  {
+    "nom": "Auxerre",
+    "dept": "89"
+  },
+  {
+    "nom": "Sens",
+    "dept": "89"
+  },
+  {
+    "nom": "Belfort",
+    "dept": "90"
+  },
+  {
+    "nom": "Évry-Courcouronnes",
+    "dept": "91"
+  },
+  {
+    "nom": "Corbeil-Essonnes",
+    "dept": "91"
+  },
+  {
+    "nom": "Boulogne-Billancourt",
+    "dept": "92"
+  },
+  {
+    "nom": "Nanterre",
+    "dept": "92"
+  },
+  {
+    "nom": "Rueil-Malmaison",
+    "dept": "92"
+  },
+  {
+    "nom": "Saint-Denis",
+    "dept": "93"
+  },
+  {
+    "nom": "Montreuil",
+    "dept": "93"
+  },
+  {
+    "nom": "Créteil",
+    "dept": "94"
+  },
+  {
+    "nom": "Cergy",
+    "dept": "95"
+  },
+  {
+    "nom": "Argenteuil",
+    "dept": "95"
+  },
+  {
+    "nom": "Bourg-en-Bresse",
+    "dept": "01"
+  },
+  {
+    "nom": "Gex",
+    "dept": "01"
+  },
+  {
+    "nom": "Saint-Quentin",
+    "dept": "02"
+  },
+  {
+    "nom": "Soissons",
+    "dept": "02"
+  },
+  {
+    "nom": "Laon",
+    "dept": "02"
+  },
+  {
+    "nom": "Vichy",
+    "dept": "03"
+  },
+  {
+    "nom": "Montluçon",
+    "dept": "03"
+  },
+  {
+    "nom": "Moulins",
+    "dept": "03"
+  },
+  {
+    "nom": "Manosque",
+    "dept": "04"
+  },
+  {
+    "nom": "Digne-les-Bains",
+    "dept": "04"
+  },
+  {
+    "nom": "Gap",
+    "dept": "05"
+  },
+  {
+    "nom": "Briançon",
+    "dept": "05"
+  },
+  {
+    "nom": "Nice",
+    "dept": "06"
+  },
+  {
+    "nom": "Antibes",
+    "dept": "06"
+  },
+  {
+    "nom": "Cannes",
+    "dept": "06"
+  },
+  {
+    "nom": "Grasse",
+    "dept": "06"
+  },
+  {
+    "nom": "Annonay",
+    "dept": "07"
+  },
+  {
+    "nom": "Aubenas",
+    "dept": "07"
+  },
+  {
+    "nom": "Charleville-Mézières",
+    "dept": "08"
+  },
+  {
+    "nom": "Sedan",
+    "dept": "08"
+  },
+  {
+    "nom": "Pamiers",
+    "dept": "09"
+  },
+  {
+    "nom": "Foix",
+    "dept": "09"
+  },
+  {
+    "nom": "Ajaccio",
+    "dept": "2A"
+  },
+  {
+    "nom": "Porto-Vecchio",
+    "dept": "2A"
+  },
+  {
+    "nom": "Bonifacio",
+    "dept": "2A"
+  },
+  {
+    "nom": "Bastia",
+    "dept": "2B"
+  },
+  {
+    "nom": "Corte",
+    "dept": "2B"
+  },
+  {
+    "nom": "Calvi",
+    "dept": "2B"
+  }
+]
