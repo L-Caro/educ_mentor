@@ -44,7 +44,7 @@ export default function FranceRegionMap({
             key={loc.id}
             d={loc.path}
             className={pathClass(loc.id)}
-            onClick={() => !locked && regionCode && onSelect(regionCode)}
+            onClick={() => !locked && regionCode && onSelect?.(regionCode)}
             onMouseEnter={() => !locked && setHovered(regionCode ?? null)}
             onMouseLeave={() => setHovered(null)}
             aria-label={regionCode ? regionData.regions[regionCode as keyof typeof regionData.regions]?.name : loc.name}
