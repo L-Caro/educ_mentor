@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import GameEngine, { type GameModuleSpec } from './engine/GameEngine.tsx';
+import type { GameModuleSpec } from "src/types/game.types.ts";
+import GameEngine from './engine/GameEngine.tsx';
 import GameStateView from './engine/GameStateView.tsx';
 
 interface LazyGameProps {

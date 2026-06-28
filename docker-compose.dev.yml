@@ -1,6 +1,7 @@
 services:
   backend:
     image: node:20-alpine
+    restart: unless-stopped
     working_dir: /app
     # npm install au démarrage pour compiler les dépendances natives (better-sqlite3) pour Alpine
     command: sh -c "npm install && npm run start:dev"
@@ -16,6 +17,7 @@ services:
 
   frontend:
     image: node:20-alpine
+    restart: unless-stopped
     working_dir: /app
     command: sh -c "npm install && npm run dev"
     volumes:
