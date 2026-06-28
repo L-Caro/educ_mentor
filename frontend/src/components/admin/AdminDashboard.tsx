@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Spinner from 'src/components/common/Spinner.tsx';
+import Toggle from 'src/components/common/Toggle.tsx';
 import { useModuleMetaResolver } from 'src/hooks';
 import { MODULES } from 'src/modules.manifest.tsx';
 import type { ModuleManifest, ProgressionStat } from 'src/modules.manifest.tsx';
+import { useGetModulesQuery, useUpdateModuleMutation } from 'src/store/api/sharedApi.ts';
 
 const SHORTCUTS = [
-  { to: '/admin/modules', icon: '🧩', label: 'Modules', desc: 'Activer / désactiver les modules' },
   { to: '/settings', icon: '⚙️', label: 'Paramètres', desc: 'Options de jeu' },
 ];
 
@@ -30,6 +31,8 @@ export default function AdminDashboard() {
   const getModuleMeta = useModuleMetaResolver();
   const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
+  const { data: catalogModules = [] } = useGetModulesQuery();
+  const [updateModule] = useUpdateModuleMutation();
 
   const fetchStats = useCallback(async (): Promise<Partial<Record<string, ProgressionSummary>>> => {
     const entries = await Promise.all(
@@ -72,7 +75,7 @@ export default function AdminDashboard() {
       </div>
 
       <div className="AdminDashboard__progression">
-        <p className="AdminDashboard__progressionTitle">Progression</p>
+        <p className="AdminDashboard__progressionTitle">Modules</p>
 
         {loading ? (
           <Spinner size="sm" />
@@ -81,12 +84,32 @@ export default function AdminDashboard() {
             {MODULES.map((module) => {
               const stats = statsMap[module.id];
               const hasData = stats !== undefined && (stats.mastered > 0 || stats.inProgress > 0);
+              const catalogMod = catalogModules.find((m) => m.id === module.id);
 
               return (
                 <div key={module.id} className="AdminDashboard__module">
                   <div className="AdminDashboard__moduleHeader">
-                    <span className="AdminDashboard__moduleIcon">{getModuleMeta(module.id)?.icon}</span>
-                    <p className="AdminDashboard__moduleLabel">{getModuleMeta(module.id)?.name ?? module.id}</p>
+                    <div className="AdminDashboard__moduleInfo">
+                      <span className="AdminDashboard__moduleIcon">{getModuleMeta(module.id)?.icon}</span>
+                      <p className="AdminDashboard__moduleLabel">{getModuleMeta(module.id)?.name ?? module.id}</p>
+                    </div>
+                    <div className="AdminDashboard__moduleControls">
+                      {catalogMod && (
+                        <Toggle
+                          checked={catalogMod.is_active}
+                          onChange={() => updateModule({ id: catalogMod.id, payload: { is_active: !catalogMod.is_active } })}
+                        />
+                      )}
+                      {module.adminTabs && module.adminTabs.length > 0 && (
+                        <Link
+                          to={`/admin/${module.id}`}
+                          className="AdminDashboard__moduleGear"
+                          title="Configurer le module"
+                        >
+                          ⚙️
+                        </Link>
+                      )}
+                    </div>
                   </div>
 
                   {hasData ? (

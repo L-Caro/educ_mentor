@@ -5,7 +5,6 @@ import { useAuth } from 'src/hooks';
 
 const NAV_ITEMS = [
   { to: "/admin", label: "Tableau de bord", icon: "🏠", end: true },
-  { to: "/admin/modules", label: "Modules", icon: "🧩", end: false },
 ];
 
 export default function AdminPage() {

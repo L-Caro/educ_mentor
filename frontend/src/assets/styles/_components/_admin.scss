@@ -201,7 +201,7 @@
 
 	&__modules {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
 		gap: v.$space-5;
 	}
 
@@ -218,7 +218,32 @@
 	&__moduleHeader {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: v.$space-3;
+	}
+
+	&__moduleInfo {
+		display: flex;
+		align-items: center;
+		gap: v.$space-3;
+		min-width: 0;
+	}
+
+	&__moduleControls {
+		display: flex;
+		align-items: center;
+		gap: v.$space-3;
+		flex-shrink: 0;
+	}
+
+	&__moduleGear {
+		font-size: v.$font-size-xl;
+		line-height: 1;
+		text-decoration: none;
+		opacity: 0.45;
+		transition: opacity 0.15s ease;
+
+		&:hover { opacity: 1; }
 	}
 
 	&__moduleIcon { font-size: v.$font-size-xl; line-height: 1; }
@@ -253,41 +278,3 @@
 	&__moduleReset { align-self: flex-start; margin-top: auto; }
 }
 
-// ─── ModuleCatalog ────────────────────────────────────────────────────────────
-
-.ModuleCatalog {
-	&__title    { font-size: v.$font-size-xl; font-weight: 700; color: var(--color-base-content); margin: 0 0 v.$space-1; }
-	&__subtitle { color: var(--color-base-content); opacity: 0.4; margin: 0 0 v.$space-7; font-size: v.$font-size-base; }
-
-	&__list {
-		display: flex;
-		flex-direction: column;
-		gap: v.$space-4;
-	}
-
-	&__item {
-		display: flex;
-		align-items: center;
-		gap: v.$space-5;
-		padding: v.$space-5 v.$space-6;
-		background: var(--color-base-100);
-		border: 1px solid var(--color-base-300);
-		border-radius: v.$border-radius-2;
-	}
-
-	&__icon { font-size: v.$font-size-2xl; line-height: 1; flex-shrink: 0; }
-	&__info { flex: 1; }
-	&__name { font-weight: 600; color: var(--color-base-content); margin: 0; font-size: v.$font-size-base; }
-	&__desc { color: var(--color-base-content); opacity: 0.4; font-size: v.$font-size-sm; margin: v.$space-1 0 0; }
-
-	&__configure {
-		font-size: v.$font-size-sm;
-		font-weight: 500;
-		color: var(--color-primary);
-		text-decoration: none;
-		white-space: nowrap;
-		flex-shrink: 0;
-
-		&:hover { text-decoration: underline; }
-	}
-}

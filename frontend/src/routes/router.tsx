@@ -16,7 +16,6 @@ import ErrorRouter from 'src/components/error/ErrorRouter';
 // Vues
 import HomeLayout from 'src/components/layout/HomeLayout.tsx';
 import AdminDashboard from 'src/components/admin/AdminDashboard';
-import ModuleCatalog from 'src/components/admin/ModuleCatalog';
 import Settings from 'src/components/admin/settings/Settings';
 
 import ModulePreSetup from 'src/components/game/ModulePreSetup';
@@ -94,7 +93,6 @@ const Router = createBrowserRouter([
     element: <PinGate><AdminPage /></PinGate>,
     children: [
       { index: true, element: <AdminDashboard />, handle: { title: 'Tableau de bord admin' } },
-      { path: 'modules', element: <ModuleCatalog /> },
       ...MODULES.map(buildAdminRoute),
     ],
   },
