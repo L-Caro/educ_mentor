@@ -48,3 +48,4 @@ frontend/tailwind-output.css
 data/educmentor.db
 data/educmentor.db-shm
 data/educmentor.db-wal
+data/invitations-backup.sql
