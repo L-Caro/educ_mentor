@@ -2,6 +2,7 @@ import store from 'src/store';
 import { geoApi } from './geo.api.ts';
 import type { GeoQuestion, GeoSessionResponse } from './geo.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import WorldMap from './WorldMap.tsx';
 import './geo.scss';
 
 export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
@@ -34,6 +35,14 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
     );
   },
 
+  map: {
+    isMapQuestion:  (q) => q.type === 'identify_country',
+    isMultiSelect:  () => false,
+    correctKeys:    (q) => [q.answer!],
+    isCorrect:      (q, clicked) => clicked === q.answer,
+    getComponent:   () => WorldMap,
+  },
+
   qcm: {
     getChoices: (q) => q.choices.map((c) => ({ key: c, label: c })),
     correctKey:  (q) => q.answer  ?? '',
@@ -55,9 +64,8 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
   },
 
   correctionLabel: (question) => {
-    if (question.answers !== null) {
-      return question.answers.join(', ');
-    }
+    if (question.type === 'identify_country') return question.display;
+    if (question.answers !== null) return question.answers.join(', ');
     return question.answer ?? '';
   },
 
@@ -74,6 +82,15 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
     })).unwrap(),
 
   buildResultEntry: (question, given, correct, timeout) => {
+    if (question.type === 'identify_country') {
+      return {
+        label:    question.prompt,
+        given:    typeof given === 'string' ? given : null,
+        expected: question.display,
+        correct,
+        timeout,
+      };
+    }
     const isMulti = question.answers !== null;
     if (isMulti) {
       const givenArr = Array.isArray(given) ? (given as string[]) : [];

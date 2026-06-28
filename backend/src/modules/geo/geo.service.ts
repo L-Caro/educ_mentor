@@ -216,6 +216,7 @@ export class GeoService {
       case 'select_continent_countries': return this.genSelectContinentCountries(activePays, difficulty);
       case 'country_borders':      return this.genCountryBorders(activePays, difficulty);
       case 'select_language_countries':  return this.genSelectLanguageCountries(activePays, difficulty);
+      case 'identify_country':           return this.genIdentifyCountry(activePays);
       default: return null;
     }
   }
@@ -512,6 +513,21 @@ export class GeoService {
       }
       return true;
     });
+  }
+
+  private genIdentifyCountry(pays: Pays[]): GeoQuestion | null {
+    const p = this.pick(pays);
+    if (!p) return null;
+    return {
+      type: 'identify_country',
+      item_key: `identify_country_${p.code}`,
+      prompt: 'Cliquez sur ce pays sur la carte',
+      display: `${p.drapeau} ${p.nom}`,
+      display_type: 'text',
+      choices: [],
+      answer: p.code,
+      answers: null,
+    };
   }
 
   private pick<T>(arr: T[]): T | null {

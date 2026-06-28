@@ -10,7 +10,8 @@ export type GeoQuestionType =
   | 'select_oceans'
   | 'select_continent_countries'
   | 'country_borders'
-  | 'select_language_countries';
+  | 'select_language_countries'
+  | 'identify_country';
 
 export interface GeoQuestion {
   type: GeoQuestionType;
@@ -21,6 +22,7 @@ export interface GeoQuestion {
   choices: string[];
   answer: string | null;
   answers: string[] | null;
+  is_map?: boolean;
 }
 
 export interface GeoSessionResponse {
