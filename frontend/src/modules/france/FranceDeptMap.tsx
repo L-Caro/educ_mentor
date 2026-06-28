@@ -24,7 +24,7 @@ export default function FranceDeptMap({
       if (inAnswer && checked)  return `${base} ${base}--correct`;
       if (inAnswer && !checked) return `${base} ${base}--missed`;
       if (!inAnswer && checked) return `${base} ${base}--wrong`;
-      return `${base} ${base}--faded`;
+      return `${base}`;
     }
 
     // Single-select
@@ -33,7 +33,7 @@ export default function FranceDeptMap({
     }
     if (correctKeys.includes(id)) return `${base} ${base}--correct`;
     if (id === selectedKey)       return `${base} ${base}--wrong`;
-    return `${base} ${base}--faded`;
+    return `${base}`;
   }
 
   function handleClick(id: string) {
