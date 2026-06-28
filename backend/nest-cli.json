@@ -6,7 +6,8 @@
     "deleteOutDir": true,
     "assets": [
       { "include": "modules/conjugaison/data/*.json", "outDir": "./dist" },
-      { "include": "modules/geo/data/*.json", "outDir": "./dist" }
+      { "include": "modules/geo/data/*.json", "outDir": "./dist" },
+      { "include": "modules/france/data/*.json", "outDir": "./dist" }
     ]
   }
 }

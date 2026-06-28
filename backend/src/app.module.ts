@@ -18,6 +18,7 @@ import { MonnaieModule } from './modules/monnaie/monnaie.module';
 import { HeureModule } from './modules/heure/heure.module';
 import { ConjugaisonModule } from './modules/conjugaison/conjugaison.module';
 import { GeoModule } from './modules/geo/geo.module';
+import { FranceModule } from './modules/france/france.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { AccessGuard } from './modules/invitation/access.guard';
 
@@ -56,6 +57,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     HeureModule,
     ConjugaisonModule,
     GeoModule,
+    FranceModule,
     InvitationModule,
   ],
   providers: [

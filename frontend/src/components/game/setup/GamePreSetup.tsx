@@ -100,7 +100,11 @@ function buildInitialValues(options: SetupOption[], initial?: SetupValues): Setu
     if (option.type === 'single') {
       values[option.key] = typeof seed === 'string' ? seed : '';
     } else {
-      values[option.key] = Array.isArray(seed) ? seed : [];
+      const available = (option.choices ?? []).map((c) => c.value);
+      // Filtrer le seed contre les choix actuels (les types désactivés en admin en sont absents)
+      const filtered = Array.isArray(seed) ? (seed as string[]).filter((v) => available.includes(v)) : [];
+      // Pas de sélection valide → tout pré-sélectionné (opt-out)
+      values[option.key] = filtered.length > 0 ? filtered : available;
     }
   }
   return values;

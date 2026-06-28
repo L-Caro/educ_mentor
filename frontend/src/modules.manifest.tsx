@@ -7,6 +7,7 @@ import { snakeModule } from 'src/modules/snake/snake.module';
 import { heureModule } from 'src/modules/heure/heure.module';
 import { conjugaisonModule } from 'src/modules/conjugaison/conjugaison.module';
 import { geoModule } from 'src/modules/geo/geo.module';
+import { franceModule } from 'src/modules/france/france.module';
 
 // Re-export pour compat des imports existants (`from 'src/modules.manifest'`).
 export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts';
@@ -15,4 +16,4 @@ export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts
  * Agrégateur : la source unique des modules. Ajouter un module = créer son dossier avec
  * `<id>.module.tsx` (descripteur co-localisé) + une ligne d'import ici.
  */
-export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule];
+export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule, franceModule];

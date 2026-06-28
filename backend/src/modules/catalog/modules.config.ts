@@ -59,4 +59,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 7,
   },
+  {
+    id: 'france',
+    name: 'France',
+    description: 'Départements, régions, préfectures, fleuves, massifs — la géographie française',
+    icon: '🇫🇷',
+    is_active: false,
+    display_order: 8,
+  },
 ];
