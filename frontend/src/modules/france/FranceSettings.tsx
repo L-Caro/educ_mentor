@@ -19,6 +19,8 @@ const QUESTION_TYPES = [
   { value: 'massif_summit',        icon: '⛰️', label: 'Sommet du massif',             description: 'Quel est le point culminant des Alpes ?' },
   { value: 'summit_altitude',      icon: '📏', label: 'Altitude du sommet',           description: 'À quelle altitude culmine le Mont Blanc ?' },
   { value: 'dept_gentile',         icon: '👤', label: 'Gentilé du département',       description: 'Comment appelle-t-on un habitant de la Gironde ?' },
+  { value: 'identify_dept',        icon: '🖱️', label: 'Localiser un département',     description: 'Cliquer sur la Gironde sur la carte' },
+  { value: 'identify_region',      icon: '🗾', label: 'Région sur la carte',          description: 'Cliquer sur un département de Bretagne' },
 ] as const;
 
 const ALL_TYPE_VALUES = QUESTION_TYPES.map((t) => t.value);
@@ -72,7 +74,7 @@ export default function FranceSettings() {
   return (
     <div className="GameSettings">
       <div className="GameSettings__header">
-        {saving && <Spinner size="xs" />}
+        {saving && <Spinner />}
       </div>
 
       {/* ── Types de questions ─────────────────────────────────────────── */}

@@ -1,5 +1,80 @@
 @use 'src/assets/styles/_abstracts/variables' as v;
 
+.FranceDeptMap {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto v.$space-4;
+  touch-action: manipulation;
+
+  &__path {
+    fill: var(--color-base-content);
+    stroke: var(--color-base-100);
+    stroke-width: 0.8;
+    cursor: pointer;
+    transition: fill 0.12s ease;
+
+    &:hover { fill: var(--color-primary-light, #a0c4ff); }
+
+    &--selected,
+    &--checked  { fill: var(--color-primary); cursor: pointer; }
+
+    &--correct {
+      fill: var(--color-success, #22c55e);
+      cursor: default;
+    }
+
+    &--missed {
+      fill: var(--color-warning, #f59e0b);
+      cursor: default;
+    }
+
+    &--wrong {
+      fill: var(--color-error, #ef4444);
+      cursor: default;
+    }
+
+    &--faded {
+      fill: var(--color-base-200);
+      opacity: 0.5;
+      cursor: default;
+    }
+  }
+}
+
+// Carte des régions — paths de départements sans traits internes
+.FranceRegionMap__path {
+  fill: var(--color-base-content);
+  stroke: none;
+  cursor: pointer;
+  transition: fill 0.12s ease;
+
+  &--hover    { fill: var(--color-primary-light, #a0c4ff); }
+  &--selected { fill: var(--color-primary); }
+
+  &--correct {
+    fill: var(--color-success, #22c55e);
+    cursor: default;
+  }
+
+  &--wrong {
+    fill: var(--color-error, #ef4444);
+    cursor: default;
+  }
+
+  &--faded {
+    fill: var(--color-base-content);
+    opacity: 0.25;
+    cursor: default;
+  }
+
+  &--dom {
+    fill: var(--color-base-content);
+    opacity: 0.1;
+    cursor: default;
+  }
+}
+
 .FrancePrompt {
   display: flex;
   flex-direction: column;

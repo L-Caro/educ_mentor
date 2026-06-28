@@ -75,13 +75,25 @@ export default function GameEngine<TSession, TQuestion>({
   function handleValidate() {
     if (!session || answerState !== 'idle') return;
     const question = getQuestions(session)[currentIdx];
-    // Multi si correctKeys est défini ET retourne des réponses pour cette question (per-question)
-    const isMulti = !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
+    const isMap = !!spec.map && spec.map.isMapQuestion(question);
+    const isMapMulti = isMap && spec.map!.isMultiSelect(question);
+    // Multi QCM si correctKeys est défini ET retourne des réponses pour cette question (per-question)
+    const isMulti = !isMap && !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
 
     let correct: boolean;
     let given: unknown;
 
-    if (!isFree(question)) {
+    if (isMapMulti) {
+      if (selectedKeys.size === 0) return;
+      const expected = new Set(spec.map!.correctKeys(question));
+      given = [...selectedKeys];
+      correct = expected.size === selectedKeys.size &&
+                [...selectedKeys].every(k => expected.has(k));
+    } else if (isMap) {
+      if (selectedKey === null) return;
+      given = selectedKey;
+      correct = spec.map!.isCorrect(question, selectedKey);
+    } else if (!isFree(question)) {
       if (isMulti) {
         if (selectedKeys.size === 0) return;
         const expected = new Set(spec.qcm!.correctKeys!(question));
@@ -117,9 +129,11 @@ export default function GameEngine<TSession, TQuestion>({
 
   const questions = getQuestions(session);
   const question = questions[currentIdx];
-  const qcm = !isFree(question);
-  // Per-question : multi si correctKeys est défini ET retourne des réponses pour cette question
-  const isMulti = !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
+  const isMap = !!spec.map && spec.map.isMapQuestion(question);
+  const isMapMulti = isMap && spec.map!.isMultiSelect(question);
+  const qcm = !isMap && !isFree(question);
+  // Per-question : multi QCM si correctKeys est défini ET retourne des réponses pour cette question
+  const isMulti = !isMap && !!spec.qcm?.correctKeys && (spec.qcm.correctKeys!(question)?.length ?? 0) > 0;
   const unlimited = (session as { is_unlimited?: boolean }).is_unlimited ?? false;
   const timerSeconds = getTimerSeconds(session);
   const total = questions.length;
@@ -127,11 +141,14 @@ export default function GameEngine<TSession, TQuestion>({
   const answeredCount = currentIdx + (answerState !== 'idle' ? 1 : 0);
   const filledStars = Math.min(5, answeredCount === 0 ? 0 : Math.floor((correctCount / answeredCount) * 5));
   const showUrgent = isUrgent && answerState === 'idle';
+  const mapCorrectKeys = isMap ? spec.map!.correctKeys(question) : [];
+  const MapComponent = isMap ? spec.map!.getComponent(question) : null;
   const validateDisabled =
     answerState !== 'idle' || (
-      qcm
-        ? (isMulti ? selectedKeys.size === 0 : selectedKey === null)
-        : freeInput.trim() === ''
+      isMapMulti ? selectedKeys.size === 0
+      : isMap    ? selectedKey === null
+      : qcm      ? (isMulti ? selectedKeys.size === 0 : selectedKey === null)
+      : freeInput.trim() === ''
     );
 
   return (
@@ -158,7 +175,16 @@ export default function GameEngine<TSession, TQuestion>({
 
         {spec.renderPrompt(question, answerState)}
 
-        {qcm ? (
+        {isMap && MapComponent ? (
+          <MapComponent
+            onSelect={isMapMulti ? undefined : (key) => { if (answerState === 'idle') setSelectedKey(key); }}
+            onToggle={isMapMulti ? (key) => { if (answerState === 'idle') handleToggleKey(key); } : undefined}
+            selectedKey={selectedKey}
+            selectedKeys={selectedKeys}
+            correctKeys={mapCorrectKeys}
+            answerState={answerState}
+          />
+        ) : qcm ? (
           isMulti ? (
             <GameChoices
               options={spec.qcm!.getChoices(question)}

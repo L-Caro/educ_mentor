@@ -21,6 +21,8 @@ const ALL_TYPE_CHOICES: SetupChoice[] = [
   { value: 'massif_summit',        icon: '⛰️', label: 'Sommet du massif' },
   { value: 'summit_altitude',      icon: '📏', label: 'Altitude du sommet' },
   { value: 'dept_gentile',         icon: '👤', label: 'Gentilé du département' },
+  { value: 'identify_dept',        icon: '🖱️', label: 'Localiser un département (carte)' },
+  { value: 'identify_region',      icon: '🗾', label: 'Région sur la carte' },
 ];
 
 async function loadEnabledTypes(): Promise<SetupChoice[]> {

@@ -1,6 +1,18 @@
-import type { ReactNode } from 'react';
+import type { ComponentType, ReactNode } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
 import type { ModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
+
+/** Props injectées par le moteur dans tout composant de carte interactive.
+ * Mode single : onSelect + selectedKey.
+ * Mode multi  : onToggle + selectedKeys. */
+export interface MapInteractionProps {
+  onSelect?: (key: string) => void;
+  onToggle?: (key: string) => void;
+  selectedKey: string | null;
+  selectedKeys: Set<string>;
+  correctKeys: string[];
+  answerState: GameAnswerState;
+}
 
 export interface GameChoice {
   key: string;
@@ -40,6 +52,15 @@ export interface GameModuleSpec<TSession, TQuestion> {
     parse: (raw: string) => unknown;
     isCorrect: (question: TQuestion, given: unknown) => boolean;
     inputProps?: GameInputConfig;
+  };
+  map?: {
+    /** Retourne le composant à utiliser pour cette question. */
+    getComponent: (question: TQuestion) => ComponentType<MapInteractionProps>;
+    isMapQuestion: (question: TQuestion) => boolean;
+    /** true = multi-select (toggle), false = single-select. */
+    isMultiSelect: (question: TQuestion) => boolean;
+    correctKeys: (question: TQuestion) => string[];
+    isCorrect: (question: TQuestion, clicked: string) => boolean;
   };
   correctionLabel: (question: TQuestion) => ReactNode;
 

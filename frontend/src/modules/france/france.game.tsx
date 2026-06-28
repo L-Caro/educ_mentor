@@ -1,10 +1,18 @@
+import france from '@svg-maps/france.departments';
 import store from 'src/store';
 import { franceApi } from './france.api.ts';
 import type { FranceQuestion, FranceSessionResponse } from './france.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import FranceDeptMap from './FranceDeptMap.tsx';
+import FranceRegionMap from './FranceRegionMap.tsx';
+import regionData from './data/france_regions.json';
 import './france.scss';
 
 const NUMBER_TYPES = new Set(['dept_to_number', 'number_to_dept']);
+const deptNameMap = new Map(france.locations.map((l) => [l.id, l.name]));
+const regionNameMap = new Map(
+  Object.entries(regionData.regions as Record<string, { name: string }>).map(([code, r]) => [code, r.name])
+);
 
 export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestion> = {
 
@@ -36,6 +44,15 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
     layout: 'list',
   },
 
+  map: {
+    getComponent: (q) =>
+      q.type === 'identify_region' && q.answers === null ? FranceRegionMap : FranceDeptMap,
+    isMapQuestion: (q) => q.is_map === true,
+    isMultiSelect: (q) => q.type === 'identify_region' && q.answers !== null,
+    correctKeys: (q) => q.answers ?? (q.answer ? [q.answer] : []),
+    isCorrect: (q, clicked) => clicked === q.answer,
+  },
+
   free: {
     parse: (raw) => raw.trim(),
     isCorrect: (q, given) => {
@@ -51,6 +68,15 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
   },
 
   correctionLabel: (question) => {
+    if (question.is_map) {
+      if (question.answers !== null) {
+        // Hard mode : liste des depts de la région
+        return question.answers.map((c) => deptNameMap.get(c) ?? c).join(', ');
+      }
+      const code = question.answer ?? '';
+      if (question.type === 'identify_region') return regionNameMap.get(code) ?? code;
+      return deptNameMap.get(code) ?? code;
+    }
     if (question.answers !== null) return question.answers.join(', ');
     return question.answer ?? '';
   },
@@ -68,6 +94,27 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
     })).unwrap(),
 
   buildResultEntry: (question, given, correct, timeout) => {
+    if (question.is_map) {
+      // Hard mode : multi-select depts
+      if (Array.isArray(given)) {
+        const givenNames = (given as string[]).map((c) => deptNameMap.get(c) ?? c).join(', ');
+        const expectedNames = (question.answers ?? []).map((c) => deptNameMap.get(c) ?? c).join(', ');
+        return { label: question.display, given: givenNames || null, expected: expectedNames, correct, timeout };
+      }
+      // Facile/moyen : clic unique (dept ou région)
+      const nameOf = (code: string) =>
+        question.type === 'identify_region'
+          ? (regionNameMap.get(code) ?? code)
+          : (deptNameMap.get(code) ?? code);
+      const givenCode = typeof given === 'string' ? given : null;
+      return {
+        label:    question.display,
+        given:    givenCode ? nameOf(givenCode) : null,
+        expected: nameOf(question.answer ?? ''),
+        correct,
+        timeout,
+      };
+    }
     const isMulti = question.answers !== null;
     if (isMulti) {
       const givenArr = Array.isArray(given) ? (given as string[]) : [];

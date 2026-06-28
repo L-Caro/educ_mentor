@@ -13,7 +13,9 @@ export type FranceQuestionType =
   | 'maritime_facade'
   | 'massif_summit'
   | 'summit_altitude'
-  | 'dept_gentile';
+  | 'dept_gentile'
+  | 'identify_dept'
+  | 'identify_region';
 
 export interface FranceQuestion {
   type: FranceQuestionType;
@@ -23,6 +25,7 @@ export interface FranceQuestion {
   choices: string[];
   answer: string | null;
   answers: string[] | null;
+  is_map?: boolean;
 }
 
 export interface FranceSessionResponse {

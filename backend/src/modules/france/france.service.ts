@@ -85,6 +85,7 @@ export interface FranceQuestion {
   choices: string[];
   answer: string | null;
   answers: string[] | null;
+  is_map?: boolean;
 }
 
 export interface FranceSessionResult {
@@ -276,6 +277,8 @@ export class FranceService {
       case 'massif_summit':        return this.genMassifSummit(choicesCount);
       case 'summit_altitude':      return this.genSummitAltitude(choicesCount);
       case 'dept_gentile':         return this.genDeptGentile(activeDepts, choicesCount);
+      case 'identify_dept':        return this.genIdentifyDept(activeDepts);
+      case 'identify_region':      return this.genIdentifyRegion(activeDepts, difficulty);
       default: return null;
     }
   }
@@ -594,6 +597,65 @@ export class FranceService {
     };
   }
 
+  // ── Carte interactive ────────────────────────────────────────────────────────
+
+  private isMetroDept(code: string): boolean {
+    return !['971', '972', '973', '974', '976'].includes(code);
+  }
+
+  private genIdentifyDept(depts: (Departement & { code: string })[]): FranceQuestion | null {
+    const metro = depts.filter((d) => this.isMetroDept(d.code));
+    const d = this.pick(metro.length > 0 ? metro : depts);
+    if (!d) return null;
+    return {
+      type: 'identify_dept',
+      item_key: `identify_dept_${d.code}`,
+      prompt: 'Cliquez sur ce département sur la carte',
+      display: d.nom,
+      choices: [],
+      answer: d.code,
+      answers: null,
+      is_map: true,
+    };
+  }
+
+  private genIdentifyRegion(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+    const activeRegionCodes = new Set(depts.map((d) => d.region));
+    const eligible = this.allRegions.filter((r) =>
+      activeRegionCodes.has(r.code) &&
+      r.departements.some((c) => this.isMetroDept(c)),
+    );
+    const region = this.pick(eligible);
+    if (!region) return null;
+
+    if (difficulty === 'hard') {
+      // Difficile : sélectionner TOUS les départements de la région
+      const answers = region.departements.filter((c) => this.isMetroDept(c));
+      return {
+        type: 'identify_region',
+        item_key: `identify_region_hard_${region.code}`,
+        prompt: 'Sélectionnez tous les départements de cette région',
+        display: region.nom,
+        choices: [],
+        answer: null,
+        answers,
+        is_map: true,
+      };
+    }
+
+    // Facile / moyen : clic unique sur la région
+    return {
+      type: 'identify_region',
+      item_key: `identify_region_${region.code}`,
+      prompt: 'Cliquez sur cette région sur la carte',
+      display: region.nom,
+      choices: [],
+      answer: region.code,
+      answers: null,
+      is_map: true,
+    };
+  }
+
   // ─── Normalisation des types ─────────────────────────────────────────────────
 
   private normalizeTypes(raw: FranceQuestionType[] | undefined, depts: (Departement & { code: string })[]): FranceQuestionType[] {
@@ -615,6 +677,10 @@ export class FranceService {
       );
       if (t === 'maritime_facade') return depts.some((d) => this.coastalCodes.has(d.code));
       if (t === 'region_chef_lieu') return activeRegionCodes.size > 0;
+      if (t === 'identify_dept') return depts.some((d) => this.isMetroDept(d.code));
+      if (t === 'identify_region') return this.allRegions.some(
+        (r) => activeRegionCodes.has(r.code) && r.departements.some((c) => this.isMetroDept(c)),
+      );
       return true;
     });
   }

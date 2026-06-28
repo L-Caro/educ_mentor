@@ -17,6 +17,8 @@ export const ALL_FRANCE_QUESTION_TYPES = [
   'massif_summit',
   'summit_altitude',
   'dept_gentile',
+  'identify_dept',
+  'identify_region',
 ] as const;
 
 export type FranceQuestionType = typeof ALL_FRANCE_QUESTION_TYPES[number];
