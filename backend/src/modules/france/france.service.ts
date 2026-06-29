@@ -86,8 +86,9 @@ export interface FranceQuestion {
   answer: string | null;
   answers: string[] | null;
   is_map?: boolean;
-  dept_code?: string;    // locate_city : pour lookup SVG dans le frontend
-  threshold_km?: number; // locate_city : seuil de validation
+  dept_code?: string;        // locate_city : pour lookup SVG dans le frontend
+  threshold_km?: number;     // locate_city : seuil de validation
+  hide_dept_borders?: boolean; // locate_city hard : carte sans limites de départements
 }
 
 export interface FranceSessionResult {
@@ -668,7 +669,7 @@ export class FranceService {
 
   private genLocateCity(
     activeDepts: (Departement & { code: string })[],
-    _difficulty: Difficulty,
+    difficulty: Difficulty,
     thresholdKm: number,
   ): FranceQuestion | null {
     const activeCodes = new Set(activeDepts.map((d) => d.code));
@@ -677,15 +678,16 @@ export class FranceService {
     if (!city) return null;
 
     return {
-      type:         'locate_city',
-      item_key:     `locate_city_${city.nom.replace(/\s/g, '_')}`,
-      prompt:       'Cliquez sur cette ville sur la carte',
-      display:      city.nom,
-      choices:      [],
-      answer:       null,
-      answers:      null,
-      dept_code:    city.dept,
-      threshold_km: thresholdKm,
+      type:               'locate_city',
+      item_key:           `locate_city_${city.nom.replace(/\s/g, '_')}`,
+      prompt:             'Cliquez sur cette ville sur la carte',
+      display:            city.nom,
+      choices:            [],
+      answer:             null,
+      answers:            null,
+      dept_code:          city.dept,
+      threshold_km:       thresholdKm,
+      hide_dept_borders:  difficulty === 'hard' || undefined,
     };
   }
 

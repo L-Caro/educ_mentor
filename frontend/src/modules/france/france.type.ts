@@ -29,6 +29,7 @@ export interface FranceQuestion {
   is_map?: boolean;
   dept_code?: string;
   threshold_km?: number;
+  hide_dept_borders?: boolean;
 }
 
 export interface FranceSessionResponse {

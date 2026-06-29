@@ -12,7 +12,8 @@ export default function FranceCityMap({
   clickedSvgPoint,
   distanceKm,
   answerState,
-}: PointMapInteractionProps) {
+  hideBorders,
+}: PointMapInteractionProps & { hideBorders?: boolean }) {
   const svgRef = useRef<SVGSVGElement>(null);
   const locked = answerState !== 'idle';
 
@@ -42,7 +43,7 @@ export default function FranceCityMap({
         <path
           key={loc.id}
           d={loc.path}
-          className="FranceCityMap__dept"
+          className={`FranceCityMap__dept${hideBorders ? ' FranceCityMap__dept--noBorders' : ''}`}
         />
       ))}
 

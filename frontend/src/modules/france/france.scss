@@ -89,6 +89,10 @@
     stroke-width: 0.8;
     opacity: 0.20;
     pointer-events: none;
+
+    &--noBorders {
+      stroke: none;
+    }
   }
 
   &__pin {
