@@ -156,4 +156,54 @@
       font-size: v.$font-size-2xl;
     }
   }
+
+  // ── Variant decompose (N champs d'un chiffre, ex : numération) ──────────────
+
+  &--decompose {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: v.$space-3;
+    padding: v.$space-2 0;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  &__decomposePart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-2;
+    flex-shrink: 0;
+  }
+
+  &__field--decompose-digit {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: v.$font-size-lg;
+    font-weight: 700;
+    text-align: center;
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$border-radius-2;
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    outline: none;
+    transition: border-color 0.15s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+
+    &::-webkit-inner-spin-button,
+    &::-webkit-outer-spin-button { display: none; }
+
+    &:focus { border-color: var(--color-primary); }
+  }
+
+  &__decomposeLabel {
+    font-size: v.$font-size-xs;
+    color: var(--color-base-content);
+    opacity: 0.6;
+    text-align: center;
+    white-space: nowrap;
+  }
 }

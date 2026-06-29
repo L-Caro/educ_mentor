@@ -58,8 +58,8 @@ export class NumerationService {
   async createSession(dto: StartNumerationSessionDto): Promise<NumerationSessionResponse> {
     const positions  = await this.getActivePositions();
     const steps      = await this.getActiveSteps();
-    const timerSec   = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
-    const countSetting = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
+    const timerSec     = parseInt(await this.settingsService.get('question_timer_seconds') ?? '', 10) || 0;
+    const countSetting = parseInt(await this.settingsService.get('questions_per_session')  ?? '', 10) || 10;
     const isUnlimited  = countSetting === 0;
     const count        = isUnlimited ? 50 : countSetting;
 
@@ -140,7 +140,9 @@ export class NumerationService {
     if (prog) {
       prog.play_count++;
       prog.last_played_at = new Date();
-      if (correct > prog.best_correct) {
+      const newAccuracy  = total > 0 ? correct / total : 0;
+      const bestAccuracy = prog.best_total > 0 ? prog.best_correct / prog.best_total : 0;
+      if (newAccuracy > bestAccuracy) {
         prog.best_correct = correct;
         prog.best_total   = total;
       }
@@ -204,6 +206,7 @@ export class NumerationService {
         const ascending = Math.random() < 0.5;
 
         if (ascending) {
+          if (step * 3 > max) return null;
           const maxStart     = Math.max(0, max - step * 3);
           const startMult    = Math.floor(Math.random() * (Math.floor(maxStart / step) + 1));
           const start        = startMult * step;

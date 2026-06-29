@@ -60,7 +60,7 @@ function correctionForDecompose(question: NumerationQuestion): string {
   const positions = question.decompose_positions ?? [];
   const digits    = question.answer.split(':');
   return positions
-    .map((pos, i) => `${digits[i]} ${POSITION_NAME[pos]}`)
+    .map((pos, i) => `${digits[i] || '?'} ${POSITION_NAME[pos]}`)
     .join(', ');
 }
 
@@ -116,11 +116,11 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
       : question.answer;
 
     let givenLabel: string | null = null;
-    if (typeof given === 'string' && given && question.type === 'decomposition') {
+    if (typeof given === 'string' && given !== '' && question.type === 'decomposition') {
       const positions = question.decompose_positions ?? [];
       const digits    = given.split(':');
       givenLabel = positions.map((pos, i) => `${digits[i] || '?'} ${POSITION_NAME[pos]}`).join(', ');
-    } else if (typeof given === 'string' && given) {
+    } else if (typeof given === 'string' && given !== '') {
       givenLabel = given;
     }
 
