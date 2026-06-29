@@ -218,7 +218,8 @@ export class GeoService {
       case 'select_continent_countries': return this.genSelectContinentCountries(activePays, difficulty);
       case 'country_borders':      return this.genCountryBorders(activePays, difficulty);
       case 'select_language_countries':  return this.genSelectLanguageCountries(activePays, difficulty);
-      case 'identify_country':           return this.genIdentifyCountry(activePays, difficulty);
+      case 'identify_country':            return this.genIdentifyCountry(activePays, difficulty);
+      case 'identify_continent':          return this.genIdentifyContinent();
       default: return null;
     }
   }
@@ -515,6 +516,21 @@ export class GeoService {
       }
       return true;
     });
+  }
+
+  private genIdentifyContinent(): GeoQuestion {
+    const continents = ['Europe', 'Asie', 'Afrique', 'Amérique du Nord', 'Amérique du Sud', 'Océanie'];
+    const continent = continents[this.rand(0, continents.length - 1)];
+    return {
+      type: 'identify_continent',
+      item_key: `identify_continent_${continent}`,
+      prompt: 'Cliquez sur ce continent sur la carte',
+      display: continent,
+      display_type: 'text',
+      choices: [],
+      answer: continent,
+      answers: null,
+    };
   }
 
   private genIdentifyCountry(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {

@@ -11,7 +11,8 @@ export type GeoQuestionType =
   | 'select_continent_countries'
   | 'country_borders'
   | 'select_language_countries'
-  | 'identify_country';
+  | 'identify_country'
+  | 'identify_continent';
 
 export interface GeoQuestion {
   type: GeoQuestionType;

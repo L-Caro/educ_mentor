@@ -201,7 +201,27 @@
     { "code": "MH", "nom": "Îles Marshall", "drapeau": "🇲🇭", "capitale": "Majuro", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Marshallais", "Anglais"] },
     { "code": "TV", "nom": "Tuvalu", "drapeau": "🇹🇻", "capitale": "Funafuti", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Tuvaluan", "Anglais"] },
     { "code": "NR", "nom": "Nauru", "drapeau": "🇳🇷", "capitale": "Yaren", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Nauruan", "Anglais"] },
-    { "code": "NZ", "nom": "Nouvelle-Zélande", "drapeau": "🇳🇿", "capitale": "Wellington", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Anglais", "Maori"] }
+    { "code": "NZ", "nom": "Nouvelle-Zélande", "drapeau": "🇳🇿", "capitale": "Wellington", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Anglais", "Maori"] },
+
+    { "code": "NC", "nom": "Nouvelle-Calédonie", "drapeau": "🇳🇨", "capitale": "Nouméa", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Français"] },
+    { "code": "PF", "nom": "Polynésie française", "drapeau": "🇵🇫", "capitale": "Papeete", "continent": "Océanie", "oceans": ["Pacifique"], "mers": [], "voisins": [], "langues": ["Français"] },
+
+    { "code": "GL", "nom": "Groenland", "drapeau": "🇬🇱", "capitale": "Nuuk", "continent": "Amérique du Nord", "oceans": ["Atlantique", "Arctique"], "mers": [], "voisins": [], "langues": ["Groenlandais", "Danois"] },
+    { "code": "PM", "nom": "Saint-Pierre-et-Miquelon", "drapeau": "🇵🇲", "capitale": "Saint-Pierre", "continent": "Amérique du Nord", "oceans": ["Atlantique"], "mers": [], "voisins": [], "langues": ["Français"] },
+    { "code": "GP", "nom": "Guadeloupe", "drapeau": "🇬🇵", "capitale": "Basse-Terre", "continent": "Amérique du Nord", "oceans": ["Atlantique"], "mers": ["Mer des Caraïbes"], "voisins": [], "langues": ["Français"] },
+    { "code": "MQ", "nom": "Martinique", "drapeau": "🇲🇶", "capitale": "Fort-de-France", "continent": "Amérique du Nord", "oceans": ["Atlantique"], "mers": ["Mer des Caraïbes"], "voisins": [], "langues": ["Français"] },
+
+    { "code": "GF", "nom": "Guyane française", "drapeau": "🇬🇫", "capitale": "Cayenne", "continent": "Amérique du Sud", "oceans": ["Atlantique"], "mers": [], "voisins": ["BR","SR"], "langues": ["Français"] },
+
+    { "code": "RE", "nom": "La Réunion", "drapeau": "🇷🇪", "capitale": "Saint-Denis", "continent": "Afrique", "oceans": ["Indien"], "mers": [], "voisins": [], "langues": ["Français"] },
+    { "code": "YT", "nom": "Mayotte", "drapeau": "🇾🇹", "capitale": "Mamoudzou", "continent": "Afrique", "oceans": ["Indien"], "mers": [], "voisins": [], "langues": ["Français"] },
+    { "code": "EH", "nom": "Sahara occidental", "drapeau": "🇪🇭", "capitale": "El Aaiún", "continent": "Afrique", "oceans": ["Atlantique"], "mers": [], "voisins": ["MA","DZ","MR"], "langues": ["Arabe"] },
+
+    { "code": "SJ", "nom": "Svalbard et Jan Mayen", "drapeau": "🇸🇯", "capitale": "Longyearbyen", "continent": "Europe", "oceans": ["Arctique"], "mers": [], "voisins": [], "langues": ["Norvégien"] },
+    { "code": "GG", "nom": "Guernesey", "drapeau": "🇬🇬", "capitale": "Saint-Pierre-Port", "continent": "Europe", "oceans": ["Atlantique"], "mers": ["Manche"], "voisins": [], "langues": ["Anglais", "Normand"] },
+    { "code": "JE", "nom": "Jersey", "drapeau": "🇯🇪", "capitale": "Saint-Hélier", "continent": "Europe", "oceans": ["Atlantique"], "mers": ["Manche"], "voisins": [], "langues": ["Anglais", "Normand"] },
+    { "code": "IM", "nom": "Île de Man", "drapeau": "🇮🇲", "capitale": "Douglas", "continent": "Europe", "oceans": ["Atlantique"], "mers": [], "voisins": [], "langues": ["Anglais", "Mannois"] },
+    { "code": "AX", "nom": "Åland", "drapeau": "🇦🇽", "capitale": "Mariehamn", "continent": "Europe", "oceans": [], "mers": ["Mer Baltique"], "voisins": [], "langues": ["Suédois"] }
 
   ]
 }

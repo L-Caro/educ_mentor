@@ -19,6 +19,7 @@ const ALL_TYPE_CHOICES: SetupChoice[] = [
   { value: 'country_borders',            icon: '🤝', label: 'Pays frontaliers' },
   { value: 'select_language_countries',  icon: '🗣️', label: "Pays d'une langue" },
   { value: 'identify_country',           icon: '🗺️', label: 'Situer un pays' },
+  { value: 'identify_continent',         icon: '🌍', label: 'Situer un continent' },
 ];
 
 async function loadEnabledTypes(): Promise<SetupChoice[]> {

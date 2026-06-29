@@ -80,6 +80,31 @@
   }
 }
 
+// ─── Carte continents ─────────────────────────────────────────────────────────
+
+.ContinentMap {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  touch-action: manipulation;
+
+  &__path {
+    fill: var(--color-base-content);
+    stroke: var(--color-base-100);
+    stroke-width: 0.5;
+    cursor: pointer;
+    transition: fill 0.12s ease;
+
+    &:hover { fill: var(--color-primary-light, #a0c4ff); }
+
+    &--selected { fill: var(--color-primary); }
+    &--correct  { fill: var(--color-success, #22c55e); }
+    &--wrong    { fill: var(--color-error, #ef4444); }
+    &--faded    { fill: var(--color-base-content); opacity: 0.15; }
+    &--neutral  { fill: var(--color-base-content); opacity: 0.35; cursor: default; }
+  }
+}
+
 // ─── Admin types de questions ────────────────────────────────────────────────
 
 .GeoTypeGrid {

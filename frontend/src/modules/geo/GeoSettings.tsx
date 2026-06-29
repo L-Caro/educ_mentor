@@ -19,6 +19,7 @@ const QUESTION_TYPES = [
   { value: 'country_borders',            icon: '🤝', label: 'Pays frontaliers',          description: 'Choix multiples : voisins de la France' },
   { value: 'select_language_countries',  icon: '🗣️', label: 'Pays d\'une langue',       description: 'Choix multiples : pays parlant espagnol' },
   { value: 'identify_country',           icon: '🗺️', label: 'Situer un pays',            description: 'Cliquer sur le pays sur la carte du monde' },
+  { value: 'identify_continent',         icon: '🌍', label: 'Situer un continent',        description: 'Cliquer sur le continent sur la carte du monde' },
 ] as const;
 
 const ALL_TYPE_VALUES = QUESTION_TYPES.map((t) => t.value);

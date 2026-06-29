@@ -18,6 +18,7 @@ export const ALL_QUESTION_TYPES = [
   'country_borders',
   'select_language_countries',
   'identify_country',
+  'identify_continent',
 ] as const;
 
 export type GeoQuestionType = typeof ALL_QUESTION_TYPES[number];
