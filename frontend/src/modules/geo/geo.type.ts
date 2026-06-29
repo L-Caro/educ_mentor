@@ -22,7 +22,8 @@ export interface GeoQuestion {
   choices: string[];
   answer: string | null;
   answers: string[] | null;
-  is_map?: boolean;
+  continent?: string | null;
+  map_filter?: string[] | null;
 }
 
 export interface GeoSessionResponse {

@@ -37,6 +37,8 @@ export interface GeoQuestion {
   choices: string[];
   answer: string | null;
   answers: string[] | null;
+  continent?: string | null;
+  map_filter?: string[] | null;
 }
 
 export interface GeoSessionResult {
@@ -216,7 +218,7 @@ export class GeoService {
       case 'select_continent_countries': return this.genSelectContinentCountries(activePays, difficulty);
       case 'country_borders':      return this.genCountryBorders(activePays, difficulty);
       case 'select_language_countries':  return this.genSelectLanguageCountries(activePays, difficulty);
-      case 'identify_country':           return this.genIdentifyCountry(activePays);
+      case 'identify_country':           return this.genIdentifyCountry(activePays, difficulty);
       default: return null;
     }
   }
@@ -515,9 +517,23 @@ export class GeoService {
     });
   }
 
-  private genIdentifyCountry(pays: Pays[]): GeoQuestion | null {
+  private genIdentifyCountry(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
+
+    let continent: string | null = null;
+    let map_filter: string[] | null = null;
+
+    if (difficulty !== 'hard') {
+      continent = p.continent;
+
+      if (difficulty === 'easy') {
+        const sameContinent = pays.filter((x) => x.continent === p.continent && x.code !== p.code);
+        const distractors = this.shuffle(sameContinent).slice(0, 3).map((x) => x.code);
+        map_filter = this.shuffle([p.code, ...distractors]);
+      }
+    }
+
     return {
       type: 'identify_country',
       item_key: `identify_country_${p.code}`,
@@ -527,6 +543,8 @@ export class GeoService {
       choices: [],
       answer: p.code,
       answers: null,
+      continent,
+      map_filter,
     };
   }
 
