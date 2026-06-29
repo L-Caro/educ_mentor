@@ -79,6 +79,10 @@ export interface GameModuleSpec<TSession, TQuestion> {
     isCorrect: (question: TQuestion, distanceKm: number) => boolean;
     feedbackLabel: (distanceKm: number) => string;
   };
+  /** Contenu affiché avant la première question (ex : texte à lire en mode difficile).
+   * Si null ou absent, la partie démarre directement. */
+  preamble?: (session: TSession) => ReactNode | null;
+
   correctionLabel: (question: TQuestion) => ReactNode;
 
   recordAnswer: (sessionId: string, question: TQuestion, correct: boolean, given: unknown) => Promise<void>;
@@ -98,10 +102,11 @@ export interface SetupChoice {
 }
 
 /** Une option de pré-jeu : choix unique (`single`) ou multiple (`multi`).
- * `choices` statiques OU `loader` async (résolu par <ModulePreSetup> avant rendu). */
+ * `choices` statiques OU `loader` async (résolu par <ModulePreSetup> avant rendu).
+ * `emptyMessage` affiché à la place de la liste vide quand `choices` est vide après résolution. */
 export type SetupOption =
-  | { key: string; type: 'single'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> }
-  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]> };
+  | { key: string; type: 'single'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]>; emptyMessage?: string }
+  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]>; emptyMessage?: string };
 
 export type SetupValues = Record<string, string | string[]>;
 

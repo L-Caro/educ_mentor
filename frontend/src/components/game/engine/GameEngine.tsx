@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDevMode, useGameSession, useAppSelector } from 'src/hooks';
 import { selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
@@ -28,6 +28,7 @@ export default function GameEngine<TSession, TQuestion>({
   const { isDevMode } = useDevMode();
   const setup = useAppSelector(selectModuleSetup(moduleId)) ?? {};
 
+  const [preambleDone, setPreambleDone] = useState(!spec.preamble);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [freeInput, setFreeInput] = useState('');
@@ -59,6 +60,12 @@ export default function GameEngine<TSession, TQuestion>({
     skipApiCalls: isDevMode,
     emptySessionError: spec.emptyError,
   });
+
+  useEffect(() => {
+    if (!preambleDone && spec.preamble && session && spec.preamble(session) === null) {
+      setPreambleDone(true);
+    }
+  }, [preambleDone, session, spec.preamble]);
 
   // Mode dérivé des seuls choix : aucun choix = saisie libre, sinon QCM.
   function isFree(question: TQuestion): boolean {
@@ -132,6 +139,23 @@ export default function GameEngine<TSession, TQuestion>({
 
   if (error || !session || getQuestions(session).length === 0) {
     return <GameStateView errorMessage={error || spec.emptyError || 'Aucune question disponible.'} onBack={() => navigate(homePath)} />;
+  }
+
+  if (!preambleDone) {
+    const preambleContent = spec.preamble!(session);
+    if (preambleContent !== null) {
+      return (
+        <PageContainer className="GameEngine">
+          <GameCard>{preambleContent}</GameCard>
+          <GameFooter
+            onTerminate={handleTerminate}
+            onValidate={() => setPreambleDone(true)}
+            isValidateDisabled={false}
+            validateLabel="📖 J'ai lu, je commence !"
+          />
+        </PageContainer>
+      );
+    }
   }
 
   const questions = getQuestions(session);

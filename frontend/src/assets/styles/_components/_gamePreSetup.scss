@@ -45,6 +45,16 @@
     gap: v.$space-4;
   }
 
+  &__emptyMessage {
+    width: 100%;
+    text-align: center;
+    font-size: v.$font-size-sm;
+    color: var(--color-base-content);
+    opacity: 0.5;
+    padding: v.$space-4 0;
+    margin: 0;
+  }
+
   &__choice {
     display: flex;
     flex-direction: column;

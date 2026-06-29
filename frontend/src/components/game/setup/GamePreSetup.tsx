@@ -53,6 +53,9 @@ export default function GamePreSetup({
           <section key={option.key} className="GamePreSetup__group">
             <p className="GamePreSetup__groupLabel">{option.label}</p>
             <div className="GamePreSetup__choices">
+              {(option.choices ?? []).length === 0 && option.emptyMessage && (
+                <p className="GamePreSetup__emptyMessage">{option.emptyMessage}</p>
+              )}
               {(option.choices ?? []).map((choice) => {
                 const isSelected =
                   option.type === 'single'

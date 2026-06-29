@@ -67,4 +67,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 8,
   },
+  {
+    id: 'lecture',
+    name: 'Lecture & Compréhension',
+    description: 'Lire un texte et répondre à des questions de compréhension',
+    icon: '📖',
+    is_active: false,
+    display_order: 9,
+  },
 ];
