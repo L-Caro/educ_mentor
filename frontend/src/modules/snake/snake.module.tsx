@@ -3,6 +3,7 @@ import SnakeGame from './SnakeGame';
 
 export const snakeModule: ModuleManifest = {
   id: 'snake',
+  category: 'jeux',
   setupOptions: [
     {
       key: 'difficulty',

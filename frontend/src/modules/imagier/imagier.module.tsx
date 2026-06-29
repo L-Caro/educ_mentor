@@ -5,6 +5,7 @@ import { IMAGIER_SETUP_OPTIONS } from './imagier.setup.ts';
 
 export const imagierModule: ModuleManifest = {
   id: 'imagier',
+  category: 'anglais',
   setupOptions: IMAGIER_SETUP_OPTIONS,
   loadGameSpec: () => import('./imagier.game.tsx').then((module) => module.imagierGameSpec),
   adminTabs: [

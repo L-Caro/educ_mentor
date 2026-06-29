@@ -27,6 +27,7 @@ const HEURE_SETUP_OPTIONS: SetupOption[] = [
 
 export const heureModule: ModuleManifest = {
   id: 'heure',
+  category: 'maths',
   setupOptions: HEURE_SETUP_OPTIONS,
   loadGameSpec: () => import('./heure.game.tsx').then((module) => module.heureGameSpec),
   adminTabs: [{ to: '/admin/heure', label: 'Paramètres', end: true }],

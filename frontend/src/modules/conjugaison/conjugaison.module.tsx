@@ -49,6 +49,7 @@ const CONJUGAISON_SETUP_OPTIONS: SetupOption[] = [
 
 export const conjugaisonModule: ModuleManifest = {
   id: 'conjugaison',
+  category: 'francais',
   setupOptions: CONJUGAISON_SETUP_OPTIONS,
   loadGameSpec: () => import('./conjugaison.game.tsx').then((m) => m.conjugaisonGameSpec),
   adminTabs: [{ to: '/admin/conjugaison', label: 'Paramètres', end: true }],

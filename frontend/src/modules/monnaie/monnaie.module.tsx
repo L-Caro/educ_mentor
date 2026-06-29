@@ -18,6 +18,7 @@ const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
 
 export const monnaieModule: ModuleManifest = {
   id: 'monnaie',
+  category: 'maths',
   setupOptions: MONNAIE_SETUP_OPTIONS,
   loadGameSpec: () => import('./monnaie.game.tsx').then((module) => module.monnaieGameSpec),
   adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],

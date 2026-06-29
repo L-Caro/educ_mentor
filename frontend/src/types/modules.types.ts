@@ -10,8 +10,11 @@ export interface ProgressionStat {
   incorrect_count: number;
 }
 
+export type ModuleCategory = 'maths' | 'francais' | 'geo' | 'anglais' | 'jeux';
+
 export interface ModuleManifest {
   id: string;            // = AppModule.id (backend) et segment d'URL ; label/icon = catalogue backend (useModuleMeta)
+  category?: ModuleCategory; // utilisé pour les filtres de la page d'accueil
   setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
   skipDifficulty?: boolean;       // true = ne pas injecter l'option difficulty commune
   // Import dynamique de la spec de jeu (code-splitting) : la spec n'est chargée qu'à l'entrée en jeu,

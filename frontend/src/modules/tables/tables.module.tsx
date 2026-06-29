@@ -5,6 +5,7 @@ import { TABLES_SETUP_OPTIONS } from './tables.setup.ts';
 
 export const tablesModule: ModuleManifest = {
   id: 'tables',
+  category: 'maths',
   setupOptions: TABLES_SETUP_OPTIONS,
   loadGameSpec: () => import('./tables.game.tsx').then((module) => module.tablesGameSpec),
   adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],

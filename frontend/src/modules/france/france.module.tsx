@@ -36,6 +36,7 @@ async function loadEnabledTypes(): Promise<SetupChoice[]> {
 
 export const franceModule: ModuleManifest = {
   id: 'france',
+  category: 'geo',
   setupOptions: [
     { key: 'questionTypes', type: 'multi', label: 'Types de questions', loader: loadEnabledTypes },
   ],

@@ -25,6 +25,7 @@ async function loadTexts(): Promise<SetupChoice[]> {
 
 export const lectureModule: ModuleManifest = {
   id: 'lecture',
+  category: 'francais',
   setupOptions: [
     {
       key: 'difficulty',

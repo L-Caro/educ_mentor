@@ -20,6 +20,7 @@ const CALCUL_SETUP_OPTIONS: SetupOption[] = [
 
 export const calculModule: ModuleManifest = {
   id: 'calcul-mental',
+  category: 'maths',
   setupOptions: CALCUL_SETUP_OPTIONS,
   loadGameSpec: () => import('./calcul.game.tsx').then((module) => module.calculGameSpec),
   adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],

@@ -4,6 +4,7 @@ import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 
 export const numerationModule: ModuleManifest = {
   id:             'numeration',
+  category:       'maths',
   skipDifficulty: true,
   setupOptions: [
     {
