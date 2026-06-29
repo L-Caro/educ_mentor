@@ -182,7 +182,7 @@ export default function GameEngine<TSession, TQuestion>({
       : isMapMulti ? selectedKeys.size === 0
       : isMap    ? selectedKey === null
       : qcm      ? (isMulti ? selectedKeys.size === 0 : selectedKey === null)
-      : freeInput.trim() === ''
+      : spec.free?.isReady ? !spec.free.isReady(question, freeInput) : freeInput.trim() === ''
     );
 
   return (
@@ -248,7 +248,9 @@ export default function GameEngine<TSession, TQuestion>({
           )
         ) : (
           <GameInput
-            {...(spec.free?.inputProps ?? {})}
+            {...(typeof spec.free?.inputProps === 'function'
+              ? spec.free.inputProps(question)
+              : (spec.free?.inputProps ?? {}))}
             value={answerState === 'timeout' ? '' : freeInput}
             onChange={setFreeInput}
             onSubmit={handleValidate}

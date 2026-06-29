@@ -75,4 +75,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 9,
   },
+  {
+    id: 'numeration',
+    name: 'Numération',
+    description: 'Comparaison, suites, décomposition, valeur positionnelle',
+    icon: '🔢',
+    is_active: false,
+    display_order: 10,
+  },
 ];

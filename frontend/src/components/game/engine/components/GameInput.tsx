@@ -2,13 +2,19 @@ import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { GameAnswerState } from 'src/hooks';
 
+const DECOMPOSE_LABELS: Record<string, string> = {
+  u: 'unités', d: 'dizaines', c: 'centaines',
+  m: 'milliers', dm: 'diz. milliers', cm: 'cent. milliers',
+};
+
 interface GameInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
   answerState: GameAnswerState;
-  variant?: 'number' | 'text' | 'time';
+  variant?: 'number' | 'text' | 'time' | 'decompose';
   timeSeparator?: ':' | 'h';
+  decomposePositions?: string[];           // pour variant='decompose', ordre le plus haut → plus bas
   placeholder?: string;
   maxLength?: number;
   numeric?: boolean;                       // type=tel + inputMode=numeric + filtre les non-chiffres
@@ -30,6 +36,7 @@ export default function GameInput({
   answerState,
   variant = 'number',
   timeSeparator = ':',
+  decomposePositions,
   placeholder,
   maxLength,
   numeric = false,
@@ -104,6 +111,44 @@ export default function GameInput({
             autoComplete="off"
           />
         </div>
+      </div>
+    );
+  }
+
+  // ── Variant decompose ─────────────────────────────────────────────────────
+
+  if (variant === 'decompose') {
+    const positions = decomposePositions ?? [];
+    const parts = value ? value.split(':') : positions.map(() => '');
+
+    function handlePartChange(i: number, raw: string) {
+      if (isLocked) return;
+      const digit = raw.replace(/\D/g, '').slice(0, 1);
+      const next = [...parts];
+      next[i] = digit;
+      onChange(next.join(':'));
+    }
+
+    return (
+      <div className="GameInput GameInput--decompose">
+        {positions.map((pos, i) => (
+          <div key={pos} className="GameInput__decomposePart">
+            <input
+              ref={i === 0 ? inputRef : undefined}
+              type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              className={`GameInput__field GameInput__field--decompose-digit${stateClass}`}
+              value={parts[i] ?? ''}
+              onChange={(e) => handlePartChange(i, e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
+              disabled={isLocked}
+              maxLength={1}
+              autoComplete="off"
+            />
+            <span className="GameInput__decomposeLabel">{DECOMPOSE_LABELS[pos] ?? pos}</span>
+          </div>
+        ))}
       </div>
     );
   }

@@ -32,8 +32,9 @@ export interface GameChoice {
 /** Sous-ensemble configurable par le module pour le champ de saisie libre.
  * Les props de contrôle (value, onChange, onSubmit, answerState) sont gérées par <GameEngine>. */
 export interface GameInputConfig {
-  variant?: 'number' | 'text' | 'time';
-  timeSeparator?: ':' | 'h';  // uniquement pour variant='time' : caractère affiché entre HH et MM
+  variant?: 'number' | 'text' | 'time' | 'decompose';
+  timeSeparator?: ':' | 'h';         // uniquement pour variant='time'
+  decomposePositions?: string[];     // uniquement pour variant='decompose', ordre le plus haut → plus bas
   placeholder?: string;
   maxLength?: number;
   numeric?: boolean;
@@ -61,7 +62,10 @@ export interface GameModuleSpec<TSession, TQuestion> {
   free?: {
     parse: (raw: string) => unknown;
     isCorrect: (question: TQuestion, given: unknown) => boolean;
-    inputProps?: GameInputConfig;
+    /** Config du champ de saisie. Peut être statique ou une fonction par question. */
+    inputProps?: GameInputConfig | ((question: TQuestion) => GameInputConfig);
+    /** Retourne true si la saisie est suffisante pour valider (remplace le test `trim() !== ''`). */
+    isReady?: (question: TQuestion, input: string) => boolean;
   };
   map?: {
     /** Retourne le composant à utiliser pour cette question. */

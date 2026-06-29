@@ -13,6 +13,7 @@ export interface ProgressionStat {
 export interface ModuleManifest {
   id: string;            // = AppModule.id (backend) et segment d'URL ; label/icon = catalogue backend (useModuleMeta)
   setupOptions?: SetupOption[];   // options de pré-jeu déclaratives (rendues par <ModulePreSetup>)
+  skipDifficulty?: boolean;       // true = ne pas injecter l'option difficulty commune
   // Import dynamique de la spec de jeu (code-splitting) : la spec n'est chargée qu'à l'entrée en jeu,
   // pas dans le bundle initial. Registre hétérogène → `any` assumé (spec typée dans `<id>.game.tsx`).
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

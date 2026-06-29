@@ -1,0 +1,134 @@
+@use 'src/assets/styles/_abstracts/variables' as v;
+
+// ─── Prompt de question ────────────────────────────────────────────────────────
+
+.NumerationPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-3;
+  width: 100%;
+
+  &--comparaison {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: v.$space-5;
+  }
+
+  &__number {
+    font-size: v.$font-size-3xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+    min-width: 3rem;
+    text-align: center;
+  }
+
+  &__blank {
+    font-size: v.$font-size-3xl;
+    color: var(--color-primary);
+    opacity: 0.5;
+  }
+
+  &--suite {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: v.$space-2;
+  }
+
+  &__term {
+    font-size: v.$font-size-2xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+    padding: v.$space-2 v.$space-3;
+    background: var(--color-base-200);
+    border-radius: v.$border-radius-2;
+    min-width: 3.5rem;
+    text-align: center;
+
+    &--blank {
+      color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    }
+  }
+
+  &--decomposition {
+    gap: v.$space-2;
+  }
+
+  &__label {
+    font-size: v.$font-size-sm;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-base-content);
+    opacity: 0.5;
+    margin: 0;
+  }
+
+  &__bigNumber {
+    font-size: v.$font-size-3xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+  }
+
+  &--valpos {
+    padding: v.$space-2 0;
+  }
+
+  &__question {
+    font-size: v.$font-size-lg;
+    font-weight: 600;
+    color: var(--color-base-content);
+    text-align: center;
+    margin: 0;
+  }
+}
+
+// ─── Input décomposition ──────────────────────────────────────────────────────
+
+.GameInput--decompose {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: v.$space-3;
+  padding: v.$space-2 0;
+  width: 100%;
+}
+
+.GameInput__decomposePart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-2;
+  flex-shrink: 0;
+}
+
+.GameInput__field--decompose-digit {
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: v.$font-size-lg;
+  font-weight: 700;
+  text-align: center;
+  border: 2px solid var(--color-base-300);
+  border-radius: v.$border-radius-2;
+  background: var(--color-base-100);
+  color: var(--color-base-content);
+  outline: none;
+  transition: border-color 0.15s;
+
+  &:focus { border-color: var(--color-primary); }
+  &--correct { border-color: var(--color-success); background: color-mix(in srgb, var(--color-success) 10%, transparent); }
+  &--wrong   { border-color: var(--color-error);   background: color-mix(in srgb, var(--color-error)   10%, transparent); }
+}
+
+.GameInput__decomposeLabel {
+  font-size: v.$font-size-xs;
+  color: var(--color-base-content);
+  opacity: 0.6;
+  text-align: center;
+  white-space: nowrap;
+}
