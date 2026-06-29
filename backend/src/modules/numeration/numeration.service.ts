@@ -92,7 +92,7 @@ export class NumerationService {
   // ─── Progression ───────────────────────────────────────────────────────────
 
   async getProgression(): Promise<{ is_mastered: boolean; correct_count: number; incorrect_count: number }[]> {
-    const prog = await this.progressionRepo.findOne({ where: {} });
+    const [prog] = await this.progressionRepo.find({ take: 1, order: { id: 'ASC' } });
     if (!prog) return [];
     return [{
       is_mastered:     prog.best_total > 0 && prog.best_correct === prog.best_total,
@@ -136,7 +136,7 @@ export class NumerationService {
   }
 
   private async updateProgression(correct: number, total: number): Promise<void> {
-    let prog = await this.progressionRepo.findOne({ where: {} });
+    let [prog] = await this.progressionRepo.find({ take: 1, order: { id: 'ASC' } });
     if (prog) {
       prog.play_count++;
       prog.last_played_at = new Date();
@@ -239,6 +239,7 @@ export class NumerationService {
       }
 
       case 'decomposition': {
+        if (positions.length === 0) return null;
         const min    = this.minForDecompose(positions);
         const number = this.rand(min, max);
         // Sorted highest → lowest for display order

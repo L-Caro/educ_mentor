@@ -2,11 +2,6 @@ import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { GameAnswerState } from 'src/hooks';
 
-const DECOMPOSE_LABELS: Record<string, string> = {
-  u: 'unités', d: 'dizaines', c: 'centaines',
-  m: 'milliers', dm: 'diz. milliers', cm: 'cent. milliers',
-};
-
 interface GameInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -15,6 +10,7 @@ interface GameInputProps {
   variant?: 'number' | 'text' | 'time' | 'decompose';
   timeSeparator?: ':' | 'h';
   decomposePositions?: string[];           // pour variant='decompose', ordre le plus haut → plus bas
+  decomposeLabels?: Record<string, string>; // labels sous chaque champ, fournis par le module appelant
   placeholder?: string;
   maxLength?: number;
   numeric?: boolean;                       // type=tel + inputMode=numeric + filtre les non-chiffres
@@ -37,6 +33,7 @@ export default function GameInput({
   variant = 'number',
   timeSeparator = ':',
   decomposePositions,
+  decomposeLabels,
   placeholder,
   maxLength,
   numeric = false,
@@ -146,7 +143,7 @@ export default function GameInput({
               maxLength={1}
               autoComplete="off"
             />
-            <span className="GameInput__decomposeLabel">{DECOMPOSE_LABELS[pos] ?? pos}</span>
+            <span className="GameInput__decomposeLabel">{decomposeLabels?.[pos] ?? pos}</span>
           </div>
         ))}
       </div>

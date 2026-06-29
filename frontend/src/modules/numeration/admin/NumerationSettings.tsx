@@ -1,7 +1,6 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi';
 import Spinner from 'src/components/common/Spinner';
-
-type PositionKey = 'u' | 'd' | 'c' | 'm' | 'dm' | 'cm';
+import type { PositionKey } from '../numeration.type';
 
 const POSITIONS: { key: PositionKey; label: string }[] = [
   { key: 'u',  label: 'Unités (1–9)' },

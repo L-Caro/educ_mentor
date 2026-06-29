@@ -35,6 +35,7 @@ export interface GameInputConfig {
   variant?: 'number' | 'text' | 'time' | 'decompose';
   timeSeparator?: ':' | 'h';         // uniquement pour variant='time'
   decomposePositions?: string[];     // uniquement pour variant='decompose', ordre le plus haut → plus bas
+  decomposeLabels?: Record<string, string>;   // labels affichés sous chaque champ de décomposition
   placeholder?: string;
   maxLength?: number;
   numeric?: boolean;

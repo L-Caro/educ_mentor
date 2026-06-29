@@ -121,6 +121,7 @@ export default function GameEngine<TSession, TQuestion>({
       }
     } else {
       if (!spec.free || freeInput.trim() === '') return;
+      if (spec.free.isReady && !spec.free.isReady(question, freeInput)) return;
       given = spec.free.parse(freeInput);
       correct = spec.free.isCorrect(question, given);
     }

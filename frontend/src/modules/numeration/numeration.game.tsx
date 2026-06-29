@@ -87,7 +87,7 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
     parse:     (raw) => raw.trim(),
     isCorrect: (q, given) => String(given) === q.answer,
     inputProps: (q) => q.type === 'decomposition'
-      ? { variant: 'decompose' as const, decomposePositions: q.decompose_positions ?? [] }
+      ? { variant: 'decompose' as const, decomposePositions: q.decompose_positions ?? [], decomposeLabels: POSITION_NAME }
       : { variant: 'number'   as const, numeric: true },
     isReady: (q, input) => {
       if (q.type !== 'decomposition') return input.trim() !== '';
@@ -119,7 +119,7 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
     if (typeof given === 'string' && given && question.type === 'decomposition') {
       const positions = question.decompose_positions ?? [];
       const digits    = given.split(':');
-      givenLabel = positions.map((pos, i) => `${digits[i] ?? '?'} ${POSITION_NAME[pos]}`).join(', ');
+      givenLabel = positions.map((pos, i) => `${digits[i] || '?'} ${POSITION_NAME[pos]}`).join(', ');
     } else if (typeof given === 'string' && given) {
       givenLabel = given;
     }
