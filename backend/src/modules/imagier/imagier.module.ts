@@ -20,5 +20,6 @@ import { AuthModule } from '../auth/auth.module';
   ],
   providers: [ImagierService, ImagierImportService],
   controllers: [ImagierGameController, ImagierAdminController],
+  exports: [ImagierService],
 })
 export class ImagierModule {}

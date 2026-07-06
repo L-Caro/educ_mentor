@@ -83,4 +83,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 10,
   },
+  {
+    id: 'memory',
+    name: 'Memory',
+    description: 'Retrouver les paires de cartes identiques ou image + mot',
+    icon: '🃏',
+    is_active: false,
+    display_order: 11,
+  },
 ];

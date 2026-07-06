@@ -21,6 +21,7 @@ import { GeoModule } from './modules/geo/geo.module';
 import { FranceModule } from './modules/france/france.module';
 import { LectureModule } from './modules/lecture/lecture.module';
 import { NumerationModule } from './modules/numeration/numeration.module';
+import { MemoryModule } from './modules/memory/memory.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { AccessGuard } from './modules/invitation/access.guard';
 
@@ -62,6 +63,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     FranceModule,
     LectureModule,
     NumerationModule,
+    MemoryModule,
     InvitationModule,
   ],
   providers: [

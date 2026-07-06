@@ -279,6 +279,32 @@ export class ImagierService {
     return { updated };
   }
 
+  // ─── Memory ───────────────────────────────────────────────────────────────
+
+  async getRandomWordsWithImages(
+    categories: string[] | undefined,
+    count: number,
+  ): Promise<{ id: string; fr: string; en: string; image_url: string | null }[]> {
+    const qb = this.wordRepo
+      .createQueryBuilder('w')
+      .where('w.is_active = 1')
+      .andWhere('w.image_filename IS NOT NULL');
+
+    if (categories?.length) {
+      qb.andWhere('w.category IN (:...cats)', { cats: categories });
+    }
+
+    const allWords = await qb.getMany();
+    const selected = this.shuffle(allWords).slice(0, count);
+
+    return selected.map((w) => ({
+      id: w.id,
+      fr: w.fr,
+      en: w.en,
+      image_url: this.buildImageUrl(w),
+    }));
+  }
+
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
   private slugify(str: string): string {
