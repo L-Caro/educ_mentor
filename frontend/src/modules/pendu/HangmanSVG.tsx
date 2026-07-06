@@ -30,7 +30,7 @@ function renderPart(part: PartName) {
   }
 }
 
-export default function HangmanSVG({ wrongCount, maxErrors }: HangmanSVGProps) {
+export default function HangmanSVG({ wrongCount }: HangmanSVGProps) {
   const visibleParts = PARTS_6.slice(0, wrongCount);
 
   return (
