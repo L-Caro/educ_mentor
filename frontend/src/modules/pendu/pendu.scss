@@ -1,0 +1,92 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.PenduGame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: $space-5;
+  gap: $space-6;
+  overflow-y: auto;
+
+  &__word {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__letter {
+    width: 2.4rem;
+    height: 3rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: $space-2;
+    border-bottom: 3px solid var(--color-base-content);
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+
+    &--revealed { color: var(--color-primary); }
+    &--preRevealed { color: var(--color-accent); }
+  }
+
+  &__letters {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: $space-2;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  &__letterBtn {
+    aspect-ratio: 1;
+    min-height: 2.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-base-300);
+    border-radius: $radius-md;
+    background: var(--color-base-100);
+    font-size: $font-size-base;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--color-base-content);
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+    &:hover:not(:disabled):not(.PenduGame__letterBtn--correct):not(.PenduGame__letterBtn--wrong) {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 10%, var(--color-base-100));
+    }
+
+    &--correct {
+      background: color-mix(in srgb, var(--color-success) 15%, var(--color-base-100));
+      border-color: var(--color-success);
+      color: var(--color-success);
+      cursor: default;
+    }
+
+    &--wrong {
+      background: color-mix(in srgb, var(--color-error) 10%, var(--color-base-100));
+      border-color: var(--color-error);
+      color: var(--color-error);
+      cursor: default;
+    }
+
+    &:disabled { opacity: 0.35; cursor: not-allowed; }
+    &:last-child { grid-column: 1 / -1; aspect-ratio: unset; min-height: 5.8rem }
+  }
+
+  &__over {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-5;
+    padding: $space-6;
+    text-align: center;
+
+    &Message { font-size: $font-size-xl; font-weight: 700; }
+    &Actions { display: flex; gap: $space-4; }
+  }
+}

@@ -1,0 +1,146 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── PenduWordList ────────────────────────────────────────────────────────────
+
+.PenduWordList {
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: v.$space-5;
+	}
+
+	&__count {
+		color: var(--color-base-content);
+		opacity: 0.4;
+		font-size: v.$font-size-sm;
+	}
+
+	&__filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: v.$space-3;
+		margin-bottom: v.$space-5;
+	}
+
+	&__filterGroup {
+		display: flex;
+		border: 1px solid var(--color-base-300);
+		border-radius: v.$border-radius-2;
+		overflow: hidden;
+	}
+
+	&__filterBtn {
+		padding: v.$space-3 v.$space-5;
+		font-size: v.$font-size-sm;
+		font-weight: 500;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		color: var(--color-base-content);
+		transition: background 0.15s;
+
+		& + & { border-left: 1px solid var(--color-base-300); }
+		&:hover { background: var(--color-base-200); }
+
+		&--active {
+			background: var(--color-primary);
+			color: var(--color-primary-content);
+		}
+	}
+
+	&__cellWord { font-weight: 600; }
+
+	&__diffBadge {
+		display: inline-block;
+		padding: v.$space-1 v.$space-3;
+		border-radius: v.$radius-pill;
+		font-size: v.$font-size-xs;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+
+		&--easy {
+			background: color-mix(in srgb, var(--color-success) 15%, var(--color-base-100));
+			color: var(--color-success);
+		}
+
+		&--normal {
+			background: var(--color-base-200);
+			color: var(--color-base-content);
+			opacity: 0.7;
+		}
+
+		&--hard {
+			background: color-mix(in srgb, var(--color-error) 12%, var(--color-base-100));
+			color: var(--color-error);
+		}
+	}
+}
+
+// ─── PenduWordForm ────────────────────────────────────────────────────────────
+
+.PenduWordForm {
+	&__title {
+		font-size: v.$font-size-xl;
+		font-weight: 700;
+		color: var(--color-base-content);
+		margin: 0 0 v.$space-7;
+	}
+
+	&__card {
+		max-width: 36rem;
+		display: flex;
+		flex-direction: column;
+		gap: v.$space-6;
+	}
+
+	&__field {
+		display: flex;
+		flex-direction: column;
+		gap: v.$space-2;
+	}
+
+	&__label {
+		font-size: v.$font-size-sm;
+		font-weight: 600;
+		color: var(--color-base-content);
+	}
+
+	&__input,
+	&__select {
+		padding: v.$space-4 v.$space-5;
+		border: 1px solid var(--color-base-300);
+		border-radius: v.$border-radius-2;
+		font-size: v.$font-size-base;
+		background: var(--color-base-100);
+		color: var(--color-base-content);
+		outline: none;
+
+		&:focus { border-color: var(--color-primary); }
+	}
+
+	&__checkRow {
+		display: flex;
+		align-items: center;
+		gap: v.$space-4;
+		cursor: pointer;
+
+		input[type='checkbox'] {
+			width: 1.125rem;
+			height: 1.125rem;
+			accent-color: var(--color-primary);
+			cursor: pointer;
+		}
+
+		span { font-size: v.$font-size-base; }
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: flex-end;
+		gap: v.$space-3;
+		padding-top: v.$space-5;
+		border-top: 1px solid var(--color-base-200);
+	}
+}

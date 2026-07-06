@@ -91,4 +91,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 11,
   },
+  {
+    id: 'pendu',
+    name: 'Le Pendu',
+    description: 'Deviner un mot lettre par lettre avant que le bonhomme soit pendu',
+    icon: '🪢',
+    is_active: false,
+    display_order: 12,
+  },
 ];
