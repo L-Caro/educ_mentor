@@ -152,7 +152,7 @@ export default function GameEngine<TSession, TQuestion>({
             onTerminate={handleTerminate}
             onValidate={() => setPreambleDone(true)}
             isValidateDisabled={false}
-            validateLabel="📖 J'ai lu, je commence !"
+            validateLabel="📖 J'ai lu, je commence"
           />
         </PageContainer>
       );
