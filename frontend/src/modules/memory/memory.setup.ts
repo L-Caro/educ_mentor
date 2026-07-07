@@ -27,6 +27,8 @@ export const MEMORY_SETUP_OPTIONS: SetupOption[] = [
       { value: '20', label: '20 paires' },
       { value: '24', label: '24 paires' },
       { value: '28', label: '28 paires' },
+      { value: '36', label: '36 paires' },
+      { value: '44', label: '44 paires' },
     ],
   },
   {

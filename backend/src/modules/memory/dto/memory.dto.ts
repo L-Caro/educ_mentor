@@ -6,7 +6,7 @@ export type MemoryMode = (typeof MEMORY_MODES)[number];
 export class StartMemorySessionDto {
   @IsInt()
   @Min(2)
-  @Max(28)
+  @Max(44)
   pairs_count: number;
 
   @IsIn(MEMORY_MODES)
