@@ -1,7 +1,27 @@
+import { useState } from 'react';
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import { useGetGeoCountriesQuery } from './geo.api.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
+import Button from 'src/components/common/Button.tsx';
 import './geo.scss';
+
+interface CountryPreset {
+  id: string;
+  name: string;
+  codes: string[];
+}
+
+const MAX_PRESETS = 5;
+
+function parsePresets(raw: string | undefined): CountryPreset[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
 const CONTINENT_ORDER = ['Europe', 'Asie', 'Afrique', 'Amérique du Nord', 'Amérique du Sud', 'Océanie'];
 
@@ -28,6 +48,10 @@ export default function GeoSettings() {
   const { data: countries = [], isLoading: loadingCountries } = useGetGeoCountriesQuery();
   const { data: rawSettings = {}, isLoading: loadingSettings } = useGetSettingsQuery();
   const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
+
+  const [addingPreset, setAddingPreset] = useState(false);
+  const [presetName, setPresetName] = useState('');
+  const [presetError, setPresetError] = useState<string | null>(null);
 
   if (loadingCountries || loadingSettings) return <Spinner size="sm" />;
 
@@ -84,6 +108,44 @@ export default function GeoSettings() {
 
   const continentsPresent = CONTINENT_ORDER.filter((c) => countries.some((p) => p.continent === c));
 
+  // ── Configurations sauvegardées ───────────────────────────────────────────
+
+  const presets = parsePresets(settings.geo_country_presets);
+
+  function savePresets(next: CountryPreset[]) {
+    updateSetting({ key: 'geo_country_presets', value: JSON.stringify(next) });
+  }
+
+  function handleCreatePreset() {
+    const name = presetName.trim();
+    if (!name) return;
+    if (presets.length >= MAX_PRESETS) {
+      setPresetError(`Maximum ${MAX_PRESETS} configurations. Supprime-en une pour en ajouter une nouvelle.`);
+      return;
+    }
+    if (presets.some((p) => p.name.toLowerCase() === name.toLowerCase())) {
+      setPresetError('Une configuration porte déjà ce nom.');
+      return;
+    }
+    savePresets([...presets, { id: crypto.randomUUID(), name, codes: [...activeCountries] }]);
+    setPresetName('');
+    setPresetError(null);
+    setAddingPreset(false);
+  }
+
+  function applyPreset(preset: CountryPreset) {
+    saveCountries(new Set(preset.codes));
+  }
+
+  function deletePreset(preset: CountryPreset) {
+    if (!confirm(`Supprimer la configuration « ${preset.name} » ?`)) return;
+    savePresets(presets.filter((p) => p.id !== preset.id));
+  }
+
+  function isPresetActive(preset: CountryPreset) {
+    return preset.codes.length === activeCountries.size && preset.codes.every((code) => activeCountries.has(code));
+  }
+
   return (
     <div className="GameSettings">
       <div className="GameSettings__header">
@@ -119,6 +181,55 @@ export default function GeoSettings() {
             );
           })}
         </div>
+      </div>
+
+      {/* ── Configurations sauvegardées ──────────────────────────────────── */}
+      <div className="AdminCard GameSettings__card GameSettings__card--full">
+        <p className="GameSettings__cardTitle">Configurations de pays sauvegardées</p>
+        <p className="GameSettings__hint" style={{ marginBottom: '1rem' }}>
+          Sauvegarde jusqu'à {MAX_PRESETS} sélections de pays nommées (une par joueur par exemple) pour les réappliquer en un clic.
+        </p>
+
+        {presets.length > 0 && (
+          <div className="GeoPresetList">
+            {presets.map((preset) => (
+              <div key={preset.id} className={`GeoPresetRow${isPresetActive(preset) ? ' GeoPresetRow--active' : ''}`}>
+                <span className="GeoPresetRow__name">{preset.name}</span>
+                <span className="GeoPresetRow__count">{preset.codes.length} pays</span>
+                <div className="GeoPresetRow__actions">
+                  <Button size="sm" variant="outline" onClick={() => applyPreset(preset)}>Appliquer</Button>
+                  <Button size="sm" variant="danger-ghost" onClick={() => deletePreset(preset)}>Suppr.</Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {addingPreset ? (
+          <div className="GeoPresetForm">
+            <input
+              className="AdminInput"
+              placeholder="Nom de la configuration (ex : Maman - Europe)"
+              value={presetName}
+              onChange={(e) => { setPresetName(e.target.value); setPresetError(null); }}
+              autoFocus
+            />
+            {presetError && <p className="GameSettings__hint" style={{ color: 'var(--color-error)' }}>{presetError}</p>}
+            <div className="GeoPresetForm__actions">
+              <Button size="sm" variant="primary" onClick={handleCreatePreset}>Enregistrer</Button>
+              <Button size="sm" variant="ghost" onClick={() => { setAddingPreset(false); setPresetName(''); setPresetError(null); }}>Annuler</Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={presets.length >= MAX_PRESETS}
+            onClick={() => setAddingPreset(true)}
+          >
+            + Enregistrer la sélection actuelle
+          </Button>
+        )}
       </div>
 
       {/* ── Pays ──────────────────────────────────────────────────────── */}

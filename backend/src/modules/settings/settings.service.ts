@@ -15,6 +15,7 @@ const DEFAULTS = {
   // ── Géographie ────────────────────────────────────────────────────────────
   geo_countries_filter: '',
   geo_question_types_filter: '',
+  geo_country_presets: '[]',
   // ── Tables de multiplication ───────────────────────────────────────────────
   tables_include_trivial: 'true',
   // ── Calcul Mental ──────────────────────────────────────────────────────────
