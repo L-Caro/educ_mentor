@@ -30,7 +30,7 @@ export interface NumerationSessionQuestion {
   display: string;
   answer: string;
   choices: string[];
-  decompose_positions: PositionKey[] | null;  // highest → lowest, only for decomposition
+  decompose_positions: PositionKey[] | null;  // ordre mélangé, only for decomposition
   suite_terms: number[] | null;               // 3 displayed terms, only for suite
 }
 
@@ -245,11 +245,9 @@ export class NumerationService {
         if (positions.length === 0) return null;
         const min    = this.minForDecompose(positions);
         const number = this.rand(min, max);
-        // Sorted highest → lowest for display order
-        const sorted = [...positions].sort(
-          (a, b) => POSITION_ORDER.indexOf(b) - POSITION_ORDER.indexOf(a),
-        );
-        const digits = sorted.map((p) => Math.floor(number / POSITION_VALUE[p]) % 10);
+        // Ordre mélangé : évite que l'enfant recopie simplement les chiffres du nombre de gauche à droite
+        const shuffled = this.shuffle(positions);
+        const digits = shuffled.map((p) => Math.floor(number / POSITION_VALUE[p]) % 10);
         const answer = digits.join(':');
         return {
           item_key:           `decomp_${number}`,
@@ -257,7 +255,7 @@ export class NumerationService {
           display:            String(number),
           answer,
           choices:            [],
-          decompose_positions: sorted,
+          decompose_positions: shuffled,
           suite_terms:        null,
         };
       }
@@ -283,5 +281,14 @@ export class NumerationService {
 
   private rand(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  private shuffle<T>(arr: T[]): T[] {
+    const result = [...arr];
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
   }
 }

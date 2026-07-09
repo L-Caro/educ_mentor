@@ -2,6 +2,7 @@ import store from 'src/store';
 import { numerationApi } from './numeration.api';
 import type { NumerationQuestion, NumerationSessionResponse, PositionKey } from './numeration.type';
 import type { GameModuleSpec } from 'src/types/game.types';
+import { formatNumbers } from 'src/utils/formatNumber';
 import './numeration.scss';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
@@ -18,9 +19,9 @@ function NumerationPrompt({ question }: { question: NumerationQuestion }) {
     const [left, , right] = question.display.split('  ');
     return (
       <div className="NumerationPrompt NumerationPrompt--comparaison">
-        <span className="NumerationPrompt__number">{left}</span>
+        <span className="NumerationPrompt__number">{formatNumbers(left)}</span>
         <span className="NumerationPrompt__blank">□</span>
-        <span className="NumerationPrompt__number">{right}</span>
+        <span className="NumerationPrompt__number">{formatNumbers(right)}</span>
       </div>
     );
   }
@@ -30,7 +31,7 @@ function NumerationPrompt({ question }: { question: NumerationQuestion }) {
     return (
       <div className="NumerationPrompt NumerationPrompt--suite">
         {terms.map((t, i) => (
-          <span key={i} className="NumerationPrompt__term">{t}</span>
+          <span key={i} className="NumerationPrompt__term">{formatNumbers(t)}</span>
         ))}
         <span className="NumerationPrompt__term NumerationPrompt__term--blank">?</span>
       </div>
@@ -41,7 +42,7 @@ function NumerationPrompt({ question }: { question: NumerationQuestion }) {
     return (
       <div className="NumerationPrompt NumerationPrompt--decomposition">
         <p className="NumerationPrompt__label">Décompose</p>
-        <span className="NumerationPrompt__bigNumber">{question.display}</span>
+        <span className="NumerationPrompt__bigNumber">{formatNumbers(question.display)}</span>
       </div>
     );
   }
@@ -49,7 +50,7 @@ function NumerationPrompt({ question }: { question: NumerationQuestion }) {
   // valeur_positionnelle
   return (
     <div className="NumerationPrompt NumerationPrompt--valpos">
-      <p className="NumerationPrompt__question">{question.display}</p>
+      <p className="NumerationPrompt__question">{formatNumbers(question.display)}</p>
     </div>
   );
 }
@@ -78,7 +79,7 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
   renderPrompt: (question) => <NumerationPrompt key={question.item_key} question={question} />,
 
   qcm: {
-    getChoices: (q) => q.choices.map((c) => ({ key: c, label: c })),
+    getChoices: (q) => q.choices.map((c) => ({ key: c, label: formatNumbers(c) })),
     correctKey: (q) => q.answer,
     layout: 'list',
   },
@@ -98,7 +99,7 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
   },
 
   correctionLabel: (q) =>
-    q.type === 'decomposition' ? correctionForDecompose(q) : q.answer,
+    q.type === 'decomposition' ? correctionForDecompose(q) : formatNumbers(q.answer),
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(numerationApi.endpoints.recordNumerationAnswer.initiate({
@@ -113,7 +114,7 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
   buildResultEntry: (question, given, correct, timeout) => {
     const expected = question.type === 'decomposition'
       ? correctionForDecompose(question)
-      : question.answer;
+      : formatNumbers(question.answer);
 
     let givenLabel: string | null = null;
     if (typeof given === 'string' && given !== '' && question.type === 'decomposition') {
@@ -121,11 +122,11 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
       const digits    = given.split(':');
       givenLabel = positions.map((pos, i) => `${digits[i] || '?'} ${POSITION_NAME[pos]}`).join(', ');
     } else if (typeof given === 'string' && given !== '') {
-      givenLabel = given;
+      givenLabel = formatNumbers(given);
     }
 
     return {
-      label:    question.display,
+      label:    formatNumbers(question.display),
       given:    givenLabel,
       expected,
       correct,
