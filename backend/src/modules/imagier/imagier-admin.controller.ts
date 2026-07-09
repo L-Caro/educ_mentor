@@ -65,11 +65,8 @@ export class ImagierAdminController {
   }
 
   // ─── Catégories ────────────────────────────────────────────────────────────
-
-  @Get('categories')
-  getCategories() {
-    return this.imagierService.getCategories();
-  }
+  // Note : la liste des catégories (GET) vit dans ImagierGameController, non protégée —
+  // elle est consommée par le pré-jeu Imagier ET Memory, pas seulement par l'admin.
 
   @Patch('normalize-categories')
   normalizeCategories() {

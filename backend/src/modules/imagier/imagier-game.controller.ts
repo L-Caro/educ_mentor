@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ImagierService } from './imagier.service';
 import {
   StartSessionDto,
@@ -6,21 +6,29 @@ import {
   CompleteSessionDto,
 } from './dto/imagier.dto';
 
-@Controller('imagier/session')
+/** Routes accessibles sans authentification admin : lancées par l'enfant pendant une partie
+ * (session de jeu + liste des catégories nécessaire au pré-jeu). Ne pas ajouter @UseGuards(JwtAuthGuard)
+ * ici — ces routes doivent rester ouvertes à tout appareil autorisé (cf. AccessGuard global). */
+@Controller('imagier')
 export class ImagierGameController {
   constructor(private readonly imagierService: ImagierService) {}
 
-  @Post()
+  @Get('categories')
+  getCategories() {
+    return this.imagierService.getCategories();
+  }
+
+  @Post('session')
   startSession(@Body() dto: StartSessionDto) {
     return this.imagierService.startSession(dto);
   }
 
-  @Post(':id/answer')
+  @Post('session/:id/answer')
   recordAnswer(@Param('id') id: string, @Body() dto: RecordAnswerDto) {
     return this.imagierService.recordAnswer(id, dto.word_id, dto.is_correct);
   }
 
-  @Post(':id/complete')
+  @Post('session/:id/complete')
   completeSession(@Param('id') id: string, @Body() dto: CompleteSessionDto) {
     return this.imagierService.completeSession(
       id,
