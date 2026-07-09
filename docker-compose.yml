@@ -1,6 +1,6 @@
 services:
   frontend:
-    build: ./frontend
+    image: ghcr.io/l-caro/educ_mentor-frontend:latest
     restart: unless-stopped
     networks:
       - traefik-network
@@ -16,7 +16,7 @@ services:
       - backend
 
   backend:
-    build: ./backend
+    image: ghcr.io/l-caro/educ_mentor-backend:latest
     restart: unless-stopped
     networks:
       # Pas sur traefik-network : le backend n'est jamais exposé directement.
