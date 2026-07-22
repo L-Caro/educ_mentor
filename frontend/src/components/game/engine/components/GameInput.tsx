@@ -87,7 +87,7 @@ export default function GameInput({
             value={h}
             onChange={(e) => handleHoursChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
-            disabled={isLocked}
+            readOnly={isLocked}
             placeholder="HH"
             maxLength={2}
             autoComplete="off"
@@ -102,7 +102,7 @@ export default function GameInput({
             value={m}
             onChange={(e) => handleMinutesChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
-            disabled={isLocked}
+            readOnly={isLocked}
             placeholder="MM"
             maxLength={2}
             autoComplete="off"
@@ -139,7 +139,7 @@ export default function GameInput({
               value={parts[i] ?? ''}
               onChange={(e) => handlePartChange(i, e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
-              disabled={isLocked}
+              readOnly={isLocked}
               maxLength={1}
               autoComplete="off"
             />
@@ -171,7 +171,7 @@ export default function GameInput({
       value={value}
       onChange={(event) => handleChange(event.target.value)}
       onKeyDown={(event) => event.key === 'Enter' && onSubmit()}
-      disabled={isLocked}
+      readOnly={isLocked}
       placeholder={placeholder}
       maxLength={maxLength}
       size={textSize}

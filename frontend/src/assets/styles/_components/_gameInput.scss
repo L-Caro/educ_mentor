@@ -37,7 +37,7 @@
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button { display: none; }
 
-    &:focus:not(:disabled) {
+    &:focus:not(:disabled):not(:read-only) {
       border-color: var(--color-primary);
       background: var(--color-base-100);
     }
@@ -110,7 +110,7 @@
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button { display: none; }
 
-    &:focus:not(:disabled) {
+    &:focus:not(:disabled):not(:read-only) {
       border-color: var(--color-primary);
       background: var(--color-base-100);
     }
@@ -193,7 +193,7 @@
     &::-webkit-inner-spin-button,
     &::-webkit-outer-spin-button { display: none; }
 
-    &:focus { border-color: var(--color-primary); }
+    &:focus:not(:read-only) { border-color: var(--color-primary); }
   }
 
   &__decomposeLabel {
