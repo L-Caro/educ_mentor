@@ -5,7 +5,8 @@ type ButtonVariant = 'primary' | 'outline' | 'danger' | 'ghost' | 'danger-ghost'
 interface ButtonProps {
   children?: React.ReactNode;
   title?: React.ReactNode;
-  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   icon?: React.ReactNode;
   isSelected?: boolean;
   disabled?: boolean;
@@ -20,6 +21,7 @@ export default function Button({
   children,
   title,
   onClick,
+  onMouseDown,
   icon,
   isSelected = false,
   disabled = false,
@@ -42,6 +44,7 @@ export default function Button({
       type={type}
       className={cls}
       onClick={onClick}
+      onMouseDown={onMouseDown}
       disabled={disabled}
       aria-label={ariaLabel}
     >
