@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
+import type { Fiche } from 'src/types/fiche.types.ts';
 import type { GameAnswerState } from 'src/hooks/useGameSession.ts';
 import type { ModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
 
@@ -95,6 +96,19 @@ export interface GameModuleSpec<TSession, TQuestion> {
   /** Contenu affiché avant la première question (ex : texte à lire en mode difficile).
    * Si null ou absent, la partie démarre directement. */
   preamble?: (session: TSession) => ReactNode | null;
+
+  /**
+   * L'explication rattachée à une question, proposée après une erreur.
+   *
+   * DOIT être une fonction pure `question → Fiche` : c'est ce qui permettra au futur mode
+   * « école » d'engendrer la bibliothèque en appelant les mêmes fonctions sur des questions
+   * types, sans rien réimplémenter.
+   *
+   * Retourner `null` quand il n'y a rien à expliquer — le moteur n'affiche alors aucun
+   * bouton et conserve son avance automatique. Un module qui ne déclare pas `fiche` est
+   * strictement inchangé.
+   */
+  fiche?: (question: TQuestion) => Fiche | null;
 
   correctionLabel: (question: TQuestion) => ReactNode;
 
