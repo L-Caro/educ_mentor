@@ -89,6 +89,17 @@ interface FranceGeoData {
 
 // ─── Question ─────────────────────────────────────────────────────────────────
 
+/** Carte d'identité du sujet, jointe pour la fiche de leçon. Même principe qu'en géographie :
+ * pas de règle à énoncer, mais une fiche complète qui sert aussi aux questions suivantes.
+ * Assemblée ici parce que le serveur résout les codes en noms (« ARA » n'apprend rien,
+ * « Auvergne-Rhône-Alpes » situe le département). */
+export interface FranceCarte {
+  kind: 'departement' | 'region';
+  titre: string;
+  numero?: string;
+  lignes: { label: string; valeur: string }[];
+}
+
 export interface FranceQuestion {
   type: FranceQuestionType;
   item_key: string;
@@ -101,6 +112,9 @@ export interface FranceQuestion {
   dept_code?: string; // locate_city : pour lookup SVG dans le frontend
   threshold_km?: number; // locate_city : seuil de validation
   hide_dept_borders?: boolean; // locate_city hard : carte sans limites de départements
+  /** Carte d'identité du sujet, pour la fiche de leçon. Absente quand la question ne porte
+   * ni sur un département ni sur une région (fleuve, massif, ville à placer). */
+  carte?: FranceCarte | null;
 }
 
 export interface FranceSessionResult {
@@ -337,6 +351,61 @@ export class FranceService {
 
   // ─── Génération ─────────────────────────────────────────────────────────────
 
+  /** Carte d'identité d'un département. Les codes sont résolus en noms : « ARA » ou
+   * « 01, 07, 26 » n'apprennent rien, les noms situent le département. */
+  private carteDept(d: Departement & { code: string }): FranceCarte {
+    const nomDept = (code: string) =>
+      this.allDepts.find((x) => x.code === code)?.nom ?? code;
+    const region = this.allRegions.find((r) => r.code === d.region);
+
+    const lignes: { label: string; valeur: string }[] = [
+      { label: 'Préfecture', valeur: d.prefecture.nom },
+      { label: 'Région', valeur: region?.nom ?? d.region },
+    ];
+
+    if (d.sous_prefectures.length) {
+      lignes.push({
+        label:
+          d.sous_prefectures.length > 1
+            ? 'Sous-préfectures'
+            : 'Sous-préfecture',
+        valeur: d.sous_prefectures.map((v) => v.nom).join(', '),
+      });
+    }
+    lignes.push({
+      label: 'Habitants',
+      valeur: `${d.gentile.masculin}, ${d.gentile.feminin}`,
+    });
+    lignes.push({
+      label: 'Voisins',
+      valeur: d.departements_limitrophes.length
+        ? d.departements_limitrophes.map(nomDept).join(', ')
+        : 'aucun, il est isolé',
+    });
+
+    return { kind: 'departement', titre: d.nom, numero: d.numero, lignes };
+  }
+
+  /** Carte d'identité d'une région. */
+  private carteRegion(r: Region & { code: string }): FranceCarte {
+    const nomDept = (code: string) =>
+      this.allDepts.find((x) => x.code === code)?.nom ?? code;
+
+    const lignes: { label: string; valeur: string }[] = [
+      { label: 'Chef-lieu', valeur: r.chef_lieu },
+      { label: 'Départements', valeur: String(r.departements.length) },
+      { label: 'Lesquels', valeur: r.departements.map(nomDept).join(', ') },
+    ];
+    if (r.anciennes_regions.length) {
+      lignes.push({
+        label: 'Autrefois',
+        valeur: r.anciennes_regions.join(', '),
+      });
+    }
+
+    return { kind: 'region', titre: r.nom, lignes };
+  }
+
   private generateQuestions(
     activeDepts: (Departement & { code: string })[],
     activeTypes: FranceQuestionType[],
@@ -450,6 +519,7 @@ export class FranceService {
     return {
       type: 'dept_to_number',
       item_key: `dept_num_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Quel est son numéro ?',
       display: d.nom,
       choices: this.freeQcm(d.numero, pool, choicesCount),
@@ -470,6 +540,7 @@ export class FranceService {
     return {
       type: 'number_to_dept',
       item_key: `dept_name_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Quel est le nom de ce département ?',
       display: d.numero,
       choices: this.freeQcm(d.nom, pool, choicesCount),
@@ -490,6 +561,7 @@ export class FranceService {
     return {
       type: 'dept_to_prefecture',
       item_key: `dept_pref_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Quelle est sa préfecture ?',
       display: d.nom,
       choices: this.freeQcm(d.prefecture.nom, pool, choicesCount),
@@ -510,6 +582,7 @@ export class FranceService {
     return {
       type: 'prefecture_to_dept',
       item_key: `pref_dept_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Dans quel département se trouve cette préfecture ?',
       display: d.prefecture.nom,
       choices: this.freeQcm(d.nom, pool, choicesCount),
@@ -532,6 +605,7 @@ export class FranceService {
     return {
       type: 'dept_to_region',
       item_key: `dept_region_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Dans quelle région se trouve ce département ?',
       display: d.nom,
       choices: this.forceQcm(region.nom, pool, choicesCount),
@@ -556,6 +630,7 @@ export class FranceService {
     return {
       type: 'region_chef_lieu',
       item_key: `region_chef_${r.code}`,
+      carte: this.carteRegion(r),
       prompt: 'Quel est son chef-lieu ?',
       display: r.nom,
       choices: this.freeQcm(r.chef_lieu, pool, choicesCount),
@@ -579,6 +654,7 @@ export class FranceService {
     return {
       type: 'maritime_facade',
       item_key: `dept_facade_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Sur quelle façade maritime ce département donne-t-il ?',
       display: d.nom,
       choices: this.forceQcm(facade.nom, allFacadeNames, choicesCount),
@@ -596,6 +672,7 @@ export class FranceService {
     return {
       type: 'massif_summit',
       item_key: `massif_summit_${m.key}`,
+      carte: null,
       prompt: 'Quel est son point culminant ?',
       display: m.nom,
       choices: this.freeQcm(m.point_culminant.nom, pool, choicesCount),
@@ -614,6 +691,7 @@ export class FranceService {
     return {
       type: 'summit_altitude',
       item_key: `summit_alt_${m.key}`,
+      carte: null,
       prompt: 'À quelle altitude culmine ce sommet ?',
       display: m.point_culminant.nom,
       choices: this.forceQcm(correct, pool, choicesCount),
@@ -634,6 +712,7 @@ export class FranceService {
     return {
       type: 'dept_gentile',
       item_key: `dept_gentile_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Comment appelle-t-on un habitant de ce département ?',
       display: d.nom,
       choices: this.freeQcm(d.gentile.masculin, pool, choicesCount),
@@ -682,6 +761,7 @@ export class FranceService {
     return {
       type: 'dept_borders',
       item_key: `dept_borders_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Quels départements bordent ce département ?',
       display: d.nom,
       choices: this.shuffle([...correctNames, ...distractors]),
@@ -709,6 +789,7 @@ export class FranceService {
     return {
       type: 'dept_sub_prefectures',
       item_key: `dept_subpref_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Quelles sont ses sous-préfectures ?',
       display: d.nom,
       choices: this.shuffle([...correctNames, ...distractors]),
@@ -744,6 +825,7 @@ export class FranceService {
     return {
       type: 'region_depts',
       item_key: `region_depts_${r.code}`,
+      carte: this.carteRegion(r),
       prompt: 'Quels départements font partie de cette région ?',
       display: r.nom,
       choices: this.shuffle([...correct, ...distractors]),
@@ -776,6 +858,7 @@ export class FranceService {
     return {
       type: 'region_old_names',
       item_key: `region_oldnames_${r.code}`,
+      carte: this.carteRegion(r),
       prompt: 'Quelles anciennes régions la composent ?',
       display: r.nom,
       choices: this.shuffle([...correct, ...distractors]),
@@ -812,6 +895,7 @@ export class FranceService {
     return {
       type: 'river_depts',
       item_key: `river_depts_${f.key}`,
+      carte: null,
       prompt: `Quels départements ce ${f.type} traverse-t-il ?`,
       display: f.nom,
       choices: this.shuffle([...correct, ...distractors]),
@@ -835,6 +919,7 @@ export class FranceService {
     return {
       type: 'identify_dept',
       item_key: `identify_dept_${d.code}`,
+      carte: this.carteDept(d),
       prompt: 'Cliquez sur ce département sur la carte',
       display: d.nom,
       choices: [],
@@ -863,6 +948,7 @@ export class FranceService {
       return {
         type: 'identify_region',
         item_key: `identify_region_hard_${region.code}`,
+        carte: this.carteRegion(region),
         prompt: 'Sélectionnez tous les départements de cette région',
         display: region.nom,
         choices: [],
@@ -876,6 +962,7 @@ export class FranceService {
     return {
       type: 'identify_region',
       item_key: `identify_region_${region.code}`,
+      carte: this.carteRegion(region),
       prompt: 'Cliquez sur cette région sur la carte',
       display: region.nom,
       choices: [],
@@ -898,6 +985,7 @@ export class FranceService {
     return {
       type: 'locate_city',
       item_key: `locate_city_${city.nom.replace(/\s/g, '_')}`,
+      carte: null,
       prompt: 'Cliquez sur cette ville sur la carte',
       display: city.nom,
       choices: [],

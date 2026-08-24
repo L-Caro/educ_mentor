@@ -18,6 +18,15 @@ export type FranceQuestionType =
   | 'identify_region'
   | 'locate_city';
 
+/** Carte d'identité du sujet, assemblée par le serveur : il résout les codes en noms
+ * (« ARA » n'apprend rien, « Auvergne-Rhône-Alpes » situe le département). */
+export interface FranceCarte {
+  kind: 'departement' | 'region';
+  titre: string;
+  numero?: string;
+  lignes: { label: string; valeur: string }[];
+}
+
 export interface FranceQuestion {
   type: FranceQuestionType;
   item_key: string;
@@ -30,6 +39,7 @@ export interface FranceQuestion {
   dept_code?: string;
   threshold_km?: number;
   hide_dept_borders?: boolean;
+  carte?: FranceCarte | null;
 }
 
 export interface FranceSessionResponse {

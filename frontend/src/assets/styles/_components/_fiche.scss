@@ -116,7 +116,8 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: calc(var(--fiche-line) / 2);
+	// Écart d'un interligne entier : un demi-pas décalerait tout ce qui suit.
+	gap: var(--fiche-line);
 
 	// Pas de hauteur minimale : un exemple TEXTE (extrait, tableau) a déjà son interligne
 	// calé sur la grille, et un plancher pour images y laisserait un grand vide.
@@ -192,6 +193,9 @@
 
 .CarteIdentite__embleme {
 	font-size: calc(1.4 * var(--fiche-fs));
+	// Interligne forcé au pas : sans lui, un glyphe plus grand dilate la boîte de ligne
+	// du titre et décale TOUT ce qui suit hors de la réglure.
+	line-height: var(--fiche-line);
 }
 
 .CarteIdentite__lignes {

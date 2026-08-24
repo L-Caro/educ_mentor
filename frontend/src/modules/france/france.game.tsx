@@ -2,6 +2,7 @@ import france from '@svg-maps/france.departments';
 import store from 'src/store';
 import { franceApi } from './france.api.ts';
 import type { FranceQuestion, FranceSessionResponse } from './france.type.ts';
+import { franceFiche } from './france.fiche';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 import FranceDeptMap from './FranceDeptMap.tsx';
 import FranceRegionMap from './FranceRegionMap.tsx';
@@ -95,6 +96,8 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
     if (question.answers !== null) return question.answers.join(', ');
     return question.answer ?? '';
   },
+
+  fiche: franceFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(franceApi.endpoints.recordFranceAnswer.initiate({

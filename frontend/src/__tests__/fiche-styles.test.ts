@@ -46,6 +46,21 @@ describe('mise en page de la fiche', () => {
     expect(SCSS).not.toContain('data-theme');
   });
 
+  it('ne laisse aucun élément dilater sa boîte de ligne', () => {
+    // Un glyphe plus grand (l'emblème d'une carte d'identité) sans interligne explicite
+    // dilate la boîte de ligne et décale tout ce qui suit hors de la réglure.
+    const embleme = bloc('.CarteIdentite__embleme');
+    expect(embleme).toContain('font-size');
+    expect(embleme).toContain('line-height: var(--fiche-line)');
+  });
+
+  it('espace les enfants de l’exemple d’un interligne ENTIER', () => {
+    // Un demi-pas décale tout ce qui suit dès qu'il y a deux enfants.
+    const exemple = bloc('.Fiche__exemple');
+    expect(exemple).toContain('gap: var(--fiche-line)');
+    expect(exemple).not.toContain('/ 2');
+  });
+
   it('laisse un blanc entre le trait de marge et le texte', () => {
     const feuille = bloc('.Fiche__sheet');
     expect(bloc('.Fiche')).toContain('--fiche-margin-gap');
