@@ -16,18 +16,20 @@ Les deux audits sont des **instantanés datés** : on ne les modifie pas, on les
 
 ---
 
-## Où on en est, franchement
+## Où on en est
 
 **Fait :**
-- deux audits complets, exécutés (lint, tsc, mesures corpus) — le diagnostic est solide
+- deux audits complets, exécutés (lint, tsc, mesures corpus)
 - trois actions sur le corpus de leçons : gitignore, miroir des images, parseur
+- **chantier A terminé** : dette technique traitée de A0 à A4, sur la branche `chantier-a-robustesse` (12 commits, non poussée)
 
-**Pas fait :**
-- **aucun fix**. Zéro. Ni les 4 items critiques de juillet, ni les 5 nouveaux d'août.
+**Reste :**
+- A5 — dépendances vulnérables, préexistantes, délibérément non traitées (voir plus bas)
+- chantier B — les fiches, à reprendre **après** l'étape 0 sur papier
 
-**La dérive à nommer** — j'ai qualifié le travail sur le corpus d'« actions sans regret » et on s'y est engouffrés, en repoussant C4 de réponse en réponse sans jamais l'exécuter. Le travail fait est bon et réutilisable, mais **la dette n'a pas bougé depuis le 7 juillet**, soit 7 semaines et 5 modules ajoutés par-dessus.
+**Ce qu'il faut retenir de la dérive de départ** — le travail sur le corpus avait été qualifié d'« actions sans regret », et la dette avait été repoussée de réponse en réponse. Elle est maintenant payée ; la règle qui l'a permis reste valable : nommer l'hypothèse non validée avant de coder, et exécuter le bloquant plutôt que le répéter.
 
-**Règle pour la suite :** pas de nouvelle feature avant C4. Ce n'est pas de la rigueur pour la forme — le chantier B ajoute des entités en base, et `synchronize: true` sans migration ni backup complet, c'est le seul risque irréversible du projet.
+**Le chantier B est désormais possible sans risque** : il ajoute des entités en base, le schéma n'évolue que par migration, et la sauvegarde existe.
 
 ---
 
