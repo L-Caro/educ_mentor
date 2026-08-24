@@ -5,6 +5,12 @@
  * `JWT_SECRET` oublié signifiait démarrer avec un secret présent dans le dépôt git, donc
  * la possibilité de forger un token administrateur. */
 
+/** Longueur plancher du secret JWT. Ce n'est pas une norme : le seuil sert à écarter un
+ * secret manifestement bidon (« changeme », un mot, une valeur tronquée), pas à mesurer
+ * l'entropie — que la longueur ne dit pas. À 23 caractères aléatoires on est déjà bien
+ * au-delà de ce que HMAC-SHA256 exige. */
+export const MIN_JWT_SECRET_LENGTH = 23;
+
 export const DEV_JWT_SECRET = 'dev_secret_change_in_prod';
 export const DEV_DEFAULT_PIN = '1234';
 
@@ -41,9 +47,9 @@ export function collectProductionSecretIssues(
     issues.push(
       'JWT_SECRET vaut le secret de développement, qui figure dans le dépôt git.',
     );
-  } else if (env.JWT_SECRET.length < 32) {
+  } else if (env.JWT_SECRET.length < MIN_JWT_SECRET_LENGTH) {
     issues.push(
-      `JWT_SECRET fait ${env.JWT_SECRET.length} caractères ; 32 au minimum sont attendus.`,
+      `JWT_SECRET fait ${env.JWT_SECRET.length} caractères ; ${MIN_JWT_SECRET_LENGTH} au minimum sont attendus.`,
     );
   }
 

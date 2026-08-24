@@ -2,6 +2,7 @@ import {
   collectProductionSecretIssues,
   DEV_DEFAULT_PIN,
   DEV_JWT_SECRET,
+  MIN_JWT_SECRET_LENGTH,
 } from './configuration';
 
 /**
@@ -37,6 +38,18 @@ describe('collectProductionSecretIssues', () => {
 
   it('laisse démarrer une production correctement configurée', () => {
     expect(collectProductionSecretIssues(validProd)).toEqual([]);
+  });
+
+  it('applique le plancher de longueur pile à la limite', () => {
+    const tooShort = 'a'.repeat(MIN_JWT_SECRET_LENGTH - 1);
+    const justEnough = 'a'.repeat(MIN_JWT_SECRET_LENGTH);
+
+    expect(
+      collectProductionSecretIssues({ ...validProd, JWT_SECRET: tooShort }),
+    ).toHaveLength(1);
+    expect(
+      collectProductionSecretIssues({ ...validProd, JWT_SECRET: justEnough }),
+    ).toEqual([]);
   });
 
   it('refuse un JWT_SECRET absent, de développement, ou trop court', () => {

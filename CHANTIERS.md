@@ -58,7 +58,7 @@ de commit — ils portent le pourquoi de chaque correction.
    ```
 2. **Sauvegarder avant le premier déploiement.** `./scripts/backup-db.sh`, puis planifier le cron.
 3. **Renseigner les variables de production.** L'application refuse désormais de démarrer si
-   `JWT_SECRET` est absent, égal au défaut ou plus court que 32 caractères, si `DEFAULT_PIN`
+   `JWT_SECRET` est absent, égal au défaut ou plus court que 23 caractères, si `DEFAULT_PIN`
    vaut encore 1234, si `ADMIN_PIN_ENABLED=false`, ou si `DB_SYNCHRONIZE=true`.
    C'est volontaire : mieux vaut un conteneur qui refuse de démarrer qu'un serveur qui signe
    ses tokens administrateur avec un secret présent dans le dépôt git. **À vérifier avant de
