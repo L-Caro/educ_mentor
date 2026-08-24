@@ -104,8 +104,13 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
+            set -e
             sudo docker compose -f /home/lionel/Lionel/development/educ_mentor/docker-compose.yml pull
             sudo docker compose -f /home/lionel/Lionel/development/educ_mentor/docker-compose.yml up -d
-            # Purge restreinte aux images de ce projet : `prune -af` sans filtre supprimait
-            # toutes les images inutilisées du VPS, y compris celles des autres projets.
-            sudo docker image prune -af --filter 'label=org.opencontainers.image.source=https://github.com/${{ github.repository }}'
+            sudo docker compose -f /home/lionel/Lionel/development/educ_mentor/docker-compose.yml ps
+            # Pas de `docker image prune` ici. La règle sudoers du compte de déploiement
+            # n'autorise que pull / up -d / ps sur ce compose : le prune échouait donc à
+            # chaque exécution et faisait passer en ROUGE un déploiement pourtant réussi.
+            # L'élargir reviendrait à accorder le droit de supprimer les images des autres
+            # projets hébergés sur la machine, ce qu'on cherche justement à éviter. Le
+            # nettoyage de disque relève d'une tâche planifiée sur le serveur.
