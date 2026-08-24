@@ -14,6 +14,11 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* Les tests vivent dans src/ et tournent sous Node : leurs globales et les APIs
+       node: doivent être connues. Un import de `node:` dans du code applicatif serait
+       accepté ici mais rejeté par le build Vite. */
+    "types": ["node", "vitest/globals", "vite/client"],
+
     /* Strict */
     "strict": true,
 
@@ -30,6 +35,5 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__"]
+  "include": ["src"]
 }
