@@ -27,6 +27,21 @@ import { MODULES, type ModuleManifest } from 'src/modules.manifest';
 
 export const MAIN_TITLE = 'Maëve';
 
+const TITRE_COURS = { title: 'Fiches de cours' };
+
+const coursRoutes: RouteObject[] = [
+  {
+    path: '/cours',
+    handle: TITRE_COURS,
+    lazy: async () => ({ Component: (await import('src/cours/pages/CoursHomePage')).default }),
+  },
+  ...['/cours/:matiere/:notion', '/cours/:matiere/:notion/:concept'].map((path) => ({
+    path,
+    handle: TITRE_COURS,
+    lazy: async () => ({ Component: (await import('src/cours/pages/NotionPage')).default }),
+  })),
+];
+
 /** Routes enfant d'un module : sélection (ou jeu direct), jeu, résultats. */
 function buildChildRoutes(module: ModuleManifest): RouteObject[] {
   const Game = module.child?.Game;
@@ -73,6 +88,13 @@ const Router = createBrowserRouter([
     children: [
       { path: '/', element: <HomeLayout />, handle: { title: MAIN_TITLE } },
       ...MODULES.flatMap(buildChildRoutes),
+
+      // ── Bibliothèque de cours ────────────────────────────────────────────
+      // Le concept est dans l'URL : une fiche précise se met en signet.
+      // Chargée en `lazy` : la bibliothèque embarque ses illustrations (donc des morceaux
+      // des modules pose et tables) et grossira à mesure qu'on écrit. Elle n'a rien à
+      // faire dans le bundle d'ouverture, que l'enfant paie à chaque visite.
+      ...coursRoutes,
     ],
   },
 

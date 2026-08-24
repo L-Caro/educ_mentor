@@ -1,0 +1,30 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Étapes de calcul dans une fiche ──────────────────────────────────────────
+// Posées sur la réglure du cahier : chaque ligne occupe exactement un interligne, et
+// rien n'ajoute de pixels (ni bordure, ni marge, ni padding vertical). Trois régressions
+// de mise en page ont déjà eu lieu sur cette fiche pour cette raison précise.
+
+.Etapes {
+	display: flex;
+	flex-direction: column;
+	font-variant-numeric: tabular-nums;
+	color: var(--fiche-ink);
+	font-size: var(--fiche-fs);
+}
+
+.Etapes__ligne {
+	line-height: var(--fiche-line, 32px);
+}
+
+// Deux colonnes autour du signe : les membres de gauche se terminent au même endroit,
+// les résultats commencent au même endroit.
+.Etapes--egal .Etapes__ligne {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 0 0.4em;
+}
+
+.Etapes__gauche { text-align: right; }
+.Etapes__egal   { color: var(--fiche-accent); }
+.Etapes__droite { text-align: left; font-weight: 600; }

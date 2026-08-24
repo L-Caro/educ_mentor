@@ -1,0 +1,175 @@
+@use '../assets/styles/_abstracts/variables' as v;
+
+// ─── Bibliothèque de cours ────────────────────────────────────────────────────
+// Le lecteur visé est le parent : on navigue par ce qu'on cherche à travailler, rien
+// n'est verrouillé derrière un exercice, et tout est atteignable en deux clics.
+
+.Cours {
+	max-width: 56rem;
+	margin: 0 auto;
+	padding: v.$space-5;
+}
+
+.Cours__intro {
+	color: var(--color-neutral);
+	margin-bottom: v.$space-6;
+}
+
+.Cours__matiere {
+	margin-bottom: v.$space-7;
+}
+
+.Cours__matiereTitre {
+	display: flex;
+	align-items: center;
+	gap: v.$space-3;
+	font-size: v.$font-size-xl;
+	margin-bottom: v.$space-4;
+}
+
+.Cours__notions {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+	gap: v.$space-4;
+}
+
+.Cours__notion {
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-2;
+	text-align: left;
+	padding: v.$space-5;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$border-radius-2;
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+	text-decoration: none;
+
+	&:hover,
+	&:focus-visible {
+		border-color: var(--color-primary);
+	}
+}
+
+.Cours__notionTitre { font-weight: 700; }
+.Cours__notionResume { color: var(--color-neutral); font-size: v.$font-size-sm; }
+.Cours__notionCompte { color: var(--color-primary); font-size: v.$font-size-sm; }
+
+// ─── Lecture d'une notion ─────────────────────────────────────────────────────
+
+.Notion {
+	max-width: 62rem;
+	margin: 0 auto;
+	padding: v.$space-5;
+}
+
+.Notion__retour {
+	display: inline-block;
+	margin-bottom: v.$space-4;
+	color: var(--color-primary);
+	text-decoration: none;
+}
+
+.Notion__titre {
+	font-size: v.$font-size-xl;
+	margin-bottom: v.$space-5;
+}
+
+.Notion__corps {
+	display: grid;
+	grid-template-columns: 15rem 1fr;
+	gap: v.$space-6;
+	align-items: start;
+}
+
+// Le sommaire passe au-dessus de la fiche sur écran étroit : sur une tablette tenue en
+// portrait, deux colonnes rendraient la feuille trop étroite pour sa réglure.
+@media (max-width: 48rem) {
+	.Notion__corps {
+		grid-template-columns: 1fr;
+	}
+}
+
+.Notion__sommaire {
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-1;
+	position: sticky;
+	top: v.$space-4;
+}
+
+.Notion__lien {
+	display: flex;
+	gap: v.$space-3;
+	align-items: baseline;
+	padding: v.$space-2 v.$space-3;
+	border-radius: v.$border-radius-2;
+	border-left: 3px solid transparent;
+	color: var(--color-base-content);
+	text-decoration: none;
+	font-size: v.$font-size-sm;
+
+	&:hover,
+	&:focus-visible {
+		background: var(--color-base-200);
+	}
+
+	&--actif {
+		border-left-color: var(--color-primary);
+		background: var(--color-base-200);
+		font-weight: 700;
+	}
+}
+
+.Notion__lienNum {
+	color: var(--color-neutral);
+	font-variant-numeric: tabular-nums;
+}
+
+.Notion__lecture {
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-4;
+	min-width: 0;
+}
+
+.Notion__pied {
+	display: flex;
+	flex-wrap: wrap;
+	gap: v.$space-3;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.Notion__nav {
+	display: flex;
+	gap: v.$space-3;
+}
+
+// `.Button` est dessiné pour un <button> ; ici ce sont des liens de navigation, et un
+// lien porte un soulignement par défaut.
+.Notion a.Button {
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+}
+
+// ─── Entrée depuis l'accueil ──────────────────────────────────────────────────
+
+.HomeLayout__cours {
+	display: inline-flex;
+	align-items: center;
+	gap: v.$space-3;
+	margin-bottom: v.$space-5;
+	padding: v.$space-3 v.$space-5;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$border-radius-2;
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+	text-decoration: none;
+
+	&:hover,
+	&:focus-visible {
+		border-color: var(--color-primary);
+	}
+}

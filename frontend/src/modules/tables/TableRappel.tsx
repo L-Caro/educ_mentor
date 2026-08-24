@@ -1,3 +1,5 @@
+import './tables.scss';
+
 interface Props {
   /** La table récitée : celle du plus petit facteur, plus facile à mémoriser. */
   table: number;
