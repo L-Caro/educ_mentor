@@ -31,50 +31,59 @@ Les deux audits sont des **instantanés datés** : on ne les modifie pas, on les
 
 ---
 
-# Chantier A — Dette technique
+# Chantier A — Dette technique ✅ **terminé** (2026-08-24)
 
-Ordre imposé par les dépendances, pas par la gravité. Chaque étape rend la suivante possible.
+Branche `chantier-a-robustesse`, 11 commits, **non poussée** — le déploiement reste ta décision.
 
-### A0 · Protéger les données ⚠️ **bloquant**
-- [x] `/data/lecons/`, `/data/lecons_media/`, `/data/corpus/` dans `.gitignore` *(fait le 2026-08-24 — 448 fichiers `??` → 0)*
-- [ ] **C4** — `synchronize: false` hors dev + première migration TypeORM
-- [ ] **C4** — backup complet du `.db` (les scripts actuels ne sauvent que les invitations)
+| | |
+|---|---|
+| A0 | migrations versionnées, `synchronize` désactivé, sauvegarde complète, `db:check` |
+| A1 | lint capable d'échouer ; 666 + 15 erreurs corrigées ; `.gitattributes` |
+| A2 | barrière lint + typecheck + test + e2e avant tout déploiement |
+| A3 | cohérence des registres de modules (bug `snake`), nettoyage, README |
+| A4 | `strict: true`, 29 tests, C1 · C2 · C3 · I6 |
 
-> `data/educmentor.db` contient la progression de Maëve. C'est la seule donnée irremplaçable du projet.
-> Tout le reste se régénère.
+Les 8 étapes de la CI ont été simulées localement à chaque étape. Détail dans les messages
+de commit — ils portent le pourquoi de chaque correction.
 
-### A1 · Rendre le lint capable d'échouer
-- [ ] **N3** — sortir `--fix` du script : `"lint": "eslint src"` + `"lint:fix": "eslint src --fix"`
-- [ ] lancer `lint:fix` une fois, **commit de formatage isolé** (649 corrections prettier, à ne pas mélanger)
-- [ ] les 17 vraies erreurs back — dont `main.ts:22` (`bootstrap()` non awaité)
-- [ ] **I4** — les 14 erreurs front. Priorité à `react-hooks/static-components` (`GameEngine.tsx:178`) : **vrai bug de perf**, la carte se démonte/remonte à chaque render
-- [ ] **I5** — réactiver `no-explicit-any` back, `ecmaVersion: 5` → ES2023, brancher Prettier au lint front
+### Avant de fusionner et déployer
 
-### A2 · Poser la barrière CI
-- [ ] **N2** — job `checks` (lint + tsc back et front) en `needs` du job `build` dans `deploy.yml`
+1. **Vérifier le schéma de production.** Il a vécu sous `synchronize: true` et a pu dériver.
+   La migration de référence utilise `CREATE TABLE IF NOT EXISTS` : sur une base qui a dérivé,
+   elle ne corrigerait rien **et ne dirait rien**.
+   ```bash
+   DB_PATH=/chemin/vers/data/educmentor.db npm run db:check
+   ```
+2. **Sauvegarder avant le premier déploiement.** `./scripts/backup-db.sh`, puis planifier le cron.
+3. **Renseigner les variables de production.** L'application refuse désormais de démarrer si
+   `JWT_SECRET` est absent, égal au défaut ou plus court que 32 caractères, si `DEFAULT_PIN`
+   vaut encore 1234, si `ADMIN_PIN_ENABLED=false`, ou si `DB_SYNCHRONIZE=true`.
+   C'est volontaire : mieux vaut un conteneur qui refuse de démarrer qu'un serveur qui signe
+   ses tokens administrateur avec un secret présent dans le dépôt git. **À vérifier avant de
+   pousser**, sinon le déploiement échouera au démarrage.
+4. Les quatre documents à la racine (`README.md`, `CHANTIERS.md`, les deux audits) et
+   `frontend/CLAUDE.md` sont maintenant versionnés.
 
-> Contrainte posée : **le push doit continuer à déclencher le CI/CD**. Il le fera — il refusera juste de
-> déployer du cassé. D'où l'ordre : A1 **avant** A2, sinon le prochain push ne déploie plus.
-> Pas de `npm test` dans le gate tant qu'il n'y a pas de test (I1).
-- [ ] `docker image prune -af` → le restreindre au projet (il purge actuellement **toutes** les images du VPS)
+---
 
-### A3 · Cohérence et hygiène
-- [ ] **N4** — check au boot ou test comparant les ids `MODULES_CONFIG` (back) et `MODULES` (front).
-      Écart actuel : `snake` est front-only → **la tuile n'apparaît jamais sur l'accueil**. Décider : l'activer ou l'assumer.
-- [ ] **I7** — `git rm --cached backend/tsconfig.build.tsbuildinfo` · supprimer le `Dockerfile` racine obsolète
-- [ ] **I8** — README racine (les READMEs back/front sont encore les templates NestJS / Vite)
+# Chantier A5 — Dépendances vulnérables ⚠️ **nouveau, non traité**
 
-### A4 · Le reste, au fil de l'eau
-- [ ] **I1** — premiers tests sur la logique pure : `common/mastery.ts`, `buildChoices`, `weightedSample`
-- [ ] **I3** — `"strict": true` progressif des deux côtés
-- [ ] **C1** — `GET /settings` expose `admin_pin_hash` → liste blanche des clés publiques
-- [ ] **C2** — fail-fast au boot si `JWT_SECRET` absent ou égal au défaut en production
-- [ ] **C3** — upload imagier : nom de fichier généré serveur, garde `if (!file)`, tmpDir depuis la config
-- [ ] **I6** — `@nestjs/throttler` sur `verify-pin`
+`npm audit` sur le backend : **26 vulnérabilités, dont 11 hautes et 1 critique**. Toutes
+préexistantes, aucune introduite par le chantier A. Les plus notables :
 
-> Calibrer C1/C2/C3/I6 sur le modèle de menace réel (encadré de l'audit de juillet) : app derrière invitation,
-> l'attaquant plausible est « quelqu'un à qui Lionel a envoyé un lien », pas un bot. Corriger pour l'hygiène,
-> ne pas sur-investir.
+| Sévérité | Paquet | Nature |
+|---|---|---|
+| haute | `multer` (direct) | déni de service par champs profondément imbriqués |
+| haute | `path-to-regexp` (via `@nestjs/serve-static`) | déni de service |
+| haute | `lodash` (via `@nestjs/config`) | injection de code via `_.template` |
+| critique | `@xhmikosr/decompress` | chaîne de build uniquement |
+
+**Volontairement non traité** : corriger cela demande de monter des versions majeures de
+`@nestjs/*`, ce qui peut casser l'application — exactement ce qu'on cherchait à éviter.
+C'est un chantier à part entière, à mener avec le filet de tests désormais en place.
+
+Portée réelle : toutes ces routes sont derrière `AccessGuard`. L'attaquant plausible reste
+« quelqu'un à qui tu as envoyé un lien d'invitation ». À traiter pour l'hygiène, sans urgence.
 
 ---
 
