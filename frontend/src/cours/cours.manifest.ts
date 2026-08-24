@@ -1,8 +1,18 @@
 import type { Matiere } from './cours.types';
 import { calculer } from './mathematiques/calculer';
+import { mesures } from './mathematiques/mesures';
 import { nombres } from './mathematiques/nombres';
+import { problemes } from './mathematiques/problemes';
 import { accords } from './francais/accords';
+import { fonctionDesMots } from './francais/fonction-des-mots';
+import { laConjugaison } from './francais/la-conjugaison';
+import { laPhrase } from './francais/la-phrase';
 import { natureDesMots } from './francais/nature-des-mots';
+import { vocabulaire } from './francais/vocabulaire';
+import { eau } from './monde/l-eau';
+import { temps } from './monde/le-temps';
+import { vivant } from './monde/le-vivant';
+import { vivreIciEtAilleurs } from './monde/vivre-ici-et-ailleurs';
 
 /**
  * La bibliothèque, matière par matière.
@@ -19,13 +29,19 @@ export const MATIERES: Matiere[] = [
     slug: 'mathematiques',
     titre: 'Mathématiques',
     emoji: '🔢',
-    notions: [nombres, calculer],
+    notions: [nombres, calculer, mesures, problemes],
   },
   {
     slug: 'francais',
     titre: 'Français',
     emoji: '✍️',
-    notions: [natureDesMots, accords],
+    notions: [laPhrase, natureDesMots, accords, fonctionDesMots, laConjugaison, vocabulaire],
+  },
+  {
+    slug: 'questionner-le-monde',
+    titre: 'Questionner le monde',
+    emoji: '🔎',
+    notions: [eau, vivant, temps, vivreIciEtAilleurs],
   },
 ];
 

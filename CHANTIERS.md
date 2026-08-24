@@ -240,23 +240,37 @@ il faut la poser à la main. Découpage proposé pour le CE1 (76 notions), à va
 |---|---|---|---|
 | Mathématiques | Les nombres jusqu'à 999 | 4 | écrite |
 | Mathématiques | Calculer | 10 | écrite, lue |
-| Mathématiques | Grandeurs et mesures | 5 | à écrire |
-| Mathématiques | Espace et géométrie | 10 | à écrire |
-| Mathématiques | Résoudre un problème | 6 | à écrire |
+| Mathématiques | Grandeurs et mesures | 5 | écrite |
+| Mathématiques | Résoudre un problème | 2 | écrite |
+| Mathématiques | Espace et géométrie | 10 | **en attente** (SVG) |
+| Français | La phrase | 3 | écrite |
 | Français | La nature des mots | 6 | écrite |
 | Français | Les accords | 5 | écrite |
-| Français | Les sons | 9 | à écrire |
-| Français | Le vocabulaire | 5 | à écrire |
-| Français | La phrase | 4 | à écrire |
-| Français | La fonction des mots | 3 | à écrire |
-| Français | La conjugaison | 1 | à écrire |
-| Questionner le monde | L'eau | 2 | à écrire |
-| Questionner le monde | Le vivant | 1 | à écrire |
-| Questionner le monde | Le temps | 2 | à écrire |
-| Questionner le monde | Vivre ici et ailleurs | 3 | à écrire |
+| Français | La fonction des mots | 3 | écrite |
+| Français | La conjugaison | 1 | écrite |
+| Français | Le vocabulaire | 5 | écrite |
+| Français | Les sons | 9 | **en attente** (audio) |
+| Questionner le monde | L'eau | 2 | écrite |
+| Questionner le monde | Le vivant | 1 | écrite |
+| Questionner le monde | Le temps | 2 | écrite |
+| Questionner le monde | Vivre ici et ailleurs | 3 | écrite |
 
-**25 fiches sur 76.** L'ordre à l'intérieur d'une matière est pédagogique : une notion
-vient après celles dont elle a besoin (« Les accords » suit « La nature des mots »).
+**52 fiches sur 71.** Les 19 restantes sont les deux notions qui demandent une décision.
+
+Le total est passé de 76 à 71, et c'est le corpus qui l'a imposé, pas un raccourci :
+
+- **Résoudre un problème, 6 → 2.** Le corpus consacre une leçon par grandeur (monnaie,
+  longueurs, masses, contenances, durées), mais ces cinq leçons ne contiennent rien d'autre
+  que « on peut résoudre un problème avec X » : tout leur contenu est dans des images
+  d'exemples résolus. Les décliner aurait produit cinq fiches creuses. Ce qui reste, et qui
+  est le vrai sujet : la méthode, et le choix de l'opération.
+- **La phrase, 4 → 3.** Le corpus isole la phrase exclamative des trois autres types. Les
+  quatre se comprennent ensemble, par ce qui les distingue ; séparés, ils deviennent quatre
+  définitions à retenir au lieu d'une seule opposition à voir.
+
+L'ordre à l'intérieur d'une matière est pédagogique : une notion vient après celles dont
+elle a besoin (« Les accords » après « La nature des mots », « La fonction des mots »
+après elle aussi).
 
 ### Les figures de la bibliothèque
 
@@ -307,4 +321,4 @@ cd backend  && node ./node_modules/eslint/bin/eslint.js "src/**/*.ts" --no-fix
 cd frontend && node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --max-warnings 0
 ```
 
-**Le prochain geste : faire valider le découpage B.4, puis écrire UNE grande notion complète.**
+**Le prochain geste : trancher l'audio (les sons) et le SVG (la géométrie), ou définir la progression.**
