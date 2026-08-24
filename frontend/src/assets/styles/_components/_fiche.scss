@@ -91,10 +91,13 @@
 	font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
 	font-size: var(--fiche-fs);
 	line-height: var(--fiche-line);
-	// Hauteur totale = 2 interlignes, padding compris, pour rester sur la grille.
-	height: calc(2 * var(--fiche-line));
+	// Hauteur = une ligne par élément, plus un interligne de respiration : la grille de
+	// ligne de base tient quel que soit le nombre de lignes.
+	height: calc((var(--fiche-regle-lines, 1) + 1) * var(--fiche-line));
 	display: flex;
-	align-items: center;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
 	padding: 0 v.$space-5;
 	background: var(--fiche-accent-soft);
 	border-left: 3px solid var(--fiche-accent);
