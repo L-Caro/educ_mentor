@@ -154,3 +154,56 @@
 .PoseSettings__methodTitle { font-weight: 700; }
 .PoseSettings__methodExemple { color: var(--color-primary); font-size: v.$font-size-sm; }
 .PoseSettings__methodDetail { color: var(--color-neutral); font-size: v.$font-size-sm; }
+
+// ─── Opération posée en lecture seule, dans une fiche de leçon ────────────────
+// Couleurs issues des jetons de la fiche : la feuille reste claire dans les deux thèmes.
+// L'interligne suit le pas de la réglure, pour que le texte suivant retombe sur une ligne.
+
+.PoseFigure {
+	--pose-fig-cell: calc(1.4 * var(--fiche-fs, 18px));
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-variant-numeric: tabular-nums;
+	// Le signe occupe une colonne à gauche.
+	padding-left: var(--pose-fig-cell);
+}
+
+.PoseFigure__row {
+	display: grid;
+	grid-template-columns: repeat(var(--pose-cols), var(--pose-fig-cell));
+	position: relative;
+	line-height: var(--fiche-line, 32px);
+}
+
+.PoseFigure__sign {
+	position: absolute;
+	right: 100%;
+	color: var(--fiche-accent);
+}
+
+.PoseFigure__digit {
+	text-align: center;
+	font-size: var(--fiche-fs);
+	font-weight: 600;
+	color: var(--fiche-ink);
+}
+
+// Les retenues s'écrivent petit, comme au crayon.
+.PoseFigure__row--carry {
+	line-height: calc(var(--fiche-line, 32px) / 2);
+}
+
+.PoseFigure__carry {
+	text-align: center;
+	font-size: var(--fiche-fs-s);
+	color: var(--fiche-accent);
+	font-weight: 700;
+}
+
+// Le trait de l'opération : une ombre portée, pas une bordure ni des caractères de
+// remplissage. Une bordure ajouterait deux pixels et sortirait la figure de la grille.
+.PoseFigure__row--result {
+	box-shadow: inset 0 2px 0 var(--fiche-ink);
+}

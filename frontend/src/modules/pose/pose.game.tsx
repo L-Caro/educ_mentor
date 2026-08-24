@@ -74,7 +74,7 @@ export const poseGameSpec: GameModuleSpec<PoseSessionResponse, PoseQuestion> = {
 function lireResultat(question: PoseQuestion, brut: string): string {
   const saisie = decode(brut, question);
   const lu = [...saisie.resultat].reverse().join('').replace(/^0+(?=\d)/, '');
-  return lu || '—';
+  return lu || 'rien';
 }
 
 /** Réexporté pour que la grille initiale des retenues serve de valeur de départ. */

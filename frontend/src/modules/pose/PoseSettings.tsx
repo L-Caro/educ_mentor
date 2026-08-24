@@ -1,5 +1,6 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
+import './pose.scss';
 
 const METHODES = [
   {
