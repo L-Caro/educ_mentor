@@ -179,6 +179,18 @@
 .CarteIdentite {
 	width: 100%;
 	text-align: left;
+	// Une carte posée sur la page, comme une fiche bristol collée dans un cahier : elle
+	// masque la réglure, ce qui la détache du texte de la leçon.
+	background: #fff;
+	border-radius: v.$space-2;
+	// Contour en ombre portée et non en bordure : une bordure ajouterait deux pixels et
+	// ferait sortir la carte de la grille de la réglure.
+	box-shadow:
+		0 0 0 1px rgb(38 43 58 / 10%),
+		0 2px 8px -3px rgb(38 43 58 / 18%);
+	// Un interligne entier en haut et en bas : la hauteur totale reste un multiple du pas,
+	// donc le texte qui suit la carte retombe sur une ligne.
+	padding: var(--fiche-line) v.$space-6;
 }
 
 .CarteIdentite__titre {
@@ -212,7 +224,9 @@
 
 	dt {
 		flex: none;
-		width: 7.5rem;
+		// Assez large pour « Sous-préfectures », le plus long libellé du jeu de données :
+		// coupé sur deux lignes, il désalignait sa valeur.
+		width: 9rem;
 		font-size: var(--fiche-fs-s);
 		color: var(--fiche-ink-soft);
 	}

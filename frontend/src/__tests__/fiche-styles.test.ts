@@ -61,6 +61,17 @@ describe('mise en page de la fiche', () => {
     expect(exemple).not.toContain('/ 2');
   });
 
+  it("détache la carte d'identité de la page sans casser la grille", () => {
+    const carte = bloc('.CarteIdentite');
+    // Une carte posée sur le cahier : fond propre, contour, coins arrondis.
+    expect(carte).toContain('background: #fff');
+    expect(carte).toContain('box-shadow');
+    // Contour en ombre et non en bordure : une bordure ajouterait deux pixels et sortirait
+    // la carte de la grille. Et le rembourrage vertical vaut un interligne entier.
+    expect(carte).not.toMatch(/\bborder:\s/);
+    expect(carte).toContain('padding: var(--fiche-line)');
+  });
+
   it('laisse un blanc entre le trait de marge et le texte', () => {
     const feuille = bloc('.Fiche__sheet');
     expect(bloc('.Fiche')).toContain('--fiche-margin-gap');
