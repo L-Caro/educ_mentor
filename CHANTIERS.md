@@ -190,25 +190,74 @@ Points de conception à ne pas défaire :
 
 58 tests côté front.
 
-## B.4 · Suite possible
+## B.4 · La bibliothèque de fiches (à valider avant d'écrire quoi que ce soit)
 
-Le mode « école » : une bibliothèque navigable par matière et par thème. Il demande les
-entités `Theme` / `Notion`, une migration, et un écran d'administration pour la relecture
-des fiches **rédigées** (géographie, histoire, sciences), là où aucune règle ne se déduit.
-Les fiches dérivées, elles, y sont déjà : il suffira d'appeler `spec.fiche` sur des
-questions types.
+**Ce qui a été tranché** (message du 2026-08-24) : l'utilisateur de la bibliothèque est le
+PARENT, pas l'enfant. « Si je vois qu'en rentrant elle a du mal sur poser une soustraction,
+on ouvre l'app et les fiches maths, on les lit. » La hiérarchie est donc
+matière → grande notion → concept → fiche, les fiches sont **réécrites par nous**, et le
+corpus Kartable sert de source, jamais de contenu livré.
 
-Non commencé, et pas urgent : la fiche réactive répond déjà au besoin qui a motivé
-l'ensemble.
+### Le corpus est plat
 
-## B.4 · Questions encore ouvertes
+355 notions sans niveau intermédiaire : il n'y a pas de « grande notion » dans la donnée,
+il faut la poser à la main. Découpage proposé pour le CE1 (76 notions), à valider.
 
-- Le pilote démarre-t-il sur **conjugaison** ? *(meilleur alignement corpus ↔ tuile : 41 leçons,
-  et la tuile expose déjà `tenses` / `verbGroups` ; 139 images, 1,0 Mo)*
-- Histoire (31 leçons) et Questionner le monde (38) n'ont **aucune tuile**. Ce sont les seuls domaines où
-  les Cours apporteraient une couverture nouvelle — mais ils exigent un module QCM générique.
-  À trancher **après** le pilote, pas avant.
-- Les 46 leçons de vocabulaire sans texte : les traiter via `imagier` / `memory` plutôt que par des fiches ?
+**Mathématiques · 35 notions → 5 grandes notions**
+
+| Grande notion | Concepts | Tuile existante |
+|---|---|---|
+| Les nombres jusqu'à 999 | lire et écrire · représenter · décomposer · comparer et ranger | `numeration` |
+| Calculer | addition en ligne · addition posée · soustraction en ligne · soustraction posée · multiplication en ligne · tables d'addition · tables de multiplication · compléments à la dizaine et à la centaine · doubles et moitiés · partage d'une quantité | `calcul` `tables` `pose` |
+| Grandeurs et mesures | longueurs · masses · contenances · dates et durées · monnaie | `heure` `monnaie` |
+| Espace et géométrie | repérage · déplacement · segments et droites · instruments de tracé · carré · rectangle · triangles · cercle · solides · symétrie | aucune |
+| Résoudre un problème | résolution de problème · avec de la monnaie · avec des contenances · avec des dates et des durées · avec des longueurs · avec des masses | aucune |
+
+**Français · 33 notions → 7 grandes notions**
+
+| Grande notion | Concepts | Tuile existante |
+|---|---|---|
+| Les sons | [an] · [é] · [ill] · [in] · [o] · [on] · [ou] · [eu] et [oeu] · [oi] et [oin] | aucune |
+| Le vocabulaire | usage du dictionnaire · ordre alphabétique · synonymes et antonymes · mot-étiquette · vocabulaire de la famille | `imagier` `pendu` |
+| La phrase | la phrase · ponctuation · phrase exclamative · déclarative, interrogative et impérative | `lecture` |
+| La nature des mots | nom · verbe · déterminants · adjectif qualificatif · pronoms personnels sujets · mots invariables | aucune |
+| Les accords | genre des noms · nombre des noms · genre et nombre de l'adjectif · accord dans le groupe nominal · accord sujet-verbe | aucune |
+| La fonction des mots | groupe nominal · sujet du verbe · compléments | aucune |
+| La conjugaison | la conjugaison du verbe | `conjugaison` |
+
+**Questionner le monde · 8 notions → 4 grandes notions**
+
+| Grande notion | Concepts | Tuile existante |
+|---|---|---|
+| L'eau | changements d'état · état solide et état liquide | aucune |
+| Le vivant | interactions entre les êtres vivants | aucune |
+| Le temps | représentation des événements dans le temps · évolution des modes de vie de ma famille | aucune |
+| Vivre ici et ailleurs | paysages en France · modes de vie en France · modes de vie dans le monde | `geo` `france` |
+
+### Ce qu'il faut trancher avant d'écrire
+
+1. **Le découpage ci-dessus.** C'est un jugement pédagogique, pas une déduction : le corpus
+   ne le contient pas. Une grande notion mal posée se paie sur les 76 fiches qui la suivent.
+2. **Le volume.** 76 fiches pour le seul CE1, réécrites. C'est de la rédaction, pas de
+   l'ingénierie, et c'est le gros du chantier. Tout écrire d'un coup n'a pas de sens :
+   commencer par UNE grande notion complète, la lire avec Maëve, puis dérouler.
+3. **Le format de stockage.** Fichiers versionnés (déjà validé), mais en TSX plutôt qu'en
+   JSON : `Fiche.exemple` est un `ReactNode`, et c'est ce qui a permis `PoseFigure`,
+   `NumerationRangs`, `ConjugaisonTable`, `CarteIdentite`. Un format de données pur perdrait
+   les illustrations, qui sont la moitié de la valeur des fiches existantes.
+4. **Le doublon avec les tuiles.** Neuf grandes notions sur seize ont déjà une tuile qui
+   produit sa fiche à la volée. La bibliothèque doit y RENVOYER, pas réécrire la même chose
+   à côté : deux textes divergents sur le même point valent moins qu'un seul.
+5. **La progression.** « Un système de cours ludique avec une progression » : reste à définir
+   ce qui est suivi (fiche lue ? notion révisée ? lien avec la maîtrise des tuiles ?) et qui
+   le voit (le parent, l'enfant, les deux ?).
+
+### Ce qui reste vrai des questions précédentes
+
+- Histoire (31 leçons) et Questionner le monde (38) n'ont aucune tuile : ce sont les seuls
+  domaines où les Cours apportent une couverture nouvelle.
+- 75 % des exemples du corpus sont cuits dans les images ; 19 % des leçons seulement ont un
+  résumé. La réécriture n'est donc pas une reformulation, c'est une rédaction.
 
 ---
 
@@ -223,4 +272,4 @@ cd backend  && node ./node_modules/eslint/bin/eslint.js "src/**/*.ts" --no-fix
 cd frontend && node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --max-warnings 0
 ```
 
-**Le prochain geste, dans l'ordre : A0 (C4), puis B.3 étape 0 sur papier.**
+**Le prochain geste : faire valider le découpage B.4, puis écrire UNE grande notion complète.**

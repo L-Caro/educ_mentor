@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useGetModulesQuery } from 'src/store/api/sharedApi.ts';
 import ModuleCard from 'src/components/common/ModuleCard.tsx';
 import Spinner from 'src/components/common/Spinner.tsx';
@@ -74,6 +75,13 @@ export default function HomeLayout() {
       <div className="HomeLayout__timerRow">
         <SessionTimerDisplay />
       </div>
+
+      {/* Entrée de la bibliothèque. Discrète et à part des tuiles : ce n'est pas un jeu,
+          et c'est le parent qui vient la chercher, pas l'enfant. */}
+      <Link className="HomeLayout__cours" to="/cours">
+        <span aria-hidden="true">📚</span>
+        <span>Les fiches de cours</span>
+      </Link>
 
       {availableCategories.length > 1 && (
         <div className="HomeLayout__filters">

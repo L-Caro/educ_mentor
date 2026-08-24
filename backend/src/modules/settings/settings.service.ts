@@ -26,6 +26,12 @@ const DEFAULTS = {
   monnaie_max_amount: '10',
   monnaie_whole_euros: 'false',
   monnaie_items_count: '3',
+  // ── Calcul posé ────────────────────────────────────────────────────────────
+  // La méthode est celle qu'enseigne la maîtresse : en enseigner une autre dessert
+  // l'enfant. Elle ne change pas d'une partie à l'autre, d'où un réglage et non un
+  // choix de pré-jeu.
+  pose_subtraction_method: 'compensation',
+  pose_digits: '3',
 };
 
 /**

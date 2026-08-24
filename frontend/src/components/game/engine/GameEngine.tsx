@@ -200,6 +200,10 @@ export default function GameEngine<TSession, TQuestion>({
     ? spec.fiche?.(question) ?? null
     : null;
 
+  // Saisie personnalisée fournie par le module (grille d'opération posée, par exemple).
+  // Référence stable garantie par le contrat, cf. game.types.ts.
+  const FreeInputComponent = spec.free?.inputComponent;
+
   const validateDisabled =
     answerState !== 'idle' || (
       isPointMap ? pointClick === null
@@ -274,6 +278,14 @@ export default function GameEngine<TSession, TQuestion>({
               layout={spec.qcm!.layout}
             />
           )
+        ) : FreeInputComponent ? (
+          <FreeInputComponent
+            question={question}
+            value={answerState === 'timeout' ? '' : freeInput}
+            onChange={setFreeInput}
+            onSubmit={handleValidate}
+            answerState={answerState}
+          />
         ) : (
           <GameInput
             {...(typeof spec.free?.inputProps === 'function'

@@ -1,0 +1,233 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Grille d'opération posée ─────────────────────────────────────────────────
+// Des colonnes de largeur fixe, alignées comme sur du papier quadrillé. Les chiffres
+// sont en chasse fixe : sur une opération posée, l'alignement EST l'exercice.
+
+.PoseGrid {
+	// La cellule s'adapte à la largeur disponible plutôt que de forcer un défilement :
+	// à 2,6rem fixes, une opération à quatre chiffres débordait déjà d'une carte étroite.
+	// Le défilement reste en dernier recours, au-delà de six ou sept colonnes.
+	--pose-cell: clamp(1.7rem, 8vw, 2.6rem);
+	--pose-gap: 0.25rem;
+	// Gouttière du signe : plus étroite qu'une colonne entière, il n'en a pas besoin.
+	--pose-sign: 1.4rem;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--pose-gap);
+	font-variant-numeric: tabular-nums;
+	padding-left: var(--pose-sign);
+	max-width: 100%;
+}
+
+.PoseGrid__row {
+	display: grid;
+	grid-template-columns: repeat(var(--pose-cols), var(--pose-cell));
+	gap: var(--pose-gap);
+	position: relative;
+}
+
+.PoseGrid__sign {
+	position: absolute;
+	right: calc(100% + var(--pose-gap));
+	font-size: v.$font-size-2xl;
+	line-height: var(--pose-cell);
+	color: var(--color-primary);
+}
+
+.PoseGrid__digit {
+	height: var(--pose-cell);
+	line-height: var(--pose-cell);
+	text-align: center;
+	font-size: v.$font-size-2xl;
+	font-weight: 600;
+}
+
+// Chiffre barré : ce qu'on écrit par cassage quand on a démonté une dizaine.
+// Le trait est un dégradé et non `text-decoration: line-through` : la barre du crayon
+// est oblique, elle traverse le chiffre en entier, et le dégradé n'ajoute rien à la mise
+// en page (ni hauteur, ni ligne, ni décalage de la réglure dans la fiche).
+@mixin barre($couleur, $epaisseur) {
+	background-image: linear-gradient(
+		to top right,
+		transparent calc(50% - #{$epaisseur} / 2),
+		#{$couleur} calc(50% - #{$epaisseur} / 2),
+		#{$couleur} calc(50% + #{$epaisseur} / 2),
+		transparent calc(50% + #{$epaisseur} / 2)
+	);
+	// Le trait couvre le chiffre, pas la gouttière : sinon les barres se rejoignent
+	// d'une colonne à l'autre et forment une rayure continue.
+	background-size: 62% 62%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.PoseGrid__digit--barre {
+	@include barre(var(--color-primary), 2px);
+	// Le chiffre s'efface, la barre reste franche. Baisser l'opacité du bloc entier
+	// aurait affadi les deux, et une barre pâle ne se voit pas de loin.
+	color: color-mix(in srgb, var(--color-base-content) 55%, transparent);
+}
+
+.PoseGrid__bar {
+	width: calc(var(--pose-cols) * var(--pose-cell) + (var(--pose-cols) - 1) * var(--pose-gap));
+	height: 3px;
+	background: var(--color-base-content);
+	border-radius: 2px;
+	margin: v.$space-2 0;
+}
+
+.PoseGrid__cell {
+	height: var(--pose-cell);
+	width: var(--pose-cell);
+	text-align: center;
+	border-radius: v.$space-2;
+	border: 2px dashed var(--color-base-300);
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+	font: inherit;
+	font-variant-numeric: tabular-nums;
+
+	&:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 2px;
+	}
+}
+
+// Les retenues sont écrites petit, au-dessus ou au-dessous, comme au crayon.
+.PoseGrid__cell--carry {
+	height: calc(var(--pose-cell) * 0.72);
+	font-size: v.$font-size-sm;
+	color: var(--color-primary);
+	border-style: dotted;
+}
+
+.PoseGrid__cell--shown {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-style: none;
+	background: none;
+	font-weight: 700;
+}
+
+// Pas de retenue attendue ici : un trou plutôt qu'une case qui invite à écrire.
+.PoseGrid__cell--none {
+	height: calc(var(--pose-cell) * 0.72);
+	border: none;
+	background: none;
+}
+
+.PoseGrid__cell--result {
+	font-size: v.$font-size-xl;
+	font-weight: 700;
+	border-style: solid;
+}
+
+.PoseGrid__cell--wrong {
+	border-color: var(--color-error);
+	background: color-mix(in srgb, var(--color-error) 12%, transparent);
+}
+
+.PoseGrid__cell--right {
+	border-color: var(--color-success);
+	background: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+// La taille suit désormais la largeur disponible : plus de palier à la main.
+
+// ─── Écran de réglages ────────────────────────────────────────────────────────
+
+.PoseSettings__methods {
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-4;
+}
+
+.PoseSettings__method {
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-2;
+	text-align: left;
+	padding: v.$space-5;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$border-radius-2;
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+	font: inherit;
+	cursor: pointer;
+
+	&--active {
+		border-color: var(--color-primary);
+		background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+	}
+
+	&:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 2px;
+	}
+}
+
+.PoseSettings__methodTitle { font-weight: 700; }
+.PoseSettings__methodExemple { color: var(--color-primary); font-size: v.$font-size-sm; }
+.PoseSettings__methodDetail { color: var(--color-neutral); font-size: v.$font-size-sm; }
+
+// ─── Opération posée en lecture seule, dans une fiche de leçon ────────────────
+// Couleurs issues des jetons de la fiche : la feuille reste claire dans les deux thèmes.
+// L'interligne suit le pas de la réglure, pour que le texte suivant retombe sur une ligne.
+
+.PoseFigure {
+	--pose-fig-cell: calc(1.4 * var(--fiche-fs, 18px));
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	font-variant-numeric: tabular-nums;
+	// Le signe occupe une colonne à gauche.
+	padding-left: var(--pose-fig-cell);
+}
+
+.PoseFigure__row {
+	display: grid;
+	grid-template-columns: repeat(var(--pose-cols), var(--pose-fig-cell));
+	position: relative;
+	line-height: var(--fiche-line, 32px);
+}
+
+.PoseFigure__sign {
+	position: absolute;
+	right: 100%;
+	color: var(--fiche-accent);
+}
+
+.PoseFigure__digit {
+	text-align: center;
+	font-size: var(--fiche-fs);
+	font-weight: 600;
+	color: var(--fiche-ink);
+}
+
+.PoseFigure__digit--barre {
+	@include barre(var(--fiche-accent), 1.5px);
+	color: color-mix(in srgb, var(--fiche-ink) 55%, transparent);
+}
+
+// Les retenues s'écrivent petit, comme au crayon.
+.PoseFigure__row--carry {
+	line-height: calc(var(--fiche-line, 32px) / 2);
+}
+
+.PoseFigure__carry {
+	text-align: center;
+	font-size: var(--fiche-fs-s);
+	color: var(--fiche-accent);
+	font-weight: 700;
+}
+
+// Le trait de l'opération : une ombre portée, pas une bordure ni des caractères de
+// remplissage. Une bordure ajouterait deux pixels et sortirait la figure de la grille.
+.PoseFigure__row--result {
+	box-shadow: inset 0 2px 0 var(--fiche-ink);
+}

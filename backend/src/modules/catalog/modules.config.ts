@@ -105,12 +105,21 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 12,
   },
   {
+    id: 'pose',
+    name: 'Calcul posé',
+    description:
+      'Poser une addition ou une soustraction en colonnes, retenues comprises',
+    icon: '🧾',
+    is_active: false,
+    display_order: 13,
+  },
+  {
     id: 'pendu',
     name: 'Le Pendu',
     description:
       'Deviner un mot lettre par lettre avant que le bonhomme soit pendu',
     icon: '🪢',
     is_active: false,
-    display_order: 13,
+    display_order: 14,
   },
 ];

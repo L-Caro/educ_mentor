@@ -25,6 +25,15 @@ export interface MapInteractionProps {
   answerState: GameAnswerState;
 }
 
+/** Ce que le moteur fournit à une saisie personnalisée. */
+export interface FreeInputRenderProps<TQuestion> {
+  question: TQuestion;
+  value: string;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+  answerState: GameAnswerState;
+}
+
 export interface GameChoice {
   key: string;
   label: ReactNode;
@@ -68,6 +77,16 @@ export interface GameModuleSpec<TSession, TQuestion> {
     inputProps?: GameInputConfig | ((question: TQuestion) => GameInputConfig);
     /** Retourne true si la saisie est suffisante pour valider (remplace le test `trim() !== ''`). */
     isReady?: (question: TQuestion, input: string) => boolean;
+    /**
+     * Porte de sortie pour une saisie que `<GameInput>` ne sait pas rendre : le module
+     * fournit son propre composant, qui reçoit la valeur et la remonte comme une chaîne.
+     * Même principe que `map.getComponent` — le moteur garde le squelette, le module
+     * fournit ce qui lui est propre. Une grille d'opération posée en est le premier cas.
+     * DOIT être une référence stable (composant défini au niveau module) : une fonction
+     * créée à chaque rendu serait un type de composant neuf, et React démonterait la
+     * grille à chaque frappe.
+     */
+    inputComponent?: ComponentType<FreeInputRenderProps<TQuestion>>;
   };
   map?: {
     /** Retourne le composant à utiliser pour cette question.
