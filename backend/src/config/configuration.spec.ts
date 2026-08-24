@@ -1,0 +1,91 @@
+import {
+  collectProductionSecretIssues,
+  DEV_DEFAULT_PIN,
+  DEV_JWT_SECRET,
+} from './configuration';
+
+/**
+ * Ce garde-fou décide si la production démarre. Un faux négatif laisserait tourner un
+ * serveur signant ses tokens administrateur avec un secret présent dans le dépôt git ;
+ * un faux positif empêcherait tout déploiement. Les deux méritent un test.
+ */
+
+const validProd = {
+  NODE_ENV: 'production',
+  JWT_SECRET: 'x'.repeat(48),
+  DEFAULT_PIN: '7391',
+};
+
+describe('collectProductionSecretIssues', () => {
+  it('ne dit rien hors production, même avec les défauts de développement', () => {
+    expect(
+      collectProductionSecretIssues({
+        JWT_SECRET: DEV_JWT_SECRET,
+        DEFAULT_PIN: DEV_DEFAULT_PIN,
+      }),
+    ).toEqual([]);
+    expect(collectProductionSecretIssues({ NODE_ENV: 'development' })).toEqual(
+      [],
+    );
+    expect(
+      collectProductionSecretIssues({
+        NODE_ENV: 'test',
+        DB_SYNCHRONIZE: 'true',
+      }),
+    ).toEqual([]);
+  });
+
+  it('laisse démarrer une production correctement configurée', () => {
+    expect(collectProductionSecretIssues(validProd)).toEqual([]);
+  });
+
+  it('refuse un JWT_SECRET absent, de développement, ou trop court', () => {
+    expect(
+      collectProductionSecretIssues({ ...validProd, JWT_SECRET: undefined }),
+    ).toHaveLength(1);
+    expect(
+      collectProductionSecretIssues({
+        ...validProd,
+        JWT_SECRET: DEV_JWT_SECRET,
+      }),
+    ).toHaveLength(1);
+    expect(
+      collectProductionSecretIssues({ ...validProd, JWT_SECRET: 'court' }),
+    ).toHaveLength(1);
+  });
+
+  it('refuse le PIN par défaut', () => {
+    const issues = collectProductionSecretIssues({
+      ...validProd,
+      DEFAULT_PIN: DEV_DEFAULT_PIN,
+    });
+    expect(issues.join(' ')).toContain('DEFAULT_PIN');
+  });
+
+  it('refuse la désactivation du PIN en production', () => {
+    const issues = collectProductionSecretIssues({
+      ...validProd,
+      ADMIN_PIN_ENABLED: 'false',
+    });
+    expect(issues.join(' ')).toContain('ADMIN_PIN_ENABLED');
+  });
+
+  it('refuse DB_SYNCHRONIZE en production', () => {
+    const issues = collectProductionSecretIssues({
+      ...validProd,
+      DB_SYNCHRONIZE: 'true',
+    });
+    expect(issues.join(' ')).toContain('DB_SYNCHRONIZE');
+  });
+
+  it('signale tous les problèmes d’un coup, pas seulement le premier', () => {
+    // Un diagnostic partiel ferait redémarrer/redéployer autant de fois qu'il y a d'erreurs.
+    const issues = collectProductionSecretIssues({
+      NODE_ENV: 'production',
+      DEFAULT_PIN: DEV_DEFAULT_PIN,
+      ADMIN_PIN_ENABLED: 'false',
+      DB_SYNCHRONIZE: 'true',
+    });
+    expect(issues.length).toBeGreaterThanOrEqual(4);
+  });
+});

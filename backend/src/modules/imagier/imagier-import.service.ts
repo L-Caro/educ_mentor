@@ -4,8 +4,8 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import { ImagierWord } from './entities/imagier-word.entity';
+import { randomUUID } from 'node:crypto';
 
 export interface ImportReport {
   inserted: number;
@@ -125,7 +125,7 @@ export class ImagierImportService {
       const image_filename = this.findImage(fr, category);
 
       const word: Partial<ImagierWord> = {
-        id: existing?.id ?? uuidv4(),
+        id: existing?.id ?? randomUUID(),
         slug,
         fr,
         en,

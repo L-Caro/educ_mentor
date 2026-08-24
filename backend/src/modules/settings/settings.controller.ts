@@ -1,5 +1,13 @@
-import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { SettingsService } from './settings.service';
+import {
+  Body,
+  Controller,
+  ForbiddenException,
+  Get,
+  Param,
+  Patch,
+  UseGuards,
+} from '@nestjs/common';
+import { SettingsService, isPrivateKey } from './settings.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { IsString } from 'class-validator';
 
@@ -14,15 +22,19 @@ export class SettingsController {
 
   @Get()
   getAll() {
-    return this.settingsService.getAll();
+    // Volontairement `getPublic` : cette route n'est pas protégée — le frontend enfant en a
+    // besoin — elle ne doit donc jamais renvoyer de secret.
+    return this.settingsService.getPublic();
   }
 
   @Patch(':key')
   @UseGuards(JwtAuthGuard)
   update(@Param('key') key: string, @Body() dto: UpdateSettingDto) {
-    // Empêcher la modification du PIN via cette route générique
-    if (key === 'admin_pin_hash') {
-      return { error: 'Utiliser /api/auth/change-pin pour modifier le PIN' };
+    // Renvoyer une erreur métier avec un statut 200 laissait le client croire au succès.
+    if (isPrivateKey(key)) {
+      throw new ForbiddenException(
+        `Le réglage « ${key} » n'est pas modifiable par cette route.`,
+      );
     }
     return this.settingsService.set(key, dto.value);
   }

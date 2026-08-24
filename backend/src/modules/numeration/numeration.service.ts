@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { NumerationSession } from './entities/numeration-session.entity';
 import { NumerationProgression } from './entities/numeration-progression.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -105,7 +105,7 @@ export class NumerationService {
     const questions = this.generateQuestions(count, types, positions, steps);
 
     const session = this.sessionsRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       started_at: new Date(),
     });
     await this.sessionsRepo.save(session);

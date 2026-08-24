@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, IsNull, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { PenduWord } from './entities/pendu-word.entity';
 import { PenduSession } from './entities/pendu-session.entity';
 import { PENDU_SEED_WORDS } from './data/pendu-seed';
@@ -40,7 +40,7 @@ export class PenduService implements OnModuleInit {
       for (const entry of PENDU_SEED_WORDS) {
         await this.wordRepo.save(
           this.wordRepo.create({
-            id: uuidv4(),
+            id: randomUUID(),
             word: entry.word,
             difficulty: entry.difficulty,
             is_active: true,
@@ -95,7 +95,7 @@ export class PenduService implements OnModuleInit {
     }
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       word_id: pickedWord.id,
       word: pickedWord.word,
       difficulty: dto.difficulty,
@@ -139,7 +139,7 @@ export class PenduService implements OnModuleInit {
       throw new BadRequestException('Le mot doit contenir au moins 5 lettres');
     }
     const word = this.wordRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       word: normalized,
       difficulty: dto.difficulty,
       is_active: dto.is_active ?? true,

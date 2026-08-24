@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { TablesProgression } from './entities/tables-progression.entity';
 import { TablesSession } from './entities/tables-session.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -15,6 +14,7 @@ import {
   selectionWeight,
 } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 /** Taille d'un lot illimité (le pool fini est rebouclé re-mélangé jusqu'à ce cap). */
 const UNLIMITED_BATCH_SIZE = 50;
@@ -97,7 +97,7 @@ export class TablesService {
 
     if (factSet.size === 0) {
       return {
-        session_id: uuidv4(),
+        session_id: randomUUID(),
         questions: [],
         timer_seconds: timerSeconds,
         is_unlimited: isUnlimited,
@@ -169,7 +169,7 @@ export class TablesService {
     });
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       selected_tables: JSON.stringify(dto.selected_tables),
     });
     await this.sessionRepo.save(session);
@@ -200,7 +200,7 @@ export class TablesService {
     });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         factor_a: a,
         factor_b: b,
         correct_count: 0,

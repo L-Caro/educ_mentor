@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import { ImagierWord } from './entities/imagier-word.entity';
 import { ImagierProgression } from './entities/imagier-progression.entity';
@@ -20,6 +19,7 @@ import {
   selectionWeight,
 } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 /** Taille d'un lot illimité (les pools finis sont rebouclés re-mélangés jusqu'à ce cap). */
 const UNLIMITED_BATCH_SIZE = 60;
@@ -98,7 +98,7 @@ export class ImagierService {
 
     if (allWords.length === 0) {
       return {
-        session_id: uuidv4(),
+        session_id: randomUUID(),
         questions: [],
         timer_seconds: timerSeconds,
         is_unlimited: isUnlimited,
@@ -154,7 +154,7 @@ export class ImagierService {
     }
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       mode,
       difficulty,
       categories: JSON.stringify(dto.categories ?? []),
@@ -182,7 +182,7 @@ export class ImagierService {
     let prog = await this.progressionRepo.findOneBy({ word_id: wordId });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         word_id: wordId,
         correct_count: 0,
         incorrect_count: 0,
@@ -247,7 +247,7 @@ export class ImagierService {
     const category = this.slugify(dto.category);
     const image_filename = this.importService.findImage(dto.fr, category);
     const word = this.wordRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       slug,
       image_filename: image_filename ?? undefined,
       ...dto,

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { HeureProgression } from './entities/heure-progression.entity';
 import { HeureSession } from './entities/heure-session.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -11,6 +10,7 @@ import type {
 } from './dto/heure.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 export type NumeralType = 'arabic' | 'roman';
 
@@ -71,7 +71,7 @@ export class HeureService {
     );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       difficulty,
       numeral_type: numeralTypeSetting,
       timer_seconds: timerSeconds,
@@ -101,7 +101,7 @@ export class HeureService {
 
     if (!progression) {
       progression = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         answer_value: dto.answer_value,
         correct_count: 0,
         incorrect_count: 0,

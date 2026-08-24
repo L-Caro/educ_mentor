@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { MonnaieProgression } from './entities/monnaie-progression.entity';
 import { MonnaieSession } from './entities/monnaie-session.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -11,6 +10,7 @@ import type {
 } from './dto/monnaie.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 export type ExerciseType = 'reconnaitre' | 'total' | 'rendre';
 
@@ -116,7 +116,7 @@ export class MonnaieService {
     );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       exercise_type: exerciseType,
       timer_seconds: timerSeconds,
     });
@@ -146,7 +146,7 @@ export class MonnaieService {
 
     if (!progression) {
       progression = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         exercise_type: dto.exercise_type,
         answer_value: dto.answer_value,
         correct_count: 0,

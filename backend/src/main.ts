@@ -6,8 +6,19 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import { collectProductionSecretIssues } from './config/configuration';
 
 async function bootstrap() {
+  // Fail-fast AVANT toute création de contexte Nest : mieux vaut ne pas démarrer du tout que
+  // démarrer avec un secret public. Le conteneur redémarre en boucle, le problème est visible.
+  const secretIssues = collectProductionSecretIssues(process.env);
+  if (secretIssues.length > 0) {
+    const logger = new Logger('Bootstrap');
+    logger.error('Démarrage refusé — configuration de production incomplète :');
+    for (const issue of secretIssues) logger.error(`  - ${issue}`);
+    process.exit(1);
+  }
+
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.setGlobalPrefix('api');

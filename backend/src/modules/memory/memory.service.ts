@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, IsNull, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { MemorySession } from './entities/memory-session.entity';
 import { ImagierService } from '../imagier/imagier.service';
 import type { StartMemorySessionDto, MemoryMode } from './dto/memory.dto';
+import { randomUUID } from 'node:crypto';
 
 export interface MemoryPair {
   id: string;
@@ -47,7 +47,7 @@ export class MemoryService {
     }));
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       pairs_count: dto.pairs_count,
       mode: dto.mode,
       categories: JSON.stringify(dto.categories ?? []),

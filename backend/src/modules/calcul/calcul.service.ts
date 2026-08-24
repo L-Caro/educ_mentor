@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { CalculProgression } from './entities/calcul-progression.entity';
 import { CalculSession } from './entities/calcul-session.entity';
 import { SettingsService } from '../settings/settings.service';
@@ -11,6 +10,7 @@ import type {
 } from './dto/calcul.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 export interface CalculQuestion {
   operation: string;
@@ -96,7 +96,7 @@ export class CalculService {
     );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       min_value: minValue,
       max_value: maxValue,
       timer_seconds: timerSeconds,
@@ -127,7 +127,7 @@ export class CalculService {
     });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         answer_value: dto.answer_value,
         correct_count: 0,
         incorrect_count: 0,

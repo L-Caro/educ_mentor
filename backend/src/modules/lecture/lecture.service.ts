@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import {
   BadRequestException,
   Injectable,
@@ -5,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { LectureText } from './entities/lecture-text.entity';
 import { LectureQuestion } from './entities/lecture-question.entity';
 import { LectureSession } from './entities/lecture-session.entity';
@@ -122,7 +122,7 @@ export class LectureService {
     });
 
     const session = this.sessionsRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       text_id: text.id,
       difficulty,
       started_at: new Date(),

@@ -9,6 +9,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { PinAttemptGuard } from './pin-attempt.guard';
 import { SettingsModule } from '../settings/settings.module';
 
 @Module({
@@ -24,7 +25,7 @@ import { SettingsModule } from '../settings/settings.module';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
+  providers: [AuthService, JwtStrategy, JwtAuthGuard, PinAttemptGuard],
   controllers: [AuthController],
   exports: [JwtAuthGuard],
 })

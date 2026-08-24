@@ -41,6 +41,12 @@ jobs:
       - name: Test
         run: npm test
 
+      # Démarrage complet sur une base vierge : couvre le câblage des modules, l'application
+      # de la migration de référence et les seeds — soit le scénario « déploiement neuf ».
+      - name: Test end-to-end
+        if: matrix.package == 'backend'
+        run: npm run test:e2e
+
   build:
     needs: checks
     runs-on: ubuntu-latest

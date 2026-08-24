@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import { ConjugaisonProgression } from './entities/conjugaison-progression.entity';
@@ -13,6 +12,7 @@ import type {
 } from './dto/conjugaison.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
+import { randomUUID } from 'node:crypto';
 
 type Pronom =
   | 'je'
@@ -117,7 +117,7 @@ export class ConjugaisonService {
     );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       difficulty,
       tenses: tenses.join(','),
       verb_groups: groups.join(','),
@@ -148,7 +148,7 @@ export class ConjugaisonService {
     });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         verb_tense: dto.verb_tense,
         correct_count: 0,
         incorrect_count: 0,
