@@ -6,6 +6,21 @@ function euros(centimes: number): string {
   return `${(centimes / 100).toFixed(2).replace('.', ',')} €`;
 }
 
+/**
+ * Une addition posée. Au-delà de trois termes, une ligne unique déborde sur un téléphone :
+ * on la pose en colonne, comme au cahier, avec le total détaché.
+ */
+function addition(montants: number[], total: number): string | string[] {
+  if (montants.length === 0) return euros(total);
+  if (montants.length <= 3) {
+    return `${montants.map(euros).join(' + ')} = ${euros(total)}`;
+  }
+  return [
+    ...montants.map((m, i) => `${i === 0 ? '  ' : '+ '}${euros(m)}`),
+    `= ${euros(total)}`,
+  ];
+}
+
 export function monnaieFiche(question: MonnaieQuestion): Fiche {
   switch (question.type) {
     case 'reconnaitre': {
@@ -13,9 +28,7 @@ export function monnaieFiche(question: MonnaieQuestion): Fiche {
       return {
         titre: 'Compter de la monnaie',
         idee: "Additionne les pièces et les billets. Commence par les plus grosses valeurs, il reste moins à retenir.",
-        regle: pieces.length
-          ? `${pieces.map(euros).join(' + ')} = ${euros(question.answer)}`
-          : euros(question.answer),
+        regle: addition(pieces, question.answer),
         piege: "1 € vaut 100 centimes : une pièce de 50 centimes n'est pas une pièce de 50 €.",
       };
     }
@@ -25,9 +38,7 @@ export function monnaieFiche(question: MonnaieQuestion): Fiche {
       return {
         titre: "Total d'un achat",
         idee: "Le total, c'est la somme de tous les prix. Rien ne s'enlève.",
-        regle: prix.length
-          ? `${prix.map(euros).join(' + ')} = ${euros(question.answer)}`
-          : euros(question.answer),
+        regle: addition(prix, question.answer),
       };
     }
 

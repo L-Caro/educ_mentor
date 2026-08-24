@@ -153,6 +153,21 @@ describe('monnaie', () => {
     assertPropre(monnaieFiche(q({ type: 'reconnaitre', answer: 160 })));
   });
 
+  it('pose l’addition en colonne au-delà de trois termes', () => {
+    // Six pièces sur une ligne débordaient sur un téléphone, comme la décomposition.
+    const f = monnaieFiche(q({
+      type: 'reconnaitre', coins: [200, 100, 50, 20, 10, 5], answer: 385,
+    }));
+    expect(f.regle).toEqual([
+      '  2,00 €', '+ 1,00 €', '+ 0,50 €', '+ 0,20 €', '+ 0,10 €', '+ 0,05 €', '= 3,85 €',
+    ]);
+  });
+
+  it('garde une ligne unique jusqu’à trois termes', () => {
+    expect(monnaieFiche(q({ type: 'total', prices: [150, 250], answer: 400 })).regle)
+      .toBe('1,50 € + 2,50 € = 4,00 €');
+  });
+
   it('reste propre sur les trois exercices', () => {
     for (const type of ['reconnaitre', 'total', 'rendre'] as const) {
       assertPropre(monnaieFiche(q({ type, coins: [100], prices: [100], price: 100, payment: 200, answer: 100 })));
@@ -193,10 +208,25 @@ describe('numeration', () => {
     ]);
   });
 
-  it('empile aussi la valeur positionnelle', () => {
-    const f = numerationFiche(q({ type: 'valeur_positionnelle', display: '3 405', answer: '4' }));
-    expect(Array.isArray(f.regle)).toBe(true);
-    expect((f.regle as string[]).length).toBe(2);
+  it('montre le tableau de numération plutôt que de recopier l’énoncé', () => {
+    // L'énoncé complet (« Dans 819 860, quel est le chiffre des centaines ? ») recopié dans
+    // l'encart monospace débordait en défilement horizontal et n'apprenait rien.
+    const f = numerationFiche(q({
+      type: 'valeur_positionnelle',
+      item_key: 'valpos_819860_c',
+      display: 'Dans 819860, quel est le chiffre des centaines ?',
+      answer: '8',
+    }));
+    expect(f.regle).toEqual(['réponse : 8']);
+    expect(f.exemple).toBeDefined();
+  });
+
+  it('se passe du tableau si la clé est inattendue, sans casser', () => {
+    const f = numerationFiche(q({
+      type: 'valeur_positionnelle', item_key: 'autre_chose', answer: '8',
+    }));
+    expect(f.exemple).toBeUndefined();
+    expect(f.regle).toEqual(['réponse : 8']);
   });
 
   it('couvre les quatre types sans trou', () => {

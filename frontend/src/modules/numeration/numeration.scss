@@ -87,3 +87,45 @@
   }
 }
 
+
+// ─── Tableau de numération affiché dans la fiche de leçon ─────────────────────
+
+.NumerationRangs {
+	border-collapse: collapse;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+	font-variant-numeric: tabular-nums;
+	text-align: center;
+
+	caption {
+		caption-side: top;
+		font-size: var(--fiche-fs-s);
+		line-height: var(--fiche-line);
+		color: var(--fiche-ink-soft);
+		text-align: left;
+	}
+
+	th,
+	td {
+		min-width: calc(1.6 * var(--fiche-fs));
+		padding: 0 v.$space-3;
+		border: 1px solid var(--fiche-rule);
+		font-weight: 400;
+	}
+
+	td {
+		font-weight: 600;
+	}
+}
+
+.NumerationRangs__classes th {
+	font-size: var(--fiche-fs-s);
+	color: var(--fiche-ink-soft);
+	font-weight: 400;
+	border-bottom: none;
+}
+
+.NumerationRangs__cell--active {
+	background: var(--fiche-accent-soft);
+	color: var(--fiche-accent);
+}

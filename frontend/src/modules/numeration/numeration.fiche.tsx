@@ -1,5 +1,6 @@
 import type { Fiche } from 'src/types/fiche.types';
-import type { NumerationQuestion } from './numeration.type';
+import type { NumerationQuestion, PositionKey } from './numeration.type';
+import NumerationRangs from './NumerationRangs';
 import { formatNumbers } from 'src/utils/formatNumber';
 import { POSITION_NAME, POSITION_ORDER } from './numeration.constants';
 
@@ -44,15 +45,20 @@ export function numerationFiche(question: NumerationQuestion): Fiche {
       };
     }
 
-    case 'valeur_positionnelle':
+    case 'valeur_positionnelle': {
+      // `item_key` vaut « valpos_<nombre>_<rang> » : la donnée est là, propre, plutôt que
+      // dans l'énoncé en français. Recopier l'énoncé dans l'encart le faisait déborder.
+      const cle = /^valpos_(\d+)_(\w+)$/.exec(question.item_key);
+
       return {
         titre: "Valeur d'un chiffre",
-        idee: "Un chiffre ne vaut pas la même chose selon sa position. Les rangs se comptent depuis la droite.",
-        regle: [
-          formatNumbers(question.display),
-          `réponse : ${question.answer}`,
-        ],
-        piege: "Ne confonds pas le chiffre écrit et ce qu'il représente : le 3 de 300 vaut trois centaines.",
+        idee: "Chaque chiffre occupe un rang, et les rangs se comptent depuis la droite. Range le nombre dans le tableau et lis la colonne demandée.",
+        regle: [`réponse : ${question.answer}`],
+        exemple: cle
+          ? <NumerationRangs nombre={Number(cle[1])} rang={cle[2] as PositionKey} />
+          : undefined,
+        piege: "Ne confonds pas le chiffre et ce qu'il vaut : le 3 de 300 est un 3, et il vaut trois centaines.",
       };
+    }
   }
 }
