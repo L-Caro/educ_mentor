@@ -79,7 +79,11 @@ export const heureGameSpec: GameModuleSpec<HeureSessionResponse, HeureQuestion> 
   },
 
   getQuestions: (session) =>
-    session.questions.map((q) => ({ ...q, separator: session.separator ?? _sep })),
+    session.questions.map((q) => ({
+      ...q,
+      separator: session.separator ?? _sep,
+      questionMode: session.questionMode ?? _mode,
+    })),
 
   renderPrompt: (question) => {
     if (_mode === 'expression') {

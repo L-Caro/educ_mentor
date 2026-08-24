@@ -10,3 +10,8 @@ export const POSITION_NAME: Record<PositionKey, string> = {
   dm: 'dizaines de milliers',
   cm: 'centaines de milliers',
 };
+
+/** Rangs du plus grand au plus petit, l'ordre dans lequel une décomposition se lit et
+ * s'écrit. Le serveur envoie `decompose_positions` MÉLANGÉ (c'est voulu : l'enfant doit
+ * réfléchir à quel rang va où), ce qui rend une fiche illisible si on le reprend tel quel. */
+export const POSITION_ORDER: PositionKey[] = ['cm', 'dm', 'm', 'c', 'd', 'u'];

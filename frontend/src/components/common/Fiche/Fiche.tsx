@@ -1,4 +1,10 @@
+import type { CSSProperties } from 'react';
 import type { Fiche as FicheContent } from 'src/types/fiche.types';
+
+/** Une règle d'une seule ligne et une règle multiligne se rendent pareil : un tableau. */
+function lignes(regle: string | string[]): string[] {
+  return Array.isArray(regle) ? regle : [regle];
+}
 
 interface FicheProps {
   fiche: FicheContent;
@@ -23,7 +29,16 @@ export default function Fiche({ fiche, onClose, closeLabel = 'Continuer' }: Fich
 
         <p className="Fiche__idee">{fiche.idee}</p>
 
-        {fiche.regle && <p className="Fiche__regle">{fiche.regle}</p>}
+        {fiche.regle && (
+          <div
+            className="Fiche__regle"
+            style={{ '--fiche-regle-lines': lignes(fiche.regle).length } as CSSProperties}
+          >
+            {lignes(fiche.regle).map((ligne) => (
+              <span key={ligne}>{ligne}</span>
+            ))}
+          </div>
+        )}
 
         {fiche.exemple && <div className="Fiche__exemple">{fiche.exemple}</div>}
 

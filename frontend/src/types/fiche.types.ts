@@ -18,8 +18,9 @@ export interface Fiche {
   titre: string;
   /** L'idée clé, en une phrase. C'est ce qui doit rester si tout le reste est oublié. */
   idee: string;
-  /** La règle, courte et littérale. Rendue en monospace. */
-  regle?: string;
+  /** La règle, littérale, en monospace. Un tableau donne une ligne par élément :
+   * une décomposition en six rangs sur une seule ligne déborde et devient illisible. */
+  regle?: string | string[];
   /** L'exemple. Le module rend ce qu'il veut : tableau, cadran, pièces, illustration. */
   exemple?: ReactNode;
   /** L'erreur classique — souvent la raison pour laquelle l'enfant vient de se tromper. */

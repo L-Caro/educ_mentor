@@ -1,7 +1,7 @@
 import type { Fiche } from 'src/types/fiche.types';
 import type { NumerationQuestion } from './numeration.type';
 import { formatNumbers } from 'src/utils/formatNumber';
-import { POSITION_NAME } from './numeration.constants';
+import { POSITION_NAME, POSITION_ORDER } from './numeration.constants';
 
 export function numerationFiche(question: NumerationQuestion): Fiche {
   switch (question.type) {
@@ -18,7 +18,7 @@ export function numerationFiche(question: NumerationQuestion): Fiche {
       const pas = termes.length >= 2 ? termes[1] - termes[0] : null;
       return {
         titre: 'Continuer une suite',
-        idee: "Cherche ce qu'on ajoute à chaque fois : l'écart entre deux termes voisins est toujours le même.",
+        idee: "Cherche ce qu'on ajoute ou soustrait à chaque fois : l'écart entre deux termes voisins est toujours le même.",
         regle: pas === null
           ? `Terme suivant : ${question.answer}`
           : `${pas > 0 ? '+' : ''}${pas} à chaque fois → ${question.answer}`,
@@ -28,21 +28,30 @@ export function numerationFiche(question: NumerationQuestion): Fiche {
     case 'decomposition': {
       const positions = question.decompose_positions ?? [];
       const chiffres = question.answer.split(':');
+
+      // Le serveur mélange les rangs pour le jeu ; on les remet du plus grand au plus petit,
+      // et une ligne par rang : six rangs sur une seule ligne débordaient.
+      const parRang = new Map(positions.map((rang, i) => [rang, chiffres[i] ?? '?']));
+      const lignes = POSITION_ORDER
+        .filter((rang) => parRang.has(rang))
+        .map((rang, i) => `${i === 0 ? '  ' : '+ '}${parRang.get(rang)} ${POSITION_NAME[rang]}`);
+
       return {
         titre: 'Décomposer un nombre',
-        idee: "Chaque chiffre a une valeur qui dépend de sa place. Décomposer, c'est dire combien il y a de chaque paquet.",
-        regle: positions.length
-          ? positions.map((p, i) => `${chiffres[i] ?? '?'} ${POSITION_NAME[p]}`).join(' + ')
-          : question.answer,
+        idee: "Chaque chiffre a une valeur qui dépend de sa place. Décomposer, c'est dire combien il y a de chaque paquet, du plus grand au plus petit.",
+        regle: lignes.length ? lignes : question.answer,
         piege: "Un zéro compte : sans lui, les chiffres suivants changeraient de place.",
       };
     }
 
     case 'valeur_positionnelle':
       return {
-        titre: 'Valeur d\'un chiffre',
-        idee: "Un chiffre ne vaut pas la même chose selon sa position. On lit les paquets de droite à gauche : unités, dizaines, centaines, milliers.",
-        regle: `${formatNumbers(question.display)} → ${question.answer}`,
+        titre: "Valeur d'un chiffre",
+        idee: "Un chiffre ne vaut pas la même chose selon sa position. Les rangs se comptent depuis la droite.",
+        regle: [
+          formatNumbers(question.display),
+          `réponse : ${question.answer}`,
+        ],
         piege: "Ne confonds pas le chiffre écrit et ce qu'il représente : le 3 de 300 vaut trois centaines.",
       };
   }

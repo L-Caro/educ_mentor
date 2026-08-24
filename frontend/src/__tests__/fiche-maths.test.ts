@@ -1,14 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { calculFiche, kindOf } from 'src/modules/calcul/calcul.fiche';
-import { heureFiche } from 'src/modules/heure/heure.fiche';
+import { heureFiche, lireEnExpression } from 'src/modules/heure/heure.fiche';
 import { monnaieFiche } from 'src/modules/monnaie/monnaie.fiche';
 import { numerationFiche } from 'src/modules/numeration/numeration.fiche';
 import type { MonnaieQuestion } from 'src/modules/monnaie/monnaie.type';
 import type { NumerationQuestion } from 'src/modules/numeration/numeration.type';
+import type { Fiche } from 'src/types/fiche.types';
 
 /** Aucune fiche ne doit employer de cadratin dans le texte affiché (cf. frontend/CLAUDE.md). */
-function assertPropre(f: { titre: string; idee: string; regle?: string; piege?: string }) {
-  for (const texte of [f.titre, f.idee, f.regle ?? '', f.piege ?? '']) {
+function assertPropre(f: Fiche) {
+  const regle = Array.isArray(f.regle) ? f.regle.join(' ') : (f.regle ?? '');
+  for (const texte of [f.titre, f.idee, regle, f.piege ?? '']) {
     expect(texte).not.toContain('—');
   }
   expect(f.titre.length).toBeGreaterThan(2);
@@ -53,39 +55,74 @@ describe('calcul', () => {
 });
 
 describe('heure', () => {
-  const q = (hour: number, minute: number) =>
-    ({ hour, minute, answer_value: hour * 60 + minute, numeral_type: 'arabic' as const, choices: [] });
+  const q = (hour: number, minute: number, mode: 'digital' | 'expression' = 'digital') =>
+    ({
+      hour, minute, answer_value: hour * 60 + minute,
+      numeral_type: 'arabic' as const, choices: [], questionMode: mode,
+    });
 
-  it('nomme les repères du cadran', () => {
-    expect(heureFiche(q(3, 15)).regle).toContain('et quart');
-    expect(heureFiche(q(3, 30)).regle).toContain('et demie');
-    expect(heureFiche(q(3, 0)).regle).toContain('pile');
+  const regleDe = (f: Fiche) => (Array.isArray(f.regle) ? f.regle.join(' | ') : f.regle ?? '');
+
+  describe('mode expression', () => {
+    it("annonce l'heure d'après passé la demie", () => {
+      // Le cas qui a motivé cette réécriture : la fiche donnait « 3 heures 50 » quand la
+      // réponse attendue était « quatre heures moins dix ».
+      expect(lireEnExpression(3, 50).dite).toBe('4 heures moins dix');
+      expect(lireEnExpression(3, 40).dite).toBe('4 heures moins vingt');
+      expect(lireEnExpression(3, 45).dite).toBe('4 heures moins le quart');
+    });
+
+    it('nomme les repères avant la demie', () => {
+      expect(lireEnExpression(3, 0).dite).toBe('3 heures pile');
+      expect(lireEnExpression(3, 15).dite).toBe('3 heures et quart');
+      expect(lireEnExpression(3, 30).dite).toBe('3 heures et demie');
+      expect(lireEnExpression(7, 20).dite).toBe('7 heures vingt');
+    });
+
+    it('accorde « heure » au singulier', () => {
+      expect(lireEnExpression(12, 50).dite).toBe('1 heure moins dix');
+    });
+
+    it('repasse à 12 après 23h', () => {
+      expect(lireEnExpression(23, 55).dite).toBe('12 heures moins cinq');
+    });
+
+    it('explique le calcul à rebours, pas la lecture digitale', () => {
+      const f = heureFiche(q(3, 50, 'expression'));
+      expect(regleDe(f)).toContain('4 heures moins dix');
+      expect(regleDe(f)).not.toContain('3 heures 50');
+      expect(f.idee).toContain("l'heure d'après");
+      expect(f.piege).toContain('annonce 4');
+    });
+
+    it("ne parle pas d'heure d'après avant la demie", () => {
+      const f = heureFiche(q(3, 20, 'expression'));
+      expect(f.piege).toBeUndefined();
+      expect(f.idee).toContain('Avant la demie');
+    });
   });
 
-  it("annonce l'heure suivante pour « moins le quart »", () => {
-    // 7h45 se dit « 8 heures moins le quart » : l'erreur classique est de dire 7.
-    const f = heureFiche(q(7, 45));
-    expect(f.regle).toContain('8 heures moins le quart');
-    expect(f.piege).toContain("l'heure d'après");
+  describe('mode digital', () => {
+    it('lit les minutes telles quelles', () => {
+      expect(regleDe(heureFiche(q(3, 50)))).toContain('3 heures 50');
+    });
+
+    it("traduit les heures de l'après-midi", () => {
+      const f = heureFiche(q(15, 20));
+      expect(regleDe(f)).toContain('3 heures');
+      expect(regleDe(f)).toContain("l'après-midi");
+    });
+
+    it('conseille de compter les petits traits hors des multiples de 5', () => {
+      expect(heureFiche(q(4, 23)).idee).toContain('un par un');
+    });
   });
 
-  it('passe de 12h45 à 1 heure moins le quart, pas 13', () => {
-    expect(heureFiche(q(12, 45)).regle).toContain('1 heures moins le quart');
-  });
-
-  it('traduit les heures de l’après-midi', () => {
-    const f = heureFiche(q(15, 20));
-    expect(f.regle).toContain('3 heures');
-    expect(f.regle).toContain("l'après-midi");
-  });
-
-  it('conseille de compter de 5 en 5 hors des repères', () => {
-    expect(heureFiche(q(4, 23)).idee).toContain('5 en 5');
-  });
-
-  it('reste propre sur les 24 heures et les minutes clés', () => {
-    for (let h = 0; h < 24; h++) {
-      for (const m of [0, 7, 15, 30, 45, 59]) assertPropre(heureFiche(q(h, m)));
+  it('reste propre sur les 24 heures, dans les deux modes', () => {
+    for (const mode of ['digital', 'expression'] as const) {
+      for (let h = 0; h < 24; h++) {
+        for (const m of [0, 7, 15, 30, 40, 45, 50, 59]) assertPropre(heureFiche(q(h, m, mode)));
+      }
     }
   });
 });
@@ -138,11 +175,28 @@ describe('numeration', () => {
       .toBe('+4 à chaque fois → 16');
   });
 
-  it('nomme les rangs d’une décomposition', () => {
+  it('empile les rangs, du plus grand au plus petit', () => {
+    // Le serveur envoie les rangs MÉLANGÉS (voulu : l'enfant doit réfléchir à quel rang va
+    // où). Repris tels quels, six rangs sur une ligne débordaient et devenaient illisibles.
     const f = numerationFiche(q({
-      type: 'decomposition', decompose_positions: ['c', 'd', 'u'], answer: '3:4:5',
+      type: 'decomposition',
+      decompose_positions: ['cm', 'd', 'dm', 'm', 'c', 'u'],
+      answer: '8:2:3:4:0:6',
     }));
-    expect(f.regle).toBe('3 centaines + 4 dizaines + 5 unités');
+    expect(f.regle).toEqual([
+      '  8 centaines de milliers',
+      '+ 3 dizaines de milliers',
+      '+ 4 milliers',
+      '+ 0 centaines',
+      '+ 2 dizaines',
+      '+ 6 unités',
+    ]);
+  });
+
+  it('empile aussi la valeur positionnelle', () => {
+    const f = numerationFiche(q({ type: 'valeur_positionnelle', display: '3 405', answer: '4' }));
+    expect(Array.isArray(f.regle)).toBe(true);
+    expect((f.regle as string[]).length).toBe(2);
   });
 
   it('couvre les quatre types sans trou', () => {

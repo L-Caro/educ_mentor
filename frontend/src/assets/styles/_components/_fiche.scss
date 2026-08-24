@@ -100,7 +100,10 @@
 	border-left: 3px solid var(--fiche-accent);
 	border-radius: 0 v.$space-2 v.$space-2 0;
 	overflow-x: auto;
-	white-space: nowrap;
+
+	span {
+		white-space: nowrap;
+	}
 }
 
 // L'illustration occupe un nombre ENTIER d'interlignes : le texte qui suit retombe
