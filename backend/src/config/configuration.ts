@@ -5,6 +5,11 @@
  * `JWT_SECRET` oublié signifiait démarrer avec un secret présent dans le dépôt git, donc
  * la possibilité de forger un token administrateur. */
 
+/** Le code PIN est un CONTRÔLE PARENTAL : il empêche l'enfant d'ouvrir les réglages, il ne
+ * protège ni donnée sensible ni argent. Sa valeur par défaut ne justifie donc pas de refuser
+ * un démarrage — d'autant qu'elle ne sert qu'au tout premier boot sur une base vierge, et
+ * devient inerte dès qu'un hash existe en base. */
+
 /** Longueur plancher du secret JWT. Ce n'est pas une norme : le seuil sert à écarter un
  * secret manifestement bidon (« changeme », un mot, une valeur tronquée), pas à mesurer
  * l'entropie — que la longueur ne dit pas. À 23 caractères aléatoires on est déjà bien
@@ -53,16 +58,13 @@ export function collectProductionSecretIssues(
     );
   }
 
+  // Malgré son nom, ADMIN_PIN_ENABLED=false ne désactive pas seulement le code PIN : il
+  // court-circuite AccessGuard, donc le portail d'invitation lui-même — toute l'API devient
+  // publique. C'est ce point-là qui justifie un refus de démarrage, pas le code PIN.
   if (env.ADMIN_PIN_ENABLED === 'false') {
     issues.push(
-      "ADMIN_PIN_ENABLED=false désactive la vérification du code PIN et l'accès par invitation.",
+      'ADMIN_PIN_ENABLED=false court-circuite AccessGuard : toute l’API devient accessible sans invitation.',
     );
-  }
-
-  // Le PIN par défaut n'est utilisé qu'au premier démarrage, mais s'il est resté à 1234
-  // sur une base neuve, l'administration est ouverte à quiconque tente le code évident.
-  if (env.DEFAULT_PIN === DEV_DEFAULT_PIN) {
-    issues.push('DEFAULT_PIN vaut encore 1234.');
   }
 
   if (env.DB_SYNCHRONIZE === 'true') {

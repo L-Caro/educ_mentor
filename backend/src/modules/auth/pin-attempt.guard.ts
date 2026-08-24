@@ -8,22 +8,30 @@ import {
 import type { Request } from 'express';
 
 /**
- * Limite les tentatives de saisie du code PIN, par adresse IP.
+ * Garde-fou contre l'énumération du code PIN, par adresse IP.
  *
- * Pourquoi : le PIN fait 4 à 8 chiffres et `verify-pin` n'était pas limitée. Un appareil
- * disposant d'une invitation valide pouvait énumérer les 10 000 combinaisons d'un PIN à
- * 4 chiffres en quelques secondes.
+ * À calibrer sur le bon adversaire. Le PIN est un CONTRÔLE PARENTAL : il empêche l'enfant
+ * d'ouvrir les réglages. Une enfant qui tâtonne n'épuisera jamais 10 000 combinaisons ;
+ * ce garde-fou ne la concerne pas.
  *
- * Pourquoi par IP et non globalement : un compteur global permettrait à un invité de
- * verrouiller l'accès administrateur du parent en épuisant volontairement les essais.
- * Le blocage reste donc cantonné à l'appareil qui se trompe.
+ * Ce qu'il couvre réellement : quelqu'un à qui une invitation a été envoyée pourrait
+ * scripter les 10 000 combinaisons en quelques secondes, et l'accès administrateur permet
+ * de réinitialiser la progression — la seule donnée irremplaçable du projet. C'est ce
+ * scénario-là, et lui seul, qui justifie la limite.
  *
- * Pourquoi en mémoire et non `@nestjs/throttler` : l'application tourne en instance unique.
- * Un compteur en mémoire suffit, ne dépend de rien, et se réinitialise au redémarrage —
- * ce qui est acceptable ici. Ce choix serait faux derrière plusieurs répliques.
+ * Le seuil est donc généreux : un parent qui se trompe sur un téléphone ne doit jamais
+ * s'enfermer dehors. 30 essais par quart d'heure laissent toute la marge nécessaire tout
+ * en ramenant une énumération complète à plusieurs jours.
+ *
+ * Par IP et non globalement : un compteur global permettrait à un invité de verrouiller
+ * l'accès du parent en épuisant volontairement les essais.
+ *
+ * En mémoire et non `@nestjs/throttler` : l'application tourne en instance unique. Un
+ * compteur en mémoire suffit, ne dépend de rien, et se réinitialise au redémarrage — ce
+ * qui est acceptable ici. Ce choix serait faux derrière plusieurs répliques.
  */
 
-const MAX_ATTEMPTS = 8;
+const MAX_ATTEMPTS = 30;
 const WINDOW_MS = 15 * 60 * 1000;
 /** Purge : sans elle, la table grossirait indéfiniment au fil des IP rencontrées. */
 const SWEEP_EVERY = 200;

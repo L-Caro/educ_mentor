@@ -93,6 +93,12 @@ Un push sur `main` déclenche `.github/workflows/deploy.yml` : contrôles qualit
 construction des images vers GHCR, puis `docker compose pull && up -d` sur le VPS.
 Le déploiement n'a lieu que si lint, typage et tests passent des deux côtés.
 
+Le backend refuse de démarrer en production si `JWT_SECRET` est absent, égal au défaut du
+dépôt ou plus court que 23 caractères, si `DB_SYNCHRONIZE=true`, ou si `ADMIN_PIN_ENABLED=false`
+— cette dernière variable, malgré son nom, court-circuite `AccessGuard` et rend toute l'API
+accessible sans invitation. Le code PIN lui-même n'entre pas dans ces contrôles : c'est un
+contrôle parental (empêcher l'enfant d'ouvrir les réglages), pas une frontière de sécurité.
+
 **Avant le premier déploiement suivant le passage aux migrations**, vérifier que le schéma de
 production correspond aux entités — il a vécu sous `synchronize: true` et a pu dériver :
 

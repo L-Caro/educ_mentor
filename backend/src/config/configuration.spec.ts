@@ -67,20 +67,27 @@ describe('collectProductionSecretIssues', () => {
     ).toHaveLength(1);
   });
 
-  it('refuse le PIN par défaut', () => {
-    const issues = collectProductionSecretIssues({
-      ...validProd,
-      DEFAULT_PIN: DEV_DEFAULT_PIN,
-    });
-    expect(issues.join(' ')).toContain('DEFAULT_PIN');
+  it('ne bloque PAS sur le code PIN par défaut', () => {
+    // Le PIN est un contrôle parental, pas une frontière de sécurité, et DEFAULT_PIN ne sert
+    // qu'au premier boot sur une base vierge. Refuser un démarrage de production pour ça,
+    // c'est fabriquer une panne sans bénéfice.
+    expect(
+      collectProductionSecretIssues({
+        ...validProd,
+        DEFAULT_PIN: DEV_DEFAULT_PIN,
+      }),
+    ).toEqual([]);
   });
 
-  it('refuse la désactivation du PIN en production', () => {
+  it("refuse ADMIN_PIN_ENABLED=false, qui ouvre l'API entière", () => {
+    // Le nom trompe : cette variable court-circuite aussi AccessGuard, donc le portail
+    // d'invitation. Le message doit nommer le vrai risque, pas le code PIN.
     const issues = collectProductionSecretIssues({
       ...validProd,
       ADMIN_PIN_ENABLED: 'false',
     });
-    expect(issues.join(' ')).toContain('ADMIN_PIN_ENABLED');
+    expect(issues).toHaveLength(1);
+    expect(issues[0]).toContain('AccessGuard');
   });
 
   it('refuse DB_SYNCHRONIZE en production', () => {
@@ -95,10 +102,10 @@ describe('collectProductionSecretIssues', () => {
     // Un diagnostic partiel ferait redémarrer/redéployer autant de fois qu'il y a d'erreurs.
     const issues = collectProductionSecretIssues({
       NODE_ENV: 'production',
-      DEFAULT_PIN: DEV_DEFAULT_PIN,
       ADMIN_PIN_ENABLED: 'false',
       DB_SYNCHRONIZE: 'true',
     });
-    expect(issues.length).toBeGreaterThanOrEqual(4);
+    // JWT_SECRET absent + AccessGuard court-circuité + synchronize actif
+    expect(issues.length).toBeGreaterThanOrEqual(3);
   });
 });

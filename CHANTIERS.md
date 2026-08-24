@@ -57,9 +57,12 @@ de commit — ils portent le pourquoi de chaque correction.
    DB_PATH=/chemin/vers/data/educmentor.db npm run db:check
    ```
 2. **Sauvegarder avant le premier déploiement.** `./scripts/backup-db.sh`, puis planifier le cron.
-3. **Renseigner les variables de production.** L'application refuse désormais de démarrer si
-   `JWT_SECRET` est absent, égal au défaut ou plus court que 23 caractères, si `DEFAULT_PIN`
-   vaut encore 1234, si `ADMIN_PIN_ENABLED=false`, ou si `DB_SYNCHRONIZE=true`.
+3. **Renseigner les variables de production.** L'application refuse de démarrer si
+   `JWT_SECRET` est absent, égal au défaut du dépôt ou plus court que 23 caractères, si
+   `DB_SYNCHRONIZE=true`, ou si `ADMIN_PIN_ENABLED=false` — cette variable court-circuite
+   `AccessGuard`, donc le portail d'invitation, malgré ce que son nom suggère.
+   Le code PIN n'entre pas dans ces contrôles : c'est un contrôle parental, pas une
+   frontière de sécurité.
    C'est volontaire : mieux vaut un conteneur qui refuse de démarrer qu'un serveur qui signe
    ses tokens administrateur avec un secret présent dans le dépôt git. **À vérifier avant de
    pousser**, sinon le déploiement échouera au démarrage.
