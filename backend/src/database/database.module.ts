@@ -38,8 +38,11 @@ import * as path from 'path';
           database,
           autoLoadEntities: true,
           synchronize,
-          // Les migrations sont compilées à côté des sources : .ts sous ts-node, .js après build.
-          migrations: [path.join(__dirname, `migrations/*.{ts,js}`)],
+          // Extension explicite : un glob `*.{ts,js}` matcherait aussi les `.d.ts` produits par
+          // `declaration: true`, que TypeORM tenterait de charger comme des migrations.
+          migrations: [
+            path.join(__dirname, `migrations/*.${__filename.endsWith('.js') ? 'js' : 'ts'}`),
+          ],
           migrationsRun: true,
         };
       },

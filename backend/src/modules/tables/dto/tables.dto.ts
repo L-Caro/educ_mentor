@@ -16,7 +16,7 @@ export class StartTablesSessionDto {
   @IsInt({ each: true })
   @Min(0, { each: true })
   @Max(10, { each: true })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }): unknown =>
     typeof value === 'string'
       ? value
           .split(',')

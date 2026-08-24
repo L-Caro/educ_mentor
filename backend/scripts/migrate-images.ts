@@ -12,7 +12,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-const SOURCE_ROOT = path.resolve(__dirname, '../../generateur_carte/image anglais');
+const SOURCE_ROOT = path.resolve(
+  __dirname,
+  '../../generateur_carte/image anglais',
+);
 const DEST_ROOT = path.resolve(__dirname, '../data/images/imagier');
 
 function normalize(str: string): string {
@@ -25,7 +28,10 @@ function normalize(str: string): string {
     .replace(/^-|-$/g, '');
 }
 
-function copyDir(srcDir: string, destDir: string): { copied: number; skipped: number } {
+function copyDir(
+  srcDir: string,
+  destDir: string,
+): { copied: number; skipped: number } {
   let copied = 0;
   let skipped = 0;
 
@@ -46,7 +52,8 @@ function copyDir(srcDir: string, destDir: string): { copied: number; skipped: nu
       skipped += result.skipped;
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name).toLowerCase();
-      if (!['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'].includes(ext)) continue;
+      if (!['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg'].includes(ext))
+        continue;
 
       if (fs.existsSync(destPath)) {
         skipped++;
@@ -71,7 +78,8 @@ function main() {
   console.log(`Destination : ${DEST_ROOT}`);
   console.log('');
 
-  const categories = fs.readdirSync(SOURCE_ROOT, { withFileTypes: true })
+  const categories = fs
+    .readdirSync(SOURCE_ROOT, { withFileTypes: true })
     .filter((e) => e.isDirectory());
 
   let totalCopied = 0;
@@ -86,11 +94,15 @@ function main() {
     totalCopied += copied;
     totalSkipped += skipped;
 
-    console.log(`  ${cat.name} → ${destDirName} : ${copied} copiés, ${skipped} ignorés`);
+    console.log(
+      `  ${cat.name} → ${destDirName} : ${copied} copiés, ${skipped} ignorés`,
+    );
   }
 
   console.log('');
-  console.log(`Total : ${totalCopied} fichiers copiés, ${totalSkipped} ignorés`);
+  console.log(
+    `Total : ${totalCopied} fichiers copiés, ${totalSkipped} ignorés`,
+  );
 }
 
 main();

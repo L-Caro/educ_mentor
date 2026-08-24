@@ -273,7 +273,11 @@ export class FranceService {
       });
     }
 
-    dto.is_correct ? prog.correct_count++ : prog.incorrect_count++;
+    if (dto.is_correct) {
+      prog.correct_count++;
+    } else {
+      prog.incorrect_count++;
+    }
     prog.last_seen = new Date();
     prog.is_mastered = isMastered(
       masteryScore(prog.correct_count, prog.incorrect_count),

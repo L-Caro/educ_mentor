@@ -39,7 +39,11 @@ async function readSchema(dataSource: DataSource): Promise<Schema> {
   const rows: { name: string; sql: string }[] = await dataSource.query(
     "select name, sql from sqlite_master where type = 'table' and sql is not null",
   );
-  return new Map(rows.filter((r) => !IGNORED.has(r.name)).map((r) => [r.name, normalize(r.sql)]));
+  return new Map(
+    rows
+      .filter((r) => !IGNORED.has(r.name))
+      .map((r) => [r.name, normalize(r.sql)]),
+  );
 }
 
 async function main() {
@@ -48,10 +52,16 @@ async function main() {
     process.exit(1);
   }
 
-  const entityGlob = path.join(SRC, `**/*.entity.${__filename.endsWith('.js') ? 'js' : 'ts'}`);
+  const entityGlob = path.join(
+    SRC,
+    `**/*.entity.${__filename.endsWith('.js') ? 'js' : 'ts'}`,
+  );
 
   // Base témoin : le schéma que les entités décrivent aujourd'hui, créé à neuf en zone temporaire.
-  const referencePath = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'educmentor-schema-')), 'reference.db');
+  const referencePath = path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'educmentor-schema-')),
+    'reference.db',
+  );
   const reference = new DataSource({
     type: 'better-sqlite3',
     database: referencePath,
@@ -77,11 +87,17 @@ async function main() {
   fs.rmSync(path.dirname(referencePath), { recursive: true, force: true });
 
   const problems: string[] = [];
-  for (const name of [...new Set([...expected.keys(), ...actual.keys()])].sort()) {
+  for (const name of [
+    ...new Set([...expected.keys(), ...actual.keys()]),
+  ].sort()) {
     if (!actual.has(name)) {
-      problems.push(`table absente de la base : ${name}\n    la migration la créera`);
+      problems.push(
+        `table absente de la base : ${name}\n    la migration la créera`,
+      );
     } else if (!expected.has(name)) {
-      problems.push(`table orpheline (plus aucune entité) : ${name}\n    aucune migration ne la supprimera`);
+      problems.push(
+        `table orpheline (plus aucune entité) : ${name}\n    aucune migration ne la supprimera`,
+      );
     } else if (expected.get(name) !== actual.get(name)) {
       problems.push(
         `colonnes divergentes : ${name}\n` +
@@ -92,7 +108,9 @@ async function main() {
   }
 
   console.log(`Base    : ${livePath}`);
-  console.log(`Tables  : ${actual.size} en base, ${expected.size} attendues par les entités\n`);
+  console.log(
+    `Tables  : ${actual.size} en base, ${expected.size} attendues par les entités\n`,
+  );
 
   if (problems.length === 0) {
     console.log('✓ Le schéma de la base correspond aux entités.');
@@ -101,7 +119,9 @@ async function main() {
 
   console.error(`✗ ${problems.length} écart(s) :\n`);
   for (const problem of problems) console.error(`  - ${problem}\n`);
-  console.error('Écrire une migration pour rattraper ces écarts avant de déployer.');
+  console.error(
+    'Écrire une migration pour rattraper ces écarts avant de déployer.',
+  );
   process.exit(1);
 }
 

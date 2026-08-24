@@ -52,12 +52,14 @@ export class BaselineSchema1787529600000 implements MigrationInterface {
     }
   }
 
-  public async down(): Promise<void> {
+  public down(): Promise<void> {
     // Volontairement bloquant : "revenir avant" la baseline signifierait supprimer toutes les
     // tables, donc toute la progression. Aucun scénario légitime ne le demande.
-    throw new Error(
-      'La migration de référence ne peut pas être annulée : elle supprimerait toutes les données. ' +
-        'Pour repartir de zéro, supprimer le fichier de base de données après en avoir fait une sauvegarde.',
+    return Promise.reject(
+      new Error(
+        'La migration de référence ne peut pas être annulée : elle supprimerait toutes les données. ' +
+          'Pour repartir de zéro, supprimer le fichier de base de données après en avoir fait une sauvegarde.',
+      ),
     );
   }
 }

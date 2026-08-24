@@ -49,11 +49,22 @@ export class ImagierImportService {
 
     let dict: Record<string, unknown>;
     try {
-      const parsed = JSON.parse(jsonStr);
-      dict = (parsed.dictionnaire_thematique ?? parsed) as Record<
-        string,
-        unknown
-      >;
+      const parsed: unknown = JSON.parse(jsonStr);
+      if (typeof parsed !== 'object' || parsed === null) {
+        report.errors.push('JSON invalide : objet attendu');
+        return report;
+      }
+      // Deux formes acceptées : le dictionnaire nu, ou enveloppé dans `dictionnaire_thematique`.
+      const wrapped = (parsed as { dictionnaire_thematique?: unknown })
+        .dictionnaire_thematique;
+      const root = wrapped ?? parsed;
+      if (typeof root !== 'object' || root === null) {
+        report.errors.push(
+          'JSON invalide : `dictionnaire_thematique` doit être un objet',
+        );
+        return report;
+      }
+      dict = root as Record<string, unknown>;
     } catch {
       report.errors.push('JSON invalide');
       return report;

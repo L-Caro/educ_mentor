@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
-import * as fs from 'fs';
 import { ImagierWord } from './entities/imagier-word.entity';
 import { ImagierProgression } from './entities/imagier-progression.entity';
 import { ImagierSession } from './entities/imagier-session.entity';
