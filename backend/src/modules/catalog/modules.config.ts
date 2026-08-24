@@ -72,12 +72,20 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 8,
   },
   {
+    id: 'snake',
+    name: 'Snake',
+    description: 'Le jeu du serpent — grandir en mangeant des fruits, sans se mordre',
+    icon: '🐍',
+    is_active: false,
+    display_order: 9,
+  },
+  {
     id: 'lecture',
     name: 'Lecture & Compréhension',
     description: 'Lire un texte et répondre à des questions de compréhension',
     icon: '📖',
     is_active: false,
-    display_order: 9,
+    display_order: 10,
   },
   {
     id: 'numeration',
@@ -85,7 +93,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     description: 'Comparaison, suites, décomposition, valeur positionnelle',
     icon: '🔢',
     is_active: false,
-    display_order: 10,
+    display_order: 11,
   },
   {
     id: 'memory',
@@ -93,7 +101,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     description: 'Retrouver les paires de cartes identiques ou image + mot',
     icon: '🃏',
     is_active: false,
-    display_order: 11,
+    display_order: 12,
   },
   {
     id: 'pendu',
@@ -102,6 +110,6 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
       'Deviner un mot lettre par lettre avant que le bonhomme soit pendu',
     icon: '🪢',
     is_active: false,
-    display_order: 12,
+    display_order: 13,
   },
 ];
