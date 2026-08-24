@@ -1,5 +1,6 @@
 import type { Matiere } from './cours.types';
 import { calculer } from './mathematiques/calculer';
+import { geometrie } from './mathematiques/geometrie';
 import { mesures } from './mathematiques/mesures';
 import { nombres } from './mathematiques/nombres';
 import { problemes } from './mathematiques/problemes';
@@ -7,6 +8,7 @@ import { accords } from './francais/accords';
 import { fonctionDesMots } from './francais/fonction-des-mots';
 import { laConjugaison } from './francais/la-conjugaison';
 import { laPhrase } from './francais/la-phrase';
+import { lesSons } from './francais/les-sons';
 import { natureDesMots } from './francais/nature-des-mots';
 import { vocabulaire } from './francais/vocabulaire';
 import { eau } from './monde/l-eau';
@@ -29,13 +31,13 @@ export const MATIERES: Matiere[] = [
     slug: 'mathematiques',
     titre: 'Mathématiques',
     emoji: '🔢',
-    notions: [nombres, calculer, mesures, problemes],
+    notions: [nombres, calculer, mesures, geometrie, problemes],
   },
   {
     slug: 'francais',
     titre: 'Français',
     emoji: '✍️',
-    notions: [laPhrase, natureDesMots, accords, fonctionDesMots, laConjugaison, vocabulaire],
+    notions: [lesSons, laPhrase, natureDesMots, accords, fonctionDesMots, laConjugaison, vocabulaire],
   },
   {
     slug: 'questionner-le-monde',

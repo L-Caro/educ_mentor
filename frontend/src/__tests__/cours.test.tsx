@@ -193,11 +193,18 @@ describe('balisage des exemples', () => {
   });
 
   it('ne laisse pas de balisage dans le texte brut des fiches', () => {
-    // `idee`, `regle` et `piege` sont rendus comme du texte : un [mot] ou un {s} qui s'y
-    // glisse s'affiche avec ses accolades. C'est arrivé en écrivant les mots invariables.
+    // `idee`, `regle` et `piege` sont rendus comme du texte : un {s} qui s'y glisse
+    // s'affiche avec ses accolades. C'est arrivé en écrivant les mots invariables.
+    //
+    // Les accolades n'ont aucun autre usage, on les interdit partout. Les crochets, si :
+    // les fiches de sons notent « le son [o] », et c'est la notation d'usage. On tolère
+    // donc un crochet autour d'une notation courte, et rien d'autre : un [groupe de mots]
+    // oublié dans un piège reste attrapé.
+    const notationPhonetique = /\[[a-zàâéèêîôùûœ]{1,3}\]/g;
     for (const concept of CONCEPTS) {
       for (const texte of textes(concept)) {
-        expect(texte, concept.slug).not.toMatch(/[[\]{}]/);
+        expect(texte, concept.slug).not.toMatch(/[{}]/);
+        expect(texte.replace(notationPhonetique, ''), concept.slug).not.toMatch(/[[\]]/);
       }
     }
   });

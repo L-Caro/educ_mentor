@@ -242,20 +242,29 @@ il faut la poser à la main. Découpage proposé pour le CE1 (76 notions), à va
 | Mathématiques | Calculer | 10 | écrite, lue |
 | Mathématiques | Grandeurs et mesures | 5 | écrite |
 | Mathématiques | Résoudre un problème | 2 | écrite |
-| Mathématiques | Espace et géométrie | 10 | **en attente** (SVG) |
+| Mathématiques | Espace et géométrie | 10 | écrite |
 | Français | La phrase | 3 | écrite |
 | Français | La nature des mots | 6 | écrite |
 | Français | Les accords | 5 | écrite |
 | Français | La fonction des mots | 3 | écrite |
 | Français | La conjugaison | 1 | écrite |
 | Français | Le vocabulaire | 5 | écrite |
-| Français | Les sons | 9 | **en attente** (audio) |
+| Français | Les sons | 9 | écrite |
 | Questionner le monde | L'eau | 2 | écrite |
 | Questionner le monde | Le vivant | 1 | écrite |
 | Questionner le monde | Le temps | 2 | écrite |
 | Questionner le monde | Vivre ici et ailleurs | 3 | écrite |
 
-**52 fiches sur 71.** Les 19 restantes sont les deux notions qui demandent une décision.
+**71 fiches sur 71. Le CE1 est couvert.**
+
+Les deux notions que je croyais bloquées ne l'étaient pas :
+
+- **Les sons.** Je les avais dites en attente d'audio, à tort. Le corpus montre que ce sont
+  des leçons d'ORTHOGRAPHE, pas d'écoute : « le son /o/ s'écrit o, ô, au ou eau ». L'enfant
+  entend déjà le son ; ce qu'elle apprend, ce sont les graphies. Rien à jouer.
+- **La géométrie.** Les formes ne sont pas insurmontables, et le SVG apporte plus que la
+  reprise des images du corpus : il permet de MARQUER l'angle droit, les côtés égaux, l'axe
+  de symétrie. Sur une capture, l'enfant doit deviner ce qu'il faut regarder.
 
 Le total est passé de 76 à 71, et c'est le corpus qui l'a imposé, pas un raccourci :
 
@@ -280,6 +289,7 @@ exemples dans des images, il n'y a rien à reprendre. Cinq figures couvrent les 
 | Figure | Ce qu'elle montre | Où |
 |---|---|---|
 | `Etapes` | un calcul déplié, une ligne par étape | `cours/components/` |
+| `Formes` | les figures géométriques, en SVG tracé | `cours/components/` |
 | `Phrases` | une phrase avec les mots marqués | `cours/components/` |
 | `Paires` | deux colonnes qui se répondent | `cours/components/` |
 | `DroiteGraduee` | une droite graduée avec un repère | `cours/components/` |
@@ -287,6 +297,11 @@ exemples dans des images, il n'y a rien à reprendre. Cinq figures couvrent les 
 
 `Phrases` et `Paires` partagent un balisage : `[mot]` surligne, `{s}` met une terminaison
 en évidence.
+
+Le catalogue de `Formes` (`catalogue-formes.tsx`) tient les treize tracés : lignes, figures
+planes, solides, symétrie, quadrillage. Il n'est pas annoté `Record<string, ReactNode>`, ce
+qui garde les clés littérales : un nom de forme mal orthographié est une erreur de typage,
+pas un cadre vide à l'écran.
 
 ### Ce qu'il faut trancher avant d'écrire la suite
 
@@ -321,4 +336,4 @@ cd backend  && node ./node_modules/eslint/bin/eslint.js "src/**/*.ts" --no-fix
 cd frontend && node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --max-warnings 0
 ```
 
-**Le prochain geste : trancher l'audio (les sons) et le SVG (la géométrie), ou définir la progression.**
+**Le prochain geste : lire les fiches, puis définir la progression (rien n'est suivi aujourd'hui).**

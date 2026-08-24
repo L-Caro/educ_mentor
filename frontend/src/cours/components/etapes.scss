@@ -148,3 +148,44 @@
 	transform: translateX(-50%);
 	font-variant-numeric: tabular-nums;
 }
+
+// ─── Figures géométriques ─────────────────────────────────────────────────────
+// Quatre interlignes exactement : trois pour le dessin, un pour la légende. Les figures
+// se répartissent sur la largeur et passent à la ligne si elles sont nombreuses, auquel
+// cas la rangée fait un multiple de quatre interlignes et la réglure tient encore.
+
+.Formes {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0 1.2em;
+	color: var(--fiche-ink);
+}
+
+.Forme {
+	margin: 0;
+	width: calc(3 * var(--fiche-line, 32px));
+}
+
+.Forme__dessin {
+	display: block;
+	width: 100%;
+	height: calc(3 * var(--fiche-line, 32px));
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.Forme__legende {
+	line-height: var(--fiche-line, 32px);
+	text-align: center;
+	font-size: var(--fiche-fs-s);
+	color: var(--fiche-accent);
+}
+
+// Les mots posés dans le dessin : nom de point, repère, axe.
+.Forme__note {
+	fill: var(--fiche-ink-soft);
+	font-size: 11px;
+	text-anchor: middle;
+	font-family: inherit;
+}
