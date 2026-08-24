@@ -106,3 +106,22 @@ export function colonnesFausses(question: PoseQuestion, saisie: PoseSaisie): num
   const attendu = resultatAttendu(question);
   return attendu.flatMap((chiffre, i) => ((saisie.resultat[i] ?? '') === chiffre ? [] : [i]));
 }
+
+/**
+ * Les colonnes où le chiffre du haut est BARRÉ, indexées depuis la droite.
+ *
+ * C'est la différence visible entre les deux méthodes, et elle n'est pas décorative.
+ * Par compensation, la marque du haut s'ajoute au chiffre : sous un « 17 » le 7 reste
+ * lisible, il fait partie de la lecture. Par cassage, la marque le REMPLACE : le nombre
+ * du haut a été démonté, et laisser les deux écritures côte à côte donnerait à lire
+ * deux nombres contradictoires.
+ *
+ * La règle est donc simple, et vaut pour toute colonne modifiée : ce qui est réécrit
+ * au-dessus est ce qui compte, ce qui est barré ne compte plus.
+ */
+export function colonnesBarrees(question: PoseQuestion): number[] {
+  if (question.operation !== 'soustraction' || question.method !== 'cassage') return [];
+  return question.retenues.haut
+    .map((v, colonne) => (v === null ? -1 : colonne))
+    .filter((colonne) => colonne >= 0 && colonne < question.columns);
+}

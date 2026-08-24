@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  colonnesBarrees,
   colonnesFausses,
   decode,
   encode,
@@ -27,6 +28,7 @@ const q = (over: Partial<PoseQuestion> = {}): PoseQuestion => ({
   answer_length: 4,
   columns: 5,
   has_carry: true,
+  method: 'compensation',
   retenues: {
     haut: [17, null, null, null, null],
     bas: [null, 4, null, null, null],
@@ -160,5 +162,48 @@ describe('colonnesFausses', () => {
     expect(colonnesFausses(q(), saisie(['9', '1', '7', '2', '']))).toEqual([1]);
     expect(colonnesFausses(q(), saisie(['8', '1', '7', '2', '']))).toEqual([0, 1]);
     expect(colonnesFausses(q(), saisie(['9', '0', '7', '2', '']))).toEqual([]);
+  });
+});
+
+describe('colonnesBarrees', () => {
+  // 502 − 348 = 154. Par cassage : le 2 devient 12, le 0 devient 9, le 5 devient 4.
+  // Les trois chiffres du haut ont été réécrits, donc les trois sont barrés.
+  const cassage = (over: Partial<PoseQuestion> = {}): PoseQuestion =>
+    q({
+      operands: [502, 348],
+      answer: 154,
+      answer_length: 3,
+      columns: 4,
+      method: 'cassage',
+      retenues: { haut: [12, 9, 4, null], bas: [null, null, null, null] },
+      ...over,
+    });
+
+  it('barre les chiffres du haut réécrits, par cassage', () => {
+    expect(colonnesBarrees(cassage())).toEqual([0, 1, 2]);
+  });
+
+  it('ne barre rien par compensation', () => {
+    // Sous un « 17 » le 7 reste lisible : la marque s'ajoute au chiffre, elle ne le
+    // remplace pas. Le barrer enseignerait l'autre méthode.
+    expect(colonnesBarrees(q())).toEqual([]);
+  });
+
+  it('ne barre rien sur une addition', () => {
+    expect(
+      colonnesBarrees(
+        q({
+          operation: 'addition',
+          method: 'cassage',
+          retenues: { haut: [null, 1, 1, null, null], bas: [null, null, null, null, null] },
+        }),
+      ),
+    ).toEqual([]);
+  });
+
+  it('ignore une marque au-delà de la dernière colonne', () => {
+    // `computeRetenues` travaille sur une colonne de plus que la grille : une marque
+    // qui tomberait hors grille ne doit pas produire un index sans chiffre à barrer.
+    expect(colonnesBarrees(cassage({ columns: 2 }))).toEqual([0, 1]);
   });
 });

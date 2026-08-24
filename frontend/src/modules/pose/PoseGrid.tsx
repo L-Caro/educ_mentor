@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession';
 import type { PoseQuestion } from './pose.type';
-import { colonnesFausses, decode, encode, type PoseSaisie } from './poseValue';
+import { colonnesBarrees, colonnesFausses, decode, encode, type PoseSaisie } from './poseValue';
 
 interface Props {
   question: PoseQuestion;
@@ -21,16 +21,26 @@ const SIGNE = { addition: '+', soustraction: '−' } as const;
 /**
  * La grille d'une opération posée, telle qu'on l'écrit sur un cahier.
  *
+ * Par compensation, on ajoute 10 en haut et une dizaine en bas :
+ *
  *      [ ] [ ] [ ] [17]   ← retenues du haut
  *        2   8   4   7
  *    −     1   3   8
- *      [ ] [ ] [4] [ ]    ← retenues du bas (compensation uniquement)
+ *      [ ] [ ] [4] [ ]    ← retenues du bas
  *      ─────────────────
  *      [ ] [ ] [ ] [ ]    ← résultat
  *
+ * Par cassage, on emprunte au chiffre de gauche, qui est barré et réécrit diminué.
+ * Rien ne s'écrit en bas, et le nombre du haut se lit dans la rangée des retenues :
+ *
+ *      [ ] [ ] [3] [17]
+ *        2   8   4̶   7̶
+ *    −     1   3   8
+ *      ─────────────────
+ *      [ ] [ ] [ ] [ ]
+ *
  * La saisie avance de DROITE À GAUCHE, comme on calcule. Les rangées de retenue
- * n'apparaissent que si la difficulté et la méthode les prévoient : la compensation écrit
- * en bas, le cassage jamais.
+ * n'apparaissent que si la difficulté et la méthode les prévoient.
  */
 export default function PoseGrid({ question, value, onChange, onSubmit, answerState }: Props) {
   const saisie = decode(value, question);
@@ -38,6 +48,10 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
   const cols = indices(question.columns);
 
   const fausses = verrouille ? colonnesFausses(question, saisie) : [];
+  // Par cassage, le nombre du haut est démonté au fur et à mesure : les chiffres
+  // remplacés sont barrés. On ne les barre que lorsque la marque est visible : sinon
+  // on signalerait les colonnes à emprunter sans donner de quoi les traiter.
+  const barrees = question.carry_display === 'hidden' ? [] : colonnesBarrees(question);
 
   // Focus sur les unités à chaque nouvelle question : c'est par là qu'on commence.
   const premierRef = useRef<HTMLInputElement>(null);
@@ -96,7 +110,12 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
 
       <div className="PoseGrid__row PoseGrid__row--operand">
         {chiffresDe(question.operands[0]).map((d, i) => (
-          <span key={cols[i]} className="PoseGrid__digit">{d}</span>
+          <span
+            key={cols[i]}
+            className={`PoseGrid__digit${barrees.includes(cols[i]) && d !== '' ? ' PoseGrid__digit--barre' : ''}`}
+          >
+            {d}
+          </span>
         ))}
       </div>
 

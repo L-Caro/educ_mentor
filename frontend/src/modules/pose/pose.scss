@@ -46,6 +46,32 @@
 	font-weight: 600;
 }
 
+// Chiffre barré : ce qu'on écrit par cassage quand on a démonté une dizaine.
+// Le trait est un dégradé et non `text-decoration: line-through` : la barre du crayon
+// est oblique, elle traverse le chiffre en entier, et le dégradé n'ajoute rien à la mise
+// en page (ni hauteur, ni ligne, ni décalage de la réglure dans la fiche).
+@mixin barre($couleur, $epaisseur) {
+	background-image: linear-gradient(
+		to top right,
+		transparent calc(50% - #{$epaisseur} / 2),
+		#{$couleur} calc(50% - #{$epaisseur} / 2),
+		#{$couleur} calc(50% + #{$epaisseur} / 2),
+		transparent calc(50% + #{$epaisseur} / 2)
+	);
+	// Le trait couvre le chiffre, pas la gouttière : sinon les barres se rejoignent
+	// d'une colonne à l'autre et forment une rayure continue.
+	background-size: 62% 62%;
+	background-position: center;
+	background-repeat: no-repeat;
+}
+
+.PoseGrid__digit--barre {
+	@include barre(var(--color-primary), 2px);
+	// Le chiffre s'efface, la barre reste franche. Baisser l'opacité du bloc entier
+	// aurait affadi les deux, et une barre pâle ne se voit pas de loin.
+	color: color-mix(in srgb, var(--color-base-content) 55%, transparent);
+}
+
 .PoseGrid__bar {
 	width: calc(var(--pose-cols) * var(--pose-cell) + (var(--pose-cols) - 1) * var(--pose-gap));
 	height: 3px;
@@ -182,6 +208,11 @@
 	font-size: var(--fiche-fs);
 	font-weight: 600;
 	color: var(--fiche-ink);
+}
+
+.PoseFigure__digit--barre {
+	@include barre(var(--fiche-accent), 1.5px);
+	color: color-mix(in srgb, var(--fiche-ink) 55%, transparent);
 }
 
 // Les retenues s'écrivent petit, comme au crayon.

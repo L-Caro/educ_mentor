@@ -1,4 +1,5 @@
 import type { PoseQuestion } from './pose.type';
+import { colonnesBarrees } from './poseValue';
 import './pose.scss';
 
 const SIGNE = { addition: '+', soustraction: '−' } as const;
@@ -18,6 +19,7 @@ export default function PoseFigure({ question }: { question: PoseQuestion }) {
     const s = String(n).split('').reverse();
     return cols.map((c) => s[c] ?? '');
   };
+  const barrees = colonnesBarrees(question);
 
   // La rangée du bas est toujours rendue, même vide : la figure doit occuper un nombre
   // ENTIER d'interlignes pour que le texte qui la suit retombe sur la réglure.
@@ -32,7 +34,12 @@ export default function PoseFigure({ question }: { question: PoseQuestion }) {
 
       <div className="PoseFigure__row">
         {chiffres(question.operands[0]).map((d, i) => (
-          <span key={cols[i]} className="PoseFigure__digit">{d}</span>
+          <span
+            key={cols[i]}
+            className={`PoseFigure__digit${barrees.includes(cols[i]) && d !== '' ? ' PoseFigure__digit--barre' : ''}`}
+          >
+            {d}
+          </span>
         ))}
       </div>
 

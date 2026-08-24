@@ -18,6 +18,9 @@ export interface PoseQuestion {
   retenues: Retenues;
   /** filled = montrées remplies · empty = cases à remplir · hidden = aucune case */
   carry_display: 'filled' | 'empty' | 'hidden';
+  /** Comment lire les marques du haut : par compensation elles s'ajoutent au chiffre,
+   *  par cassage elles le remplacent, et le chiffre d'origine est alors barré. */
+  method: MethodeSoustraction;
 }
 
 export interface PoseSessionResponse {

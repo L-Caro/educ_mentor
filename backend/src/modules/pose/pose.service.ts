@@ -34,6 +34,10 @@ export interface PoseSessionQuestion {
   retenues: Retenues;
   /** Les retenues sont-elles montrées ? remplies ? Dérivé de la difficulté. */
   carry_display: 'filled' | 'empty' | 'hidden';
+  /** Répété sur chaque question, bien qu'il soit constant pour la session : la fiche se
+   *  construit à partir de la question seule, et un « 9 » écrit au-dessus d'un « 0 » ne
+   *  veut rien dire sans savoir s'il remplace ce chiffre ou s'y ajoute. */
+  method: MethodeSoustraction;
 }
 
 export interface PoseSessionResult {
@@ -101,6 +105,7 @@ export class PoseService {
         columns: Math.max(String(a).length, String(b).length) + 1,
         retenues: computeRetenues(operation, a, b, method),
         carry_display: CARRY_BY_DIFFICULTY[difficulty],
+        method,
       });
     }
 
