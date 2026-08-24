@@ -5,16 +5,20 @@
 // sont en chasse fixe : sur une opération posée, l'alignement EST l'exercice.
 
 .PoseGrid {
-	--pose-cell: 2.6rem;
+	// La cellule s'adapte à la largeur disponible plutôt que de forcer un défilement :
+	// à 2,6rem fixes, une opération à quatre chiffres débordait déjà d'une carte étroite.
+	// Le défilement reste en dernier recours, au-delà de six ou sept colonnes.
+	--pose-cell: clamp(1.7rem, 8vw, 2.6rem);
 	--pose-gap: 0.25rem;
+	// Gouttière du signe : plus étroite qu'une colonne entière, il n'en a pas besoin.
+	--pose-sign: 1.4rem;
 
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	gap: var(--pose-gap);
 	font-variant-numeric: tabular-nums;
-	// Le signe occupe une colonne à gauche de la grille.
-	padding-left: var(--pose-cell);
+	padding-left: var(--pose-sign);
 	overflow-x: auto;
 	max-width: 100%;
 }
@@ -97,12 +101,6 @@
 	border-style: solid;
 }
 
-// Colonne de débordement inutilisée : présente pour l'alignement, discrète.
-.PoseGrid__cell--spare {
-	border-color: transparent;
-	background: none;
-}
-
 .PoseGrid__cell--wrong {
 	border-color: var(--color-error);
 	background: color-mix(in srgb, var(--color-error) 12%, transparent);
@@ -113,11 +111,7 @@
 	background: color-mix(in srgb, var(--color-success) 12%, transparent);
 }
 
-@media (max-width: 30rem) {
-	.PoseGrid {
-		--pose-cell: 2.1rem;
-	}
-}
+// La taille suit désormais la largeur disponible : plus de palier à la main.
 
 // ─── Écran de réglages ────────────────────────────────────────────────────────
 

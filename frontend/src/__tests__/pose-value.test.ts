@@ -93,13 +93,22 @@ describe('estComplete', () => {
   // Difficulté « difficile » : aucune case de retenue, seul le résultat compte.
   const sansRetenues = q({ carry_display: 'hidden' });
 
-  it('exige le résultat sur toute sa longueur', () => {
-    expect(estComplete(sansRetenues, saisie(['9', '0', '7', '', '']))).toBe(false);
-    expect(estComplete(sansRetenues, saisie(['9', '0', '7', '2', '']))).toBe(true);
+  it("n'exige pas de remplir toutes les cases", () => {
+    // 7059 − 7014 = 45 : la réponse tient sur deux colonnes, les autres restent vides.
+    // Exiger le nombre exact de chiffres reviendrait à l'annoncer à l'enfant.
+    const court = q({ operands: [7059, 7014], answer: 45, carry_display: 'hidden' });
+    expect(estComplete(court, saisie(['5', '4', '', '', '']))).toBe(true);
   });
 
-  it("n'exige pas la colonne de débordement inutilisée", () => {
-    expect(estComplete(sansRetenues, saisie(['9', '0', '7', '2', '']))).toBe(true);
+  it('exige au moins la colonne des unités', () => {
+    expect(estComplete(sansRetenues, saisie(['', '', '', '', '']))).toBe(false);
+    expect(estComplete(sansRetenues, saisie(['9', '', '', '', '']))).toBe(true);
+  });
+
+  it('refuse un trou entre les chiffres', () => {
+    // « 5_7 » n'est pas un nombre : c'est une saisie en cours, pas une réponse.
+    expect(estComplete(sansRetenues, saisie(['5', '', '7', '', '']))).toBe(false);
+    expect(estComplete(sansRetenues, saisie(['5', '4', '7', '', '']))).toBe(true);
   });
 
   it('exige aussi les retenues en difficulté moyenne', () => {
@@ -138,7 +147,9 @@ describe('estCorrecte', () => {
     expect(estCorrecte(q(), s)).toBe(true);
   });
 
-  it('refuse un chiffre en trop dans la colonne de débordement', () => {
+  it('refuse un chiffre en trop dans une colonne qui doit rester vide', () => {
+    // Les cases se ressemblent toutes : rien n'empêche d'écrire à gauche du nombre.
+    // « 12709 » n'est pas « 2709 ».
     expect(estCorrecte(q(), saisie(['9', '0', '7', '2', '1']))).toBe(false);
   });
 });

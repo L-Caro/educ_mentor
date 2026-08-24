@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession';
 import type { PoseQuestion } from './pose.type';
-import { colonnesFausses, decode, encode, resultatAttendu, type PoseSaisie } from './poseValue';
+import { colonnesFausses, decode, encode, type PoseSaisie } from './poseValue';
 
 interface Props {
   question: PoseQuestion;
@@ -37,7 +37,6 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
   const verrouille = answerState !== 'idle';
   const cols = indices(question.columns);
 
-  const attendu = resultatAttendu(question);
   const fausses = verrouille ? colonnesFausses(question, saisie) : [];
 
   // Focus sur les unités à chaque nouvelle question : c'est par là qu'on commence.
@@ -132,7 +131,9 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
 
       <div className="PoseGrid__row PoseGrid__row--result">
         {cols.map((c) => {
-          const inutile = attendu[c] === '';
+          // Toutes les cases se ressemblent. En griser celles que la réponse n'utilise pas
+          // reviendrait à annoncer le nombre de chiffres attendu : la case vide EST une
+          // réponse possible, et c'est à l'enfant de décider où son nombre s'arrête.
           return (
             <input
               key={c}
@@ -146,9 +147,8 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
               className={[
                 'PoseGrid__cell',
                 'PoseGrid__cell--result',
-                inutile ? 'PoseGrid__cell--spare' : '',
                 fausses.includes(c) ? 'PoseGrid__cell--wrong' : '',
-                verrouille && !fausses.includes(c) && !inutile ? 'PoseGrid__cell--right' : '',
+                verrouille && !fausses.includes(c) ? 'PoseGrid__cell--right' : '',
               ].filter(Boolean).join(' ')}
               value={saisie.resultat[c] ?? ''}
               readOnly={verrouille}

@@ -61,16 +61,25 @@ export function resultatAttendu(question: PoseQuestion): string[] {
 }
 
 /**
- * La validation est-elle possible ? Le résultat doit être complet sur toute sa longueur.
+ * La validation est-elle possible ?
+ *
+ * On n'exige PAS que toutes les cases soient remplies : c'est à l'enfant de décider
+ * combien de chiffres compte sa réponse. Exiger le nombre exact reviendrait à le lui
+ * annoncer. On exige seulement qu'elle ait écrit un nombre : la colonne des unités
+ * renseignée, et pas de trou entre les chiffres.
+ *
  * En difficulté moyenne, les cases de retenue attendues doivent l'être aussi : c'est
  * l'exercice. Sinon elle pourrait les ignorer et l'échafaudage ne servirait à rien.
  */
 export function estComplete(question: PoseQuestion, saisie: PoseSaisie): boolean {
-  const attendu = resultatAttendu(question);
-  const resultatRempli = attendu.every(
-    (chiffre, i) => chiffre === '' || saisie.resultat[i] !== '',
-  );
-  if (!resultatRempli) return false;
+  const cases = saisie.resultat.slice(0, question.columns);
+  if ((cases[0] ?? '') === '') return false;
+
+  // Un trou (une case vide suivie d'une case remplie, plus à gauche) est une saisie en
+  // cours, pas un nombre : mieux vaut bloquer que valider « 5_7 ».
+  const dernierRempli = cases.reduce((max, v, i) => (v !== '' ? i : max), -1);
+  const sansTrou = cases.slice(0, dernierRempli + 1).every((v) => v !== '');
+  if (!sansTrou) return false;
 
   if (question.carry_display !== 'empty') return true;
 
