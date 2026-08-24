@@ -8,12 +8,19 @@ services:
     volumes:
       - ./backend:/app
       - backend_modules:/app/node_modules   # volume isolé — évite les conflits avec les node_modules du host
-      - ./data:/app/data
+      # Monté à /data et NON à /app/data : imbriqué sous le bind ./backend:/app, il se faisait
+      # écraser par celui-ci (Docker applique les montages dans l'ordre, et /app arrivait après
+      # /app/data). Le conteneur créait alors une base vierge dans backend/data/ sur l'hôte —
+      # modules inactifs, aucun mot, aucun texte, sans le moindre message d'erreur.
+      - ./data:/data
     ports:
       - "4005:4005"
     env_file: .env
     environment:
       - CHOKIDAR_USEPOLLING=true            # nécessaire dans Docker/WSL pour que le watcher NestJS détecte les changements
+      # Chemins absolus : ils priment sur ceux du .env, qui sont relatifs au répertoire de travail.
+      - DB_PATH=/data/educmentor.db
+      - IMAGES_PATH=/data/images
 
   frontend:
     image: node:20-alpine

@@ -10,7 +10,12 @@ import { LectureAdminController } from './lecture-admin.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([LectureText, LectureQuestion, LectureSession, LectureProgression]),
+    TypeOrmModule.forFeature([
+      LectureText,
+      LectureQuestion,
+      LectureSession,
+      LectureProgression,
+    ]),
   ],
   controllers: [LectureGameController, LectureAdminController],
   providers: [LectureService],

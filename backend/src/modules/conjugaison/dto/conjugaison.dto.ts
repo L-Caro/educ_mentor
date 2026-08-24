@@ -1,8 +1,15 @@
-import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 const VALID_DIRECTIONS = ['forward', 'reverse', 'random'] as const;
-export type QuestionDirection = typeof VALID_DIRECTIONS[number];
+export type QuestionDirection = (typeof VALID_DIRECTIONS)[number];
 
 export class StartConjugaisonSessionDto {
   @IsOptional()

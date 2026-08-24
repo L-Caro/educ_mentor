@@ -39,6 +39,12 @@ const OBSOLETE_KEYS = [
   'monnaie_response_mode',
 ];
 
+const PRIVATE_KEY_PATTERN = /(hash|secret|token)/i;
+
+export function isPrivateKey(key: string): boolean {
+  return PRIVATE_KEY_PATTERN.test(key);
+}
+
 @Injectable()
 export class SettingsService implements OnModuleInit {
   constructor(
@@ -74,6 +80,20 @@ export class SettingsService implements OnModuleInit {
     }
   }
 
+  /**
+   * Réglages exposés à l'API. `admin_pin_hash` en était : n'importe quel appareil invité
+   * pouvait le lire, puis casser hors ligne un code à 4 chiffres — puis changer le PIN.
+   *
+   * Le filtre est structurel plutôt qu'une liste nominative : tout réglage dont la clé
+   * contient `hash`, `secret` ou `token` reste privé. Un futur secret nommé selon cette
+   * convention est protégé sans qu'on ait à y penser.
+   */
+  async getPublic(): Promise<Setting[]> {
+    const all = await this.repo.find();
+    return all.filter((setting) => !isPrivateKey(setting.key));
+  }
+
+  /** Tous les réglages, secrets compris. Usage interne uniquement — jamais exposé par un contrôleur. */
   async getAll(): Promise<Setting[]> {
     return this.repo.find();
   }

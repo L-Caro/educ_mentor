@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { CalculService } from './calcul.service';
-import { RecordCalculAnswerDto, CompleteCalculSessionDto, StartCalculSessionDto } from './dto/calcul.dto';
+import {
+  RecordCalculAnswerDto,
+  CompleteCalculSessionDto,
+  StartCalculSessionDto,
+} from './dto/calcul.dto';
 
 @Controller('calcul')
 export class CalculGameController {
@@ -17,7 +21,14 @@ export class CalculGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteCalculSessionDto) {
-    return this.calculService.completeSession(id, dto.correct_answers, dto.total_questions);
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteCalculSessionDto,
+  ) {
+    return this.calculService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

@@ -1,4 +1,11 @@
-import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export const ALL_FRANCE_QUESTION_TYPES = [
@@ -22,7 +29,7 @@ export const ALL_FRANCE_QUESTION_TYPES = [
   'locate_city',
 ] as const;
 
-export type FranceQuestionType = typeof ALL_FRANCE_QUESTION_TYPES[number];
+export type FranceQuestionType = (typeof ALL_FRANCE_QUESTION_TYPES)[number];
 
 export class StartFranceSessionDto {
   @IsOptional()

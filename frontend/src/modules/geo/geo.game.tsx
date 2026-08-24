@@ -1,7 +1,7 @@
 import store from 'src/store';
 import { geoApi } from './geo.api.ts';
 import type { GeoQuestion, GeoSessionResponse } from './geo.type.ts';
-import type { GameModuleSpec, MapInteractionProps } from 'src/types/game.types.ts';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
 import WorldMap from './WorldMap.tsx';
 import ContinentMap from './ContinentMap.tsx';
 import './geo.scss';
@@ -41,15 +41,11 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
     isMultiSelect: () => false,
     correctKeys:   (q) => [q.answer!],
     isCorrect:     (q, clicked) => clicked === q.answer,
-    getComponent: (q) => {
-      if (q.type === 'identify_continent') return ContinentMap;
-      if (!q.continent && !q.map_filter) return WorldMap;
-      const continent = q.continent ?? undefined;
-      const visibleKeys = q.map_filter ? new Set(q.map_filter) : undefined;
-      return (props: MapInteractionProps) => (
-        <WorldMap {...props} continent={continent} visibleKeys={visibleKeys} />
-      );
-    },
+    getComponent: (q) => (q.type === 'identify_continent' ? ContinentMap : WorldMap),
+    getComponentProps: (q) => ({
+      continent: q.continent ?? undefined,
+      visibleKeys: q.map_filter ? new Set(q.map_filter) : undefined,
+    }),
   },
 
   qcm: {

@@ -1,6 +1,10 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { LectureService } from './lecture.service';
-import { CompleteLectureSessionDto, RecordLectureAnswerDto, StartLectureSessionDto } from './dto/lecture.dto';
+import {
+  CompleteLectureSessionDto,
+  RecordLectureAnswerDto,
+  StartLectureSessionDto,
+} from './dto/lecture.dto';
 
 @Controller('lecture')
 export class LectureGameController {

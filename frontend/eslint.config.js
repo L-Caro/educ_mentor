@@ -16,8 +16,22 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2023,
       globals: globals.browser,
+    },
+    rules: {
+      // Mêmes conventions que le backend : `_` marque un paramètre volontairement inutilisé,
+      // et `ignoreRestSiblings` couvre `const { id, textId: _textId, ...body } = props`,
+      // où la clé n'est extraite que pour être exclue du reste.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          ignoreRestSiblings: true,
+        },
+      ],
     },
   },
 ])

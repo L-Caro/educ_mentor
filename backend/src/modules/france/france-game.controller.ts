@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { FranceService } from './france.service';
-import { StartFranceSessionDto, RecordFranceAnswerDto, CompleteFranceSessionDto } from './dto/france.dto';
+import {
+  StartFranceSessionDto,
+  RecordFranceAnswerDto,
+  CompleteFranceSessionDto,
+} from './dto/france.dto';
 
 @Controller('france')
 export class FranceGameController {
@@ -17,7 +21,14 @@ export class FranceGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteFranceSessionDto) {
-    return this.franceService.completeSession(id, dto.correct_answers, dto.total_questions);
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteFranceSessionDto,
+  ) {
+    return this.franceService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

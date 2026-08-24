@@ -6,6 +6,7 @@ node_modules/
 dist/
 build/
 backend/static/
+backend/tsconfig.build.tsbuildinfo
 
 # Base de données et données persistées
 backend/data/educmentor.db
@@ -49,3 +50,10 @@ data/educmentor.db
 data/educmentor.db-shm
 data/educmentor.db-wal
 data/invitations-backup.sql
+data/backups/
+
+# Corpus de travail Kartable — source privée, jamais versionnée ni livrée.
+# 448 leçons HTML (46 Mo, webfonts inlinées) + leur miroir d'images (~25 Mo).
+/data/lecons/
+/data/lecons_media/
+/data/corpus/

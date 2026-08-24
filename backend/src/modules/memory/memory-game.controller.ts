@@ -1,6 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { MemoryService } from './memory.service';
-import { StartMemorySessionDto, CompleteMemorySessionDto } from './dto/memory.dto';
+import {
+  StartMemorySessionDto,
+  CompleteMemorySessionDto,
+} from './dto/memory.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('memory')
@@ -13,7 +24,10 @@ export class MemoryGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteMemorySessionDto) {
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteMemorySessionDto,
+  ) {
     return this.memoryService.completeSession(id, dto.attempts);
   }
 

@@ -6,7 +6,49 @@ on:
       - main
 
 jobs:
+  # Barrière de qualité — s'exécute AVANT toute construction d'image.
+  # Sans elle, chaque push déployait en production sans qu'aucun lint, typage ni test
+  # n'ait été exécuté : le pipeline ne faisait qu'accélérer la mise en ligne de code cassé.
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false          # voir les deux paquets d'un coup plutôt qu'un puis l'autre
+      matrix:
+        package: [backend, frontend]
+    defaults:
+      run:
+        working-directory: ${{ matrix.package }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22      # même version que les Dockerfile
+          cache: npm
+          cache-dependency-path: ${{ matrix.package }}/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      # Démarrage complet sur une base vierge : couvre le câblage des modules, l'application
+      # de la migration de référence et les seeds — soit le scénario « déploiement neuf ».
+      - name: Test end-to-end
+        if: matrix.package == 'backend'
+        run: npm run test:e2e
+
   build:
+    needs: checks
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -33,6 +75,8 @@ jobs:
           tags: |
             ghcr.io/l-caro/educ_mentor-frontend:latest
             ghcr.io/l-caro/educ_mentor-frontend:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha,scope=frontend
           cache-to: type=gha,mode=max,scope=frontend
 
@@ -44,6 +88,8 @@ jobs:
           tags: |
             ghcr.io/l-caro/educ_mentor-backend:latest
             ghcr.io/l-caro/educ_mentor-backend:${{ github.sha }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
           cache-from: type=gha,scope=backend
           cache-to: type=gha,mode=max,scope=backend
 
@@ -60,4 +106,6 @@ jobs:
           script: |
             sudo docker compose -f /home/lionel/Lionel/development/educ_mentor/docker-compose.yml pull
             sudo docker compose -f /home/lionel/Lionel/development/educ_mentor/docker-compose.yml up -d
-            sudo docker image prune -af
+            # Purge restreinte aux images de ce projet : `prune -af` sans filtre supprimait
+            # toutes les images inutilisées du VPS, y compris celles des autres projets.
+            sudo docker image prune -af --filter 'label=org.opencontainers.image.source=https://github.com/${{ github.repository }}'

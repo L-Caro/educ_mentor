@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
-import { Transform } from 'class-transformer';
 import { CatalogService } from './catalog.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 

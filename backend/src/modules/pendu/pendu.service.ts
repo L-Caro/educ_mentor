@@ -1,7 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { BadRequestException, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, IsNull, Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { PenduWord } from './entities/pendu-word.entity';
 import { PenduSession } from './entities/pendu-session.entity';
 import { PENDU_SEED_WORDS } from './data/pendu-seed';
@@ -40,7 +40,7 @@ export class PenduService implements OnModuleInit {
       for (const entry of PENDU_SEED_WORDS) {
         await this.wordRepo.save(
           this.wordRepo.create({
-            id: uuidv4(),
+            id: randomUUID(),
             word: entry.word,
             difficulty: entry.difficulty,
             is_active: true,
@@ -54,7 +54,10 @@ export class PenduService implements OnModuleInit {
 
   async startSession(dto: StartPenduSessionDto): Promise<StartSessionResult> {
     // Cherche des mots actifs selon difficulté et longueur
-    let words = await this.wordRepo.findBy({ is_active: true, difficulty: dto.difficulty });
+    let words = await this.wordRepo.findBy({
+      is_active: true,
+      difficulty: dto.difficulty,
+    });
 
     // Fallback sur tous les mots actifs si aucun trouvé pour la difficulté
     if (words.length === 0) {
@@ -92,7 +95,7 @@ export class PenduService implements OnModuleInit {
     }
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       word_id: pickedWord.id,
       word: pickedWord.word,
       difficulty: dto.difficulty,
@@ -109,7 +112,10 @@ export class PenduService implements OnModuleInit {
     };
   }
 
-  async completeSession(sessionId: string, dto: CompletePenduSessionDto): Promise<void> {
+  async completeSession(
+    sessionId: string,
+    dto: CompletePenduSessionDto,
+  ): Promise<void> {
     const session = await this.sessionRepo.findOneBy({ id: sessionId });
     if (!session) return;
     session.won = dto.won;
@@ -133,7 +139,7 @@ export class PenduService implements OnModuleInit {
       throw new BadRequestException('Le mot doit contenir au moins 5 lettres');
     }
     const word = this.wordRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       word: normalized,
       difficulty: dto.difficulty,
       is_active: dto.is_active ?? true,
@@ -141,7 +147,10 @@ export class PenduService implements OnModuleInit {
     return this.wordRepo.save(word);
   }
 
-  async updateWord(id: string, dto: UpdatePenduWordDto): Promise<PenduWord | null> {
+  async updateWord(
+    id: string,
+    dto: UpdatePenduWordDto,
+  ): Promise<PenduWord | null> {
     const word = await this.wordRepo.findOneBy({ id });
     if (!word) return null;
     if (dto.word !== undefined) {

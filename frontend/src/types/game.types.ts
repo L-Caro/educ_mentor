@@ -69,8 +69,14 @@ export interface GameModuleSpec<TSession, TQuestion> {
     isReady?: (question: TQuestion, input: string) => boolean;
   };
   map?: {
-    /** Retourne le composant à utiliser pour cette question. */
+    /** Retourne le composant à utiliser pour cette question.
+     * DOIT renvoyer une référence stable (un composant défini au niveau module) : une
+     * fonction créée ici serait un type de composant différent à chaque rendu, et React
+     * démonterait puis remonterait toute la carte SVG à chaque changement d'état.
+     * Ce qui varie d'une question à l'autre passe par `getComponentProps`. */
     getComponent: (question: TQuestion) => ComponentType<MapInteractionProps>;
+    /** Props supplémentaires passées au composant, propres à la question. */
+    getComponentProps?: (question: TQuestion) => Record<string, unknown>;
     isMapQuestion: (question: TQuestion) => boolean;
     /** true = multi-select (toggle), false = single-select. */
     isMultiSelect: (question: TQuestion) => boolean;
@@ -78,7 +84,9 @@ export interface GameModuleSpec<TSession, TQuestion> {
     isCorrect: (question: TQuestion, clicked: string) => boolean;
   };
   pointMap?: {
+    /** Même règle de stabilité que `map.getComponent`. */
     getComponent: (question: TQuestion) => ComponentType<PointMapInteractionProps>;
+    getComponentProps?: (question: TQuestion) => Record<string, unknown>;
     isPointMapQuestion: (question: TQuestion) => boolean;
     targetSvgPoint: (question: TQuestion) => { x: number; y: number };
     isCorrect: (question: TQuestion, distanceKm: number) => boolean;

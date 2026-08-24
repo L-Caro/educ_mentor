@@ -1,16 +1,27 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class StartLectureSessionDto {
-  @IsInt() @Min(1) @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Type(() => Number)
   textId: number;
 
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   difficulty?: string;
 }
 
 export class RecordLectureAnswerDto {
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   itemKey: string;
 
   @IsBoolean()
@@ -18,65 +29,90 @@ export class RecordLectureAnswerDto {
 }
 
 export class CompleteLectureSessionDto {
-  @IsInt() @Min(0) @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
   correctAnswers: number;
 
-  @IsInt() @Min(0) @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
   totalQuestions: number;
 }
 
 export class CreateTextDto {
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   titre: string;
 
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   contenu: string;
 
-  @IsOptional() @IsBoolean()
+  @IsOptional()
+  @IsBoolean()
   actif?: boolean;
 }
 
 export class UpdateTextDto {
-  @IsOptional() @IsString() @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   titre?: string;
 
-  @IsOptional() @IsString() @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   contenu?: string;
 
-  @IsOptional() @IsBoolean()
+  @IsOptional()
+  @IsBoolean()
   actif?: boolean;
 }
 
 export class CreateQuestionDto {
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   question: string;
 
-  @IsString() @IsNotEmpty()
+  @IsString()
+  @IsNotEmpty()
   answer: string;
 
   @IsString({ each: true })
   distractors: string[];
 
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   excerpt?: string;
 
-  @IsOptional() @IsInt() @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
   ordre?: number;
 }
 
 export class UpdateQuestionDto {
-  @IsOptional() @IsString() @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   question?: string;
 
-  @IsOptional() @IsString() @IsNotEmpty()
+  @IsOptional()
+  @IsString()
+  @IsNotEmpty()
   answer?: string;
 
-  @IsOptional() @IsString({ each: true })
+  @IsOptional()
+  @IsString({ each: true })
   distractors?: string[];
 
-  @IsOptional() @IsString()
+  @IsOptional()
+  @IsString()
   excerpt?: string;
 
-  @IsOptional() @IsInt() @Type(() => Number)
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
   ordre?: number;
 }

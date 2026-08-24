@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useMatches, useNavigate } from 'react-router-dom';
-import { useTheme } from 'src/context/ThemeContext';
+import { useTheme } from 'src/context/theme';
 import { useModuleMetaResolver } from 'src/hooks';
 import dark from 'src/assets/images/dark-theme.svg';
 import light from 'src/assets/images/light-theme.svg';

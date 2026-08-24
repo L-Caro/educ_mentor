@@ -1,13 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import { GeoProgression } from './entities/geo-progression.entity';
 import { GeoSession } from './entities/geo-session.entity';
 import { SettingsService } from '../settings/settings.service';
-import { normalizeDifficulty, qcmChoiceCount, type Difficulty } from '../../common/difficulty';
+import {
+  normalizeDifficulty,
+  qcmChoiceCount,
+  type Difficulty,
+} from '../../common/difficulty';
 import { masteryScore, isMastered } from '../../common/mastery';
 import {
   ALL_QUESTION_TYPES,
@@ -22,8 +26,8 @@ interface Pays {
   drapeau: string;
   capitale: string;
   continent: string;
-  oceans: string[];   // vrais océans uniquement (Atlantique, Pacifique, Indien, Arctique, Antarctique)
-  mers: string[];     // mers et détroits (Méditerranée, Mer du Nord…) — réservé aux futurs types de questions
+  oceans: string[]; // vrais océans uniquement (Atlantique, Pacifique, Indien, Arctique, Antarctique)
+  mers: string[]; // mers et détroits (Méditerranée, Mer du Nord…) — réservé aux futurs types de questions
   voisins: string[];
   langues: string[];
 }
@@ -48,8 +52,22 @@ export interface GeoSessionResult {
   is_unlimited: boolean;
 }
 
-const TRUE_OCEANS = ['Atlantique', 'Pacifique', 'Indien', 'Arctique', 'Antarctique'];
-const SELECT_OCEAN_DISTRACTORS = ['Méditerranée', 'Mer du Nord', 'Mer Rouge', 'Mer des Caraïbes', 'Europe', 'Asie', 'Afrique'];
+const TRUE_OCEANS = [
+  'Atlantique',
+  'Pacifique',
+  'Indien',
+  'Arctique',
+  'Antarctique',
+];
+const SELECT_OCEAN_DISTRACTORS = [
+  'Méditerranée',
+  'Mer du Nord',
+  'Mer Rouge',
+  'Mer des Caraïbes',
+  'Europe',
+  'Asie',
+  'Afrique',
+];
 
 @Injectable()
 export class GeoService {
@@ -63,7 +81,9 @@ export class GeoService {
     private readonly settingsService: SettingsService,
   ) {
     const jsonPath = path.join(__dirname, 'data', 'pays.json');
-    const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as { pays: Pays[] };
+    const data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as {
+      pays: Pays[];
+    };
     this.allPays = data.pays;
   }
 
@@ -73,12 +93,25 @@ export class GeoService {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
-    const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
-    const questionsPerSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
+    const timerSeconds = parseInt(
+      (await this.settingsService.get('question_timer_seconds')) ?? '0',
+      10,
+    );
+    const questionsPerSession = parseInt(
+      (await this.settingsService.get('questions_per_session')) ?? '10',
+      10,
+    );
 
-    const countriesFilterRaw = await this.settingsService.get('geo_countries_filter');
+    const countriesFilterRaw = await this.settingsService.get(
+      'geo_countries_filter',
+    );
     const countriesFilter = countriesFilterRaw
-      ? new Set(countriesFilterRaw.split(',').map((c) => c.trim()).filter(Boolean))
+      ? new Set(
+          countriesFilterRaw
+            .split(',')
+            .map((c) => c.trim())
+            .filter(Boolean),
+        )
       : null;
 
     let activePays = countriesFilter
@@ -93,21 +126,34 @@ export class GeoService {
     if (activePays.length === 0) activePays = [...this.allPays];
 
     // Types actifs : filtre admin > types envoyés par le client > tous les types
-    const typesFilterRaw = await this.settingsService.get('geo_question_types_filter');
-    const adminTypes = typesFilterRaw?.split(',').map((t) => t.trim()).filter(Boolean) as GeoQuestionType[];
-    const rawTypes = dto.question_types?.length ? dto.question_types
-                   : adminTypes?.length         ? adminTypes
-                   : undefined;
+    const typesFilterRaw = await this.settingsService.get(
+      'geo_question_types_filter',
+    );
+    const adminTypes = typesFilterRaw
+      ?.split(',')
+      .map((t) => t.trim())
+      .filter(Boolean) as GeoQuestionType[];
+    const rawTypes = dto.question_types?.length
+      ? dto.question_types
+      : adminTypes?.length
+        ? adminTypes
+        : undefined;
     const activeTypes = this.normalizeTypes(rawTypes, activePays);
     const capitalDirection = dto.capital_direction ?? 'forward';
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
 
-    const questions = this.generateQuestions(activePays, activeTypes, difficulty, choicesCount, count);
+    const questions = this.generateQuestions(
+      activePays,
+      activeTypes,
+      difficulty,
+      choicesCount,
+      count,
+    );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       difficulty,
       question_types: activeTypes.join(','),
       continents: dto.continents?.join(',') ?? null,
@@ -116,16 +162,27 @@ export class GeoService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+    return {
+      session_id: session.id,
+      questions,
+      timer_seconds: timerSeconds,
+      is_unlimited: isUnlimited,
+    };
   }
 
-  async recordAnswer(sessionId: string, dto: RecordGeoAnswerDto): Promise<void> {
-    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
+  async recordAnswer(
+    sessionId: string,
+    dto: RecordGeoAnswerDto,
+  ): Promise<void> {
+    const threshold = parseInt(
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
+      10,
+    );
 
     let prog = await this.progressionRepo.findOneBy({ item_key: dto.item_key });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         item_key: dto.item_key,
         correct_count: 0,
         incorrect_count: 0,
@@ -140,12 +197,19 @@ export class GeoService {
       prog.incorrect_count++;
     }
     prog.last_seen = new Date();
-    prog.is_mastered = isMastered(masteryScore(prog.correct_count, prog.incorrect_count), threshold);
+    prog.is_mastered = isMastered(
+      masteryScore(prog.correct_count, prog.incorrect_count),
+      threshold,
+    );
 
     await this.progressionRepo.save(prog);
   }
 
-  async completeSession(sessionId: string, correctAnswers: number, totalQuestions: number): Promise<void> {
+  async completeSession(
+    sessionId: string,
+    correctAnswers: number,
+    totalQuestions: number,
+  ): Promise<void> {
     const session = await this.sessionRepo.findOneBy({ id: sessionId });
     if (!session) return;
     session.completed_at = new Date();
@@ -156,8 +220,18 @@ export class GeoService {
 
   // ─── Admin ────────────────────────────────────────────────────────────────
 
-  getAllCountries(): { code: string; nom: string; drapeau: string; continent: string }[] {
-    return this.allPays.map(({ code, nom, drapeau, continent }) => ({ code, nom, drapeau, continent }));
+  getAllCountries(): {
+    code: string;
+    nom: string;
+    drapeau: string;
+    continent: string;
+  }[] {
+    return this.allPays.map(({ code, nom, drapeau, continent }) => ({
+      code,
+      nom,
+      drapeau,
+      continent,
+    }));
   }
 
   async getProgression(): Promise<GeoProgression[]> {
@@ -165,7 +239,10 @@ export class GeoService {
   }
 
   async getRecentSessions(limit = 20): Promise<GeoSession[]> {
-    return this.sessionRepo.find({ order: { started_at: 'DESC' }, take: limit });
+    return this.sessionRepo.find({
+      order: { started_at: 'DESC' },
+      take: limit,
+    });
   }
 
   async resetProgression(): Promise<void> {
@@ -206,41 +283,67 @@ export class GeoService {
     choicesCount: number,
   ): GeoQuestion | null {
     switch (type) {
-      case 'country_to_capital':   return this.genCountryToCapital(activePays, choicesCount);
-      case 'capital_to_country':   return this.genCapitalToCountry(activePays, choicesCount);
-      case 'country_to_continent': return this.genCountryToContinent(activePays);
-      case 'country_to_ocean':     return this.genCountryToOcean(activePays, choicesCount);
-      case 'flag_to_country':      return this.genFlagToCountry(activePays, choicesCount);
-      case 'country_to_flag':      return this.genCountryToFlag(activePays, choicesCount);
-      case 'odd_one_out':          return this.genOddOneOut(activePays, choicesCount);
-      case 'country_to_language':  return this.genCountryToLanguage(activePays, choicesCount);
-      case 'select_oceans':        return this.genSelectOceans(difficulty);
-      case 'select_continent_countries': return this.genSelectContinentCountries(activePays, difficulty);
-      case 'country_borders':      return this.genCountryBorders(activePays, difficulty);
-      case 'select_language_countries':  return this.genSelectLanguageCountries(activePays, difficulty);
-      case 'identify_country':            return this.genIdentifyCountry(activePays, difficulty);
-      case 'identify_continent':          return this.genIdentifyContinent();
-      default: return null;
+      case 'country_to_capital':
+        return this.genCountryToCapital(activePays, choicesCount);
+      case 'capital_to_country':
+        return this.genCapitalToCountry(activePays, choicesCount);
+      case 'country_to_continent':
+        return this.genCountryToContinent(activePays);
+      case 'country_to_ocean':
+        return this.genCountryToOcean(activePays, choicesCount);
+      case 'flag_to_country':
+        return this.genFlagToCountry(activePays, choicesCount);
+      case 'country_to_flag':
+        return this.genCountryToFlag(activePays, choicesCount);
+      case 'odd_one_out':
+        return this.genOddOneOut(activePays, choicesCount);
+      case 'country_to_language':
+        return this.genCountryToLanguage(activePays, choicesCount);
+      case 'select_oceans':
+        return this.genSelectOceans(difficulty);
+      case 'select_continent_countries':
+        return this.genSelectContinentCountries(activePays, difficulty);
+      case 'country_borders':
+        return this.genCountryBorders(activePays, difficulty);
+      case 'select_language_countries':
+        return this.genSelectLanguageCountries(activePays, difficulty);
+      case 'identify_country':
+        return this.genIdentifyCountry(activePays, difficulty);
+      case 'identify_continent':
+        return this.genIdentifyContinent();
+      default:
+        return null;
     }
   }
 
   // ── Single-select ──────────────────────────────────────────────────────────
 
   /** choicesCount=0 → saisie libre pour les types qui le supportent */
-  private freeQcm(correct: string, pool: string[], choicesCount: number): string[] {
+  private freeQcm(
+    correct: string,
+    pool: string[],
+    choicesCount: number,
+  ): string[] {
     if (choicesCount === 0) return []; // saisie libre
     const distractors = this.shuffle(pool.filter((x) => x !== correct));
     return this.shuffle([correct, ...distractors.slice(0, choicesCount - 1)]);
   }
 
   /** choicesCount=0 → 6 choix pour les types qui ne peuvent pas être en saisie libre */
-  private forceQcm(correct: string, pool: string[], choicesCount: number): string[] {
+  private forceQcm(
+    correct: string,
+    pool: string[],
+    choicesCount: number,
+  ): string[] {
     const n = choicesCount === 0 ? 6 : choicesCount;
     const distractors = this.shuffle(pool.filter((x) => x !== correct));
     return this.shuffle([correct, ...distractors.slice(0, n - 1)]);
   }
 
-  private genCountryToCapital(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genCountryToCapital(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
     const pool = pays.filter((x) => x.code !== p.code).map((x) => x.capitale);
@@ -257,7 +360,10 @@ export class GeoService {
     };
   }
 
-  private genCapitalToCountry(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genCapitalToCountry(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
     const pool = pays.filter((x) => x.code !== p.code).map((x) => x.nom);
@@ -291,12 +397,20 @@ export class GeoService {
     };
   }
 
-  private genCountryToOcean(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genCountryToOcean(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const withOcean = pays.filter((p) => p.oceans.length > 0);
     const p = this.pick(withOcean);
     if (!p) return null;
     const correct = p.oceans[this.rand(0, p.oceans.length - 1)];
-    const pool = [...TRUE_OCEANS, 'Méditerranée', 'Mer du Nord', 'Mer Rouge'].filter((o) => o !== correct);
+    const pool = [
+      ...TRUE_OCEANS,
+      'Méditerranée',
+      'Mer du Nord',
+      'Mer Rouge',
+    ].filter((o) => o !== correct);
     return {
       type: 'country_to_ocean',
       item_key: `${p.code}_ocean`,
@@ -309,7 +423,10 @@ export class GeoService {
     };
   }
 
-  private genFlagToCountry(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genFlagToCountry(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
     const pool = pays.filter((x) => x.code !== p.code).map((x) => x.nom);
@@ -326,7 +443,10 @@ export class GeoService {
     };
   }
 
-  private genCountryToFlag(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genCountryToFlag(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
     const pool = pays.filter((x) => x.code !== p.code).map((x) => x.drapeau);
@@ -350,7 +470,9 @@ export class GeoService {
     const numChoices = Math.max(4, choicesCount === 0 ? 6 : choicesCount);
     const numDecoys = numChoices - 1;
 
-    const validContinents = continents.filter((c) => pays.filter((p) => p.continent === c).length >= numDecoys);
+    const validContinents = continents.filter(
+      (c) => pays.filter((p) => p.continent === c).length >= numDecoys,
+    );
     if (validContinents.length === 0) return null;
 
     const continent = validContinents[this.rand(0, validContinents.length - 1)];
@@ -374,11 +496,16 @@ export class GeoService {
     };
   }
 
-  private genCountryToLanguage(pays: Pays[], choicesCount: number): GeoQuestion | null {
+  private genCountryToLanguage(
+    pays: Pays[],
+    choicesCount: number,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p || p.langues.length === 0) return null;
     const correct = p.langues[0];
-    const pool = [...new Set(pays.flatMap((x) => x.langues))].filter((l) => l !== correct);
+    const pool = [...new Set(pays.flatMap((x) => x.langues))].filter(
+      (l) => l !== correct,
+    );
     return {
       type: 'country_to_language',
       item_key: `${p.code}_lang`,
@@ -422,16 +549,27 @@ export class GeoService {
     };
   }
 
-  private genSelectContinentCountries(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {
+  private genSelectContinentCountries(
+    pays: Pays[],
+    difficulty: Difficulty,
+  ): GeoQuestion | null {
     const continents = [...new Set(pays.map((p) => p.continent))];
-    const validContinents = continents.filter((c) => pays.filter((p) => p.continent === c).length >= 2);
+    const validContinents = continents.filter(
+      (c) => pays.filter((p) => p.continent === c).length >= 2,
+    );
     if (validContinents.length === 0) return null;
 
     const continent = validContinents[this.rand(0, validContinents.length - 1)];
-    const allCorrect = pays.filter((p) => p.continent === continent).map((p) => p.nom);
-    const correct = this.shuffle(allCorrect).slice(0, this.correctCountCap(difficulty));
-    const distractors = this.shuffle(pays.filter((p) => p.continent !== continent).map((p) => p.nom))
-      .slice(0, this.distractorCount(difficulty));
+    const allCorrect = pays
+      .filter((p) => p.continent === continent)
+      .map((p) => p.nom);
+    const correct = this.shuffle(allCorrect).slice(
+      0,
+      this.correctCountCap(difficulty),
+    );
+    const distractors = this.shuffle(
+      pays.filter((p) => p.continent !== continent).map((p) => p.nom),
+    ).slice(0, this.distractorCount(difficulty));
 
     return {
       type: 'select_continent_countries',
@@ -445,16 +583,26 @@ export class GeoService {
     };
   }
 
-  private genCountryBorders(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {
+  private genCountryBorders(
+    pays: Pays[],
+    difficulty: Difficulty,
+  ): GeoQuestion | null {
     const codeSet = new Set(pays.map((p) => p.code));
-    const withBorders = pays.filter((p) => p.voisins.some((v) => codeSet.has(v)));
+    const withBorders = pays.filter((p) =>
+      p.voisins.some((v) => codeSet.has(v)),
+    );
     const p = this.pick(withBorders);
     if (!p) return null;
 
     const activeBorders = p.voisins.filter((v) => codeSet.has(v));
-    const correctNames = activeBorders.map((code) => pays.find((x) => x.code === code)!.nom);
-    const distractors = this.shuffle(pays.filter((x) => !activeBorders.includes(x.code) && x.code !== p.code).map((x) => x.nom))
-      .slice(0, this.distractorCount(difficulty));
+    const correctNames = activeBorders.map(
+      (code) => pays.find((x) => x.code === code)!.nom,
+    );
+    const distractors = this.shuffle(
+      pays
+        .filter((x) => !activeBorders.includes(x.code) && x.code !== p.code)
+        .map((x) => x.nom),
+    ).slice(0, this.distractorCount(difficulty));
 
     return {
       type: 'country_borders',
@@ -468,16 +616,27 @@ export class GeoService {
     };
   }
 
-  private genSelectLanguageCountries(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {
+  private genSelectLanguageCountries(
+    pays: Pays[],
+    difficulty: Difficulty,
+  ): GeoQuestion | null {
     const allLangs = [...new Set(pays.flatMap((p) => p.langues))];
-    const validLangs = allLangs.filter((l) => pays.filter((p) => p.langues.includes(l)).length >= 2);
+    const validLangs = allLangs.filter(
+      (l) => pays.filter((p) => p.langues.includes(l)).length >= 2,
+    );
     if (validLangs.length === 0) return null;
 
     const lang = validLangs[this.rand(0, validLangs.length - 1)];
-    const allCorrect = pays.filter((p) => p.langues.includes(lang)).map((p) => p.nom);
-    const correct = this.shuffle(allCorrect).slice(0, this.correctCountCap(difficulty));
-    const distractors = this.shuffle(pays.filter((p) => !p.langues.includes(lang)).map((p) => p.nom))
-      .slice(0, this.distractorCount(difficulty));
+    const allCorrect = pays
+      .filter((p) => p.langues.includes(lang))
+      .map((p) => p.nom);
+    const correct = this.shuffle(allCorrect).slice(
+      0,
+      this.correctCountCap(difficulty),
+    );
+    const distractors = this.shuffle(
+      pays.filter((p) => !p.langues.includes(lang)).map((p) => p.nom),
+    ).slice(0, this.distractorCount(difficulty));
 
     return {
       type: 'select_language_countries',
@@ -493,33 +652,48 @@ export class GeoService {
 
   // ─── Utilitaires ──────────────────────────────────────────────────────────
 
-  private normalizeTypes(raw: GeoQuestionType[] | undefined, activePays: Pays[]): GeoQuestionType[] {
-    const valid = (raw?.length ? raw : [...ALL_QUESTION_TYPES]) as GeoQuestionType[];
+  private normalizeTypes(
+    raw: GeoQuestionType[] | undefined,
+    activePays: Pays[],
+  ): GeoQuestionType[] {
+    const valid = raw?.length ? raw : [...ALL_QUESTION_TYPES];
     // Supprimer les types impossibles avec le set de pays actifs
     return valid.filter((t) => {
-      if (t === 'country_to_ocean') return activePays.some((p) => p.oceans.length > 0);
+      if (t === 'country_to_ocean')
+        return activePays.some((p) => p.oceans.length > 0);
       if (t === 'odd_one_out') {
-        return [...new Set(activePays.map((p) => p.continent))]
-          .some((c) => activePays.filter((p) => p.continent === c).length >= 3);
+        return [...new Set(activePays.map((p) => p.continent))].some(
+          (c) => activePays.filter((p) => p.continent === c).length >= 3,
+        );
       }
       if (t === 'country_borders') {
         const codes = new Set(activePays.map((p) => p.code));
         return activePays.some((p) => p.voisins.some((v) => codes.has(v)));
       }
       if (t === 'select_continent_countries') {
-        return [...new Set(activePays.map((p) => p.continent))]
-          .some((c) => activePays.filter((p) => p.continent === c).length >= 2);
+        return [...new Set(activePays.map((p) => p.continent))].some(
+          (c) => activePays.filter((p) => p.continent === c).length >= 2,
+        );
       }
       if (t === 'select_language_countries') {
         const allLangs = [...new Set(activePays.flatMap((p) => p.langues))];
-        return allLangs.some((l) => activePays.filter((p) => p.langues.includes(l)).length >= 2);
+        return allLangs.some(
+          (l) => activePays.filter((p) => p.langues.includes(l)).length >= 2,
+        );
       }
       return true;
     });
   }
 
   private genIdentifyContinent(): GeoQuestion {
-    const continents = ['Europe', 'Asie', 'Afrique', 'Amérique du Nord', 'Amérique du Sud', 'Océanie'];
+    const continents = [
+      'Europe',
+      'Asie',
+      'Afrique',
+      'Amérique du Nord',
+      'Amérique du Sud',
+      'Océanie',
+    ];
     const continent = continents[this.rand(0, continents.length - 1)];
     return {
       type: 'identify_continent',
@@ -533,7 +707,10 @@ export class GeoService {
     };
   }
 
-  private genIdentifyCountry(pays: Pays[], difficulty: Difficulty): GeoQuestion | null {
+  private genIdentifyCountry(
+    pays: Pays[],
+    difficulty: Difficulty,
+  ): GeoQuestion | null {
     const p = this.pick(pays);
     if (!p) return null;
 
@@ -544,8 +721,12 @@ export class GeoService {
       continent = p.continent;
 
       if (difficulty === 'easy') {
-        const sameContinent = pays.filter((x) => x.continent === p.continent && x.code !== p.code);
-        const distractors = this.shuffle(sameContinent).slice(0, 3).map((x) => x.code);
+        const sameContinent = pays.filter(
+          (x) => x.continent === p.continent && x.code !== p.code,
+        );
+        const distractors = this.shuffle(sameContinent)
+          .slice(0, 3)
+          .map((x) => x.code);
         map_filter = this.shuffle([p.code, ...distractors]);
       }
     }

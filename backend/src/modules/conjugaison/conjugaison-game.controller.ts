@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { ConjugaisonService } from './conjugaison.service';
-import { StartConjugaisonSessionDto, RecordConjugaisonAnswerDto, CompleteConjugaisonSessionDto } from './dto/conjugaison.dto';
+import {
+  StartConjugaisonSessionDto,
+  RecordConjugaisonAnswerDto,
+  CompleteConjugaisonSessionDto,
+} from './dto/conjugaison.dto';
 
 @Controller('conjugaison')
 export class ConjugaisonGameController {
@@ -12,12 +16,22 @@ export class ConjugaisonGameController {
   }
 
   @Post('session/:id/answer')
-  recordAnswer(@Param('id') id: string, @Body() dto: RecordConjugaisonAnswerDto) {
+  recordAnswer(
+    @Param('id') id: string,
+    @Body() dto: RecordConjugaisonAnswerDto,
+  ) {
     return this.conjugaisonService.recordAnswer(id, dto);
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteConjugaisonSessionDto) {
-    return this.conjugaisonService.completeSession(id, dto.correct_answers, dto.total_questions);
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteConjugaisonSessionDto,
+  ) {
+    return this.conjugaisonService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

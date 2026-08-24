@@ -12,12 +12,18 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "lint": "eslint \"{src,apps,libs,test,scripts}/**/*.ts\"",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts",
+    "migration:show": "typeorm-ts-node-commonjs migration:show -d src/database/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
+    "db:check": "ts-node -T src/database/check-schema.ts",
+    "lint:fix": "eslint \"{src,apps,libs,test,scripts}/**/*.ts\" --fix",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -32,7 +38,6 @@
     "@types/better-sqlite3": "^7.6.13",
     "@types/multer": "^2.1.0",
     "@types/passport-jwt": "^4.0.1",
-    "@types/uuid": "^10.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.8.0",
     "class-transformer": "^0.5.1",
@@ -43,8 +48,7 @@
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.28",
-    "uuid": "^13.0.0"
+    "typeorm": "^0.3.28"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

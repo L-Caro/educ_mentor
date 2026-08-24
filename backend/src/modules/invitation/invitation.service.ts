@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import { Invitation } from './entities/invitation.entity';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class InvitationService {
@@ -12,7 +12,7 @@ export class InvitationService {
   ) {}
 
   async create(label: string): Promise<Invitation> {
-    const invitation = this.repo.create({ token: uuidv4(), label });
+    const invitation = this.repo.create({ token: randomUUID(), label });
     return this.repo.save(invitation);
   }
 
@@ -28,7 +28,11 @@ export class InvitationService {
    * Utilisé par le bootstrap admin : chaque appel crée une entrée distincte
    * (un appareil admin = une entrée dans la liste), sans consommer le bootstrap token. */
   async createAndUse(label: string): Promise<Invitation> {
-    const invitation = this.repo.create({ token: uuidv4(), label, used_at: new Date() });
+    const invitation = this.repo.create({
+      token: randomUUID(),
+      label,
+      used_at: new Date(),
+    });
     return this.repo.save(invitation);
   }
 

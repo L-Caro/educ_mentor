@@ -1,13 +1,17 @@
+import { randomUUID } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
 import * as path from 'path';
 import * as fs from 'fs';
 import { FranceProgression } from './entities/france-progression.entity';
 import { FranceSession } from './entities/france-session.entity';
 import { SettingsService } from '../settings/settings.service';
-import { normalizeDifficulty, qcmChoiceCount, type Difficulty } from '../../common/difficulty';
+import {
+  normalizeDifficulty,
+  qcmChoiceCount,
+  type Difficulty,
+} from '../../common/difficulty';
 import { masteryScore, isMastered } from '../../common/mastery';
 import {
   ALL_FRANCE_QUESTION_TYPES,
@@ -18,7 +22,10 @@ import {
 
 // ─── Types JSON ───────────────────────────────────────────────────────────────
 
-interface Coords { lat: number; lng: number }
+interface Coords {
+  lat: number;
+  lng: number;
+}
 
 interface Region {
   nom: string;
@@ -55,7 +62,12 @@ interface Fleuve {
 
 interface Massif {
   nom: string;
-  point_culminant: { nom: string; altitude_m: number; lieu: string; coordonnees: Coords };
+  point_culminant: {
+    nom: string;
+    altitude_m: number;
+    lieu: string;
+    coordonnees: Coords;
+  };
   departements: string[];
   frontieres: string[];
 }
@@ -86,8 +98,8 @@ export interface FranceQuestion {
   answer: string | null;
   answers: string[] | null;
   is_map?: boolean;
-  dept_code?: string;        // locate_city : pour lookup SVG dans le frontend
-  threshold_km?: number;     // locate_city : seuil de validation
+  dept_code?: string; // locate_city : pour lookup SVG dans le frontend
+  threshold_km?: number; // locate_city : seuil de validation
   hide_dept_borders?: boolean; // locate_city hard : carte sans limites de départements
 }
 
@@ -124,18 +136,36 @@ export class FranceService {
     this.data = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as FranceGeoData;
 
     const citiesPath = path.join(__dirname, 'data', 'france_cities_list.json');
-    this.curatedCities = JSON.parse(fs.readFileSync(citiesPath, 'utf-8')) as { nom: string; dept: string }[];
+    this.curatedCities = JSON.parse(fs.readFileSync(citiesPath, 'utf-8')) as {
+      nom: string;
+      dept: string;
+    }[];
 
-    this.allRegions = Object.entries(this.data.regions).map(([code, r]) => ({ ...r, code }));
-    this.allDepts   = Object.entries(this.data.departements).map(([code, d]) => ({ ...d, code }));
-    this.allFleuves = Object.entries(this.data.fleuves_et_rivieres).map(([key, f]) => ({ ...f, key }));
-    this.allMassifs = Object.entries(this.data.massifs).map(([key, m]) => ({ ...m, key }));
-    this.allFacades = Object.entries(this.data.facades_maritimes).map(([key, f]) => ({ ...f, key }));
+    this.allRegions = Object.entries(this.data.regions).map(([code, r]) => ({
+      ...r,
+      code,
+    }));
+    this.allDepts = Object.entries(this.data.departements).map(([code, d]) => ({
+      ...d,
+      code,
+    }));
+    this.allFleuves = Object.entries(this.data.fleuves_et_rivieres).map(
+      ([key, f]) => ({ ...f, key }),
+    );
+    this.allMassifs = Object.entries(this.data.massifs).map(([key, m]) => ({
+      ...m,
+      key,
+    }));
+    this.allFacades = Object.entries(this.data.facades_maritimes).map(
+      ([key, f]) => ({ ...f, key }),
+    );
 
-    this.deptByCode   = new Map(this.allDepts.map((d) => [d.code, d]));
+    this.deptByCode = new Map(this.allDepts.map((d) => [d.code, d]));
     this.regionByCode = new Map(this.allRegions.map((r) => [r.code, r]));
 
-    this.coastalCodes = new Set(this.allFacades.flatMap((f) => f.departements_cotiers));
+    this.coastalCodes = new Set(
+      this.allFacades.flatMap((f) => f.departements_cotiers),
+    );
   }
 
   // ─── Session ────────────────────────────────────────────────────────────────
@@ -144,36 +174,69 @@ export class FranceService {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
-    const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
-    const questionsPerSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-
-    const regionsFilterRaw = await this.settingsService.get('france_regions_filter');
-    const adminRegions = regionsFilterRaw?.split(',').map((r) => r.trim()).filter(Boolean) ?? [];
-
-    const activeRegionCodes = new Set(
-      dto.regions?.length ? dto.regions
-      : adminRegions.length ? adminRegions
-      : this.allRegions.map((r) => r.code),
+    const timerSeconds = parseInt(
+      (await this.settingsService.get('question_timer_seconds')) ?? '0',
+      10,
+    );
+    const questionsPerSession = parseInt(
+      (await this.settingsService.get('questions_per_session')) ?? '10',
+      10,
     );
 
-    let activeDepts = this.allDepts.filter((d) => activeRegionCodes.has(d.region));
+    const regionsFilterRaw = await this.settingsService.get(
+      'france_regions_filter',
+    );
+    const adminRegions =
+      regionsFilterRaw
+        ?.split(',')
+        .map((r) => r.trim())
+        .filter(Boolean) ?? [];
+
+    const activeRegionCodes = new Set(
+      dto.regions?.length
+        ? dto.regions
+        : adminRegions.length
+          ? adminRegions
+          : this.allRegions.map((r) => r.code),
+    );
+
+    let activeDepts = this.allDepts.filter((d) =>
+      activeRegionCodes.has(d.region),
+    );
     if (activeDepts.length === 0) activeDepts = [...this.allDepts];
 
-    const typesFilterRaw = await this.settingsService.get('france_question_types_filter');
-    const adminTypes = typesFilterRaw?.split(',').map((t) => t.trim()).filter(Boolean) as FranceQuestionType[];
-    const rawTypes = dto.question_types?.length ? dto.question_types
-                   : adminTypes?.length         ? adminTypes
-                   : undefined;
+    const typesFilterRaw = await this.settingsService.get(
+      'france_question_types_filter',
+    );
+    const adminTypes = typesFilterRaw
+      ?.split(',')
+      .map((t) => t.trim())
+      .filter(Boolean) as FranceQuestionType[];
+    const rawTypes = dto.question_types?.length
+      ? dto.question_types
+      : adminTypes?.length
+        ? adminTypes
+        : undefined;
     const activeTypes = this.normalizeTypes(rawTypes, activeDepts);
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
-    const cityThresholdKm = parseInt((await this.settingsService.get('france_city_threshold_km')) ?? '20', 10);
+    const cityThresholdKm = parseInt(
+      (await this.settingsService.get('france_city_threshold_km')) ?? '20',
+      10,
+    );
 
-    const questions = this.generateQuestions(activeDepts, activeTypes, difficulty, choicesCount, count, cityThresholdKm);
+    const questions = this.generateQuestions(
+      activeDepts,
+      activeTypes,
+      difficulty,
+      choicesCount,
+      count,
+      cityThresholdKm,
+    );
 
     const session = this.sessionRepo.create({
-      id: uuidv4(),
+      id: randomUUID(),
       difficulty,
       question_types: activeTypes.join(','),
       regions: [...activeRegionCodes].join(',') ?? null,
@@ -181,16 +244,27 @@ export class FranceService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+    return {
+      session_id: session.id,
+      questions,
+      timer_seconds: timerSeconds,
+      is_unlimited: isUnlimited,
+    };
   }
 
-  async recordAnswer(sessionId: string, dto: RecordFranceAnswerDto): Promise<void> {
-    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
+  async recordAnswer(
+    sessionId: string,
+    dto: RecordFranceAnswerDto,
+  ): Promise<void> {
+    const threshold = parseInt(
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
+      10,
+    );
 
     let prog = await this.progressionRepo.findOneBy({ item_key: dto.item_key });
     if (!prog) {
       prog = this.progressionRepo.create({
-        id: uuidv4(),
+        id: randomUUID(),
         item_key: dto.item_key,
         correct_count: 0,
         incorrect_count: 0,
@@ -199,14 +273,25 @@ export class FranceService {
       });
     }
 
-    dto.is_correct ? prog.correct_count++ : prog.incorrect_count++;
+    if (dto.is_correct) {
+      prog.correct_count++;
+    } else {
+      prog.incorrect_count++;
+    }
     prog.last_seen = new Date();
-    prog.is_mastered = isMastered(masteryScore(prog.correct_count, prog.incorrect_count), threshold);
+    prog.is_mastered = isMastered(
+      masteryScore(prog.correct_count, prog.incorrect_count),
+      threshold,
+    );
 
     await this.progressionRepo.save(prog);
   }
 
-  async completeSession(sessionId: string, correctAnswers: number, totalQuestions: number): Promise<void> {
+  async completeSession(
+    sessionId: string,
+    correctAnswers: number,
+    totalQuestions: number,
+  ): Promise<void> {
     const session = await this.sessionRepo.findOneBy({ id: sessionId });
     if (!session) return;
     session.completed_at = new Date();
@@ -218,11 +303,20 @@ export class FranceService {
   // ─── Admin ──────────────────────────────────────────────────────────────────
 
   getRegions() {
-    return this.allRegions.map(({ code, nom, departements }) => ({ code, nom, dept_count: departements.length }));
+    return this.allRegions.map(({ code, nom, departements }) => ({
+      code,
+      nom,
+      dept_count: departements.length,
+    }));
   }
 
   getDepartements() {
-    return this.allDepts.map(({ code, nom, numero, region }) => ({ code, nom, numero, region }));
+    return this.allDepts.map(({ code, nom, numero, region }) => ({
+      code,
+      nom,
+      numero,
+      region,
+    }));
   }
 
   async getProgression(): Promise<FranceProgression[]> {
@@ -230,7 +324,10 @@ export class FranceService {
   }
 
   async getRecentSessions(limit = 20): Promise<FranceSession[]> {
-    return this.sessionRepo.find({ order: { started_at: 'DESC' }, take: limit });
+    return this.sessionRepo.find({
+      order: { started_at: 'DESC' },
+      take: limit,
+    });
   }
 
   async resetProgression(): Promise<void> {
@@ -255,7 +352,13 @@ export class FranceService {
     while (questions.length < count && attempts < count * 20) {
       attempts++;
       const type = activeTypes[this.rand(0, activeTypes.length - 1)];
-      const q = this.generateOne(type, activeDepts, difficulty, choicesCount, cityThresholdKm);
+      const q = this.generateOne(
+        type,
+        activeDepts,
+        difficulty,
+        choicesCount,
+        cityThresholdKm,
+      );
       if (!q || usedKeys.has(q.item_key)) continue;
       usedKeys.add(q.item_key);
       questions.push(q);
@@ -272,46 +375,78 @@ export class FranceService {
     cityThresholdKm: number,
   ): FranceQuestion | null {
     switch (type) {
-      case 'dept_to_number':       return this.genDeptToNumber(activeDepts, choicesCount);
-      case 'number_to_dept':       return this.genNumberToDept(activeDepts, choicesCount);
-      case 'dept_to_prefecture':   return this.genDeptToPrefecture(activeDepts, choicesCount);
-      case 'prefecture_to_dept':   return this.genPrefectureToDept(activeDepts, choicesCount);
-      case 'dept_to_region':       return this.genDeptToRegion(activeDepts, choicesCount);
-      case 'region_chef_lieu':     return this.genRegionChefLieu(activeDepts, choicesCount);
-      case 'dept_borders':         return this.genDeptBorders(activeDepts, difficulty);
-      case 'dept_sub_prefectures': return this.genDeptSubPrefectures(activeDepts, difficulty);
-      case 'region_depts':         return this.genRegionDepts(activeDepts, difficulty);
-      case 'region_old_names':     return this.genRegionOldNames(activeDepts, difficulty);
-      case 'river_depts':          return this.genRiverDepts(activeDepts, difficulty);
-      case 'maritime_facade':      return this.genMaritimeFacade(activeDepts, choicesCount);
-      case 'massif_summit':        return this.genMassifSummit(choicesCount);
-      case 'summit_altitude':      return this.genSummitAltitude(choicesCount);
-      case 'dept_gentile':         return this.genDeptGentile(activeDepts, choicesCount);
-      case 'identify_dept':        return this.genIdentifyDept(activeDepts);
-      case 'identify_region':      return this.genIdentifyRegion(activeDepts, difficulty);
-      case 'locate_city':          return this.genLocateCity(activeDepts, difficulty, cityThresholdKm);
-      default: return null;
+      case 'dept_to_number':
+        return this.genDeptToNumber(activeDepts, choicesCount);
+      case 'number_to_dept':
+        return this.genNumberToDept(activeDepts, choicesCount);
+      case 'dept_to_prefecture':
+        return this.genDeptToPrefecture(activeDepts, choicesCount);
+      case 'prefecture_to_dept':
+        return this.genPrefectureToDept(activeDepts, choicesCount);
+      case 'dept_to_region':
+        return this.genDeptToRegion(activeDepts, choicesCount);
+      case 'region_chef_lieu':
+        return this.genRegionChefLieu(activeDepts, choicesCount);
+      case 'dept_borders':
+        return this.genDeptBorders(activeDepts, difficulty);
+      case 'dept_sub_prefectures':
+        return this.genDeptSubPrefectures(activeDepts, difficulty);
+      case 'region_depts':
+        return this.genRegionDepts(activeDepts, difficulty);
+      case 'region_old_names':
+        return this.genRegionOldNames(activeDepts, difficulty);
+      case 'river_depts':
+        return this.genRiverDepts(activeDepts, difficulty);
+      case 'maritime_facade':
+        return this.genMaritimeFacade(activeDepts, choicesCount);
+      case 'massif_summit':
+        return this.genMassifSummit(choicesCount);
+      case 'summit_altitude':
+        return this.genSummitAltitude(choicesCount);
+      case 'dept_gentile':
+        return this.genDeptGentile(activeDepts, choicesCount);
+      case 'identify_dept':
+        return this.genIdentifyDept(activeDepts);
+      case 'identify_region':
+        return this.genIdentifyRegion(activeDepts, difficulty);
+      case 'locate_city':
+        return this.genLocateCity(activeDepts, difficulty, cityThresholdKm);
+      default:
+        return null;
     }
   }
 
   // ── Single-select ────────────────────────────────────────────────────────────
 
-  private freeQcm(correct: string, pool: string[], choicesCount: number): string[] {
+  private freeQcm(
+    correct: string,
+    pool: string[],
+    choicesCount: number,
+  ): string[] {
     if (choicesCount === 0) return [];
     const distractors = this.shuffle(pool.filter((x) => x !== correct));
     return this.shuffle([correct, ...distractors.slice(0, choicesCount - 1)]);
   }
 
-  private forceQcm(correct: string, pool: string[], choicesCount: number): string[] {
+  private forceQcm(
+    correct: string,
+    pool: string[],
+    choicesCount: number,
+  ): string[] {
     const n = choicesCount === 0 ? 6 : choicesCount;
     const distractors = this.shuffle(pool.filter((x) => x !== correct));
     return this.shuffle([correct, ...distractors.slice(0, n - 1)]);
   }
 
-  private genDeptToNumber(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genDeptToNumber(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d) return null;
-    const pool = this.allDepts.filter((x) => x.code !== d.code).map((x) => x.numero);
+    const pool = this.allDepts
+      .filter((x) => x.code !== d.code)
+      .map((x) => x.numero);
     return {
       type: 'dept_to_number',
       item_key: `dept_num_${d.code}`,
@@ -323,10 +458,15 @@ export class FranceService {
     };
   }
 
-  private genNumberToDept(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genNumberToDept(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d) return null;
-    const pool = this.allDepts.filter((x) => x.code !== d.code).map((x) => x.nom);
+    const pool = this.allDepts
+      .filter((x) => x.code !== d.code)
+      .map((x) => x.nom);
     return {
       type: 'number_to_dept',
       item_key: `dept_name_${d.code}`,
@@ -338,10 +478,15 @@ export class FranceService {
     };
   }
 
-  private genDeptToPrefecture(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genDeptToPrefecture(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d) return null;
-    const pool = this.allDepts.filter((x) => x.code !== d.code).map((x) => x.prefecture.nom);
+    const pool = this.allDepts
+      .filter((x) => x.code !== d.code)
+      .map((x) => x.prefecture.nom);
     return {
       type: 'dept_to_prefecture',
       item_key: `dept_pref_${d.code}`,
@@ -353,10 +498,15 @@ export class FranceService {
     };
   }
 
-  private genPrefectureToDept(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genPrefectureToDept(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d) return null;
-    const pool = this.allDepts.filter((x) => x.code !== d.code).map((x) => x.nom);
+    const pool = this.allDepts
+      .filter((x) => x.code !== d.code)
+      .map((x) => x.nom);
     return {
       type: 'prefecture_to_dept',
       item_key: `pref_dept_${d.code}`,
@@ -368,12 +518,17 @@ export class FranceService {
     };
   }
 
-  private genDeptToRegion(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genDeptToRegion(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d) return null;
     const region = this.regionByCode.get(d.region);
     if (!region) return null;
-    const pool = this.allRegions.filter((r) => r.code !== d.region).map((r) => r.nom);
+    const pool = this.allRegions
+      .filter((r) => r.code !== d.region)
+      .map((r) => r.nom);
     return {
       type: 'dept_to_region',
       item_key: `dept_region_${d.code}`,
@@ -385,12 +540,19 @@ export class FranceService {
     };
   }
 
-  private genRegionChefLieu(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genRegionChefLieu(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const activeRegionCodes = new Set(depts.map((d) => d.region));
-    const activeRegions = this.allRegions.filter((r) => activeRegionCodes.has(r.code));
+    const activeRegions = this.allRegions.filter((r) =>
+      activeRegionCodes.has(r.code),
+    );
     const r = this.pick(activeRegions);
     if (!r) return null;
-    const pool = this.allRegions.filter((x) => x.code !== r.code).map((x) => x.chef_lieu);
+    const pool = this.allRegions
+      .filter((x) => x.code !== r.code)
+      .map((x) => x.chef_lieu);
     return {
       type: 'region_chef_lieu',
       item_key: `region_chef_${r.code}`,
@@ -402,11 +564,16 @@ export class FranceService {
     };
   }
 
-  private genMaritimeFacade(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genMaritimeFacade(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const coastal = depts.filter((d) => this.coastalCodes.has(d.code));
     const d = this.pick(coastal);
     if (!d) return null;
-    const facade = this.allFacades.find((f) => f.departements_cotiers.includes(d.code));
+    const facade = this.allFacades.find((f) =>
+      f.departements_cotiers.includes(d.code),
+    );
     if (!facade) return null;
     const allFacadeNames = this.allFacades.map((f) => f.nom);
     return {
@@ -423,7 +590,9 @@ export class FranceService {
   private genMassifSummit(choicesCount: number): FranceQuestion | null {
     const m = this.pick(this.allMassifs);
     if (!m) return null;
-    const pool = this.allMassifs.filter((x) => x.key !== m.key).map((x) => x.point_culminant.nom);
+    const pool = this.allMassifs
+      .filter((x) => x.key !== m.key)
+      .map((x) => x.point_culminant.nom);
     return {
       type: 'massif_summit',
       item_key: `massif_summit_${m.key}`,
@@ -453,10 +622,15 @@ export class FranceService {
     };
   }
 
-  private genDeptGentile(depts: (Departement & { code: string })[], choicesCount: number): FranceQuestion | null {
+  private genDeptGentile(
+    depts: (Departement & { code: string })[],
+    choicesCount: number,
+  ): FranceQuestion | null {
     const d = this.pick(depts);
     if (!d || !d.gentile.masculin) return null;
-    const pool = this.allDepts.filter((x) => x.code !== d.code && x.gentile.masculin).map((x) => x.gentile.masculin);
+    const pool = this.allDepts
+      .filter((x) => x.code !== d.code && x.gentile.masculin)
+      .map((x) => x.gentile.masculin);
     return {
       type: 'dept_gentile',
       item_key: `dept_gentile_${d.code}`,
@@ -482,18 +656,27 @@ export class FranceService {
     return 4;
   }
 
-  private genDeptBorders(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genDeptBorders(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const codeSet = new Set(depts.map((d) => d.code));
-    const withBorders = depts.filter((d) => d.departements_limitrophes.some((c) => codeSet.has(c)));
+    const withBorders = depts.filter((d) =>
+      d.departements_limitrophes.some((c) => codeSet.has(c)),
+    );
     const d = this.pick(withBorders);
     if (!d) return null;
 
-    const borderCodes = d.departements_limitrophes.filter((c) => codeSet.has(c));
+    const borderCodes = d.departements_limitrophes.filter((c) =>
+      codeSet.has(c),
+    );
     const correctNames = borderCodes.map((c) => this.deptByCode.get(c)!.nom);
     // Distracteurs depuis tous les depts, en excluant TOUS les voisins réels (pas seulement les actifs)
     const allBorderCodes = new Set(d.departements_limitrophes);
     const distractors = this.shuffle(
-      this.allDepts.filter((x) => !allBorderCodes.has(x.code) && x.code !== d.code).map((x) => x.nom),
+      this.allDepts
+        .filter((x) => !allBorderCodes.has(x.code) && x.code !== d.code)
+        .map((x) => x.nom),
     ).slice(0, this.distractorCount(difficulty));
 
     return {
@@ -507,7 +690,10 @@ export class FranceService {
     };
   }
 
-  private genDeptSubPrefectures(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genDeptSubPrefectures(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const withSubpref = depts.filter((d) => d.sous_prefectures.length > 0);
     const d = this.pick(withSubpref);
     if (!d) return null;
@@ -516,8 +702,9 @@ export class FranceService {
     const allSubprefNames = this.allDepts
       .filter((x) => x.code !== d.code)
       .flatMap((x) => x.sous_prefectures.map((sp) => sp.nom));
-    const distractors = this.shuffle(allSubprefNames.filter((n) => !correctNames.includes(n)))
-      .slice(0, this.distractorCount(difficulty));
+    const distractors = this.shuffle(
+      allSubprefNames.filter((n) => !correctNames.includes(n)),
+    ).slice(0, this.distractorCount(difficulty));
 
     return {
       type: 'dept_sub_prefectures',
@@ -530,18 +717,29 @@ export class FranceService {
     };
   }
 
-  private genRegionDepts(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genRegionDepts(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const activeRegionCodes = new Set(depts.map((d) => d.region));
     const validRegions = this.allRegions.filter(
-      (r) => activeRegionCodes.has(r.code) && depts.filter((d) => d.region === r.code).length >= 2,
+      (r) =>
+        activeRegionCodes.has(r.code) &&
+        depts.filter((d) => d.region === r.code).length >= 2,
     );
     const r = this.pick(validRegions);
     if (!r) return null;
 
-    const allCorrect = depts.filter((d) => d.region === r.code).map((d) => d.nom);
-    const correct = this.shuffle(allCorrect).slice(0, this.correctCountCap(difficulty));
-    const distractors = this.shuffle(this.allDepts.filter((d) => d.region !== r.code).map((d) => d.nom))
-      .slice(0, this.distractorCount(difficulty));
+    const allCorrect = depts
+      .filter((d) => d.region === r.code)
+      .map((d) => d.nom);
+    const correct = this.shuffle(allCorrect).slice(
+      0,
+      this.correctCountCap(difficulty),
+    );
+    const distractors = this.shuffle(
+      this.allDepts.filter((d) => d.region !== r.code).map((d) => d.nom),
+    ).slice(0, this.distractorCount(difficulty));
 
     return {
       type: 'region_depts',
@@ -554,7 +752,10 @@ export class FranceService {
     };
   }
 
-  private genRegionOldNames(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genRegionOldNames(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const activeRegionCodes = new Set(depts.map((d) => d.region));
     const validRegions = this.allRegions.filter(
       (r) => activeRegionCodes.has(r.code) && r.anciennes_regions.length > 0,
@@ -567,7 +768,10 @@ export class FranceService {
       .filter((x) => x.code !== r.code)
       .flatMap((x) => x.anciennes_regions)
       .filter((n) => !correct.includes(n));
-    const distractors = this.shuffle(allOtherOldNames).slice(0, this.distractorCount(difficulty));
+    const distractors = this.shuffle(allOtherOldNames).slice(
+      0,
+      this.distractorCount(difficulty),
+    );
 
     return {
       type: 'region_old_names',
@@ -580,7 +784,10 @@ export class FranceService {
     };
   }
 
-  private genRiverDepts(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genRiverDepts(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const codeSet = new Set(depts.map((d) => d.code));
     const validFleuves = this.allFleuves.filter(
       (f) => f.departements_traverses.filter((c) => codeSet.has(c)).length >= 2,
@@ -590,11 +797,16 @@ export class FranceService {
 
     const activeCodes = f.departements_traverses.filter((c) => codeSet.has(c));
     const allCorrectNames = activeCodes.map((c) => this.deptByCode.get(c)!.nom);
-    const correct = this.shuffle(allCorrectNames).slice(0, this.correctCountCap(difficulty));
+    const correct = this.shuffle(allCorrectNames).slice(
+      0,
+      this.correctCountCap(difficulty),
+    );
     // Exclure tous les depts traversés (pas seulement les actifs) pour éviter les faux distracteurs
     const allTraversedCodes = new Set(f.departements_traverses);
     const distractors = this.shuffle(
-      this.allDepts.filter((d) => !allTraversedCodes.has(d.code)).map((d) => d.nom),
+      this.allDepts
+        .filter((d) => !allTraversedCodes.has(d.code))
+        .map((d) => d.nom),
     ).slice(0, this.distractorCount(difficulty));
 
     return {
@@ -614,7 +826,9 @@ export class FranceService {
     return !['971', '972', '973', '974', '976'].includes(code);
   }
 
-  private genIdentifyDept(depts: (Departement & { code: string })[]): FranceQuestion | null {
+  private genIdentifyDept(
+    depts: (Departement & { code: string })[],
+  ): FranceQuestion | null {
     const metro = depts.filter((d) => this.isMetroDept(d.code));
     const d = this.pick(metro.length > 0 ? metro : depts);
     if (!d) return null;
@@ -630,11 +844,15 @@ export class FranceService {
     };
   }
 
-  private genIdentifyRegion(depts: (Departement & { code: string })[], difficulty: Difficulty): FranceQuestion | null {
+  private genIdentifyRegion(
+    depts: (Departement & { code: string })[],
+    difficulty: Difficulty,
+  ): FranceQuestion | null {
     const activeRegionCodes = new Set(depts.map((d) => d.region));
-    const eligible = this.allRegions.filter((r) =>
-      activeRegionCodes.has(r.code) &&
-      r.departements.some((c) => this.isMetroDept(c)),
+    const eligible = this.allRegions.filter(
+      (r) =>
+        activeRegionCodes.has(r.code) &&
+        r.departements.some((c) => this.isMetroDept(c)),
     );
     const region = this.pick(eligible);
     if (!region) return null;
@@ -678,47 +896,67 @@ export class FranceService {
     if (!city) return null;
 
     return {
-      type:               'locate_city',
-      item_key:           `locate_city_${city.nom.replace(/\s/g, '_')}`,
-      prompt:             'Cliquez sur cette ville sur la carte',
-      display:            city.nom,
-      choices:            [],
-      answer:             null,
-      answers:            null,
-      dept_code:          city.dept,
-      threshold_km:       thresholdKm,
-      hide_dept_borders:  difficulty === 'hard' || undefined,
+      type: 'locate_city',
+      item_key: `locate_city_${city.nom.replace(/\s/g, '_')}`,
+      prompt: 'Cliquez sur cette ville sur la carte',
+      display: city.nom,
+      choices: [],
+      answer: null,
+      answers: null,
+      dept_code: city.dept,
+      threshold_km: thresholdKm,
+      hide_dept_borders: difficulty === 'hard' || undefined,
     };
   }
 
   // ─── Normalisation des types ─────────────────────────────────────────────────
 
-  private normalizeTypes(raw: FranceQuestionType[] | undefined, depts: (Departement & { code: string })[]): FranceQuestionType[] {
-    const valid = (raw?.length ? raw : [...ALL_FRANCE_QUESTION_TYPES]) as FranceQuestionType[];
+  private normalizeTypes(
+    raw: FranceQuestionType[] | undefined,
+    depts: (Departement & { code: string })[],
+  ): FranceQuestionType[] {
+    const valid = raw?.length ? raw : [...ALL_FRANCE_QUESTION_TYPES];
     const codeSet = new Set(depts.map((d) => d.code));
     const activeRegionCodes = new Set(depts.map((d) => d.region));
 
     return valid.filter((t) => {
-      if (t === 'dept_borders') return depts.some((d) => d.departements_limitrophes.some((c) => codeSet.has(c)));
-      if (t === 'dept_sub_prefectures') return depts.some((d) => d.sous_prefectures.length > 0);
-      if (t === 'region_depts') return this.allRegions.some(
-        (r) => activeRegionCodes.has(r.code) && depts.filter((d) => d.region === r.code).length >= 2,
-      );
-      if (t === 'region_old_names') return this.allRegions.some(
-        (r) => activeRegionCodes.has(r.code) && r.anciennes_regions.length > 0,
-      );
-      if (t === 'river_depts') return this.allFleuves.some(
-        (f) => f.departements_traverses.filter((c) => codeSet.has(c)).length >= 2,
-      );
-      if (t === 'maritime_facade') return depts.some((d) => this.coastalCodes.has(d.code));
+      if (t === 'dept_borders')
+        return depts.some((d) =>
+          d.departements_limitrophes.some((c) => codeSet.has(c)),
+        );
+      if (t === 'dept_sub_prefectures')
+        return depts.some((d) => d.sous_prefectures.length > 0);
+      if (t === 'region_depts')
+        return this.allRegions.some(
+          (r) =>
+            activeRegionCodes.has(r.code) &&
+            depts.filter((d) => d.region === r.code).length >= 2,
+        );
+      if (t === 'region_old_names')
+        return this.allRegions.some(
+          (r) =>
+            activeRegionCodes.has(r.code) && r.anciennes_regions.length > 0,
+        );
+      if (t === 'river_depts')
+        return this.allFleuves.some(
+          (f) =>
+            f.departements_traverses.filter((c) => codeSet.has(c)).length >= 2,
+        );
+      if (t === 'maritime_facade')
+        return depts.some((d) => this.coastalCodes.has(d.code));
       if (t === 'region_chef_lieu') return activeRegionCodes.size > 0;
-      if (t === 'identify_dept') return depts.some((d) => this.isMetroDept(d.code));
-      if (t === 'identify_region') return this.allRegions.some(
-        (r) => activeRegionCodes.has(r.code) && r.departements.some((c) => this.isMetroDept(c)),
-      );
-      if (t === 'locate_city') return depts.some(
-        (d) => this.isMetroDept(d.code) && d.plus_grandes_villes?.length > 0,
-      );
+      if (t === 'identify_dept')
+        return depts.some((d) => this.isMetroDept(d.code));
+      if (t === 'identify_region')
+        return this.allRegions.some(
+          (r) =>
+            activeRegionCodes.has(r.code) &&
+            r.departements.some((c) => this.isMetroDept(c)),
+        );
+      if (t === 'locate_city')
+        return depts.some(
+          (d) => this.isMetroDept(d.code) && d.plus_grandes_villes?.length > 0,
+        );
       return true;
     });
   }

@@ -58,7 +58,7 @@ export class StartSessionDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  @Transform(({ value }) =>
+  @Transform(({ value }: { value: unknown }): unknown =>
     typeof value === 'string' ? value.split(',').filter(Boolean) : value,
   )
   categories?: string[];

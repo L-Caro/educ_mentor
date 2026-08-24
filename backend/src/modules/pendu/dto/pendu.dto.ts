@@ -1,4 +1,13 @@
-import { IsBoolean, IsIn, IsInt, IsNotEmpty, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
 const PENDU_DIFFICULTIES = ['easy', 'normal', 'hard'] as const;
 const WORD_LENGTHS = ['any', 'short', 'medium', 'long'] as const;

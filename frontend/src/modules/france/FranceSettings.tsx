@@ -49,7 +49,11 @@ export default function FranceSettings() {
 
   function toggleType(value: string) {
     const next = new Set(activeTypes);
-    next.has(value) ? next.delete(value) : next.add(value);
+    if (next.has(value)) {
+      next.delete(value);
+    } else {
+      next.add(value);
+    }
     saveTypes(next);
   }
 
@@ -68,7 +72,11 @@ export default function FranceSettings() {
 
   function toggleRegion(code: string) {
     const next = new Set(activeRegions);
-    next.has(code) ? next.delete(code) : next.add(code);
+    if (next.has(code)) {
+      next.delete(code);
+    } else {
+      next.add(code);
+    }
     saveRegions(next);
   }
 
