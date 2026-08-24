@@ -7,11 +7,23 @@ import * as fs from 'fs';
 import { ConjugaisonProgression } from './entities/conjugaison-progression.entity';
 import { ConjugaisonSession } from './entities/conjugaison-session.entity';
 import { SettingsService } from '../settings/settings.service';
-import type { StartConjugaisonSessionDto, RecordConjugaisonAnswerDto } from './dto/conjugaison.dto';
+import type {
+  StartConjugaisonSessionDto,
+  RecordConjugaisonAnswerDto,
+} from './dto/conjugaison.dto';
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 
-type Pronom = 'je' | 'tu' | 'il' | 'elle' | 'on' | 'nous' | 'vous' | 'ils' | 'elles';
+type Pronom =
+  | 'je'
+  | 'tu'
+  | 'il'
+  | 'elle'
+  | 'on'
+  | 'nous'
+  | 'vous'
+  | 'ils'
+  | 'elles';
 
 interface VerbData {
   groupe: string;
@@ -50,35 +62,59 @@ export class ConjugaisonService {
     private readonly settingsService: SettingsService,
   ) {
     const jsonPath = path.join(__dirname, 'data', 'conjugaisons.json');
-    this.verbs = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as Record<string, VerbData>;
+    this.verbs = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as Record<
+      string,
+      VerbData
+    >;
   }
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(dto: StartConjugaisonSessionDto): Promise<ConjugaisonSessionResult> {
+  async startSession(
+    dto: StartConjugaisonSessionDto,
+  ): Promise<ConjugaisonSessionResult> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
-    const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
-    const questionsPerSession = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
+    const timerSeconds = parseInt(
+      (await this.settingsService.get('question_timer_seconds')) ?? '0',
+      10,
+    );
+    const questionsPerSession = parseInt(
+      (await this.settingsService.get('questions_per_session')) ?? '10',
+      10,
+    );
 
     const tenses = this.normalizeTenses(dto.tenses);
     const groups = this.normalizeGroups(dto.verb_groups);
     const direction = dto.question_direction ?? 'forward'; // 'random' résolu par question dans generateQuestions
 
-    const verbsFilterRaw = await this.settingsService.get('conjugaison_verbs_filter');
+    const verbsFilterRaw = await this.settingsService.get(
+      'conjugaison_verbs_filter',
+    );
     const verbsFilter = verbsFilterRaw
-      ? verbsFilterRaw.split(',').map((v) => v.trim()).filter(Boolean)
+      ? verbsFilterRaw
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean)
       : null;
 
     const availableVerbs = Object.entries(this.verbs)
-      .filter(([, v]) => groups.includes(v.groupe as typeof VALID_GROUPS[number]))
+      .filter(([, v]) =>
+        groups.includes(v.groupe as (typeof VALID_GROUPS)[number]),
+      )
       .filter(([inf]) => !verbsFilter || verbsFilter.includes(inf));
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
 
-    const questions = this.generateQuestions(availableVerbs, tenses, direction, count, choicesCount);
+    const questions = this.generateQuestions(
+      availableVerbs,
+      tenses,
+      direction,
+      count,
+      choicesCount,
+    );
 
     const session = this.sessionRepo.create({
       id: uuidv4(),
@@ -90,13 +126,26 @@ export class ConjugaisonService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+    return {
+      session_id: session.id,
+      questions,
+      timer_seconds: timerSeconds,
+      is_unlimited: isUnlimited,
+    };
   }
 
-  async recordAnswer(sessionId: string, dto: RecordConjugaisonAnswerDto): Promise<void> {
-    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
+  async recordAnswer(
+    sessionId: string,
+    dto: RecordConjugaisonAnswerDto,
+  ): Promise<void> {
+    const threshold = parseInt(
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
+      10,
+    );
 
-    let prog = await this.progressionRepo.findOneBy({ verb_tense: dto.verb_tense });
+    let prog = await this.progressionRepo.findOneBy({
+      verb_tense: dto.verb_tense,
+    });
     if (!prog) {
       prog = this.progressionRepo.create({
         id: uuidv4(),
@@ -114,12 +163,19 @@ export class ConjugaisonService {
       prog.incorrect_count++;
     }
     prog.last_seen = new Date();
-    prog.is_mastered = isMastered(masteryScore(prog.correct_count, prog.incorrect_count), threshold);
+    prog.is_mastered = isMastered(
+      masteryScore(prog.correct_count, prog.incorrect_count),
+      threshold,
+    );
 
     await this.progressionRepo.save(prog);
   }
 
-  async completeSession(sessionId: string, correctAnswers: number, totalQuestions: number): Promise<void> {
+  async completeSession(
+    sessionId: string,
+    correctAnswers: number,
+    totalQuestions: number,
+  ): Promise<void> {
     const session = await this.sessionRepo.findOneBy({ id: sessionId });
     if (!session) return;
     session.completed_at = new Date();
@@ -131,7 +187,10 @@ export class ConjugaisonService {
   // ─── Admin ────────────────────────────────────────────────────────────────
 
   getAvailableVerbs(): { infinitif: string; groupe: string }[] {
-    return Object.entries(this.verbs).map(([infinitif, v]) => ({ infinitif, groupe: v.groupe }));
+    return Object.entries(this.verbs).map(([infinitif, v]) => ({
+      infinitif,
+      groupe: v.groupe,
+    }));
   }
 
   async getProgression(): Promise<ConjugaisonProgression[]> {
@@ -139,7 +198,10 @@ export class ConjugaisonService {
   }
 
   async getRecentSessions(limit = 20): Promise<ConjugaisonSession[]> {
-    return this.sessionRepo.find({ order: { started_at: 'DESC' }, take: limit });
+    return this.sessionRepo.find({
+      order: { started_at: 'DESC' },
+      take: limit,
+    });
   }
 
   async resetProgression(): Promise<void> {
@@ -156,7 +218,11 @@ export class ConjugaisonService {
     count: number,
     choicesCount: number,
   ): ConjugaisonQuestion[] {
-    const candidates: Array<{ infinitif: string; tense: string; groupe: string }> = [];
+    const candidates: Array<{
+      infinitif: string;
+      tense: string;
+      groupe: string;
+    }> = [];
     for (const [infinitif, verbData] of availableVerbs) {
       for (const tense of tenses) {
         if (verbData.conjugaisons[tense]) {
@@ -177,7 +243,11 @@ export class ConjugaisonService {
       const candidate = candidates[this.rand(0, candidates.length - 1)];
       const pronoun = this.pickPronoun();
       const questionDirection: 'forward' | 'reverse' =
-        direction === 'random' ? (this.rand(0, 1) === 0 ? 'forward' : 'reverse') : direction;
+        direction === 'random'
+          ? this.rand(0, 1) === 0
+            ? 'forward'
+            : 'reverse'
+          : direction;
       const key = `${candidate.infinitif}_${candidate.tense}_${pronoun}_${questionDirection}`;
 
       if (used.has(key)) continue;
@@ -189,7 +259,15 @@ export class ConjugaisonService {
 
       const choices =
         choicesCount > 0
-          ? this.buildChoices(candidate.infinitif, candidate.tense, pronoun, conjugated, questionDirection, availableVerbs, choicesCount)
+          ? this.buildChoices(
+              candidate.infinitif,
+              candidate.tense,
+              pronoun,
+              conjugated,
+              questionDirection,
+              availableVerbs,
+              choicesCount,
+            )
           : [];
 
       questions.push({
@@ -228,8 +306,13 @@ export class ConjugaisonService {
     size: number,
   ): string[] {
     if (direction === 'reverse') {
-      const pool = availableVerbs.map(([inf]) => inf).filter((inf) => inf !== infinitif);
-      return this.shuffle([infinitif, ...this.shuffle(pool).slice(0, size - 1)]);
+      const pool = availableVerbs
+        .map(([inf]) => inf)
+        .filter((inf) => inf !== infinitif);
+      return this.shuffle([
+        infinitif,
+        ...this.shuffle(pool).slice(0, size - 1),
+      ]);
     }
 
     // Forward : formes conjuguées comme choix
@@ -237,7 +320,9 @@ export class ConjugaisonService {
     const verbData = this.verbs[infinitif];
 
     // Priorité 1 : autres formes du même verbe au même temps (confusion la plus pédagogique)
-    const sameVerbForms = Object.values(verbData.conjugaisons[tense]).filter((f) => f !== correctForm);
+    const sameVerbForms = Object.values(verbData.conjugaisons[tense]).filter(
+      (f) => f !== correctForm,
+    );
     for (const f of this.shuffle(sameVerbForms)) {
       if (choices.size >= size) break;
       choices.add(f);

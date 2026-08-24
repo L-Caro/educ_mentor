@@ -68,8 +68,6 @@ import { AccessGuard } from './modules/invitation/access.guard';
     PenduModule,
     InvitationModule,
   ],
-  providers: [
-    { provide: APP_GUARD, useClass: AccessGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: AccessGuard }],
 })
 export class AppModule {}

@@ -1,6 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { NumerationService } from './numeration.service';
-import { CompleteNumerationSessionDto, RecordNumerationAnswerDto, StartNumerationSessionDto } from './dto/numeration.dto';
+import {
+  CompleteNumerationSessionDto,
+  RecordNumerationAnswerDto,
+  StartNumerationSessionDto,
+} from './dto/numeration.dto';
 
 @Controller('numeration')
 export class NumerationGameController {
@@ -22,12 +26,18 @@ export class NumerationGameController {
   }
 
   @Post('session/:id/answer')
-  async recordAnswer(@Param('id') id: string, @Body() dto: RecordNumerationAnswerDto) {
+  async recordAnswer(
+    @Param('id') id: string,
+    @Body() dto: RecordNumerationAnswerDto,
+  ) {
     await this.service.recordAnswer(id, dto.itemKey, dto.isCorrect);
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteNumerationSessionDto) {
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteNumerationSessionDto,
+  ) {
     return this.service.completeSession(id, dto);
   }
 }

@@ -12,7 +12,10 @@ export class PenduGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompletePenduSessionDto) {
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompletePenduSessionDto,
+  ) {
     return this.penduService.completeSession(id, dto);
   }
 }

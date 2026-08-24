@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -48,10 +52,13 @@ export interface LectureTextSummary {
 @Injectable()
 export class LectureService {
   constructor(
-    @InjectRepository(LectureText)      private textsRepo: Repository<LectureText>,
-    @InjectRepository(LectureQuestion)  private questionsRepo: Repository<LectureQuestion>,
-    @InjectRepository(LectureSession)   private sessionsRepo: Repository<LectureSession>,
-    @InjectRepository(LectureProgression) private progressionRepo: Repository<LectureProgression>,
+    @InjectRepository(LectureText) private textsRepo: Repository<LectureText>,
+    @InjectRepository(LectureQuestion)
+    private questionsRepo: Repository<LectureQuestion>,
+    @InjectRepository(LectureSession)
+    private sessionsRepo: Repository<LectureSession>,
+    @InjectRepository(LectureProgression)
+    private progressionRepo: Repository<LectureProgression>,
   ) {}
 
   // ─── Game endpoints ────────────────────────────────────────────────────────
@@ -73,15 +80,17 @@ export class LectureService {
         titre: t.titre,
         actif: t.actif,
         question_count: t.questions?.length ?? 0,
-        play_count:     prog?.play_count      ?? 0,
-        last_played_at: prog?.last_played_at  ?? null,
-        best_correct:   prog?.best_correct    ?? 0,
-        best_total:     prog?.best_total      ?? 0,
+        play_count: prog?.play_count ?? 0,
+        last_played_at: prog?.last_played_at ?? null,
+        best_correct: prog?.best_correct ?? 0,
+        best_total: prog?.best_total ?? 0,
       };
     });
   }
 
-  async createSession(dto: StartLectureSessionDto): Promise<LectureSessionResponse> {
+  async createSession(
+    dto: StartLectureSessionDto,
+  ): Promise<LectureSessionResponse> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const text = await this.textsRepo.findOne({
       where: { id: dto.textId },
@@ -95,67 +104,97 @@ export class LectureService {
     const sorted = [...text.questions].sort((a, b) => a.ordre - b.ordre);
     const questions: LectureSessionQuestion[] = sorted.map((q) => {
       const needed = choiceCount - 1;
-      const shuffledDistractors = this.shuffle([...q.distractors]).slice(0, needed);
+      const shuffledDistractors = this.shuffle([...q.distractors]).slice(
+        0,
+        needed,
+      );
       const choices = this.shuffle([q.answer, ...shuffledDistractors]);
       return {
-        item_key:     `lecture_q_${q.id}`,
-        display:      q.question,
+        item_key: `lecture_q_${q.id}`,
+        display: q.question,
         choices,
-        answer:       q.answer,
-        show_text:    showText,
+        answer: q.answer,
+        show_text: showText,
         text_contenu: text.contenu,
-        text_titre:   text.titre,
-        excerpt:      difficulty === 'easy' ? (q.excerpt ?? null) : null,
+        text_titre: text.titre,
+        excerpt: difficulty === 'easy' ? (q.excerpt ?? null) : null,
       };
     });
 
     const session = this.sessionsRepo.create({
-      id:         uuidv4(),
-      text_id:    text.id,
+      id: uuidv4(),
+      text_id: text.id,
       difficulty,
       started_at: new Date(),
     });
     await this.sessionsRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: 0, is_unlimited: true };
+    return {
+      session_id: session.id,
+      questions,
+      timer_seconds: 0,
+      is_unlimited: true,
+    };
   }
 
-  async completeSession(sessionId: string, dto: CompleteLectureSessionDto): Promise<void> {
-    const session = await this.sessionsRepo.findOne({ where: { id: sessionId } });
-    if (!session) throw new NotFoundException(`Session ${sessionId} introuvable`);
+  async completeSession(
+    sessionId: string,
+    dto: CompleteLectureSessionDto,
+  ): Promise<void> {
+    const session = await this.sessionsRepo.findOne({
+      where: { id: sessionId },
+    });
+    if (!session)
+      throw new NotFoundException(`Session ${sessionId} introuvable`);
     if (session.completed_at) return;
     if (dto.correctAnswers > dto.totalQuestions) {
-      throw new BadRequestException('correctAnswers ne peut pas dépasser totalQuestions');
+      throw new BadRequestException(
+        'correctAnswers ne peut pas dépasser totalQuestions',
+      );
     }
 
-    session.correct_answers  = dto.correctAnswers;
-    session.total_questions  = dto.totalQuestions;
-    session.completed_at     = new Date();
+    session.correct_answers = dto.correctAnswers;
+    session.total_questions = dto.totalQuestions;
+    session.completed_at = new Date();
     await this.sessionsRepo.save(session);
 
-    await this.updateProgression(session.text_id, dto.correctAnswers, dto.totalQuestions);
+    await this.updateProgression(
+      session.text_id,
+      dto.correctAnswers,
+      dto.totalQuestions,
+    );
   }
 
-  async recordAnswer(_sessionId: string, _itemKey: string, _isCorrect: boolean): Promise<void> {
+  async recordAnswer(
+    _sessionId: string,
+    _itemKey: string,
+    _isCorrect: boolean,
+  ): Promise<void> {
     // Réponses individuelles non persistées ; seuls les totaux de session sont enregistrés via completeSession.
   }
 
-  private async updateProgression(textId: number, correct: number, total: number): Promise<void> {
-    let prog = await this.progressionRepo.findOne({ where: { text_id: textId } });
+  private async updateProgression(
+    textId: number,
+    correct: number,
+    total: number,
+  ): Promise<void> {
+    let prog = await this.progressionRepo.findOne({
+      where: { text_id: textId },
+    });
     if (prog) {
       prog.play_count += 1;
       prog.last_played_at = new Date();
       if (correct > prog.best_correct) {
         prog.best_correct = correct;
-        prog.best_total   = total;
+        prog.best_total = total;
       }
     } else {
       prog = this.progressionRepo.create({
-        text_id:        textId,
-        play_count:     1,
+        text_id: textId,
+        play_count: 1,
         last_played_at: new Date(),
-        best_correct:   correct,
-        best_total:     total,
+        best_correct: correct,
+        best_total: total,
       });
     }
     await this.progressionRepo.save(prog);
@@ -168,7 +207,9 @@ export class LectureService {
       relations: ['questions'],
       order: { created_at: 'ASC' },
     });
-    return texts.map((t) => Object.assign(t, { question_count: t.questions?.length ?? 0 }));
+    return texts.map((t) =>
+      Object.assign(t, { question_count: t.questions?.length ?? 0 }),
+    );
   }
 
   async createText(dto: CreateTextDto): Promise<LectureText> {
@@ -196,14 +237,24 @@ export class LectureService {
     });
   }
 
-  async createQuestion(textId: number, dto: CreateQuestionDto): Promise<LectureQuestion> {
+  async createQuestion(
+    textId: number,
+    dto: CreateQuestionDto,
+  ): Promise<LectureQuestion> {
     const text = await this.textsRepo.findOne({ where: { id: textId } });
     if (!text) throw new NotFoundException(`Texte ${textId} introuvable`);
-    const q = this.questionsRepo.create({ ...dto, text_id: textId, excerpt: dto.excerpt ?? null });
+    const q = this.questionsRepo.create({
+      ...dto,
+      text_id: textId,
+      excerpt: dto.excerpt ?? null,
+    });
     return this.questionsRepo.save(q);
   }
 
-  async updateQuestion(id: number, dto: UpdateQuestionDto): Promise<LectureQuestion> {
+  async updateQuestion(
+    id: number,
+    dto: UpdateQuestionDto,
+  ): Promise<LectureQuestion> {
     const q = await this.questionsRepo.findOne({ where: { id } });
     if (!q) throw new NotFoundException(`Question ${id} introuvable`);
     Object.assign(q, dto);
@@ -216,7 +267,9 @@ export class LectureService {
 
   // ─── Admin — progression ───────────────────────────────────────────────────
 
-  async getProgression(): Promise<{ is_mastered: boolean; correct_count: number; incorrect_count: number }[]> {
+  async getProgression(): Promise<
+    { is_mastered: boolean; correct_count: number; incorrect_count: number }[]
+  > {
     const items = await this.progressionRepo.find();
     if (items.length === 0) return [];
 
@@ -224,13 +277,18 @@ export class LectureService {
       where: { id: In(items.map((p) => p.text_id)) },
       relations: ['questions'],
     });
-    const questionCountMap = new Map(texts.map((t) => [t.id, t.questions?.length ?? 0]));
+    const questionCountMap = new Map(
+      texts.map((t) => [t.id, t.questions?.length ?? 0]),
+    );
 
     return items.map((p) => {
       const currentTotal = questionCountMap.get(p.text_id) ?? p.best_total;
       return {
-        is_mastered:    p.best_total > 0 && p.best_correct === p.best_total && p.best_total === currentTotal,
-        correct_count:   p.best_correct,
+        is_mastered:
+          p.best_total > 0 &&
+          p.best_correct === p.best_total &&
+          p.best_total === currentTotal,
+        correct_count: p.best_correct,
         incorrect_count: Math.max(0, p.best_total - p.best_correct),
       };
     });
@@ -245,7 +303,7 @@ export class LectureService {
   // Intentionnellement différent de qcmChoiceCount (hard=0 pour les autres modules) :
   // lecture n'utilise jamais la saisie libre, même en difficile.
   private choiceCount(difficulty: Difficulty): number {
-    if (difficulty === 'easy')   return 2;
+    if (difficulty === 'easy') return 2;
     if (difficulty === 'medium') return 4;
     return 6;
   }

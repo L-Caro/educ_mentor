@@ -57,7 +57,7 @@ export class BaselineSchema1787529600000 implements MigrationInterface {
     // tables, donc toute la progression. Aucun scénario légitime ne le demande.
     throw new Error(
       'La migration de référence ne peut pas être annulée : elle supprimerait toutes les données. ' +
-      'Pour repartir de zéro, supprimer le fichier de base de données après en avoir fait une sauvegarde.',
+        'Pour repartir de zéro, supprimer le fichier de base de données après en avoir fait une sauvegarde.',
     );
   }
 }

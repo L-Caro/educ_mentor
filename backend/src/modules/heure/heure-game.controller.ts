@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { HeureService } from './heure.service';
-import { StartHeureSessionDto, RecordHeureAnswerDto, CompleteHeureSessionDto } from './dto/heure.dto';
+import {
+  StartHeureSessionDto,
+  RecordHeureAnswerDto,
+  CompleteHeureSessionDto,
+} from './dto/heure.dto';
 
 @Controller('heure')
 export class HeureGameController {
@@ -17,7 +21,14 @@ export class HeureGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteHeureSessionDto) {
-    return this.heureService.completeSession(id, dto.correct_answers, dto.total_questions);
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteHeureSessionDto,
+  ) {
+    return this.heureService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

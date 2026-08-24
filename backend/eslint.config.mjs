@@ -17,7 +17,7 @@ export default tseslint.config(
         ...globals.node,
         ...globals.jest,
       },
-      ecmaVersion: 5,
+      ecmaVersion: 2023,
       sourceType: 'module',
       parserOptions: {
         projectService: true,
@@ -27,9 +27,12 @@ export default tseslint.config(
   },
   {
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn'
+      // `no-explicit-any` était désactivé : un `any` pouvait passer inaperçu à la relecture.
+      // Réactivé en erreur — les rares cas légitimes se justifient par un commentaire
+      // et un `eslint-disable-next-line` explicite.
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-floating-promises': 'error',
+      '@typescript-eslint/no-unsafe-argument': 'warn',
     },
   },
 );

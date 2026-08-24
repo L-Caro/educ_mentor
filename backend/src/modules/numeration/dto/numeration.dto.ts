@@ -1,7 +1,14 @@
-import { IsArray, IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class StartNumerationSessionDto {
-  @IsArray() @IsOptional()
+  @IsArray()
+  @IsOptional()
   question_types?: string[];
 }
 
@@ -11,6 +18,6 @@ export class CompleteNumerationSessionDto {
 }
 
 export class RecordNumerationAnswerDto {
-  @IsString()  itemKey:   string;
+  @IsString() itemKey: string;
   @IsBoolean() isCorrect: boolean;
 }

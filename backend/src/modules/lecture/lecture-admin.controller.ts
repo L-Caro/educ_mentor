@@ -1,7 +1,22 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { LectureService } from './lecture.service';
-import { CreateQuestionDto, CreateTextDto, UpdateQuestionDto, UpdateTextDto } from './dto/lecture.dto';
+import {
+  CreateQuestionDto,
+  CreateTextDto,
+  UpdateQuestionDto,
+  UpdateTextDto,
+} from './dto/lecture.dto';
 
 @Controller('admin/lecture')
 @UseGuards(JwtAuthGuard)
@@ -21,7 +36,10 @@ export class LectureAdminController {
   }
 
   @Put('texts/:id')
-  updateText(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateTextDto) {
+  updateText(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateTextDto,
+  ) {
     return this.service.updateText(id, dto);
   }
 
@@ -38,12 +56,18 @@ export class LectureAdminController {
   }
 
   @Post('texts/:textId/questions')
-  createQuestion(@Param('textId', ParseIntPipe) textId: number, @Body() dto: CreateQuestionDto) {
+  createQuestion(
+    @Param('textId', ParseIntPipe) textId: number,
+    @Body() dto: CreateQuestionDto,
+  ) {
     return this.service.createQuestion(textId, dto);
   }
 
   @Put('questions/:id')
-  updateQuestion(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateQuestionDto) {
+  updateQuestion(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: UpdateQuestionDto,
+  ) {
     return this.service.updateQuestion(id, dto);
   }
 

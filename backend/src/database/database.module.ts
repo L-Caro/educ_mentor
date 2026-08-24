@@ -22,7 +22,8 @@ import * as path from 'path';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const synchronize = configService.get<boolean>('dbSynchronize') ?? false;
+        const synchronize =
+          configService.get<boolean>('dbSynchronize') ?? false;
         const database = path.resolve(configService.get<string>('dbPath')!);
 
         if (synchronize) {

@@ -54,7 +54,10 @@ export class PenduService implements OnModuleInit {
 
   async startSession(dto: StartPenduSessionDto): Promise<StartSessionResult> {
     // Cherche des mots actifs selon difficulté et longueur
-    let words = await this.wordRepo.findBy({ is_active: true, difficulty: dto.difficulty });
+    let words = await this.wordRepo.findBy({
+      is_active: true,
+      difficulty: dto.difficulty,
+    });
 
     // Fallback sur tous les mots actifs si aucun trouvé pour la difficulté
     if (words.length === 0) {
@@ -109,7 +112,10 @@ export class PenduService implements OnModuleInit {
     };
   }
 
-  async completeSession(sessionId: string, dto: CompletePenduSessionDto): Promise<void> {
+  async completeSession(
+    sessionId: string,
+    dto: CompletePenduSessionDto,
+  ): Promise<void> {
     const session = await this.sessionRepo.findOneBy({ id: sessionId });
     if (!session) return;
     session.won = dto.won;
@@ -141,7 +147,10 @@ export class PenduService implements OnModuleInit {
     return this.wordRepo.save(word);
   }
 
-  async updateWord(id: string, dto: UpdatePenduWordDto): Promise<PenduWord | null> {
+  async updateWord(
+    id: string,
+    dto: UpdatePenduWordDto,
+  ): Promise<PenduWord | null> {
     const word = await this.wordRepo.findOneBy({ id });
     if (!word) return null;
     if (dto.word !== undefined) {

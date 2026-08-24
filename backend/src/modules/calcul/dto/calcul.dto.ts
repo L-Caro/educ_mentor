@@ -1,4 +1,12 @@
-import { IsArray, IsBoolean, IsIn, IsInt, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 export class StartCalculSessionDto {

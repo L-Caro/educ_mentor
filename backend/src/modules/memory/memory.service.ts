@@ -21,7 +21,7 @@ export interface MemorySessionResult {
 
 export interface MemoryProgressionStat {
   is_mastered: boolean;
-  correct_count: number;  // = pairs_count (pairs found — toujours total pour Memory)
+  correct_count: number; // = pairs_count (pairs found — toujours total pour Memory)
   incorrect_count: number; // = attempts - pairs_count (coups en trop)
 }
 

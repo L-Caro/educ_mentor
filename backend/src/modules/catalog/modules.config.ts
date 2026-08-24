@@ -30,15 +30,17 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'monnaie',
     name: 'Monnaie',
-    description: 'Reconnaître des pièces et billets, rendre la monnaie, calculer un total',
+    description:
+      'Reconnaître des pièces et billets, rendre la monnaie, calculer un total',
     icon: '💶',
     is_active: false,
     display_order: 4,
   },
   {
     id: 'heure',
-    name: 'Lire l\'heure',
-    description: 'Lire l\'heure sur une horloge à aiguilles, distinguer matin et après-midi',
+    name: "Lire l'heure",
+    description:
+      "Lire l'heure sur une horloge à aiguilles, distinguer matin et après-midi",
     icon: '🕐',
     is_active: false,
     display_order: 5,
@@ -46,7 +48,8 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'conjugaison',
     name: 'Conjugaison',
-    description: 'Conjuguer les verbes aux temps du présent, de l\'imparfait et du futur simple',
+    description:
+      "Conjuguer les verbes aux temps du présent, de l'imparfait et du futur simple",
     icon: '✍️',
     is_active: false,
     display_order: 6,
@@ -62,7 +65,8 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'france',
     name: 'France',
-    description: 'Départements, régions, préfectures, fleuves, massifs — la géographie française',
+    description:
+      'Départements, régions, préfectures, fleuves, massifs — la géographie française',
     icon: '🇫🇷',
     is_active: false,
     display_order: 8,
@@ -94,7 +98,8 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'pendu',
     name: 'Le Pendu',
-    description: 'Deviner un mot lettre par lettre avant que le bonhomme soit pendu',
+    description:
+      'Deviner un mot lettre par lettre avant que le bonhomme soit pendu',
     icon: '🪢',
     is_active: false,
     display_order: 12,

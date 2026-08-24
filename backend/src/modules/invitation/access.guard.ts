@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InvitationService } from './invitation.service';
 
@@ -17,7 +22,9 @@ export class AccessGuard implements CanActivate {
     const pinEnabled = this.configService.get<boolean>('adminPinEnabled');
     if (!pinEnabled) return true;
 
-    const request = context.switchToHttp().getRequest<{ path: string; cookies: Record<string, string> }>();
+    const request = context
+      .switchToHttp()
+      .getRequest<{ path: string; cookies: Record<string, string> }>();
 
     if (request.path.startsWith('/api/auth/invite/')) return true;
     if (request.path === '/api/auth/admin-access') return true;

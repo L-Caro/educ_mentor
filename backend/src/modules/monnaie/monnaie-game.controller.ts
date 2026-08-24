@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { MonnaieService } from './monnaie.service';
-import { StartMonnaieSessionDto, RecordMonnaieAnswerDto, CompleteMonnaieSessionDto } from './dto/monnaie.dto';
+import {
+  StartMonnaieSessionDto,
+  RecordMonnaieAnswerDto,
+  CompleteMonnaieSessionDto,
+} from './dto/monnaie.dto';
 
 @Controller('monnaie')
 export class MonnaieGameController {
@@ -17,7 +21,14 @@ export class MonnaieGameController {
   }
 
   @Post('session/:id/complete')
-  completeSession(@Param('id') id: string, @Body() dto: CompleteMonnaieSessionDto) {
-    return this.monnaieService.completeSession(id, dto.correct_answers, dto.total_questions);
+  completeSession(
+    @Param('id') id: string,
+    @Body() dto: CompleteMonnaieSessionDto,
+  ) {
+    return this.monnaieService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

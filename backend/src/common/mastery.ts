@@ -8,7 +8,10 @@
 export const DEFAULT_MASTERY_THRESHOLD = 10;
 
 /** Réussites nettes : correct − incorrect, jamais sous 0. */
-export function masteryScore(correctCount: number, incorrectCount: number): number {
+export function masteryScore(
+  correctCount: number,
+  incorrectCount: number,
+): number {
   return Math.max(0, correctCount - incorrectCount);
 }
 

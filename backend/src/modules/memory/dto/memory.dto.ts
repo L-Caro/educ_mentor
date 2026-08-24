@@ -1,6 +1,18 @@
-import { IsArray, IsIn, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsArray,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+} from 'class-validator';
 
-export const MEMORY_MODES = ['image', 'image_word_fr', 'image_word_en'] as const;
+export const MEMORY_MODES = [
+  'image',
+  'image_word_fr',
+  'image_word_en',
+] as const;
 export type MemoryMode = (typeof MEMORY_MODES)[number];
 
 export class StartMemorySessionDto {

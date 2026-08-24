@@ -2,7 +2,6 @@
  * Organisé par longueur exacte (5/6/7/8/9+) × difficulté (easy/normal/hard).
  * 20 mots par combinaison = 300 mots au total. */
 export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
-
   // ═══════════════════════════════════════════════════════════════════════════
   // 5 LETTRES
   // ═══════════════════════════════════════════════════════════════════════════

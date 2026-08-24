@@ -20,11 +20,7 @@ import { Response } from 'express';
 import { ImagierService } from './imagier.service';
 import { ImagierImportService } from './imagier-import.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import {
-  CreateWordDto,
-  UpdateWordDto,
-  ImportJsonDto,
-} from './dto/imagier.dto';
+import { CreateWordDto, UpdateWordDto, ImportJsonDto } from './dto/imagier.dto';
 
 @Controller('imagier')
 @UseGuards(JwtAuthGuard)
@@ -135,7 +131,10 @@ export class ImagierAdminController {
     const destPath = path.join(categoryDir, file.originalname);
     fs.renameSync(file.path, destPath);
 
-    const updated = await this.imagierService.saveUploadedImage(id, file.originalname);
+    const updated = await this.imagierService.saveUploadedImage(
+      id,
+      file.originalname,
+    );
     return res.json(updated);
   }
 }

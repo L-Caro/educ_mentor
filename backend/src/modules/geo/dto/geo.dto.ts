@@ -1,8 +1,15 @@
-import { IsArray, IsBoolean, IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsInt,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
 const VALID_DIRECTIONS = ['forward', 'reverse', 'random'] as const;
-export type CapitalDirection = typeof VALID_DIRECTIONS[number];
+export type CapitalDirection = (typeof VALID_DIRECTIONS)[number];
 
 export const ALL_QUESTION_TYPES = [
   'country_to_capital',
@@ -21,7 +28,7 @@ export const ALL_QUESTION_TYPES = [
   'identify_continent',
 ] as const;
 
-export type GeoQuestionType = typeof ALL_QUESTION_TYPES[number];
+export type GeoQuestionType = (typeof ALL_QUESTION_TYPES)[number];
 
 export class StartGeoSessionDto {
   @IsOptional()

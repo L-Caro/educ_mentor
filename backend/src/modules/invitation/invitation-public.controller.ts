@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Query, Res, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Res,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Response } from 'express';
 import { InvitationService } from './invitation.service';
@@ -20,12 +27,15 @@ export class InvitationPublicController {
     @Query('token') token: string,
     @Res({ passthrough: true }) response: Response,
   ) {
-    const bootstrapToken = this.configService.get<string>('adminBootstrapToken');
+    const bootstrapToken = this.configService.get<string>(
+      'adminBootstrapToken',
+    );
     if (!bootstrapToken || token !== bootstrapToken) {
       throw new UnauthorizedException('Token invalide');
     }
 
-    const invitation = await this.invitationService.createAndUse('Admin — bootstrap');
+    const invitation =
+      await this.invitationService.createAndUse('Admin — bootstrap');
     const pinEnabled = this.configService.get<boolean>('adminPinEnabled');
     response.cookie('access_token', invitation.token, {
       httpOnly: true,
@@ -48,7 +58,8 @@ export class InvitationPublicController {
     const invitation = await this.invitationService.findByToken(token);
 
     if (!invitation) throw new UnauthorizedException('Lien invalide');
-    if (invitation.used_at) throw new UnauthorizedException('Lien déjà utilisé');
+    if (invitation.used_at)
+      throw new UnauthorizedException('Lien déjà utilisé');
 
     await this.invitationService.markAsUsed(invitation.id);
 

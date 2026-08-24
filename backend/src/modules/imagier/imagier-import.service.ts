@@ -21,9 +21,9 @@ function normalize(str: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '') // retire les accents
-    .replace(/[^a-z0-9]/g, '-')      // remplace tout non-alphanumérique par -
-    .replace(/-+/g, '-')             // collapse les - multiples
-    .replace(/^-|-$/g, '');          // retire les - en début/fin
+    .replace(/[^a-z0-9]/g, '-') // remplace tout non-alphanumérique par -
+    .replace(/-+/g, '-') // collapse les - multiples
+    .replace(/^-|-$/g, ''); // retire les - en début/fin
 }
 
 @Injectable()
@@ -41,13 +41,19 @@ export class ImagierImportService {
     );
   }
 
-  async importFromJson(jsonStr: string, overwrite = false): Promise<ImportReport> {
+  async importFromJson(
+    jsonStr: string,
+    overwrite = false,
+  ): Promise<ImportReport> {
     const report: ImportReport = { inserted: 0, skipped: 0, errors: [] };
 
     let dict: Record<string, unknown>;
     try {
       const parsed = JSON.parse(jsonStr);
-      dict = (parsed.dictionnaire_thematique ?? parsed) as Record<string, unknown>;
+      dict = (parsed.dictionnaire_thematique ?? parsed) as Record<
+        string,
+        unknown
+      >;
     } catch {
       report.errors.push('JSON invalide');
       return report;
@@ -56,14 +62,30 @@ export class ImagierImportService {
     for (const [category, categoryData] of Object.entries(dict)) {
       if (typeof categoryData !== 'object' || categoryData === null) continue;
 
-      for (const [subOrFr, subOrEn] of Object.entries(categoryData as DictionaryCategory)) {
+      for (const [subOrFr, subOrEn] of Object.entries(
+        categoryData as DictionaryCategory,
+      )) {
         if (typeof subOrEn === 'string') {
           // Structure plate : subOrFr = mot FR, subOrEn = mot EN
-          await this.processWord(subOrFr, subOrEn, category, undefined, overwrite, report);
+          await this.processWord(
+            subOrFr,
+            subOrEn,
+            category,
+            undefined,
+            overwrite,
+            report,
+          );
         } else if (typeof subOrEn === 'object' && subOrEn !== null) {
           // Structure imbriquée : subOrFr = sous-catégorie
-          for (const [fr, en] of Object.entries(subOrEn as Record<string, string>)) {
-            await this.processWord(fr, en, category, subOrFr, overwrite, report);
+          for (const [fr, en] of Object.entries(subOrEn)) {
+            await this.processWord(
+              fr,
+              en,
+              category,
+              subOrFr,
+              overwrite,
+              report,
+            );
           }
         }
       }
@@ -121,7 +143,8 @@ export class ImagierImportService {
     // Lire tous les dossiers disponibles une seule fois
     let allDirs: string[] = [];
     try {
-      allDirs = fs.readdirSync(this.imagesBasePath, { withFileTypes: true })
+      allDirs = fs
+        .readdirSync(this.imagesBasePath, { withFileTypes: true })
         .filter((d) => d.isDirectory())
         .map((d) => d.name);
     } catch {
@@ -130,7 +153,9 @@ export class ImagierImportService {
 
     // 1. Cherche d'abord dans le dossier qui correspond à la catégorie
     //    (comparaison insensible à la casse via normalize)
-    const categoryDirName = allDirs.find((d) => normalize(d) === normalize(category));
+    const categoryDirName = allDirs.find(
+      (d) => normalize(d) === normalize(category),
+    );
     if (categoryDirName) {
       const found = this.searchInDir(
         path.join(this.imagesBasePath, categoryDirName),
@@ -154,7 +179,11 @@ export class ImagierImportService {
     return null;
   }
 
-  private searchInDir(dir: string, frOriginal: string, frNormalized: string): string | null {
+  private searchInDir(
+    dir: string,
+    frOriginal: string,
+    frNormalized: string,
+  ): string | null {
     if (!fs.existsSync(dir)) return null;
 
     try {
@@ -178,12 +207,16 @@ export class ImagierImportService {
    * Retourne le chemin relatif de l'image pour construire l'URL.
    * ex: { category: 'animaux', filename: 'chat.webp' }
    */
-  resolveImageCategory(imageFilename: string, wordCategory: string): string | null {
+  resolveImageCategory(
+    imageFilename: string,
+    wordCategory: string,
+  ): string | null {
     if (!fs.existsSync(this.imagesBasePath)) return null;
 
     // Cherche dans quel dossier se trouve réellement le fichier
     try {
-      const dirs = fs.readdirSync(this.imagesBasePath, { withFileTypes: true })
+      const dirs = fs
+        .readdirSync(this.imagesBasePath, { withFileTypes: true })
         .filter((d) => d.isDirectory())
         .map((d) => d.name);
 

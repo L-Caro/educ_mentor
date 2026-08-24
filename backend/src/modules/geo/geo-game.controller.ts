@@ -1,6 +1,10 @@
 import { Body, Controller, Param, Post } from '@nestjs/common';
 import { GeoService } from './geo.service';
-import { StartGeoSessionDto, RecordGeoAnswerDto, CompleteGeoSessionDto } from './dto/geo.dto';
+import {
+  StartGeoSessionDto,
+  RecordGeoAnswerDto,
+  CompleteGeoSessionDto,
+} from './dto/geo.dto';
 
 @Controller('geo')
 export class GeoGameController {
@@ -18,6 +22,10 @@ export class GeoGameController {
 
   @Post('session/:id/complete')
   completeSession(@Param('id') id: string, @Body() dto: CompleteGeoSessionDto) {
-    return this.geoService.completeSession(id, dto.correct_answers, dto.total_questions);
+    return this.geoService.completeSession(
+      id,
+      dto.correct_answers,
+      dto.total_questions,
+    );
   }
 }

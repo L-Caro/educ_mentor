@@ -9,7 +9,11 @@ import type {
   StartTablesSessionDto,
   RecordTablesAnswerDto,
 } from './dto/tables.dto';
-import { masteryScore, isMastered, selectionWeight } from '../../common/mastery';
+import {
+  masteryScore,
+  isMastered,
+  selectionWeight,
+} from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 
 /** Taille d'un lot illimité (le pool fini est rebouclé re-mélangé jusqu'à ce cap). */
@@ -45,22 +49,36 @@ export class TablesService {
   // ─── Session ──────────────────────────────────────────────────────────────
 
   async startSession(dto: StartTablesSessionDto): Promise<TablesSessionResult> {
-    const timerSeconds = parseInt((await this.settingsService.get('question_timer_seconds')) ?? '0', 10);
-    const threshold = parseInt((await this.settingsService.get('mastery_threshold')) ?? '10', 10);
-    const rawCount = parseInt((await this.settingsService.get('questions_per_session')) ?? '10', 10);
-    const excludeTrivial = (await this.settingsService.get('tables_include_trivial')) === 'false';
+    const timerSeconds = parseInt(
+      (await this.settingsService.get('question_timer_seconds')) ?? '0',
+      10,
+    );
+    const threshold = parseInt(
+      (await this.settingsService.get('mastery_threshold')) ?? '10',
+      10,
+    );
+    const rawCount = parseInt(
+      (await this.settingsService.get('questions_per_session')) ?? '10',
+      10,
+    );
+    const excludeTrivial =
+      (await this.settingsService.get('tables_include_trivial')) === 'false';
 
     // Difficulté = choix de pré-jeu enfant ; pilote le nombre de choix QCM (0 = saisie libre).
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
     // Aucune table sélectionnée = toutes (filtrées par excludeTrivial dans la boucle).
-    const selectedTables = dto.selected_tables.length > 0
-      ? dto.selected_tables
-      : Array.from({ length: 11 }, (_, table) => table);
+    const selectedTables =
+      dto.selected_tables.length > 0
+        ? dto.selected_tables
+        : Array.from({ length: 11 }, (_, table) => table);
 
     // Build pool of all unique facts (normalized) involving selected tables
-    const factSet = new Map<string, { a: number; b: number; selectedTable: number }>();
+    const factSet = new Map<
+      string,
+      { a: number; b: number; selectedTable: number }
+    >();
     for (const t of selectedTables) {
       for (let f = 0; f <= 10; f++) {
         if (excludeTrivial && (f === 0 || f === 1)) continue;
@@ -78,7 +96,12 @@ export class TablesService {
     const isUnlimited = rawCount <= 0;
 
     if (factSet.size === 0) {
-      return { session_id: uuidv4(), questions: [], timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+      return {
+        session_id: uuidv4(),
+        questions: [],
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      };
     }
 
     const factEntries = [...factSet.entries()];
@@ -86,7 +109,10 @@ export class TablesService {
 
     if (isUnlimited) {
       // Illimité = on reboucle le pool de faits re-mélangé jusqu'au cap.
-      selectedKeys = this.cycle(factEntries.map(([key]) => key), UNLIMITED_BATCH_SIZE);
+      selectedKeys = this.cycle(
+        factEntries.map(([key]) => key),
+        UNLIMITED_BATCH_SIZE,
+      );
     } else {
       // Load all progression (max 66 facts) and build lookup map
       const allProgressions = await this.progressionRepo.find();
@@ -98,7 +124,9 @@ export class TablesService {
       const weighted: string[] = [];
       for (const [key] of factEntries) {
         const prog = progMap.get(key);
-        const score = prog ? masteryScore(prog.correct_count, prog.incorrect_count) : 0;
+        const score = prog
+          ? masteryScore(prog.correct_count, prog.incorrect_count)
+          : 0;
         const weight = selectionWeight(score, threshold);
         for (let i = 0; i < weight; i++) weighted.push(key);
       }
@@ -132,9 +160,10 @@ export class TablesService {
       const display_a = selectedTable;
       const display_b = otherFactor;
 
-      const choices = choicesCount === 0
-        ? []
-        : this.buildChoices(answer, display_a, display_b, choicesCount - 1);
+      const choices =
+        choicesCount === 0
+          ? []
+          : this.buildChoices(answer, display_a, display_b, choicesCount - 1);
 
       return { fact_id: key, display_a, display_b, answer, choices };
     });
@@ -145,7 +174,12 @@ export class TablesService {
     });
     await this.sessionRepo.save(session);
 
-    return { session_id: session.id, questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited };
+    return {
+      session_id: session.id,
+      questions,
+      timer_seconds: timerSeconds,
+      is_unlimited: isUnlimited,
+    };
   }
 
   async recordAnswer(
@@ -160,7 +194,10 @@ export class TablesService {
     const a = Math.min(dto.factor_a, dto.factor_b);
     const b = Math.max(dto.factor_a, dto.factor_b);
 
-    let prog = await this.progressionRepo.findOneBy({ factor_a: a, factor_b: b });
+    let prog = await this.progressionRepo.findOneBy({
+      factor_a: a,
+      factor_b: b,
+    });
     if (!prog) {
       prog = this.progressionRepo.create({
         id: uuidv4(),
@@ -216,13 +253,23 @@ export class TablesService {
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
-  private buildChoices(correct: number, a: number, b: number, distractorCount = 3): number[] {
+  private buildChoices(
+    correct: number,
+    a: number,
+    b: number,
+    distractorCount = 3,
+  ): number[] {
     const candidates = new Set<number>([
-      correct + 1, correct - 1,
-      correct + a, correct - a,
-      correct + b, correct - b,
-      correct + 2, correct - 2,
-      (a + 1) * b, a * (b + 1),
+      correct + 1,
+      correct - 1,
+      correct + a,
+      correct - a,
+      correct + b,
+      correct - b,
+      correct + 2,
+      correct - 2,
+      (a + 1) * b,
+      a * (b + 1),
       Math.max(0, correct - a - b),
       correct + a + b,
     ]);
