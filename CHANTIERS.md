@@ -234,23 +234,58 @@ il faut la poser à la main. Découpage proposé pour le CE1 (76 notions), à va
 | Le temps | représentation des événements dans le temps · évolution des modes de vie de ma famille | aucune |
 | Vivre ici et ailleurs | paysages en France · modes de vie en France · modes de vie dans le monde | `geo` `france` |
 
-### Ce qu'il faut trancher avant d'écrire
+### État du remplissage
 
-1. **Le découpage ci-dessus.** C'est un jugement pédagogique, pas une déduction : le corpus
-   ne le contient pas. Une grande notion mal posée se paie sur les 76 fiches qui la suivent.
-2. **Le volume.** 76 fiches pour le seul CE1, réécrites. C'est de la rédaction, pas de
-   l'ingénierie, et c'est le gros du chantier. Tout écrire d'un coup n'a pas de sens :
-   commencer par UNE grande notion complète, la lire avec Maëve, puis dérouler.
-3. **Le format de stockage.** Fichiers versionnés (déjà validé), mais en TSX plutôt qu'en
-   JSON : `Fiche.exemple` est un `ReactNode`, et c'est ce qui a permis `PoseFigure`,
-   `NumerationRangs`, `ConjugaisonTable`, `CarteIdentite`. Un format de données pur perdrait
-   les illustrations, qui sont la moitié de la valeur des fiches existantes.
-4. **Le doublon avec les tuiles.** Neuf grandes notions sur seize ont déjà une tuile qui
-   produit sa fiche à la volée. La bibliothèque doit y RENVOYER, pas réécrire la même chose
-   à côté : deux textes divergents sur le même point valent moins qu'un seul.
-5. **La progression.** « Un système de cours ludique avec une progression » : reste à définir
-   ce qui est suivi (fiche lue ? notion révisée ? lien avec la maîtrise des tuiles ?) et qui
-   le voit (le parent, l'enfant, les deux ?).
+| Matière | Grande notion | Fiches | État |
+|---|---|---|---|
+| Mathématiques | Les nombres jusqu'à 999 | 4 | écrite |
+| Mathématiques | Calculer | 10 | écrite, lue |
+| Mathématiques | Grandeurs et mesures | 5 | à écrire |
+| Mathématiques | Espace et géométrie | 10 | à écrire |
+| Mathématiques | Résoudre un problème | 6 | à écrire |
+| Français | La nature des mots | 6 | écrite |
+| Français | Les accords | 5 | écrite |
+| Français | Les sons | 9 | à écrire |
+| Français | Le vocabulaire | 5 | à écrire |
+| Français | La phrase | 4 | à écrire |
+| Français | La fonction des mots | 3 | à écrire |
+| Français | La conjugaison | 1 | à écrire |
+| Questionner le monde | L'eau | 2 | à écrire |
+| Questionner le monde | Le vivant | 1 | à écrire |
+| Questionner le monde | Le temps | 2 | à écrire |
+| Questionner le monde | Vivre ici et ailleurs | 3 | à écrire |
+
+**25 fiches sur 76.** L'ordre à l'intérieur d'une matière est pédagogique : une notion
+vient après celles dont elle a besoin (« Les accords » suit « La nature des mots »).
+
+### Les figures de la bibliothèque
+
+Écrire une fiche, c'est surtout trouver comment la MONTRER : le corpus met 75 % de ses
+exemples dans des images, il n'y a rien à reprendre. Cinq figures couvrent les 25 fiches.
+
+| Figure | Ce qu'elle montre | Où |
+|---|---|---|
+| `Etapes` | un calcul déplié, une ligne par étape | `cours/components/` |
+| `Phrases` | une phrase avec les mots marqués | `cours/components/` |
+| `Paires` | deux colonnes qui se répondent | `cours/components/` |
+| `DroiteGraduee` | une droite graduée avec un repère | `cours/components/` |
+| `PoseFigure` `TableRappel` `NumerationRangs` | réutilisées des tuiles | `modules/` |
+
+`Phrases` et `Paires` partagent un balisage : `[mot]` surligne, `{s}` met une terminaison
+en évidence.
+
+### Ce qu'il faut trancher avant d'écrire la suite
+
+1. **La progression.** Rien n'est suivi ni mémorisé aujourd'hui, et c'est assumé : reste à
+   définir ce qui est suivi (fiche lue ? notion révisée ? lien avec la maîtrise des tuiles ?)
+   et qui le voit (le parent, l'enfant, les deux ?). Le remplissage continue en attendant ;
+   ça ne coûte rien puisque la progression viendra par-dessus.
+2. **Les sons (français, 9 fiches).** Elles ont besoin d'AUDIO ou de rien : une fiche sur le
+   son [an] qui ne le fait pas entendre n'apprend pas grand-chose. À trancher avant de les
+   écrire, pas après.
+3. **Espace et géométrie (10 fiches).** Ce sont des figures, pas du texte : carré, triangle,
+   cercle, symétrie. Il faudra du SVG, et c'est un autre métier que les quatre figures
+   actuelles. La plus grosse notion restante, et la plus chère.
 
 ### Ce qui reste vrai des questions précédentes
 
