@@ -32,9 +32,24 @@ describe('mise en page de la fiche', () => {
     expect(regle).toContain('flex-direction: column');
   });
 
-  it('fait dépendre la hauteur de l’encart du nombre de lignes', () => {
-    // Sans cela, trois lignes sont rognées dans une boîte de deux interlignes.
-    expect(bloc('.Fiche__regle')).toContain('--fiche-regle-lines');
+  it("laisse le texte de la règle passer à la ligne", () => {
+    // L'encart calculait sa hauteur sur le nombre d'ÉLÉMENTS et interdisait le retour à
+    // la ligne. Ça tenait pour des formes courtes (« je suis · tu es ») ; les phrases de
+    // geste des fiches de cours le faisaient défiler horizontalement, et une phrase
+    // coupée hors de l'écran ne se lit jamais.
+    const regle = bloc('.Fiche__regle');
+    expect(regle).not.toContain('nowrap');
+    expect(regle).not.toContain('overflow-x');
+    // `line-height` contient « height: » : on cible la déclaration seule.
+    expect(regle).not.toMatch(/[\s;{]height:/);
+  });
+
+  it("garde l'encart sur un nombre entier d'interlignes", () => {
+    // Chaque ligne rendue vaut un interligne ; il ne reste qu'à ce que le rembourrage
+    // vertical en soit un multiple, sinon tout le texte qui suit sort de la réglure.
+    const regle = bloc('.Fiche__regle');
+    expect(regle).toContain('line-height: var(--fiche-line)');
+    expect(regle).toMatch(/padding:\s*calc\(var\(--fiche-line\)\s*\/\s*2\)/);
   });
 
   it('garde la feuille claire dans les deux thèmes', () => {

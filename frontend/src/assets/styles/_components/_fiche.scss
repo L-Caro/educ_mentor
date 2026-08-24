@@ -91,21 +91,27 @@
 	font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
 	font-size: var(--fiche-fs);
 	line-height: var(--fiche-line);
-	// Hauteur = une ligne par élément, plus un interligne de respiration : la grille de
-	// ligne de base tient quel que soit le nombre de lignes.
-	height: calc((var(--fiche-regle-lines, 1) + 1) * var(--fiche-line));
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
 	align-items: flex-start;
-	padding: 0 v.$space-5;
+	// Un demi-interligne en haut et en bas : chaque ligne RENDUE fait un interligne, donc
+	// la hauteur totale reste un multiple entier quoi qu'il arrive.
+	//
+	// L'encart calculait autrefois sa hauteur sur le nombre d'ÉLÉMENTS et interdisait le
+	// retour à la ligne. Ça tenait tant que la règle listait des formes courtes (« je suis ·
+	// tu es »). Les fiches de cours y mettent des phrases de geste, et l'encart se mettait à
+	// défiler horizontalement : illisible, et une phrase coupée hors de l'écran ne se lit
+	// jamais. Le texte passe donc à la ligne, et la grille de ligne de base tient toute seule.
+	padding: calc(var(--fiche-line) / 2) v.$space-5;
 	background: var(--fiche-accent-soft);
 	border-left: 3px solid var(--fiche-accent);
 	border-radius: 0 v.$space-2 v.$space-2 0;
-	overflow-x: auto;
 
+	// Retrait négatif : une ligne qui se poursuit est décalée, un geste qui commence ne
+	// l'est pas. Sans ça, une phrase repliée se lit comme une étape de plus.
 	span {
-		white-space: nowrap;
+		padding-left: 1.2em;
+		text-indent: -1.2em;
 	}
 }
 
