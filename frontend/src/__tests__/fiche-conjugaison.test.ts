@@ -38,15 +38,17 @@ describe('fiche de conjugaison', () => {
     expect(f!.titre).toContain('imparfait');
   });
 
-  it('récite les six formes dans l’ordre du tableau', () => {
-    expect(fiche(question())!.regle)
-      .toBe('chante  ·  chantes  ·  chante  ·  chantons  ·  chantez  ·  chantent');
+  it('ne répète pas les formes en ligne : le tableau les donne déjà', () => {
+    // Une ligne « chante · chantes · chante · … » débordait en défilement horizontal et
+    // doublonnait le tableau juste en dessous.
+    expect(fiche(question())!.regle).toBeUndefined();
   });
 
   it('adapte l’idée clé au groupe du verbe', () => {
     expect(fiche(question({ groupe: '1' }))!.idee).toContain('-er');
     expect(fiche(question({ groupe: '2' }))!.idee).toContain('-iss-');
-    expect(fiche(question({ groupe: 'auxiliaire' }))!.idee).toMatch(/être et avoir/);
+    // « Avoir » d'abord : commencer la phrase par « être » interdit la majuscule.
+    expect(fiche(question({ groupe: 'auxiliaire' }))!.idee).toMatch(/^Avoir et être/);
   });
 
   it('retombe sur une idée générique pour un groupe inconnu', () => {
@@ -63,14 +65,21 @@ describe('fiche de conjugaison', () => {
   it('est pure : deux appels sur la même question donnent le même contenu', () => {
     const q = question();
     const a = fiche(q), b = fiche(q);
-    expect({ titre: a!.titre, idee: a!.idee, regle: a!.regle, piege: a!.piege })
-      .toEqual({ titre: b!.titre, idee: b!.idee, regle: b!.regle, piege: b!.piege });
+    expect({ titre: a!.titre, idee: a!.idee, piege: a!.piege })
+      .toEqual({ titre: b!.titre, idee: b!.idee, piege: b!.piege });
   });
 
   it('ne dépend pas du sens de la question', () => {
-    // En mode « conjugué → infinitif », la fiche reste celle du verbe : même contenu utile.
-    expect(fiche(question({ direction: 'reverse' }))!.regle)
-      .toBe(fiche(question({ direction: 'forward' }))!.regle);
+    // En mode « conjugué vers infinitif », la fiche reste celle du verbe : même contenu.
+    expect(fiche(question({ direction: 'reverse' }))!.titre)
+      .toBe(fiche(question({ direction: 'forward' }))!.titre);
+  });
+
+  it("n'emploie aucun cadratin dans le texte affiché", () => {
+    const f = fiche(question({ groupe: 'auxiliaire' }))!;
+    for (const texte of [f.titre, f.idee, f.piege ?? '']) {
+      expect(texte).not.toContain('\u2014');
+    }
   });
 });
 

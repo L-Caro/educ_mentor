@@ -16,18 +16,11 @@ const ROWS: { label: string; pronoun: Pronom }[] = [
  * (« elle » et « on » vivent sur la ligne « il »). */
 const ROW_OF: Partial<Record<Pronom, Pronom>> = { elle: 'il', on: 'il', elles: 'ils' };
 
-/**
- * Découpe une ligne en deux cellules. L'élision fait exception : « j'ai » ne se coupe pas
- * en « j' » + « ai », on la garde d'un bloc et la colonne des pronoms reste vide. Les
- * verbes sans élision (« je chante ») conservent les deux colonnes alignées.
- */
-function cellsFor(label: string, pronoun: Pronom, forms: Record<Pronom, string>) {
-  if (pronoun !== 'je') return { label, form: forms[pronoun] };
-
-  const elided = applyElision('je', forms.je);
-  return elided.startsWith("j'")
-    ? { label: '', form: elided }
-    : { label, form: forms.je };
+/** Le pronom tel qu'il s'écrit devant cette forme : « j' » devant voyelle, « je » sinon.
+ * Les deux colonnes restent alignées dans tous les cas. */
+function pronounLabel(label: string, pronoun: Pronom, forms: Record<Pronom, string>): string {
+  if (pronoun !== 'je') return label;
+  return applyElision('je', forms.je).startsWith("j'") ? "j'" : 'je';
 }
 
 interface Props {
@@ -47,8 +40,8 @@ export default function ConjugaisonTable({ forms, highlight }: Props) {
             key={pronoun}
             className={pronoun === active ? 'ConjugaisonTable__row--active' : undefined}
           >
-            <th scope="row">{cellsFor(label, pronoun, forms).label}</th>
-            <td>{cellsFor(label, pronoun, forms).form}</td>
+            <th scope="row">{pronounLabel(label, pronoun, forms)}</th>
+            <td>{forms[pronoun]}</td>
           </tr>
         ))}
       </tbody>

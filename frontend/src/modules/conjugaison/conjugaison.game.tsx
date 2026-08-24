@@ -56,18 +56,16 @@ const GROUP_IDEA: Record<string, string> = {
   '1': "Tous les verbes en -er suivent le même modèle. Si tu en connais un, tu les connais tous.",
   '2': "Les verbes en -ir du 2e groupe intercalent -iss- au pluriel : nous finissons.",
   '3': "Le 3e groupe ne suit pas de modèle régulier : ces verbes s'apprennent un par un.",
-  auxiliaire: "être et avoir servent à construire tous les autres temps. On les connaît par cœur.",
+  auxiliaire: "Avoir et être servent à construire tous les autres temps. On les connaît par cœur.",
   default: "Repère la terminaison : c'est elle qui change selon la personne.",
 };
 
-/** L'erreur classique du groupe — souvent la raison de la faute qui vient d'être commise. */
+/** L'erreur classique du groupe, souvent la raison de la faute qui vient d'être commise. */
 const GROUP_TRAP: Record<string, string | undefined> = {
   '1': "« aller » se termine par -er mais ne suit pas ce modèle.",
   '2': "Tous les verbes en -ir ne sont pas du 2e groupe : « venir » et « partir » n'en sont pas.",
   auxiliaire: "« tu es » et « tu as » se prononcent presque pareil et ne s'écrivent pas pareil.",
 };
-
-const PRONOUN_ORDER = ['je', 'tu', 'il', 'nous', 'vous', 'ils'] as const;
 
 export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, ConjugaisonQuestion> = {
 
@@ -149,9 +147,8 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
    * engendrer la bibliothèque, sans dupliquer quoi que ce soit.
    */
   fiche: (question) => ({
-    titre: `${question.infinitif} — ${question.tense}`,
+    titre: `${question.infinitif} · ${question.tense}`,
     idee: GROUP_IDEA[question.groupe] ?? GROUP_IDEA.default,
-    regle: PRONOUN_ORDER.map((p) => question.forms[p]).join('  ·  '),
     exemple: <ConjugaisonTable forms={question.forms} highlight={question.pronoun} />,
     piege: GROUP_TRAP[question.groupe],
   }),
@@ -174,7 +171,7 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
 
     if (question.direction === 'forward') {
       return {
-        label:    `${question.infinitif} — ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
+        label:    `${question.infinitif} · ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
         given:    givenStr ? applyElision(question.pronoun, givenStr) : null,
         expected: applyElision(question.pronoun, question.conjugated),
         correct,

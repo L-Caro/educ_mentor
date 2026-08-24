@@ -19,7 +19,14 @@
 	// C'est ce calcul qui pose le trait SOUS le texte et non au milieu de l'interligne.
 	--fiche-baseline: calc((var(--fiche-line) - 1.364 * var(--fiche-fs)) / 2 + 1.011 * var(--fiche-fs));
 	--fiche-pad-top: calc(2 * var(--fiche-line));
-	--fiche-pad-left: clamp(3rem, 9vw, 3.75rem);
+	// Position du trait de marge, et respiration entre ce trait et le texte : sans elle,
+	// les lettres viennent buter contre la marge comme dans un cahier mal rempli.
+	--fiche-margin-x: clamp(2.6rem, 8vw, 3.25rem);
+	--fiche-margin-gap: 0.6rem;
+	--fiche-pad-left: calc(var(--fiche-margin-x) + var(--fiche-margin-gap));
+	// Le texte repose 1px AU-DESSUS du trait plutôt que dessus : sinon les jambages
+	// des lettres mordent la ligne.
+	--fiche-rule-nudge: 2px;
 
 	--fiche-paper: #FCFBF8;
 	--fiche-ink: #262B3A;
@@ -52,8 +59,8 @@
 		);
 	background-size: 1.5px 100%, 100% 100%;
 	background-position:
-		var(--fiche-pad-left) 0,
-		0 calc(var(--fiche-pad-top) + var(--fiche-baseline) - var(--fiche-line) + 1px);
+		var(--fiche-margin-x) 0,
+		0 calc(var(--fiche-pad-top) + var(--fiche-baseline) - var(--fiche-line) + var(--fiche-rule-nudge));
 	background-repeat: no-repeat, repeat;
 	border-radius: v.$border-radius-2;
 	box-shadow: 0 1px 2px rgb(0 0 0 / 16%), 0 14px 34px -10px rgb(0 0 0 / 22%);
