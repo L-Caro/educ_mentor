@@ -14,6 +14,16 @@ export type GeoQuestionType =
   | 'identify_country'
   | 'identify_continent';
 
+/** Carte d'identité du sujet, assemblée par le serveur : il possède les 211 pays et peut
+ * résoudre les codes voisins en noms. Envoyer le jeu de données au client mettrait toutes
+ * les réponses du jeu dans le bundle. */
+export interface GeoCarte {
+  kind: 'pays' | 'continent';
+  titre: string;
+  drapeau?: string;
+  lignes: { label: string; valeur: string }[];
+}
+
 export interface GeoQuestion {
   type: GeoQuestionType;
   item_key: string;
@@ -25,6 +35,7 @@ export interface GeoQuestion {
   answers: string[] | null;
   continent?: string | null;
   map_filter?: string[] | null;
+  carte?: GeoCarte | null;
 }
 
 export interface GeoSessionResponse {

@@ -28,7 +28,13 @@ export interface LectureSessionQuestion {
   show_text: boolean;
   text_contenu: string;
   text_titre: string;
+  /** Le passage du texte qui porte la réponse. Toujours envoyé : la fiche de leçon
+   * l'affiche APRÈS la réponse, où le révéler n'est plus tricher mais expliquer. */
   excerpt: string | null;
+  /** Faut-il le surligner PENDANT la question ? Vrai en mode facile seulement.
+   * Séparer les deux évite qu'une décision d'affichage soit encodée dans l'absence
+   * de la donnée : le serveur envoie le fait, le client décide quoi en montrer. */
+  highlight_excerpt: boolean;
 }
 
 export interface LectureSessionResponse {
@@ -117,7 +123,8 @@ export class LectureService {
         show_text: showText,
         text_contenu: text.contenu,
         text_titre: text.titre,
-        excerpt: difficulty === 'easy' ? (q.excerpt ?? null) : null,
+        excerpt: q.excerpt ?? null,
+        highlight_excerpt: difficulty === 'easy',
       };
     });
 

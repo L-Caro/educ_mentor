@@ -1,6 +1,7 @@
 import store from 'src/store';
 import { lectureApi } from './lecture.api';
 import { LecturePromptView } from './LecturePromptView';
+import { lectureFiche } from './lecture.fiche';
 import type { LectureQuestion, LectureSessionResponse } from './lecture.type';
 import type { GameModuleSpec } from 'src/types/game.types';
 import './lecture.scss';
@@ -38,6 +39,8 @@ export const lectureGameSpec: GameModuleSpec<LectureSessionResponse, LectureQues
   },
 
   correctionLabel: (question) => question.answer,
+
+  fiche: lectureFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(lectureApi.endpoints.recordLectureAnswer.initiate({

@@ -116,14 +116,18 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: calc(var(--fiche-line) / 2);
-	min-height: calc(6 * var(--fiche-line));
+	// Écart d'un interligne entier : un demi-pas décalerait tout ce qui suit.
+	gap: var(--fiche-line);
 
+	// Pas de hauteur minimale : un exemple TEXTE (extrait, tableau) a déjà son interligne
+	// calé sur la grille, et un plancher pour images y laisserait un grand vide.
+	// Les images, elles, prennent une hauteur multiple du pas — sinon le bloc qui suit
+	// retombe entre deux lignes de la réglure.
 	img,
 	svg {
+		height: calc(6 * var(--fiche-line));
 		max-width: 100%;
-		max-height: calc(9 * var(--fiche-line));
-		height: auto;
+		object-fit: contain;
 		display: block;
 	}
 }
@@ -165,5 +169,70 @@
 		--fiche-line: 28px;
 		--fiche-fs: 16px;
 		--fiche-fs-s: 12px;
+	}
+}
+
+// ─── Carte d'identité ─────────────────────────────────────────────────────────
+// Le second genre de fiche : un sujet et ce qu'on en sait, quand il n'y a pas de règle à
+// énoncer. Couleurs issues des jetons de la fiche : la feuille reste claire.
+
+.CarteIdentite {
+	width: 100%;
+	text-align: left;
+	// Une carte posée sur la page, comme une fiche bristol collée dans un cahier : elle
+	// masque la réglure, ce qui la détache du texte de la leçon.
+	background: #fff;
+	border-radius: v.$space-2;
+	// Contour en ombre portée et non en bordure : une bordure ajouterait deux pixels et
+	// ferait sortir la carte de la grille de la réglure.
+	box-shadow:
+		0 0 0 1px rgb(38 43 58 / 10%),
+		0 2px 8px -3px rgb(38 43 58 / 18%);
+	// Un interligne entier en haut et en bas : la hauteur totale reste un multiple du pas,
+	// donc le texte qui suit la carte retombe sur une ligne.
+	padding: var(--fiche-line) v.$space-6;
+}
+
+.CarteIdentite__titre {
+	margin: 0;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+	font-weight: 600;
+	display: flex;
+	align-items: baseline;
+	gap: v.$space-4;
+}
+
+.CarteIdentite__embleme {
+	font-size: calc(1.4 * var(--fiche-fs));
+	// Interligne forcé au pas : sans lui, un glyphe plus grand dilate la boîte de ligne
+	// du titre et décale TOUT ce qui suit hors de la réglure.
+	line-height: var(--fiche-line);
+}
+
+.CarteIdentite__lignes {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.CarteIdentite__ligne {
+	display: flex;
+	gap: v.$space-4;
+	align-items: baseline;
+	line-height: var(--fiche-line);
+
+	dt {
+		flex: none;
+		// Assez large pour « Sous-préfectures », le plus long libellé du jeu de données :
+		// coupé sur deux lignes, il désalignait sa valeur.
+		width: 9rem;
+		font-size: var(--fiche-fs-s);
+		color: var(--fiche-ink-soft);
+	}
+
+	dd {
+		margin: 0;
+		font-size: var(--fiche-fs);
 	}
 }

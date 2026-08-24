@@ -109,7 +109,9 @@
 	td {
 		min-width: calc(1.6 * var(--fiche-fs));
 		padding: 0 v.$space-3;
-		border: 1px solid var(--fiche-rule);
+		// Séparation par ombre portée et non par bordure : une bordure ajoute un pixel
+		// par ligne et fait sortir le tableau de la grille de la réglure.
+		box-shadow: inset 0 0 0 1px var(--fiche-rule);
 		font-weight: 400;
 	}
 

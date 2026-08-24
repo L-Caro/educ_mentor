@@ -220,3 +220,27 @@
     font-size: v.$font-size-base;
   }
 }
+
+// ─── Extrait du texte affiché dans la fiche de leçon ──────────────────────────
+// Le passage qui répond, avec la réponse en évidence. Rendu sur la page de cahier :
+// les couleurs viennent des jetons de la fiche, pas du thème de l'application.
+
+.LectureExtrait {
+	margin: 0;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+	font-style: italic;
+	text-align: left;
+
+	&::before { content: '« '; }
+	&::after  { content: ' »'; }
+}
+
+.LectureExtrait__mark {
+	background: var(--fiche-accent-soft);
+	color: var(--fiche-accent);
+	font-style: normal;
+	font-weight: 600;
+	padding: 0 0.15em;
+	border-radius: 2px;
+}

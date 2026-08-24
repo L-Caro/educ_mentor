@@ -4,6 +4,7 @@ import type { GeoQuestion, GeoSessionResponse } from './geo.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 import WorldMap from './WorldMap.tsx';
 import ContinentMap from './ContinentMap.tsx';
+import { geoFiche } from './geo.fiche';
 import './geo.scss';
 
 export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
@@ -73,6 +74,8 @@ export const geoGameSpec: GameModuleSpec<GeoSessionResponse, GeoQuestion> = {
     if (question.answers !== null) return question.answers.join(', ');
     return question.answer ?? '';
   },
+
+  fiche: geoFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(geoApi.endpoints.recordGeoAnswer.initiate({
