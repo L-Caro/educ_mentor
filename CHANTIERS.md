@@ -54,7 +54,7 @@ de commit — ils portent le pourquoi de chaque correction.
    La migration de référence utilise `CREATE TABLE IF NOT EXISTS` : sur une base qui a dérivé,
    elle ne corrigerait rien **et ne dirait rien**.
    ```bash
-   DB_PATH=/chemin/vers/data/educmentor.db npm run db:check
+   docker compose exec backend node dist/database/check-schema.js
    ```
 2. **Sauvegarder avant le premier déploiement.** `./scripts/backup-db.sh`, puis planifier le cron.
 3. **Renseigner les variables de production.** L'application refuse de démarrer si

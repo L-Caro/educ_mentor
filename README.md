@@ -103,5 +103,6 @@ contrôle parental (empêcher l'enfant d'ouvrir les réglages), pas une frontiè
 production correspond aux entités — il a vécu sous `synchronize: true` et a pu dériver :
 
 ```bash
-DB_PATH=/chemin/vers/data/educmentor.db npm run db:check
+# depuis le serveur, dans le conteneur (le script est compilé dans l'image)
+docker compose exec backend node dist/database/check-schema.js
 ```

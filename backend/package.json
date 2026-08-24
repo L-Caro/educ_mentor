@@ -21,7 +21,7 @@
     "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/database/data-source.ts",
     "migration:show": "typeorm-ts-node-commonjs migration:show -d src/database/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/database/data-source.ts",
-    "db:check": "ts-node -T scripts/check-schema.ts",
+    "db:check": "ts-node -T src/database/check-schema.ts",
     "lint:fix": "eslint \"{src,apps,libs,test,scripts}/**/*.ts\" --fix",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

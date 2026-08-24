@@ -1,25 +1,34 @@
 /**
  * Compare le schéma réel d'une base au schéma que TypeORM produirait depuis les entités.
  *
+ * Vit dans `src/` et non dans `scripts/` pour une raison précise : `tsconfig.build.json`
+ * exclut `scripts/`, et le Dockerfile élague les devDependencies — donc `ts-node`. Placé
+ * ailleurs, ce script était inexécutable sur l'image de production, c'est-à-dire sur la
+ * seule base dont la dérive compte vraiment.
+ *
  * Pourquoi : le projet a vécu sous `synchronize: true`, donc le schéma d'une base peut avoir
  * dérivé des entités sans que personne ne le sache. La migration de référence utilise
  * `CREATE TABLE IF NOT EXISTS` : sur une base qui a dérivé, elle ne corrigerait rien **et ne
  * dirait rien**. Ce script est le garde-fou : à lancer sur la production **avant** le premier
  * déploiement en mode migration.
  *
- * Usage :
- *   npm run db:check                              # base par défaut (<repo>/data/educmentor.db)
- *   DB_PATH=/app/data/educmentor.db npm run db:check
+ * En local (sources TypeScript) :
+ *   npm run db:check
  *
- * Sortie : code 0 si le schéma correspond, 1 sinon (utilisable dans un script de déploiement).
+ * Sur un serveur, dans le conteneur (JavaScript compilé, pas de ts-node nécessaire) :
+ *   docker compose exec backend node dist/database/check-schema.js
+ *
+ * Sortie : code 0 si le schéma correspond, 1 sinon — utilisable dans un script de déploiement.
+ * Le script ne fait que LIRE la base ; il crée sa base témoin en zone temporaire.
  */
 import { DataSource } from 'typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 
-const SRC = path.resolve(__dirname, '../src');
-const REPO_ROOT = path.resolve(__dirname, '../..');
+// __dirname vaut src/database sous ts-node, dist/database dans l'image.
+const SRC = path.resolve(__dirname, '..');
+const REPO_ROOT = path.resolve(SRC, '../..');
 
 const livePath = process.env.DB_PATH
   ? path.resolve(process.env.DB_PATH)
