@@ -234,23 +234,87 @@ il faut la poser à la main. Découpage proposé pour le CE1 (76 notions), à va
 | Le temps | représentation des événements dans le temps · évolution des modes de vie de ma famille | aucune |
 | Vivre ici et ailleurs | paysages en France · modes de vie en France · modes de vie dans le monde | `geo` `france` |
 
-### Ce qu'il faut trancher avant d'écrire
+### État du remplissage
 
-1. **Le découpage ci-dessus.** C'est un jugement pédagogique, pas une déduction : le corpus
-   ne le contient pas. Une grande notion mal posée se paie sur les 76 fiches qui la suivent.
-2. **Le volume.** 76 fiches pour le seul CE1, réécrites. C'est de la rédaction, pas de
-   l'ingénierie, et c'est le gros du chantier. Tout écrire d'un coup n'a pas de sens :
-   commencer par UNE grande notion complète, la lire avec Maëve, puis dérouler.
-3. **Le format de stockage.** Fichiers versionnés (déjà validé), mais en TSX plutôt qu'en
-   JSON : `Fiche.exemple` est un `ReactNode`, et c'est ce qui a permis `PoseFigure`,
-   `NumerationRangs`, `ConjugaisonTable`, `CarteIdentite`. Un format de données pur perdrait
-   les illustrations, qui sont la moitié de la valeur des fiches existantes.
-4. **Le doublon avec les tuiles.** Neuf grandes notions sur seize ont déjà une tuile qui
-   produit sa fiche à la volée. La bibliothèque doit y RENVOYER, pas réécrire la même chose
-   à côté : deux textes divergents sur le même point valent moins qu'un seul.
-5. **La progression.** « Un système de cours ludique avec une progression » : reste à définir
-   ce qui est suivi (fiche lue ? notion révisée ? lien avec la maîtrise des tuiles ?) et qui
-   le voit (le parent, l'enfant, les deux ?).
+| Matière | Grande notion | Fiches | État |
+|---|---|---|---|
+| Mathématiques | Les nombres jusqu'à 999 | 4 | écrite |
+| Mathématiques | Calculer | 10 | écrite, lue |
+| Mathématiques | Grandeurs et mesures | 5 | écrite |
+| Mathématiques | Résoudre un problème | 2 | écrite |
+| Mathématiques | Espace et géométrie | 10 | écrite |
+| Français | La phrase | 3 | écrite |
+| Français | La nature des mots | 6 | écrite |
+| Français | Les accords | 5 | écrite |
+| Français | La fonction des mots | 3 | écrite |
+| Français | La conjugaison | 1 | écrite |
+| Français | Le vocabulaire | 5 | écrite |
+| Français | Les sons | 9 | écrite |
+| Questionner le monde | L'eau | 2 | écrite |
+| Questionner le monde | Le vivant | 1 | écrite |
+| Questionner le monde | Le temps | 2 | écrite |
+| Questionner le monde | Vivre ici et ailleurs | 3 | écrite |
+
+**71 fiches sur 71. Le CE1 est couvert.**
+
+Les deux notions que je croyais bloquées ne l'étaient pas :
+
+- **Les sons.** Je les avais dites en attente d'audio, à tort. Le corpus montre que ce sont
+  des leçons d'ORTHOGRAPHE, pas d'écoute : « le son /o/ s'écrit o, ô, au ou eau ». L'enfant
+  entend déjà le son ; ce qu'elle apprend, ce sont les graphies. Rien à jouer.
+- **La géométrie.** Les formes ne sont pas insurmontables, et le SVG apporte plus que la
+  reprise des images du corpus : il permet de MARQUER l'angle droit, les côtés égaux, l'axe
+  de symétrie. Sur une capture, l'enfant doit deviner ce qu'il faut regarder.
+
+Le total est passé de 76 à 71, et c'est le corpus qui l'a imposé, pas un raccourci :
+
+- **Résoudre un problème, 6 → 2.** Le corpus consacre une leçon par grandeur (monnaie,
+  longueurs, masses, contenances, durées), mais ces cinq leçons ne contiennent rien d'autre
+  que « on peut résoudre un problème avec X » : tout leur contenu est dans des images
+  d'exemples résolus. Les décliner aurait produit cinq fiches creuses. Ce qui reste, et qui
+  est le vrai sujet : la méthode, et le choix de l'opération.
+- **La phrase, 4 → 3.** Le corpus isole la phrase exclamative des trois autres types. Les
+  quatre se comprennent ensemble, par ce qui les distingue ; séparés, ils deviennent quatre
+  définitions à retenir au lieu d'une seule opposition à voir.
+
+L'ordre à l'intérieur d'une matière est pédagogique : une notion vient après celles dont
+elle a besoin (« Les accords » après « La nature des mots », « La fonction des mots »
+après elle aussi).
+
+### Les figures de la bibliothèque
+
+Écrire une fiche, c'est surtout trouver comment la MONTRER : le corpus met 75 % de ses
+exemples dans des images, il n'y a rien à reprendre. Cinq figures couvrent les 25 fiches.
+
+| Figure | Ce qu'elle montre | Où |
+|---|---|---|
+| `Etapes` | un calcul déplié, une ligne par étape | `cours/components/` |
+| `Formes` | les figures géométriques, en SVG tracé | `cours/components/` |
+| `Phrases` | une phrase avec les mots marqués | `cours/components/` |
+| `Paires` | deux colonnes qui se répondent | `cours/components/` |
+| `DroiteGraduee` | une droite graduée avec un repère | `cours/components/` |
+| `PoseFigure` `TableRappel` `NumerationRangs` | réutilisées des tuiles | `modules/` |
+
+`Phrases` et `Paires` partagent un balisage : `[mot]` surligne, `{s}` met une terminaison
+en évidence.
+
+Le catalogue de `Formes` (`catalogue-formes.tsx`) tient les treize tracés : lignes, figures
+planes, solides, symétrie, quadrillage. Il n'est pas annoté `Record<string, ReactNode>`, ce
+qui garde les clés littérales : un nom de forme mal orthographié est une erreur de typage,
+pas un cadre vide à l'écran.
+
+### Ce qu'il faut trancher avant d'écrire la suite
+
+1. **La progression.** Rien n'est suivi ni mémorisé aujourd'hui, et c'est assumé : reste à
+   définir ce qui est suivi (fiche lue ? notion révisée ? lien avec la maîtrise des tuiles ?)
+   et qui le voit (le parent, l'enfant, les deux ?). Le remplissage continue en attendant ;
+   ça ne coûte rien puisque la progression viendra par-dessus.
+2. **Les sons (français, 9 fiches).** Elles ont besoin d'AUDIO ou de rien : une fiche sur le
+   son [an] qui ne le fait pas entendre n'apprend pas grand-chose. À trancher avant de les
+   écrire, pas après.
+3. **Espace et géométrie (10 fiches).** Ce sont des figures, pas du texte : carré, triangle,
+   cercle, symétrie. Il faudra du SVG, et c'est un autre métier que les quatre figures
+   actuelles. La plus grosse notion restante, et la plus chère.
 
 ### Ce qui reste vrai des questions précédentes
 
@@ -272,4 +336,4 @@ cd backend  && node ./node_modules/eslint/bin/eslint.js "src/**/*.ts" --no-fix
 cd frontend && node ./node_modules/eslint/bin/eslint.js . --ext ts,tsx --max-warnings 0
 ```
 
-**Le prochain geste : faire valider le découpage B.4, puis écrire UNE grande notion complète.**
+**Le prochain geste : lire les fiches, puis définir la progression (rien n'est suivi aujourd'hui).**

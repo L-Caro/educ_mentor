@@ -28,3 +28,164 @@
 .Etapes__gauche { text-align: right; }
 .Etapes__egal   { color: var(--fiche-accent); }
 .Etapes__droite { text-align: left; font-weight: 600; }
+
+// ─── Exemples en phrases ──────────────────────────────────────────────────────
+
+.Phrases {
+	display: flex;
+	flex-direction: column;
+	color: var(--fiche-ink);
+	font-size: var(--fiche-fs);
+}
+
+.Phrases__ligne {
+	line-height: var(--fiche-line, 32px);
+}
+
+// Le mot désigné : surligné comme au feutre. Le fond ne doit pas ajouter de hauteur,
+// sinon la ligne sort de la réglure : d'où le padding horizontal seul.
+.Phrases__mot {
+	background: var(--fiche-accent-soft);
+	color: var(--fiche-ink);
+	padding: 0 0.2em;
+	border-radius: 0.2em;
+}
+
+// La marque d'accord : la lettre qu'on ajoute, en encre de correction.
+.Phrases__marque {
+	color: var(--fiche-margin);
+	font-weight: 800;
+}
+
+// ─── Deux colonnes qui se répondent ───────────────────────────────────────────
+
+.Paires {
+	display: flex;
+	flex-direction: column;
+	color: var(--fiche-ink);
+	font-size: var(--fiche-fs);
+}
+
+.Paires__ligne {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0 1.2em;
+	line-height: var(--fiche-line, 32px);
+
+	> :first-child { text-align: right; }
+}
+
+.Paires__ligne--tete {
+	color: var(--fiche-accent);
+	font-size: var(--fiche-fs-s);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+
+// ─── Droite graduée ───────────────────────────────────────────────────────────
+// Deux interlignes exactement : le trait sur le premier, les nombres sur le second.
+// Les repères sont positionnés en pourcentage, donc la figure suit la largeur de la
+// feuille sans jamais déborder.
+
+.Droite {
+	--droite-marge: 1.6em;
+
+	color: var(--fiche-ink);
+	font-size: var(--fiche-fs-s);
+	// La marge intérieure laisse la place aux nombres des extrémités, qui débordent de
+	// moitié de part et d'autre de leur repère.
+	padding: 0 var(--droite-marge);
+}
+
+.Droite__axe {
+	position: relative;
+	height: var(--fiche-line, 32px);
+	// Le trait tombe sur la ligne de base plutôt qu'au milieu de l'interligne.
+	background:
+		linear-gradient(var(--fiche-ink), var(--fiche-ink)) 0 calc(var(--fiche-baseline) - 1px) / 100% 2px
+		no-repeat;
+}
+
+.Droite__tick {
+	position: absolute;
+	top: calc(var(--fiche-baseline) - 0.5em);
+	width: 2px;
+	height: 0.5em;
+	margin-left: -1px;
+	background: var(--fiche-ink);
+}
+
+.Droite__marque {
+	position: absolute;
+	top: calc(var(--fiche-baseline) - 1.5em);
+	transform: translateX(-50%);
+	color: var(--fiche-margin);
+	font-weight: 800;
+
+	// La flèche qui descend sur le trait : un pseudo-élément, rien qui prenne de la place
+	// dans le flux.
+	&::after {
+		content: '';
+		position: absolute;
+		left: 50%;
+		top: 1.35em;
+		width: 2px;
+		height: 0.55em;
+		margin-left: -1px;
+		background: var(--fiche-margin);
+	}
+}
+
+.Droite__labels {
+	position: relative;
+	height: var(--fiche-line, 32px);
+	line-height: var(--fiche-line, 32px);
+}
+
+.Droite__label {
+	position: absolute;
+	transform: translateX(-50%);
+	font-variant-numeric: tabular-nums;
+}
+
+// ─── Figures géométriques ─────────────────────────────────────────────────────
+// Quatre interlignes exactement : trois pour le dessin, un pour la légende. Les figures
+// se répartissent sur la largeur et passent à la ligne si elles sont nombreuses, auquel
+// cas la rangée fait un multiple de quatre interlignes et la réglure tient encore.
+
+.Formes {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0 1.2em;
+	color: var(--fiche-ink);
+}
+
+.Forme {
+	margin: 0;
+	width: calc(3 * var(--fiche-line, 32px));
+}
+
+.Forme__dessin {
+	display: block;
+	width: 100%;
+	height: calc(3 * var(--fiche-line, 32px));
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.Forme__legende {
+	line-height: var(--fiche-line, 32px);
+	text-align: center;
+	font-size: var(--fiche-fs-s);
+	color: var(--fiche-accent);
+}
+
+// Les mots posés dans le dessin : nom de point, repère, axe.
+.Forme__note {
+	fill: var(--fiche-ink-soft);
+	font-size: 11px;
+	text-anchor: middle;
+	font-family: inherit;
+}

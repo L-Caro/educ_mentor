@@ -1,3 +1,5 @@
+import './numeration.scss';
+
 import { POSITION_NAME, POSITION_ORDER } from './numeration.constants';
 import type { PositionKey } from './numeration.type';
 

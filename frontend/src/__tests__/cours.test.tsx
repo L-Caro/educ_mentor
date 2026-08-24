@@ -13,6 +13,11 @@ import type { PoseQuestion } from 'src/modules/pose/pose.type';
 
 const CONCEPTS: Concept[] = MATIERES.flatMap((m) => m.notions.flatMap((n) => n.concepts));
 
+/** Chaque concept avec la matière qui le contient, pour vérifier qu'ils se correspondent. */
+const AVEC_MATIERE = MATIERES.flatMap((m) =>
+  m.notions.flatMap((n) => n.concepts.map((c) => ({ matiere: m.slug, concept: c }))),
+);
+
 /** Les deux jeux de réglages qui changent une fiche. */
 const REGLAGES = [
   { pose_subtraction_method: 'compensation' },
@@ -75,9 +80,13 @@ describe('bibliothèque de cours', () => {
 
   it('trace la leçon du corpus qui a servi de source', () => {
     // Pas affiché, mais indispensable à la relecture : sans lui, impossible de vérifier
-    // qu'une fiche réécrite n'a pas perdu un morceau du programme.
-    for (const concept of CONCEPTS) {
-      expect(concept.source, concept.slug).toMatch(/^ce1\.mathematiques\./);
+    // qu'une fiche réécrite n'a pas perdu un morceau du programme. La matière du corpus
+    // doit être celle de la matière qui porte la fiche : c'est ce qui attrape une source
+    // recopiée d'un fichier à l'autre.
+    for (const { matiere, concept } of AVEC_MATIERE) {
+      expect(concept.source, concept.slug).toMatch(
+        new RegExp(`^ce1\\.${matiere}\\.[a-z0-9-]+$`),
+      );
     }
   });
 });
@@ -136,22 +145,70 @@ function retenuesAttendues(q: PoseQuestion): { haut: (number | null)[]; bas: (nu
   return { haut, bas };
 }
 
-/** Les figures posées des fiches, retrouvées dans l'arbre React de l'exemple. */
-function figures(): PoseQuestion[] {
-  const trouvees: PoseQuestion[] = [];
+/** Parcourt l'arbre React des exemples et remonte ce que `lire` en extrait. */
+function dansLesExemples<T>(lire: (props: Record<string, unknown>) => T | undefined): T[] {
+  const trouves: T[] = [];
   const visiter = (noeud: unknown) => {
     if (!noeud || typeof noeud !== 'object') return;
     if (Array.isArray(noeud)) return noeud.forEach(visiter);
     const el = noeud as { props?: Record<string, unknown> };
-    const question = el.props?.question as PoseQuestion | undefined;
-    if (question?.operands) trouvees.push(question);
-    if (el.props?.children) visiter(el.props.children);
+    if (el.props) {
+      const valeur = lire(el.props);
+      if (valeur !== undefined) trouves.push(valeur);
+      visiter(el.props.children);
+    }
   };
   for (const concept of CONCEPTS) {
     for (const reglages of REGLAGES) visiter(ficheDe(concept, reglages).exemple);
   }
-  return trouvees;
+  return trouves;
 }
+
+/** Les figures posées des fiches. */
+function figures(): PoseQuestion[] {
+  return dansLesExemples((props) => {
+    const question = props.question as PoseQuestion | undefined;
+    return question?.operands ? question : undefined;
+  });
+}
+
+/** Toutes les chaînes balisées passées à `Phrases` et `Paires`. */
+function chainesBalisees(): string[] {
+  const lignes = dansLesExemples((props) => props.lignes as unknown[] | undefined);
+  const colonnes = dansLesExemples((props) => props.colonnes as string[] | undefined);
+  return [...lignes, ...colonnes].flat(2).filter((v): v is string => typeof v === 'string');
+}
+
+describe('balisage des exemples', () => {
+  it('équilibre les marques', () => {
+    // `Phrases` et `Paires` marquent avec [mot] et {terminaison}. Un crochet non fermé
+    // n'échoue pas : il s'affiche tel quel au milieu de la phrase, et personne ne le voit
+    // avant l'enfant.
+    const chaines = chainesBalisees();
+    expect(chaines.length).toBeGreaterThan(10);
+    for (const chaine of chaines) {
+      expect(chaine.split('[').length, chaine).toBe(chaine.split(']').length);
+      expect(chaine.split('{').length, chaine).toBe(chaine.split('}').length);
+    }
+  });
+
+  it('ne laisse pas de balisage dans le texte brut des fiches', () => {
+    // `idee`, `regle` et `piege` sont rendus comme du texte : un {s} qui s'y glisse
+    // s'affiche avec ses accolades. C'est arrivé en écrivant les mots invariables.
+    //
+    // Les accolades n'ont aucun autre usage, on les interdit partout. Les crochets, si :
+    // les fiches de sons notent « le son [o] », et c'est la notation d'usage. On tolère
+    // donc un crochet autour d'une notation courte, et rien d'autre : un [groupe de mots]
+    // oublié dans un piège reste attrapé.
+    const notationPhonetique = /\[[a-zàâéèêîôùûœ]{1,3}\]/g;
+    for (const concept of CONCEPTS) {
+      for (const texte of textes(concept)) {
+        expect(texte, concept.slug).not.toMatch(/[{}]/);
+        expect(texte.replace(notationPhonetique, ''), concept.slug).not.toMatch(/[[\]]/);
+      }
+    }
+  });
+});
 
 describe('opérations posées montrées dans les fiches', () => {
   it('en montre au moins une par méthode de soustraction', () => {
