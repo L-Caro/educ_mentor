@@ -32,6 +32,25 @@ interface Pays {
   langues: string[];
 }
 
+/**
+ * Carte d'identité du sujet d'une question, jointe pour la fiche de leçon.
+ *
+ * En géographie il n'y a pas de règle à énoncer : « pourquoi Lima ? » n'a pas de réponse.
+ * Ce qui aide, c'est de voir la fiche complète du pays — capitale, continent, voisins,
+ * langues. Rater la capitale du Pérou, puis lire sa carte, prépare la question suivante
+ * sur son continent.
+ *
+ * Assemblée ici parce que le serveur possède les 211 pays et peut résoudre les codes
+ * voisins en noms. Envoyer le jeu de données au client mettrait toutes les réponses du
+ * jeu dans le bundle.
+ */
+export interface GeoCarte {
+  kind: 'pays' | 'continent';
+  titre: string;
+  drapeau?: string;
+  lignes: { label: string; valeur: string }[];
+}
+
 export interface GeoQuestion {
   type: GeoQuestionType;
   item_key: string;
@@ -42,6 +61,9 @@ export interface GeoQuestion {
   answer: string | null;
   answers: string[] | null;
   continent?: string | null;
+  /** Carte d'identité du sujet, pour la fiche de leçon. Absente si la question ne porte
+   * pas sur un pays ou un continent identifiable (intrus, sélection par langue). */
+  carte?: GeoCarte | null;
   map_filter?: string[] | null;
 }
 
@@ -252,6 +274,51 @@ export class GeoService {
 
   // ─── Génération ───────────────────────────────────────────────────────────
 
+  /** Carte d'identité d'un pays. Les codes voisins sont résolus en noms : « UA, HU, BG »
+   * n'apprend rien, « Ukraine, Hongrie, Bulgarie » situe le pays. */
+  private cartePays(p: Pays): GeoCarte {
+    const nomDe = (code: string) =>
+      this.allPays.find((x) => x.code === code)?.nom ?? code;
+    const eaux = [...p.oceans, ...p.mers];
+
+    const lignes: { label: string; valeur: string }[] = [
+      { label: 'Capitale', valeur: p.capitale },
+      { label: 'Continent', valeur: p.continent },
+    ];
+    if (eaux.length)
+      lignes.push({ label: 'Bordé par', valeur: eaux.join(', ') });
+    if (p.langues.length)
+      lignes.push({
+        label: p.langues.length > 1 ? 'Langues' : 'Langue',
+        valeur: p.langues.join(', '),
+      });
+    if (p.voisins.length)
+      lignes.push({
+        label: 'Voisins',
+        valeur: p.voisins.map(nomDe).join(', '),
+      });
+    else lignes.push({ label: 'Voisins', valeur: "aucun, c'est une île" });
+
+    return { kind: 'pays', titre: p.nom, drapeau: p.drapeau, lignes };
+  }
+
+  /** Carte d'un continent : ce qu'on peut en dire à partir des pays qu'il contient. */
+  private carteContinent(continent: string): GeoCarte {
+    const dedans = this.allPays.filter((p) => p.continent === continent);
+    const oceans = [...new Set(dedans.flatMap((p) => p.oceans))].sort();
+    const exemples = dedans.slice(0, 4).map((p) => `${p.drapeau} ${p.nom}`);
+
+    return {
+      kind: 'continent',
+      titre: continent,
+      lignes: [
+        { label: 'Pays', valeur: String(dedans.length) },
+        { label: 'Océans', valeur: oceans.join(', ') || 'aucun' },
+        { label: 'Par exemple', valeur: exemples.join(', ') },
+      ],
+    };
+  }
+
   private generateQuestions(
     activePays: Pays[],
     activeTypes: GeoQuestionType[],
@@ -350,6 +417,7 @@ export class GeoService {
     return {
       type: 'country_to_capital',
       item_key: `${p.code}_capital`,
+      carte: this.cartePays(p),
       // Le drapeau seul en display : le nom est dans la question → pas de doublon
       prompt: `Quelle est la capitale de ${p.nom} ?`,
       display: p.drapeau,
@@ -370,6 +438,7 @@ export class GeoService {
     return {
       type: 'capital_to_country',
       item_key: `${p.code}_capital_rev`,
+      carte: this.cartePays(p),
       // La capitale en grand → question générique sans répétition
       prompt: 'De quel pays est-ce la capitale ?',
       display: p.capitale,
@@ -387,6 +456,7 @@ export class GeoService {
     return {
       type: 'country_to_continent',
       item_key: `${p.code}_continent`,
+      carte: this.cartePays(p),
       prompt: `Dans quel continent se trouve ${p.nom} ?`,
       display: p.drapeau,
       display_type: 'flag',
@@ -414,6 +484,7 @@ export class GeoService {
     return {
       type: 'country_to_ocean',
       item_key: `${p.code}_ocean`,
+      carte: this.cartePays(p),
       prompt: `Quel océan borde ${p.nom} ?`,
       display: `${p.drapeau} ${p.nom}`,
       display_type: 'text',
@@ -433,6 +504,7 @@ export class GeoService {
     return {
       type: 'flag_to_country',
       item_key: `${p.code}_flag`,
+      carte: this.cartePays(p),
       prompt: 'Quel pays représente ce drapeau ?',
       display: p.drapeau,
       display_type: 'flag',
@@ -453,6 +525,7 @@ export class GeoService {
     return {
       type: 'country_to_flag',
       item_key: `${p.code}_flag_rev`,
+      carte: this.cartePays(p),
       // Le nom seul en grand → question sans répétition
       prompt: 'Quel est son drapeau ?',
       display: p.nom,
@@ -487,6 +560,7 @@ export class GeoService {
     return {
       type: 'odd_one_out',
       item_key: `oddout_${continent}_${correct.code}`,
+      carte: this.cartePays(correct),
       prompt: `Quel pays ne se trouve PAS en ${continent} ?`,
       display: continent,
       display_type: 'text',
@@ -509,6 +583,7 @@ export class GeoService {
     return {
       type: 'country_to_language',
       item_key: `${p.code}_lang`,
+      carte: this.cartePays(p),
       prompt: `Quelle langue parle-t-on principalement en ${p.nom} ?`,
       display: p.drapeau,
       display_type: 'flag',
@@ -574,6 +649,7 @@ export class GeoService {
     return {
       type: 'select_continent_countries',
       item_key: `select_continent_${continent}`,
+      carte: this.carteContinent(continent),
       prompt: `Sélectionne tous les pays d'${continent} dans la liste`,
       display: continent,
       display_type: 'text',
@@ -607,6 +683,7 @@ export class GeoService {
     return {
       type: 'country_borders',
       item_key: `${p.code}_borders`,
+      carte: this.cartePays(p),
       prompt: `Quels pays de la liste sont frontaliers de ${p.nom} ?`,
       display: p.drapeau,
       display_type: 'flag',
@@ -641,6 +718,7 @@ export class GeoService {
     return {
       type: 'select_language_countries',
       item_key: `select_lang_${lang}`,
+      carte: null,
       prompt: `Quels pays de la liste parlent ${lang} ?`,
       display: lang,
       display_type: 'text',
@@ -698,6 +776,7 @@ export class GeoService {
     return {
       type: 'identify_continent',
       item_key: `identify_continent_${continent}`,
+      carte: this.carteContinent(continent),
       prompt: 'Cliquez sur ce continent sur la carte',
       display: continent,
       display_type: 'text',
@@ -734,6 +813,7 @@ export class GeoService {
     return {
       type: 'identify_country',
       item_key: `identify_country_${p.code}`,
+      carte: this.cartePays(p),
       prompt: 'Cliquez sur ce pays sur la carte',
       display: `${p.drapeau} ${p.nom}`,
       display_type: 'text',

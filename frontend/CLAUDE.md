@@ -87,6 +87,9 @@ ni dans le contenu des fiches. Utiliser `·`, `:` ou une phrase séparée selon 
 Le test `frontend/src/__tests__/fiche-conjugaison.test.ts` le vérifie pour les fiches.
 *(Les commentaires de code en contiennent encore : nettoyage à faire, la règle vaut pour la suite.)*
 
+**Apostrophe droite (`'`), jamais typographique (`’`)**, dans tout le texte affiché.
+C'est ce que le reste de l'interface utilise ; mélanger les deux se voit à l'écran.
+
 **Attention à l'ordre des mots quand une phrase commence par un mot non capitalisable.**
 « Avoir et être servent à… » plutôt que « être et avoir… ».
 

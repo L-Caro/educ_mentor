@@ -170,3 +170,51 @@
 		--fiche-fs-s: 12px;
 	}
 }
+
+// ─── Carte d'identité ─────────────────────────────────────────────────────────
+// Le second genre de fiche : un sujet et ce qu'on en sait, quand il n'y a pas de règle à
+// énoncer. Couleurs issues des jetons de la fiche : la feuille reste claire.
+
+.CarteIdentite {
+	width: 100%;
+	text-align: left;
+}
+
+.CarteIdentite__titre {
+	margin: 0;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+	font-weight: 600;
+	display: flex;
+	align-items: baseline;
+	gap: v.$space-4;
+}
+
+.CarteIdentite__embleme {
+	font-size: calc(1.4 * var(--fiche-fs));
+}
+
+.CarteIdentite__lignes {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.CarteIdentite__ligne {
+	display: flex;
+	gap: v.$space-4;
+	align-items: baseline;
+	line-height: var(--fiche-line);
+
+	dt {
+		flex: none;
+		width: 7.5rem;
+		font-size: var(--fiche-fs-s);
+		color: var(--fiche-ink-soft);
+	}
+
+	dd {
+		margin: 0;
+		font-size: var(--fiche-fs);
+	}
+}
