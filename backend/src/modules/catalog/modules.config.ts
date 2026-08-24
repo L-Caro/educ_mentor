@@ -74,7 +74,8 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'snake',
     name: 'Snake',
-    description: 'Le jeu du serpent — grandir en mangeant des fruits, sans se mordre',
+    description:
+      'Le jeu du serpent — grandir en mangeant des fruits, sans se mordre',
     icon: '🐍',
     is_active: false,
     display_order: 9,
