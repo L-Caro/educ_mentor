@@ -117,13 +117,16 @@
 	align-items: center;
 	justify-content: center;
 	gap: calc(var(--fiche-line) / 2);
-	min-height: calc(6 * var(--fiche-line));
 
+	// Pas de hauteur minimale : un exemple TEXTE (extrait, tableau) a déjà son interligne
+	// calé sur la grille, et un plancher pour images y laisserait un grand vide.
+	// Les images, elles, prennent une hauteur multiple du pas — sinon le bloc qui suit
+	// retombe entre deux lignes de la réglure.
 	img,
 	svg {
+		height: calc(6 * var(--fiche-line));
 		max-width: 100%;
-		max-height: calc(9 * var(--fiche-line));
-		height: auto;
+		object-fit: contain;
 		display: block;
 	}
 }

@@ -1,17 +1,13 @@
 import { useState } from 'react';
 import type { LectureQuestion } from './lecture.type';
+import { surligner } from './surligner';
 
 // ─── Rendu du texte avec surlignage optionnel ─────────────────────────────────
 
 function renderTextBody(contenu: string, excerpt: string | null) {
-  if (!excerpt) return <p className="LectureText__body">{contenu}</p>;
-  const idx = contenu.indexOf(excerpt);
-  if (idx === -1) return <p className="LectureText__body">{contenu}</p>;
   return (
     <p className="LectureText__body">
-      {contenu.slice(0, idx)}
-      <mark className="LectureText__highlight">{excerpt}</mark>
-      {contenu.slice(idx + excerpt.length)}
+      {surligner(contenu, excerpt, 'LectureText__highlight')}
     </p>
   );
 }
