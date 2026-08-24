@@ -32,7 +32,10 @@ export function LecturePromptView({ question }: { question: LectureQuestion }) {
           {revealed && (
             <div className="LectureText">
               <p className="LectureText__titre">{question.text_titre}</p>
-              {renderTextBody(question.text_contenu, question.excerpt)}
+              {renderTextBody(
+                question.text_contenu,
+                question.highlight_excerpt ? question.excerpt : null,
+              )}
             </div>
           )}
         </div>

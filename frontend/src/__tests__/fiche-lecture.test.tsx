@@ -18,6 +18,7 @@ const q = (over: Partial<LectureQuestion> = {}): LectureQuestion => ({
   text_titre: 'Ulysse et la mer',
   text_contenu: "Tout le monde dans son île d'Ithaque l'aimait et le respectait.",
   excerpt: "Tout le monde dans son île d'Ithaque l'aimait et le respectait.",
+  highlight_excerpt: false,
   ...over,
 });
 
@@ -37,6 +38,18 @@ describe('fiche de lecture', () => {
     const f = lectureFiche(q())!;
     expect(f.idee).toContain('dans le texte');
     expect(f.piege).toContain("c'est le texte qui décide");
+  });
+
+  it("existe dans les trois modes, pas seulement en facile", () => {
+    // Le serveur ne joignait l'extrait qu'en mode facile, parce que c'est là que le jeu le
+    // surligne pendant la question. En moyen et difficile la fiche n'avait donc rien à
+    // montrer — alors que c'est précisément là qu'elle sert. L'extrait est désormais
+    // toujours envoyé, et un drapeau distinct commande le surlignage en jeu.
+    for (const highlight of [true, false]) {
+      for (const showText of [true, false]) {
+        expect(lectureFiche(q({ highlight_excerpt: highlight, show_text: showText }))).not.toBeNull();
+      }
+    }
   });
 
   it('montre le passage, pas la règle', () => {

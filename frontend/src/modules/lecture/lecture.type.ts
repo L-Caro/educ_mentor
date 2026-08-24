@@ -6,7 +6,8 @@ export interface LectureQuestion {
   show_text: boolean;
   text_contenu: string;
   text_titre: string;
-  excerpt: string | null;
+  excerpt: string | null;          // toujours envoyé ; la fiche l'affiche après la réponse
+  highlight_excerpt: boolean;      // surligné pendant la question : mode facile seulement
 }
 
 export interface LectureSessionResponse {
