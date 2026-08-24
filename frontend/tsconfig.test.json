@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.test.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "esnext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
+    /* Les tests s'exécutent sous Node (accès disque, chemins), pas dans le navigateur. */
+    "types": ["node", "vitest/globals"],
+
+    /* Bundler mode — aligné sur tsconfig.app.json */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
@@ -14,22 +17,15 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    /* Strict */
     "strict": true,
-
-    /* Linting */
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Path configuration (paths résolus relativement à ce tsconfig — pas besoin de baseUrl en moduleResolution bundler) */
-    "paths": {
-      "src/*": ["./src/*"]
-    },
+    "paths": { "src/*": ["./src/*"] },
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true
   },
-  "include": ["src"],
-  "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__"]
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/__tests__/**/*"]
 }
