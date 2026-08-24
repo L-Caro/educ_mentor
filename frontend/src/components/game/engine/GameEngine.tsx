@@ -14,6 +14,7 @@ import GameTimerBar from './components/GameTimerBar.tsx';
 import GameCard from './components/GameCard.tsx';
 import GameStateView from './GameStateView.tsx';
 import DevBadge from 'src/components/common/DevBadge.tsx';
+import Fiche from 'src/components/common/Fiche/Fiche.tsx';
 
 interface GameEngineProps<TSession, TQuestion> {
   spec: GameModuleSpec<TSession, TQuestion>;
@@ -34,6 +35,7 @@ export default function GameEngine<TSession, TQuestion>({
   const [freeInput, setFreeInput] = useState('');
   const [pointClick, setPointClick] = useState<{ svgX: number; svgY: number; distanceKm: number } | null>(null);
   const [streak, setStreak] = useState(0);
+  const [ficheOpen, setFicheOpen] = useState(false);
   const streakRef = useRef(0);
 
   const homePath = `/module/${moduleId}`;
@@ -45,7 +47,7 @@ export default function GameEngine<TSession, TQuestion>({
 
   const {
     loading, error, session, currentIdx, answerState, correctCount,
-    timeRemaining, timerPct, isUrgent, submitAnswer, handleTerminate,
+    timeRemaining, timerPct, isUrgent, submitAnswer, advanceNow, handleTerminate,
   } = useGameSession<TSession, TQuestion>({
     loader: () => spec.loadSession(setup),
     homePath,
@@ -56,7 +58,7 @@ export default function GameEngine<TSession, TQuestion>({
     onComplete: (sessionId, correct, total) => spec.completeSession(sessionId, correct, total),
     buildTimeoutResult: (question) => spec.buildResultEntry(question, null, false, true),
     recordTimeout: (sessionId, question) => spec.recordAnswer(sessionId, question, false, null),
-    onQuestionChange: () => { setSelectedKey(null); setSelectedKeys(new Set()); setFreeInput(''); setPointClick(null); },
+    onQuestionChange: () => { setSelectedKey(null); setSelectedKeys(new Set()); setFreeInput(''); setPointClick(null); setFicheOpen(false); },
     skipApiCalls: isDevMode,
     emptySessionError: spec.emptyError,
   });
@@ -128,10 +130,16 @@ export default function GameEngine<TSession, TQuestion>({
     if (correct) { streakRef.current++; setStreak(streakRef.current); }
     else { streakRef.current = 0; setStreak(0); }
 
+    // Sur une erreur, si le module sait expliquer, on suspend l'avance automatique :
+    // 1600 ms ne laissent pas le temps de repérer un bouton. La main revient à l'enfant.
+    // Sur une bonne réponse, rien ne change — on n'interrompt pas une série.
+    const explains = !correct && spec.fiche?.(question) != null;
+
     submitAnswer(
       correct,
       spec.buildResultEntry(question, given, correct, false),
       () => spec.recordAnswer(getSessionId(session), question, correct, given),
+      { hold: explains },
     );
   }
 
@@ -187,6 +195,11 @@ export default function GameEngine<TSession, TQuestion>({
   const mapExtraProps = isMap ? (spec.map!.getComponentProps?.(question) ?? {}) : {};
   const PointMapComponent = isPointMap ? spec.pointMap!.getComponent(question) : null;
   const pointMapExtraProps = isPointMap ? (spec.pointMap!.getComponentProps?.(question) ?? {}) : {};
+  // Proposée seulement après une erreur : c'est le moment où l'enfant veut savoir pourquoi.
+  const fiche = answerState === 'wrong' || answerState === 'timeout'
+    ? spec.fiche?.(question) ?? null
+    : null;
+
   const validateDisabled =
     answerState !== 'idle' || (
       isPointMap ? pointClick === null
@@ -283,11 +296,18 @@ export default function GameEngine<TSession, TQuestion>({
         />
       </GameCard>
 
-      <GameFooter
-        onTerminate={handleTerminate}
-        onValidate={handleValidate}
-        isValidateDisabled={validateDisabled}
-      />
+      {fiche && ficheOpen ? (
+        <Fiche fiche={fiche} onClose={() => { setFicheOpen(false); advanceNow(); }} />
+      ) : (
+        <GameFooter
+          onTerminate={handleTerminate}
+          onValidate={fiche ? advanceNow : handleValidate}
+          isValidateDisabled={fiche ? false : validateDisabled}
+          validateLabel={fiche ? 'Suivant →' : undefined}
+          secondaryLabel={fiche ? '📘 Pourquoi ?' : undefined}
+          onSecondary={fiche ? () => setFicheOpen(true) : undefined}
+        />
+      )}
     </PageContainer>
   );
 }

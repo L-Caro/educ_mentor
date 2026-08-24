@@ -156,8 +156,16 @@ export function useGameSession<TSession, TQuestion>({
    *
    * @param record - Fonction zéro-argument qui appelle l'API d'enregistrement.
    *                 N'est pas appelée si skipApiCalls est actif.
+   * @param options.hold - Suspend l'avance automatique : la partie reste sur la correction
+   *   jusqu'à un appel à `advanceNow()`. Utilisé quand l'écran propose une explication —
+   *   1600 ms ne laissent pas le temps de repérer un bouton, encore moins de le toucher.
    */
-  function submitAnswer(isCorrect: boolean, resultEntry: GameResultEntry, record: () => Promise<void>) {
+  function submitAnswer(
+    isCorrect: boolean,
+    resultEntry: GameResultEntry,
+    record: () => Promise<void>,
+    options: { hold?: boolean } = {},
+  ) {
     const currentSession = sessionRef.current;
     const idx = currentIdxRef.current;
     if (!currentSession || answerStateRef.current !== 'idle') return;
@@ -179,10 +187,25 @@ export function useGameSession<TSession, TQuestion>({
       record().catch(console.error);
     }
 
+    if (options.hold) return; // la main revient au joueur, via advanceNow()
+
     pendingAdvanceRef.current = setTimeout(() => {
       pendingAdvanceRef.current = null;
       advance(currentSession, idx);
     }, isCorrect ? 900 : 1600);
+  }
+
+  /** Passe à la question suivante immédiatement. Sans effet tant qu'aucune réponse
+   * n'a été donnée, et idempotent si l'avance automatique est déjà programmée. */
+  function advanceNow() {
+    const currentSession = sessionRef.current;
+    if (!currentSession || answerStateRef.current === 'idle') return;
+
+    if (pendingAdvanceRef.current) {
+      clearTimeout(pendingAdvanceRef.current);
+      pendingAdvanceRef.current = null;
+    }
+    advance(currentSession, currentIdxRef.current);
   }
 
   async function handleTerminate() {
@@ -224,6 +247,7 @@ export function useGameSession<TSession, TQuestion>({
     timerPct,
     isUrgent,
     submitAnswer,
+    advanceNow,
     handleTerminate,
   };
 }

@@ -4,6 +4,7 @@ import { sharedApi } from 'src/store/api/sharedApi.ts';
 import ClockFace from './components/ClockFace.tsx';
 import type { HeureQuestion, HeureSessionResponse, NumeralType } from './heure.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import { heureFiche } from './heure.fiche.ts';
 import './heure.scss';
 
 let _sep:  ':' | 'h'              = ':';
@@ -78,7 +79,11 @@ export const heureGameSpec: GameModuleSpec<HeureSessionResponse, HeureQuestion> 
   },
 
   getQuestions: (session) =>
-    session.questions.map((q) => ({ ...q, separator: session.separator ?? _sep })),
+    session.questions.map((q) => ({
+      ...q,
+      separator: session.separator ?? _sep,
+      questionMode: session.questionMode ?? _mode,
+    })),
 
   renderPrompt: (question) => {
     if (_mode === 'expression') {
@@ -131,6 +136,8 @@ export const heureGameSpec: GameModuleSpec<HeureSessionResponse, HeureQuestion> 
     if (_mode === 'expression') return toFrenchExpression(question.hour, question.minute);
     return formatTime(question.answer_value, question.separator ?? _sep);
   },
+
+  fiche: heureFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(heureApi.endpoints.recordHeureAnswer.initiate({

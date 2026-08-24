@@ -23,9 +23,13 @@ Les deux audits sont des **instantanés datés** : on ne les modifie pas, on les
 - trois actions sur le corpus de leçons : gitignore, miroir des images, parseur
 - **chantier A terminé** : dette technique traitée de A0 à A4, sur la branche `chantier-a-robustesse` (12 commits, non poussée)
 
+- **chantier B, étape 1 faite** : la fiche réactive, validée par Maëve, branchée sur les
+  six modules qui ont une règle à expliquer. Branche `fiches`, 10 commits, non poussée.
+
 **Reste :**
 - A5 — dépendances vulnérables, préexistantes, délibérément non traitées (voir plus bas)
-- chantier B — les fiches, à reprendre **après** l'étape 0 sur papier
+- chantier B, suite : le mode « école » (bibliothèque de fiches), qui demande des entités
+  et une migration — contrairement à tout ce qui a été fait jusqu'ici
 
 **Ce qu'il faut retenir de la dérive de départ** — le travail sur le corpus avait été qualifié d'« actions sans regret », et la dette avait été repoussée de réponse en réponse. Elle est maintenant payée ; la règle qui l'a permis reste valable : nommer l'hypothèse non validée avant de coder, et exécuter le bloquant plutôt que le répéter.
 
@@ -135,40 +139,67 @@ déjà encodée. Elle justifie une fiche **par niveau**, pas une fiche par notio
 - **La progression par notion** : table `notion_progression` alimentée par la fiche elle-même
   (option A), pas de `notionKey` à câbler dans les 13 modules (option B) — on y viendra si ça tient.
 
-## B.2 · Correction de direction ⚠️ **lire avant de reprendre**
+## B.2 · Ce qui a été validé, puis construit
 
-Le plan en 8 étapes de `AUDIT_2026-08-24_ET_ORIENTATION_COURS.md` (§2.6) est **caduc**. Il construisait
-le contenant — thèmes, parcours, carte du savoir — avant d'avoir validé l'atome : la fiche.
-Il ne testait l'hypothèse centrale qu'à l'étape 6, après 6 à 8 jours de travail.
+Le plan en 8 étapes de `AUDIT_2026-08-24_ET_ORIENTATION_COURS.md` (§2.6) reste **caduc** :
+il construisait le contenant (thèmes, parcours, carte) avant l'atome, et ne testait
+l'hypothèse centrale qu'après une semaine de travail.
 
-**Deux hypothèses non validées, et tout repose dessus :**
+**Validation.** Trois fiches réelles publiées comme page autonome, montrées à Maëve, sans
+une ligne dans l'application. Elle a accroché. C'est ce qui a autorisé la suite.
 
-1. Une fiche de 60 mots accroche-t-elle Maëve ?
-2. Ouvrira-t-elle spontanément une section « Cours » ? — *réponse probable : non.
-   Un enfant de 8 ans ouvre un jeu, pas un cours.*
+**Direction retenue : la fiche réactive.** Après une erreur, l'écran de correction propose
+« 📘 Pourquoi ? ». Pas de section « Cours » à ouvrir : l'explication arrive au moment où
+l'enfant veut savoir. Le mode « école » viendra après, s'il se justifie.
 
-**Direction retenue à la place : la fiche réactive.**
-Elle se trompe sur une question → l'écran de correction propose « 📘 pourquoi ? » → la fiche s'affiche.
-Pas de thème, pas de parcours, pas de carte, pas de taxonomie. Ça intervient **au moment où la motivation
-existe** — elle vient de rater, elle veut savoir — au lieu de lui demander d'aller chercher le cours.
+## B.3 · Ce qui existe aujourd'hui (branche `fiches`)
 
-Le contenant (thèmes, parcours, carte) reste une bonne idée **plus tard**, si et seulement si la fiche prend.
+Une extension du contrat, pas une refonte :
 
-## B.3 · Prochain pas
+```ts
+// game.types.ts, à côté de map / pointMap / preamble
+fiche?: (question: TQuestion) => Fiche | null;
+```
 
-**Étape 0 — sur papier, avant toute ligne de code.**
-Écrire **3 fiches à la main** sur des bristols (idée clé, règle, exemple, piège), sur des notions que Maëve
-travaille déjà dans la tuile `conjugaison`. Les lui montrer entre deux parties. Observer.
+La fonction doit être **pure** : c'est ce qui permettra au mode « école » d'engendrer sa
+bibliothèque en appelant ces mêmes fonctions sur des questions types, sans dupliquer le
+contenu. La pureté est testée explicitement.
 
-Coût : 30 minutes. C'est la seule chose qui répond à la question à laquelle aucun code ne répondra.
+| Module | Contenu de la fiche | Backend touché |
+|---|---|---|
+| `conjugaison` | tableau complet du verbe, ligne ratée en avant | 3 lignes (les six formes) |
+| `tables` | table du plus petit facteur, commutativité | non |
+| `calcul` | l'opération posée, double et moitié par l'inverse | non |
+| `heure` | lecture en expression, calcul à rebours passé la demie | non |
+| `monnaie` | l'opération en euros, posée en colonne au-delà de 3 termes | non |
+| `numeration` | tableau de numération, décomposition triée et empilée | non |
 
-- Si ça accroche → coder la fiche réactive dans l'écran de correction (~1 jour, aucune entité en base).
-- Si ça n'accroche pas → on a économisé une semaine, et le corpus reste utile pour alimenter les tuiles
-  existantes (banques de mots, de phrases, d'exercices).
+Points de conception à ne pas défaire :
 
-**Ne pas faire maintenant :** entités `Theme`/`Notion`, admin de relecture, `ParcoursRunner`,
-3ᵉ racine statique, carte du savoir. Tout ça attend la réponse de l'étape 0 — et, en tout état de cause,
-attend A0.
+- **L'avance automatique est suspendue** sur une erreur dans un module qui sait expliquer.
+  1600 ms ne laissent pas le temps de repérer un bouton. Sur une bonne réponse, rien ne
+  change : on n'interrompt pas une série.
+- **La feuille reste claire dans les deux thèmes.** Les illustrations du corpus ont une
+  encre foncée sur fond transparent ; une feuille qui suivrait le thème sombre les rendrait
+  invisibles. Le fond de cahier Séyès impose par ailleurs une grille de ligne de base :
+  chaque bloc de texte a un interligne multiple du pas de la réglure.
+- **`Fiche.regle` accepte plusieurs lignes.** Une décomposition en six rangs, ou une
+  addition de six pièces, débordent sur une seule ligne.
+- Quatre tests lisent la feuille de style pour verrouiller ces invariants de mise en page :
+  ce sont des pannes dont le seul symptôme est visuel, invisibles au typage et au lint.
+
+58 tests côté front.
+
+## B.4 · Suite possible
+
+Le mode « école » : une bibliothèque navigable par matière et par thème. Il demande les
+entités `Theme` / `Notion`, une migration, et un écran d'administration pour la relecture
+des fiches **rédigées** (géographie, histoire, sciences), là où aucune règle ne se déduit.
+Les fiches dérivées, elles, y sont déjà : il suffira d'appeler `spec.fiche` sur des
+questions types.
+
+Non commencé, et pas urgent : la fiche réactive répond déjà au besoin qui a motivé
+l'ensemble.
 
 ## B.4 · Questions encore ouvertes
 

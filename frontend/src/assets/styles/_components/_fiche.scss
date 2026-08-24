@@ -1,0 +1,169 @@
+@use 'src/assets/styles/_abstracts/variables' as v;
+
+// ─── Fiche de leçon — page de cahier Séyès ────────────────────────────────────
+//
+// La réglure impose une grille de ligne de base : l'interligne de CHAQUE bloc de texte
+// vaut un multiple exact de --fiche-line, et le trait tombe sur la ligne de base plutôt
+// qu'au milieu de l'interligne. Sans ça le texte flotte entre les lignes.
+//
+// La feuille garde ses propres couleurs, hors du thème de l'application : une feuille de
+// cahier est claire, en thème clair comme en thème sombre. C'est aussi ce qui garantit la
+// lisibilité des illustrations, dont l'encre est foncée sur fond transparent.
+
+.Fiche {
+	--fiche-line: 32px;
+	--fiche-fs: 18px;
+	--fiche-fs-s: 13px;
+	// Position de la ligne de base dans la boîte de ligne, d'après les métriques de Nunito
+	// (ascendante ≈ 1.011em, descendante ≈ 0.353em, soit 1.364em de hauteur totale).
+	// C'est ce calcul qui pose le trait SOUS le texte et non au milieu de l'interligne.
+	--fiche-baseline: calc((var(--fiche-line) - 1.364 * var(--fiche-fs)) / 2 + 1.011 * var(--fiche-fs));
+	--fiche-pad-top: calc(2 * var(--fiche-line));
+	// Position du trait de marge, et respiration entre ce trait et le texte : sans elle,
+	// les lettres viennent buter contre la marge comme dans un cahier mal rempli.
+	--fiche-margin-x: clamp(2.6rem, 8vw, 3.25rem);
+	--fiche-margin-gap: 0.6rem;
+	--fiche-pad-left: calc(var(--fiche-margin-x) + var(--fiche-margin-gap));
+	// Le texte repose 1px AU-DESSUS du trait plutôt que dessus : sinon les jambages
+	// des lettres mordent la ligne.
+	--fiche-rule-nudge: 2px;
+
+	--fiche-paper: #FCFBF8;
+	--fiche-ink: #262B3A;
+	--fiche-ink-soft: #6B7186;
+	--fiche-rule: #BFC8E8;
+	--fiche-margin: #D4574A;
+	--fiche-accent: #17A9E0;
+	--fiche-accent-soft: #E4F4FB;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: v.$space-6;
+	width: 100%;
+}
+
+.Fiche__sheet {
+	width: min(34rem, 100%);
+	color: var(--fiche-ink);
+	font-family: v.$font-family;
+	background-color: var(--fiche-paper);
+	background-image:
+		linear-gradient(var(--fiche-margin), var(--fiche-margin)),
+		repeating-linear-gradient(
+			to bottom,
+			transparent 0,
+			transparent calc(var(--fiche-line) - 1px),
+			var(--fiche-rule) calc(var(--fiche-line) - 1px),
+			var(--fiche-rule) var(--fiche-line)
+		);
+	background-size: 1.5px 100%, 100% 100%;
+	background-position:
+		var(--fiche-margin-x) 0,
+		0 calc(var(--fiche-pad-top) + var(--fiche-baseline) - var(--fiche-line) + var(--fiche-rule-nudge));
+	background-repeat: no-repeat, repeat;
+	border-radius: v.$border-radius-2;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 16%), 0 14px 34px -10px rgb(0 0 0 / 22%);
+	// Marges multiples du pas : sinon tout le bloc est décalé d'un demi-interligne.
+	padding: var(--fiche-pad-top) clamp(1rem, 4vw, 1.75rem) calc(2 * var(--fiche-line)) var(--fiche-pad-left);
+	display: flex;
+	flex-direction: column;
+	gap: var(--fiche-line);
+}
+
+.Fiche__tag {
+	margin: 0;
+	font-size: var(--fiche-fs-s);
+	line-height: var(--fiche-line);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--fiche-ink-soft);
+}
+
+.Fiche__idee {
+	margin: 0;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+}
+
+.Fiche__regle {
+	margin: 0;
+	font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+	// Hauteur = une ligne par élément, plus un interligne de respiration : la grille de
+	// ligne de base tient quel que soit le nombre de lignes.
+	height: calc((var(--fiche-regle-lines, 1) + 1) * var(--fiche-line));
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 0 v.$space-5;
+	background: var(--fiche-accent-soft);
+	border-left: 3px solid var(--fiche-accent);
+	border-radius: 0 v.$space-2 v.$space-2 0;
+	overflow-x: auto;
+
+	span {
+		white-space: nowrap;
+	}
+}
+
+// L'illustration occupe un nombre ENTIER d'interlignes : le texte qui suit retombe
+// sur la réglure, comme une image collée dans un cahier.
+.Fiche__exemple {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: calc(var(--fiche-line) / 2);
+	min-height: calc(6 * var(--fiche-line));
+
+	img,
+	svg {
+		max-width: 100%;
+		max-height: calc(9 * var(--fiche-line));
+		height: auto;
+		display: block;
+	}
+}
+
+.Fiche__piege {
+	margin: 0;
+	display: flex;
+	gap: v.$space-4;
+	align-items: flex-start;
+	font-size: var(--fiche-fs-s);
+	line-height: var(--fiche-line);
+	color: var(--fiche-ink-soft);
+}
+
+.Fiche__piegeMark {
+	flex: none;
+	font-weight: 700;
+	color: var(--fiche-margin);
+}
+
+.Fiche__close {
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	padding: v.$space-5 v.$space-9;
+	border: none;
+	border-radius: v.$border-radius;
+	background: var(--color-primary);
+	color: var(--color-primary-content);
+
+	&:focus-visible {
+		outline: 3px solid var(--color-accent);
+		outline-offset: 3px;
+	}
+}
+
+@media (max-width: 30rem) {
+	.Fiche {
+		--fiche-line: 28px;
+		--fiche-fs: 16px;
+		--fiche-fs-s: 12px;
+	}
+}

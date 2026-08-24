@@ -3,6 +3,8 @@ import { conjugaisonApi } from './conjugaison.api.ts';
 import { sharedApi } from 'src/store/api/sharedApi.ts';
 import type { ConjugaisonQuestion, ConjugaisonSessionResponse } from './conjugaison.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import ConjugaisonTable from './ConjugaisonTable.tsx';
+import { applyElision } from './elision.ts';
 import './conjugaison.scss';
 
 // ─── État de session ──────────────────────────────────────────────────────────
@@ -39,14 +41,6 @@ function displayPronoun(pronoun: string, seed = ''): string {
 
 // ─── Élision ─────────────────────────────────────────────────────────────────
 
-/** Applique l'élision je → j' devant voyelle ou h muet. */
-function applyElision(pronoun: string, form: string): string {
-  if (pronoun === 'je' && /^[aeiouyéèêëàâîïôùûhœæAEIOUYÉÈÊËÀÂÎÏÔÙÛH]/u.test(form)) {
-    return `j'${form}`;
-  }
-  return `${pronoun} ${form}`;
-}
-
 // ─── Normalisation (saisie libre) ─────────────────────────────────────────────
 
 function normalize(s: string): string {
@@ -56,6 +50,22 @@ function normalize(s: string): string {
 }
 
 // ─── Spec ─────────────────────────────────────────────────────────────────────
+
+/** L'idée clé dépend du groupe : c'est elle qui doit rester si tout le reste s'oublie. */
+const GROUP_IDEA: Record<string, string> = {
+  '1': "Tous les verbes en -er suivent le même modèle. Si tu en connais un, tu les connais tous.",
+  '2': "Les verbes en -ir du 2e groupe intercalent -iss- au pluriel : nous finissons.",
+  '3': "Le 3e groupe ne suit pas de modèle régulier : ces verbes s'apprennent un par un.",
+  auxiliaire: "Avoir et être servent à construire tous les autres temps. On les connaît par cœur.",
+  default: "Repère la terminaison : c'est elle qui change selon la personne.",
+};
+
+/** L'erreur classique du groupe, souvent la raison de la faute qui vient d'être commise. */
+const GROUP_TRAP: Record<string, string | undefined> = {
+  '1': "« aller » se termine par -er mais ne suit pas ce modèle.",
+  '2': "Tous les verbes en -ir ne sont pas du 2e groupe : « venir » et « partir » n'en sont pas.",
+  auxiliaire: "« tu es » et « tu as » se prononcent presque pareil et ne s'écrivent pas pareil.",
+};
 
 export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, ConjugaisonQuestion> = {
 
@@ -128,6 +138,21 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
       ? applyElision(question.pronoun, question.conjugated)
       : question.infinitif,
 
+  /**
+   * Fiche dérivée de la question, sans rien de rédigé à l'avance : le tableau complet du
+   * verbe au temps demandé, avec la ligne ratée mise en avant. Ce que l'enfant vient de
+   * chercher est donc exactement ce qu'elle voit.
+   *
+   * Fonction pure : le futur mode « école » l'appellera sur des questions types pour
+   * engendrer la bibliothèque, sans dupliquer quoi que ce soit.
+   */
+  fiche: (question) => ({
+    titre: `${question.infinitif} · ${question.tense}`,
+    idee: GROUP_IDEA[question.groupe] ?? GROUP_IDEA.default,
+    exemple: <ConjugaisonTable forms={question.forms} highlight={question.pronoun} />,
+    piege: GROUP_TRAP[question.groupe],
+  }),
+
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(conjugaisonApi.endpoints.recordConjugaisonAnswer.initiate({
       sessionId,
@@ -146,7 +171,7 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
 
     if (question.direction === 'forward') {
       return {
-        label:    `${question.infinitif} — ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
+        label:    `${question.infinitif} · ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
         given:    givenStr ? applyElision(question.pronoun, givenStr) : null,
         expected: applyElision(question.pronoun, question.conjugated),
         correct,

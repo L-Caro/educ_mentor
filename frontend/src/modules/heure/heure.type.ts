@@ -7,6 +7,7 @@ export interface HeureQuestion {
   numeral_type: NumeralType;
   choices: number[];      // minutes depuis minuit ; vide si saisie libre
   separator?: ':' | 'h'; // injecté côté frontend par getQuestions
+  questionMode?: 'digital' | 'expression'; // idem : la fiche n'a accès qu'à la question
 }
 
 export interface HeureSessionResponse {

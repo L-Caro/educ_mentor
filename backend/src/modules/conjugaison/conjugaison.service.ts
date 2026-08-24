@@ -38,6 +38,10 @@ export interface ConjugaisonQuestion {
   groupe: string;
   direction: 'forward' | 'reverse';
   choices: string[];
+  /** Les six formes du verbe à ce temps, pour que le front puisse afficher le tableau
+   * complet dans la fiche de leçon. La donnée est déjà en mémoire ici ; la recalculer
+   * côté client aurait demandé d'y dupliquer le fichier de conjugaisons. */
+  forms: Record<Pronom, string>;
 }
 
 export interface ConjugaisonSessionResult {
@@ -278,6 +282,7 @@ export class ConjugaisonService {
         groupe: candidate.groupe,
         direction: questionDirection,
         choices,
+        forms: verbData.conjugaisons[candidate.tense],
       });
     }
 

@@ -1,17 +1,14 @@
 import store from 'src/store';
 import { numerationApi } from './numeration.api';
 import { NumerationPrompt } from './NumerationPrompt';
-import type { NumerationQuestion, NumerationSessionResponse, PositionKey } from './numeration.type';
+import type { NumerationQuestion, NumerationSessionResponse } from './numeration.type';
 import type { GameModuleSpec } from 'src/types/game.types';
+import { numerationFiche } from './numeration.fiche';
+import { POSITION_NAME } from './numeration.constants';
 import { formatNumbers } from 'src/utils/formatNumber';
 import './numeration.scss';
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
-
-const POSITION_NAME: Record<PositionKey, string> = {
-  u: 'unités', d: 'dizaines', c: 'centaines',
-  m: 'milliers', dm: 'dizaines de milliers', cm: 'centaines de milliers',
-};
 
 // ─── Correction label ─────────────────────────────────────────────────────────
 
@@ -58,6 +55,8 @@ export const numerationGameSpec: GameModuleSpec<NumerationSessionResponse, Numer
 
   correctionLabel: (q) =>
     q.type === 'decomposition' ? correctionForDecompose(q) : formatNumbers(q.answer),
+
+  fiche: numerationFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(numerationApi.endpoints.recordNumerationAnswer.initiate({

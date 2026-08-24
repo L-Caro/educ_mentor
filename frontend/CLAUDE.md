@@ -78,6 +78,20 @@ ModulePreSetup → dispatch(setModuleSetup) → navigate(/play)
 
 ---
 
+---
+
+## Conventions d'écriture
+
+**Pas de cadratins (—) dans le texte affiché.** Ni dans les libellés, ni dans les messages,
+ni dans le contenu des fiches. Utiliser `·`, `:` ou une phrase séparée selon le cas.
+Le test `frontend/src/__tests__/fiche-conjugaison.test.ts` le vérifie pour les fiches.
+*(Les commentaires de code en contiennent encore : nettoyage à faire, la règle vaut pour la suite.)*
+
+**Attention à l'ordre des mots quand une phrase commence par un mot non capitalisable.**
+« Avoir et être servent à… » plutôt que « être et avoir… ».
+
+---
+
 ## Modes de réponse dans `GameModuleSpec`
 
 Le moteur supporte trois modes, détectés automatiquement par question :

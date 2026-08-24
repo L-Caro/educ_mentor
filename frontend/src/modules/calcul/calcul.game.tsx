@@ -3,6 +3,7 @@ import store from 'src/store';
 import { calculApi } from './calcul.api.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import { calculFiche } from './calcul.fiche.ts';
 
 function renderOperation(operation: string) {
   const parts = operation.split('?');
@@ -37,6 +38,8 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
   },
 
   correctionLabel: (question) => question.answer,
+
+  fiche: calculFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(calculApi.endpoints.recordCalculAnswer.initiate({
