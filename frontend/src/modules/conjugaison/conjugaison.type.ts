@@ -9,6 +9,7 @@ export interface ConjugaisonQuestion {
   groupe: string;
   direction: QuestionDirection;
   choices: string[];          // formes conjuguées (forward) ou infinitifs (reverse) ; vide si saisie libre
+  forms: Record<Pronom, string>;  // les six formes à ce temps, pour la fiche de leçon
 }
 
 export interface ConjugaisonSessionResponse {

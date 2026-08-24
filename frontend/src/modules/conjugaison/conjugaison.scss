@@ -84,3 +84,37 @@
   }
 }
 
+
+// ─── Tableau de conjugaison affiché dans la fiche de leçon ────────────────────
+// Rendu sur la page de cahier : les couleurs viennent des jetons de la fiche, pas du
+// thème de l'application — la feuille reste claire dans les deux thèmes.
+
+.ConjugaisonTable {
+	border-collapse: collapse;
+	font-size: var(--fiche-fs);
+	line-height: var(--fiche-line);
+
+	th,
+	td {
+		padding: 0 v.$space-5;
+		text-align: left;
+		font-weight: 400;
+	}
+
+	th {
+		color: var(--fiche-ink-soft);
+		white-space: nowrap;
+	}
+
+	td {
+		font-weight: 600;
+	}
+}
+
+.ConjugaisonTable__row--active {
+	background: var(--fiche-accent-soft);
+
+	td {
+		color: var(--fiche-accent);
+	}
+}
