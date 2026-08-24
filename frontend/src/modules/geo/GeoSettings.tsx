@@ -71,7 +71,11 @@ export default function GeoSettings() {
 
   function toggleType(value: string) {
     const next = new Set(activeTypes);
-    next.has(value) ? next.delete(value) : next.add(value);
+    if (next.has(value)) {
+      next.delete(value);
+    } else {
+      next.add(value);
+    }
     saveTypes(next);
   }
 
@@ -90,7 +94,11 @@ export default function GeoSettings() {
 
   function toggleCountry(code: string) {
     const next = new Set(activeCountries);
-    next.has(code) ? next.delete(code) : next.add(code);
+    if (next.has(code)) {
+      next.delete(code);
+    } else {
+      next.add(code);
+    }
     saveCountries(next);
   }
 

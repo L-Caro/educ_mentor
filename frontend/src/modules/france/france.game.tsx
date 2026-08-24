@@ -2,7 +2,7 @@ import france from '@svg-maps/france.departments';
 import store from 'src/store';
 import { franceApi } from './france.api.ts';
 import type { FranceQuestion, FranceSessionResponse } from './france.type.ts';
-import type { GameModuleSpec, PointMapInteractionProps } from 'src/types/game.types.ts';
+import type { GameModuleSpec } from 'src/types/game.types.ts';
 import FranceDeptMap from './FranceDeptMap.tsx';
 import FranceRegionMap from './FranceRegionMap.tsx';
 import FranceCityMap from './FranceCityMap.tsx';
@@ -59,9 +59,8 @@ export const franceGameSpec: GameModuleSpec<FranceSessionResponse, FranceQuestio
   },
 
   pointMap: {
-    getComponent: (q) => q.hide_dept_borders
-      ? (props: PointMapInteractionProps) => <FranceCityMap {...props} hideBorders />
-      : FranceCityMap,
+    getComponent: () => FranceCityMap,
+    getComponentProps: (q) => ({ hideBorders: q.hide_dept_borders === true }),
     isPointMapQuestion: (q) => q.type === 'locate_city',
     targetSvgPoint: (q) => cityIndex.get(`${q.display}|${q.dept_code}`) ?? { x: 300, y: 290 },
     isCorrect: (q, distanceKm) => distanceKm <= (q.threshold_km ?? 20),

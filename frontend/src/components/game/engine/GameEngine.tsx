@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDevMode, useGameSession, useAppSelector } from 'src/hooks';
 import { selectModuleSetup } from 'src/store/slice/gameSetupSlice.ts';
@@ -28,7 +28,7 @@ export default function GameEngine<TSession, TQuestion>({
   const { isDevMode } = useDevMode();
   const setup = useAppSelector(selectModuleSetup(moduleId)) ?? {};
 
-  const [preambleDone, setPreambleDone] = useState(!spec.preamble);
+  const [preambleDismissed, setPreambleDismissed] = useState(false);
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [freeInput, setFreeInput] = useState('');
@@ -61,11 +61,6 @@ export default function GameEngine<TSession, TQuestion>({
     emptySessionError: spec.emptyError,
   });
 
-  useEffect(() => {
-    if (!preambleDone && spec.preamble && session && spec.preamble(session) === null) {
-      setPreambleDone(true);
-    }
-  }, [preambleDone, session, spec.preamble]);
 
   // Mode dérivé des seuls choix : aucun choix = saisie libre, sinon QCM.
   function isFree(question: TQuestion): boolean {
@@ -75,7 +70,11 @@ export default function GameEngine<TSession, TQuestion>({
   function handleToggleKey(key: string) {
     setSelectedKeys(prev => {
       const next = new Set(prev);
-      next.has(key) ? next.delete(key) : next.add(key);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
       return next;
     });
   }
@@ -142,21 +141,23 @@ export default function GameEngine<TSession, TQuestion>({
     return <GameStateView errorMessage={error || spec.emptyError || 'Aucune question disponible.'} onBack={() => navigate(homePath)} />;
   }
 
-  if (!preambleDone) {
-    const preambleContent = spec.preamble!(session);
-    if (preambleContent !== null) {
-      return (
-        <PageContainer className="GameEngine">
-          <GameCard>{preambleContent}</GameCard>
-          <GameFooter
-            onTerminate={handleTerminate}
-            onValidate={() => setPreambleDone(true)}
-            isValidateDisabled={false}
-            validateLabel="📖 J'ai lu, je commence"
-          />
-        </PageContainer>
-      );
-    }
+  // Le préambule est DÉRIVÉ, pas synchronisé : un module peut n'en avoir aucun, ou en
+  // retourner un vide selon la session. L'ancien `useEffect` + `setState` provoquait un
+  // rendu supplémentaire systématique à chaque chargement de partie.
+  const preambleContent = !preambleDismissed && spec.preamble ? spec.preamble(session) : null;
+
+  if (preambleContent !== null) {
+    return (
+      <PageContainer className="GameEngine">
+        <GameCard>{preambleContent}</GameCard>
+        <GameFooter
+          onTerminate={handleTerminate}
+          onValidate={() => setPreambleDismissed(true)}
+          isValidateDisabled={false}
+          validateLabel="📖 J'ai lu, je commence"
+        />
+      </PageContainer>
+    );
   }
 
   const questions = getQuestions(session);
@@ -175,8 +176,17 @@ export default function GameEngine<TSession, TQuestion>({
   const filledStars = Math.min(5, answeredCount === 0 ? 0 : Math.floor((correctCount / answeredCount) * 5));
   const showUrgent = isUrgent && answerState === 'idle';
   const mapCorrectKeys = isMap ? spec.map!.correctKeys(question) : [];
+  // La stabilité de ces composants est une clause du contrat, documentée sur
+  // `map.getComponent` / `pointMap.getComponent` dans game.types.ts : ils doivent être définis
+  // au niveau module. ESLint ne peut pas le vérifier à travers l'indirection du spec — il voit
+  // seulement un appel de fonction renvoyant un composant — d'où ces dérogations ciblées.
+  // La règle reste active partout ailleurs, et c'est elle qui avait révélé le problème réel :
+  // geo et france renvoyaient une closure, donc un type de composant neuf à chaque rendu, et
+  // React reconstruisait la carte SVG entière à chaque clic.
   const MapComponent = isMap ? spec.map!.getComponent(question) : null;
+  const mapExtraProps = isMap ? (spec.map!.getComponentProps?.(question) ?? {}) : {};
   const PointMapComponent = isPointMap ? spec.pointMap!.getComponent(question) : null;
+  const pointMapExtraProps = isPointMap ? (spec.pointMap!.getComponentProps?.(question) ?? {}) : {};
   const validateDisabled =
     answerState !== 'idle' || (
       isPointMap ? pointClick === null
@@ -211,7 +221,9 @@ export default function GameEngine<TSession, TQuestion>({
         {spec.renderPrompt(question, answerState)}
 
         {isPointMap && PointMapComponent ? (
+          // eslint-disable-next-line react-hooks/static-components -- cf. commentaire sur MapComponent
           <PointMapComponent
+            {...pointMapExtraProps}
             targetSvgPoint={spec.pointMap!.targetSvgPoint(question)}
             onPointClick={(result) => { if (answerState === 'idle') setPointClick(result); }}
             clickedSvgPoint={pointClick ? { x: pointClick.svgX, y: pointClick.svgY } : null}
@@ -219,7 +231,9 @@ export default function GameEngine<TSession, TQuestion>({
             answerState={answerState}
           />
         ) : isMap && MapComponent ? (
+          // eslint-disable-next-line react-hooks/static-components -- cf. commentaire sur MapComponent
           <MapComponent
+            {...mapExtraProps}
             onSelect={isMapMulti ? undefined : (key) => { if (answerState === 'idle') setSelectedKey(key); }}
             onToggle={isMapMulti ? (key) => { if (answerState === 'idle') handleToggleKey(key); } : undefined}
             selectedKey={selectedKey}
