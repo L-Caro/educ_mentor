@@ -4,6 +4,7 @@ import { monnaieApi } from './monnaie.api.ts';
 import { formatCents, getMonnaieImageUrl, parseMoneyInput } from './constants/denominations.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import { monnaieFiche } from './monnaie.fiche.ts';
 import './monnaie.scss';
 
 const EXERCISE_PROMPTS: Record<MonnaieExerciseType, string> = {
@@ -91,6 +92,8 @@ export const monnaieGameSpec: GameModuleSpec<MonnaieSessionResponse, MonnaieQues
   },
 
   correctionLabel: (question) => formatCents(question.answer),
+
+  fiche: monnaieFiche,
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(monnaieApi.endpoints.recordMonnaieAnswer.initiate({
