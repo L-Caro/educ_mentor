@@ -3,6 +3,8 @@ import store from 'src/store';
 import { tablesApi } from './tables.api.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
+import TableRappel from './TableRappel.tsx';
+import './tables.scss';
 
 export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion> = {
   loadSession: (setup) => {
@@ -33,6 +35,32 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
   },
 
   correctionLabel: (question) => question.answer,
+
+  /**
+   * Fiche dérivée de la question : la table du plus PETIT facteur, avec la ligne cherchée
+   * mise en avant. On récite toujours la plus petite (7 × 8 renvoie à la table de 7) parce
+   * que c'est celle que l'enfant a apprise, et la commutativité fait le reste — c'est
+   * justement l'idée clé de la fiche.
+   *
+   * Fonction pure : réutilisable telle quelle par le futur mode « école ».
+   */
+  fiche: (question) => {
+    const [petit, grand] = question.display_a <= question.display_b
+      ? [question.display_a, question.display_b]
+      : [question.display_b, question.display_a];
+
+    return {
+      titre: `${question.display_a} × ${question.display_b}`,
+      idee: `${petit} × ${grand} et ${grand} × ${petit} donnent le même résultat. Tu peux réciter celle que tu connais le mieux.`,
+      regle: `${petit} × ${grand} = ${question.answer}`,
+      exemple: <TableRappel table={petit} highlight={grand} />,
+      piege: petit === 0 || grand === 0
+        ? 'Multiplier par 0 donne toujours 0.'
+        : petit === 1
+          ? 'Multiplier par 1 ne change rien.'
+          : undefined,
+    };
+  },
 
   recordAnswer: (sessionId, question, correct) =>
     store.dispatch(tablesApi.endpoints.recordTablesAnswer.initiate({
