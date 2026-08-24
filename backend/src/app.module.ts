@@ -23,6 +23,7 @@ import { LectureModule } from './modules/lecture/lecture.module';
 import { NumerationModule } from './modules/numeration/numeration.module';
 import { MemoryModule } from './modules/memory/memory.module';
 import { PenduModule } from './modules/pendu/pendu.module';
+import { PoseModule } from './modules/pose/pose.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { AccessGuard } from './modules/invitation/access.guard';
 
@@ -66,6 +67,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     NumerationModule,
     MemoryModule,
     PenduModule,
+    PoseModule,
     InvitationModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AccessGuard }],
