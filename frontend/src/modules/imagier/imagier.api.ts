@@ -85,11 +85,11 @@ export const imagierApi = baseApi.injectEndpoints({
 
     // ─── Admin — import JSON ────────────────────────────────────────────────────
     importImagierJson: builder.mutation<
-      { inserted: number; skipped: number; errors: string[] },
-      { json: string; overwrite?: boolean }
+      { inserted: number; skipped: number; replaced: boolean; errors: string[] },
+      { json: string; overwrite?: boolean; replace?: boolean; activate?: boolean }
     >({
       query: (body) => ({ url: '/imagier/import', method: 'POST', body }),
-      invalidatesTags: ['ImagierWords', 'ImagierCategories'],
+      invalidatesTags: ['ImagierWords', 'ImagierCategories', { type: 'Progression', id: 'imagier' }],
     }),
   }),
 });

@@ -85,7 +85,11 @@ export class ImagierAdminController {
 
   @Post('import')
   async importJson(@Body() dto: ImportJsonDto) {
-    return this.importService.importFromJson(dto.json, dto.overwrite ?? false);
+    return this.importService.importFromJson(dto.json, {
+      overwrite: dto.overwrite,
+      replace: dto.replace,
+      activate: dto.activate,
+    });
   }
 
   // ─── Progression ───────────────────────────────────────────────────────────

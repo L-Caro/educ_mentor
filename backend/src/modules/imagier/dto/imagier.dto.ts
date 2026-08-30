@@ -102,4 +102,12 @@ export class ImportJsonDto {
   @IsOptional()
   @IsBoolean()
   overwrite?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  replace?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  activate?: boolean;
 }

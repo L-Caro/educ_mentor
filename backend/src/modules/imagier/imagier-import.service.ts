@@ -5,11 +5,22 @@ import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
 import { ImagierWord } from './entities/imagier-word.entity';
+import { ImagierProgression } from './entities/imagier-progression.entity';
 import { randomUUID } from 'node:crypto';
+
+export interface ImportOptions {
+  /** Écrase un mot existant (même slug FR) au lieu de l'ignorer. */
+  overwrite?: boolean;
+  /** Vide `imagier_words` + `imagier_progression` avant d'importer. */
+  replace?: boolean;
+  /** Marque les mots importés comme actifs (visibles dans le jeu). */
+  activate?: boolean;
+}
 
 export interface ImportReport {
   inserted: number;
   skipped: number;
+  replaced: boolean;
   errors: string[];
 }
 
@@ -33,6 +44,8 @@ export class ImagierImportService {
   constructor(
     @InjectRepository(ImagierWord)
     private readonly wordRepo: Repository<ImagierWord>,
+    @InjectRepository(ImagierProgression)
+    private readonly progressionRepo: Repository<ImagierProgression>,
     private readonly configService: ConfigService,
   ) {
     this.imagesBasePath = path.resolve(
@@ -43,9 +56,14 @@ export class ImagierImportService {
 
   async importFromJson(
     jsonStr: string,
-    overwrite = false,
+    options: ImportOptions = {},
   ): Promise<ImportReport> {
-    const report: ImportReport = { inserted: 0, skipped: 0, errors: [] };
+    const report: ImportReport = {
+      inserted: 0,
+      skipped: 0,
+      replaced: false,
+      errors: [],
+    };
 
     let dict: Record<string, unknown>;
     try {
@@ -70,6 +88,15 @@ export class ImagierImportService {
       return report;
     }
 
+    // Remplacement : on ne vide qu'une fois le JSON validé, pour ne jamais effacer sur une entrée cassée.
+    if (options.replace) {
+      await this.wordRepo.manager.transaction(async (manager) => {
+        await manager.getRepository(ImagierProgression).clear();
+        await manager.getRepository(ImagierWord).clear();
+      });
+      report.replaced = true;
+    }
+
     for (const [category, categoryData] of Object.entries(dict)) {
       if (typeof categoryData !== 'object' || categoryData === null) continue;
 
@@ -83,20 +110,13 @@ export class ImagierImportService {
             subOrEn,
             category,
             undefined,
-            overwrite,
+            options,
             report,
           );
         } else if (typeof subOrEn === 'object' && subOrEn !== null) {
           // Structure imbriquée : subOrFr = sous-catégorie
           for (const [fr, en] of Object.entries(subOrEn)) {
-            await this.processWord(
-              fr,
-              en,
-              category,
-              subOrFr,
-              overwrite,
-              report,
-            );
+            await this.processWord(fr, en, category, subOrFr, options, report);
           }
         }
       }
@@ -110,14 +130,14 @@ export class ImagierImportService {
     en: string,
     category: string,
     subcategory: string | undefined,
-    overwrite: boolean,
+    options: ImportOptions,
     report: ImportReport,
   ) {
     try {
       const slug = normalize(fr);
       const existing = await this.wordRepo.findOneBy({ slug });
 
-      if (existing && !overwrite) {
+      if (existing && !options.overwrite) {
         report.skipped++;
         return;
       }
@@ -132,7 +152,7 @@ export class ImagierImportService {
         category: normalize(category),
         subcategory,
         image_filename: image_filename ?? undefined,
-        is_active: existing?.is_active ?? false,
+        is_active: options.activate ? true : (existing?.is_active ?? false),
       };
 
       await this.wordRepo.save(word);

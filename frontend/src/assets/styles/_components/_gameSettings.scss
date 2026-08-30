@@ -80,6 +80,13 @@
 		font-weight: 500;
 	}
 
+	&__error {
+		font-size: v.$font-size-sm;
+		color: var(--color-error);
+		font-weight: 500;
+		margin: v.$space-3 0 0;
+	}
+
 	&__toggle {
 		display: flex;
 		align-items: center;
