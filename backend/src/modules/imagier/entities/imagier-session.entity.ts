@@ -24,5 +24,5 @@ export class ImagierSession {
   difficulty: string; // 'level_1' | 'level_2'
 
   @Column({ nullable: true })
-  categories: string; // JSON stringifié ex: '["animaux","nourriture"]'
+  categories: string; // JSON du filtre : { category, subcategories: [] }
 }

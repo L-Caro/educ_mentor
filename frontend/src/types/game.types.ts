@@ -145,14 +145,18 @@ export interface SetupChoice {
   label: string;
   icon?: string;
   description?: string;
+  /** Option dépendante : ce choix n'apparaît que si l'option parente vaut `parent`. */
+  parent?: string;
 }
 
 /** Une option de pré-jeu : choix unique (`single`) ou multiple (`multi`).
  * `choices` statiques OU `loader` async (résolu par <ModulePreSetup> avant rendu).
- * `emptyMessage` affiché à la place de la liste vide quand `choices` est vide après résolution. */
+ * `emptyMessage` affiché à la place de la liste vide quand `choices` est vide après résolution.
+ * `dependsOn` (multi) : ne montre que les `choices` dont `parent` vaut la valeur de l'option
+ * `single` désignée ; la sélection est vidée quand cette valeur change. */
 export type SetupOption =
   | { key: string; type: 'single'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]>; emptyMessage?: string }
-  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]>; emptyMessage?: string };
+  | { key: string; type: 'multi'; label: string; choices?: SetupChoice[]; loader?: () => Promise<SetupChoice[]>; emptyMessage?: string; dependsOn?: string };
 
 export type SetupValues = Record<string, string | string[]>;
 

@@ -13,7 +13,8 @@ function normalize(text: string): string {
 export const imagierGameSpec: GameModuleSpec<ImagierSessionResponse, ImagierQuestion> = {
   loadSession: (setup) =>
     store.dispatch(imagierApi.endpoints.startImagierSession.initiate({
-      categories: setup.categories as string[] | undefined,
+      category: setup.category as string | undefined,
+      subcategories: setup.subcategories as string[] | undefined,
       difficulty: setup.difficulty as string | undefined,
       mode: setup.mode as string | undefined,
     })).unwrap(),

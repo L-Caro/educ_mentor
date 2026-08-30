@@ -87,10 +87,13 @@ export class ImagierService {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
-    // Récupérer les mots actifs pour les catégories demandées
+    // Récupérer les mots actifs du thème demandé, éventuellement restreints à des sous-catégories.
     const qb = this.wordRepo.createQueryBuilder('w').where('w.is_active = 1');
-    if (dto.categories?.length) {
-      qb.andWhere('w.category IN (:...cats)', { cats: dto.categories });
+    if (dto.category) {
+      qb.andWhere('w.category = :category', { category: dto.category });
+    }
+    if (dto.subcategories?.length) {
+      qb.andWhere('w.subcategory IN (:...subs)', { subs: dto.subcategories });
     }
     const allWords = await qb.getMany();
 
@@ -157,7 +160,10 @@ export class ImagierService {
       id: randomUUID(),
       mode,
       difficulty,
-      categories: JSON.stringify(dto.categories ?? []),
+      categories: JSON.stringify({
+        category: dto.category ?? null,
+        subcategories: dto.subcategories ?? [],
+      }),
     });
     await this.sessionRepo.save(session);
 
@@ -272,25 +278,77 @@ export class ImagierService {
   }
 
   async getCategories(): Promise<
-    { category: string; count: number; active_count: number }[]
+    {
+      category: string;
+      count: number;
+      active_count: number;
+      subcategories: {
+        subcategory: string;
+        count: number;
+        active_count: number;
+      }[];
+    }[]
   > {
     const rows = await this.wordRepo
       .createQueryBuilder('w')
       .select('w.category', 'category')
+      .addSelect('w.subcategory', 'subcategory')
       .addSelect('COUNT(*)', 'count')
       .addSelect(
         'SUM(CASE WHEN w.is_active = 1 THEN 1 ELSE 0 END)',
         'active_count',
       )
       .groupBy('w.category')
+      .addGroupBy('w.subcategory')
       .orderBy('w.category')
-      .getRawMany<{ category: string; count: string; active_count: string }>();
+      .addOrderBy('w.subcategory')
+      .getRawMany<{
+        category: string;
+        subcategory: string | null;
+        count: string;
+        active_count: string;
+      }>();
 
-    return rows.map((r) => ({
-      category: r.category,
-      count: parseInt(r.count, 10),
-      active_count: parseInt(r.active_count, 10),
-    }));
+    const byCategory = new Map<
+      string,
+      {
+        category: string;
+        count: number;
+        active_count: number;
+        subcategories: {
+          subcategory: string;
+          count: number;
+          active_count: number;
+        }[];
+      }
+    >();
+
+    for (const row of rows) {
+      const count = parseInt(row.count, 10);
+      const activeCount = parseInt(row.active_count, 10);
+
+      let entry = byCategory.get(row.category);
+      if (!entry) {
+        entry = {
+          category: row.category,
+          count: 0,
+          active_count: 0,
+          subcategories: [],
+        };
+        byCategory.set(row.category, entry);
+      }
+      entry.count += count;
+      entry.active_count += activeCount;
+      if (row.subcategory) {
+        entry.subcategories.push({
+          subcategory: row.subcategory,
+          count,
+          active_count: activeCount,
+        });
+      }
+    }
+
+    return [...byCategory.values()];
   }
 
   async getProgression(): Promise<
@@ -320,34 +378,6 @@ export class ImagierService {
       }
     }
     return { updated };
-  }
-
-  // ─── Memory ───────────────────────────────────────────────────────────────
-
-  async getRandomWordsWithImages(
-    categories: string[] | undefined,
-    count: number,
-  ): Promise<
-    { id: string; fr: string; en: string; image_url: string | null }[]
-  > {
-    const qb = this.wordRepo
-      .createQueryBuilder('w')
-      .where('w.is_active = 1')
-      .andWhere('w.image_filename IS NOT NULL');
-
-    if (categories?.length) {
-      qb.andWhere('w.category IN (:...cats)', { cats: categories });
-    }
-
-    const allWords = await qb.getMany();
-    const selected = this.shuffle(allWords).slice(0, count);
-
-    return selected.map((w) => ({
-      id: w.id,
-      fr: w.fr,
-      en: w.en,
-      image_url: this.buildImageUrl(w),
-    }));
   }
 
   // ─── Helpers ──────────────────────────────────────────────────────────────

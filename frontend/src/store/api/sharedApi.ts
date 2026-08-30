@@ -32,7 +32,12 @@ export const sharedApi = baseApi.injectEndpoints({
       invalidatesTags: ['Catalog'],
     }),
     getImagierCategories: builder.query<
-      { category: string; count: number; active_count: number }[],
+      {
+        category: string;
+        count: number;
+        active_count: number;
+        subcategories: { subcategory: string; count: number; active_count: number }[];
+      }[],
       void
     >({
       query: () => '/imagier/categories',

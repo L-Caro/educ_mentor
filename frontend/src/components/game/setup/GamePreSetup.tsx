@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Button from 'src/components/common/Button.tsx';
 import PageContainer from 'src/components/layout/PageContainer/PageContainer.tsx';
 import type { SetupOption, SetupValues } from 'src/types/game.types.ts';
+import { applySingleSelection, buildInitialValues, visibleChoices } from './setupOptions.ts';
 
 interface GamePreSetupProps {
   subtitle?: string;
@@ -15,6 +16,7 @@ interface GamePreSetupProps {
  * Écran de pré-jeu générique, partagé par tous les modules. Rend les `setupOptions`
  * déclarées par le module, mémorise la sélection et lance la partie via `onStart`.
  * Le titre du module est déjà porté par le Header — on n'affiche ici que les options.
+ * La logique de sélection (valeurs initiales, cascade `dependsOn`) vit dans `setupOptions.ts`.
  */
 export default function GamePreSetup({
   subtitle,
@@ -26,7 +28,7 @@ export default function GamePreSetup({
   const [values, setValues] = useState<SetupValues>(() => buildInitialValues(options, initialValues));
 
   function selectSingle(key: string, value: string) {
-    setValues((previous) => ({ ...previous, [key]: value }));
+    setValues((previous) => applySingleSelection(options, previous, key, value));
   }
 
   function toggleMulti(key: string, value: string) {
@@ -49,41 +51,47 @@ export default function GamePreSetup({
       {subtitle && <p className="GamePreSetup__subtitle">{subtitle}</p>}
 
       <div className="GamePreSetup__groups">
-        {options.map((option) => (
-          <section key={option.key} className="GamePreSetup__group">
-            <p className="GamePreSetup__groupLabel">{option.label}</p>
-            <div className="GamePreSetup__choices">
-              {(option.choices ?? []).length === 0 && option.emptyMessage && (
-                <p className="GamePreSetup__emptyMessage">{option.emptyMessage}</p>
-              )}
-              {(option.choices ?? []).map((choice) => {
-                const isSelected =
-                  option.type === 'single'
-                    ? values[option.key] === choice.value
-                    : ((values[option.key] as string[] | undefined) ?? []).includes(choice.value);
-                return (
-                  <button
-                    key={choice.value}
-                    type="button"
-                    className={`GamePreSetup__choice${isSelected ? ' GamePreSetup__choice--selected' : ''}`}
-                    onClick={() =>
-                      option.type === 'single'
-                        ? selectSingle(option.key, choice.value)
-                        : toggleMulti(option.key, choice.value)
-                    }
-                    aria-pressed={isSelected}
-                  >
-                    {choice.icon && <span className="GamePreSetup__choiceIcon">{choice.icon}</span>}
-                    <span className="GamePreSetup__choiceLabel">{choice.label}</span>
-                    {choice.description && (
-                      <span className="GamePreSetup__choiceDesc">{choice.description}</span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-        ))}
+        {options.map((option) => {
+          const choices = visibleChoices(option, values);
+          // Option dépendante sans parent choisi : rien à montrer, on masque la section.
+          if (option.type === 'multi' && option.dependsOn && choices.length === 0) return null;
+
+          return (
+            <section key={option.key} className="GamePreSetup__group">
+              <p className="GamePreSetup__groupLabel">{option.label}</p>
+              <div className="GamePreSetup__choices">
+                {choices.length === 0 && option.emptyMessage && (
+                  <p className="GamePreSetup__emptyMessage">{option.emptyMessage}</p>
+                )}
+                {choices.map((choice) => {
+                  const isSelected =
+                    option.type === 'single'
+                      ? values[option.key] === choice.value
+                      : ((values[option.key] as string[] | undefined) ?? []).includes(choice.value);
+                  return (
+                    <button
+                      key={choice.value}
+                      type="button"
+                      className={`GamePreSetup__choice${isSelected ? ' GamePreSetup__choice--selected' : ''}`}
+                      onClick={() =>
+                        option.type === 'single'
+                          ? selectSingle(option.key, choice.value)
+                          : toggleMulti(option.key, choice.value)
+                      }
+                      aria-pressed={isSelected}
+                    >
+                      {choice.icon && <span className="GamePreSetup__choiceIcon">{choice.icon}</span>}
+                      <span className="GamePreSetup__choiceLabel">{choice.label}</span>
+                      {choice.description && (
+                        <span className="GamePreSetup__choiceDesc">{choice.description}</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </div>
 
       <Button
@@ -94,21 +102,4 @@ export default function GamePreSetup({
       />
     </PageContainer>
   );
-}
-
-function buildInitialValues(options: SetupOption[], initial?: SetupValues): SetupValues {
-  const values: SetupValues = {};
-  for (const option of options) {
-    const seed = initial?.[option.key];
-    if (option.type === 'single') {
-      values[option.key] = typeof seed === 'string' ? seed : '';
-    } else {
-      const available = (option.choices ?? []).map((c) => c.value);
-      // Filtrer le seed contre les choix actuels (les types désactivés en admin en sont absents)
-      const filtered = Array.isArray(seed) ? (seed as string[]).filter((v) => available.includes(v)) : [];
-      // Pas de sélection valide → tout pré-sélectionné (opt-out)
-      values[option.key] = filtered.length > 0 ? filtered : available;
-    }
-  }
-  return values;
 }

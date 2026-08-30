@@ -55,13 +55,19 @@ export class UpdateWordDto {
 }
 
 export class StartSessionDto {
+  // Thème choisi au pré-jeu (une seule catégorie).
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  // Sous-catégories du thème pour restreindre le tirage ; vide = tout le thème.
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   @Transform(({ value }: { value: unknown }): unknown =>
     typeof value === 'string' ? value.split(',').filter(Boolean) : value,
   )
-  categories?: string[];
+  subcategories?: string[];
 
   @IsOptional()
   @IsIn(DIFFICULTIES)

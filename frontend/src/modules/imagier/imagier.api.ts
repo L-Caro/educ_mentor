@@ -7,7 +7,7 @@ export const imagierApi = baseApi.injectEndpoints({
     // ─── Jeu (impératif : déclenché par la spec via store.dispatch) ─────────────
     startImagierSession: builder.mutation<
       ImagierSessionResponse,
-      { categories?: string[]; difficulty?: string; mode?: string }
+      { category?: string; subcategories?: string[]; difficulty?: string; mode?: string }
     >({
       query: (body) => ({ url: '/imagier/session', method: 'POST', body }),
     }),
