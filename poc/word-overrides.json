@@ -1,0 +1,19 @@
+{
+  "_comment": "Corrections de traduction dépendantes de la catégorie (le même mot EN a deux sens selon le thème). Appliquées par toImagier.ts après le mapping. Clé : catégorie -> mot EN (minuscules) -> FR.",
+  "verbes": {
+    "cook": "cuisiner",
+    "fish": "pêcher",
+    "fly": "voler",
+    "dry": "sécher",
+    "iron": "repasser",
+    "open": "ouvrir",
+    "vacuum": "passer l'aspirateur"
+  },
+  "maison": {
+    "chest": "coffre"
+  },
+  "electromenager": {
+    "scales": "balance",
+    "iron": "fer à repasser"
+  }
+}

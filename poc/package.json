@@ -1,0 +1,20 @@
+{
+  "name": "flashcards-scraper",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "POC — extraction des flashcards de kids-flashcards.com pour le module imagier",
+  "scripts": {
+    "catalog": "node src/catalog.ts",
+    "set": "node src/scrapeSet.ts",
+    "samples": "node src/sampleImages.ts",
+    "scrape": "node src/main.ts",
+    "to-imagier": "node src/toImagier.ts",
+    "build-memory-seed": "node src/buildMemorySeed.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "cheerio": "^1.2.0",
+    "sharp": "^0.35.4"
+  }
+}
