@@ -3,7 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MemorySession } from './entities/memory-session.entity';
 import { MemoryCard } from './entities/memory-card.entity';
 import { MemoryService } from './memory.service';
-import { MemoryCardSeedService } from './memory-card.seed';
+import { MemoryCardSeedService } from './memory-card-seed.service';
 import { MemoryGameController } from './memory-game.controller';
 import { AuthModule } from '../auth/auth.module';
 
