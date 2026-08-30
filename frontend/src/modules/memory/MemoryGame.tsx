@@ -51,7 +51,6 @@ export default function MemoryGame() {
 
   const pairsCount = parseInt((setup['pairs_count'] as string | undefined) ?? '6', 10);
   const mode = ((setup['mode'] as string | undefined) ?? 'image') as MemoryMode;
-  const categories = setup['categories'] as string[] | undefined;
 
   const [startSession] = useStartMemorySessionMutation();
   const [completeSession] = useCompleteMemorySessionMutation();
@@ -68,13 +67,13 @@ export default function MemoryGame() {
   const isCheckingRef = useRef(false);
 
   useEffect(() => {
-    startSession({ pairs_count: pairsCount, mode, categories })
+    startSession({ pairs_count: pairsCount, mode })
       .unwrap()
       .then((data) => {
         setSession(data);
         setCards(buildCards(data.pairs, data.mode));
       })
-      .catch(() => setError('Impossible de charger la partie. Vérifie que des images sont disponibles pour ces thèmes.'));
+      .catch(() => setError('Impossible de charger la partie.'));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

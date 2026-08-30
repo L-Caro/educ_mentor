@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Not, IsNull, Repository } from 'typeorm';
-import { MemorySession } from './entities/memory-session.entity';
-import { ImagierService } from '../imagier/imagier.service';
-import type { StartMemorySessionDto, MemoryMode } from './dto/memory.dto';
+import { IsNull, Not, Repository } from 'typeorm';
 import { randomUUID } from 'node:crypto';
+import { MemorySession } from './entities/memory-session.entity';
+import { MemoryCard } from './entities/memory-card.entity';
+import type { MemoryMode, StartMemorySessionDto } from './dto/memory.dto';
 
 export interface MemoryPair {
   id: string;
@@ -21,7 +21,7 @@ export interface MemorySessionResult {
 
 export interface MemoryProgressionStat {
   is_mastered: boolean;
-  correct_count: number; // = pairs_count (pairs found — toujours total pour Memory)
+  correct_count: number; // = pairs_count (paires trouvées — toujours le total pour Memory)
   incorrect_count: number; // = attempts - pairs_count (coups en trop)
 }
 
@@ -30,27 +30,30 @@ export class MemoryService {
   constructor(
     @InjectRepository(MemorySession)
     private readonly sessionRepo: Repository<MemorySession>,
-    private readonly imagierService: ImagierService,
+    @InjectRepository(MemoryCard)
+    private readonly cardRepo: Repository<MemoryCard>,
   ) {}
 
   async startSession(dto: StartMemorySessionDto): Promise<MemorySessionResult> {
-    const words = await this.imagierService.getRandomWordsWithImages(
-      dto.categories,
-      dto.pairs_count,
-    );
+    const cards = await this.cardRepo
+      .createQueryBuilder('card')
+      .where('card.image_filename IS NOT NULL')
+      .orderBy('RANDOM()')
+      .limit(dto.pairs_count)
+      .getMany();
 
-    const pairs: MemoryPair[] = words.map((w) => ({
-      id: w.id,
-      image_url: w.image_url,
-      word_fr: w.fr,
-      word_en: w.en,
+    const pairs: MemoryPair[] = cards.map((card) => ({
+      id: card.id,
+      image_url: `/media/memory/${encodeURIComponent(card.image_filename)}`,
+      word_fr: card.fr,
+      word_en: card.en,
     }));
 
     const session = this.sessionRepo.create({
       id: randomUUID(),
       pairs_count: dto.pairs_count,
       mode: dto.mode,
-      categories: JSON.stringify(dto.categories ?? []),
+      categories: '[]',
       attempts: null,
       completed_at: null,
     });
@@ -73,10 +76,10 @@ export class MemoryService {
       order: { completed_at: 'DESC' },
     });
 
-    return sessions.map((s) => ({
-      is_mastered: s.attempts === s.pairs_count,
-      correct_count: s.pairs_count,
-      incorrect_count: (s.attempts ?? 0) - s.pairs_count,
+    return sessions.map((session) => ({
+      is_mastered: session.attempts === session.pairs_count,
+      correct_count: session.pairs_count,
+      incorrect_count: (session.attempts ?? 0) - session.pairs_count,
     }));
   }
 

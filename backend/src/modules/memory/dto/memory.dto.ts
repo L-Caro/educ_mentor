@@ -1,12 +1,4 @@
-import {
-  IsArray,
-  IsIn,
-  IsInt,
-  IsOptional,
-  IsString,
-  Max,
-  Min,
-} from 'class-validator';
+import { IsIn, IsInt, Max, Min } from 'class-validator';
 
 export const MEMORY_MODES = [
   'image',
@@ -23,11 +15,6 @@ export class StartMemorySessionDto {
 
   @IsIn(MEMORY_MODES)
   mode: MemoryMode;
-
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  categories?: string[];
 }
 
 export class CompleteMemorySessionDto {

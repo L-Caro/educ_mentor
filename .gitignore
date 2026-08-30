@@ -45,6 +45,8 @@ frontend/tailwind-output.css
 /data/operations-a-trous.html
 /data/images/imagier
 /data/images/monnaie
+# Peuplé au démarrage depuis backend/src/modules/memory/seed-images/ (celui-là versionné).
+/data/images/memory
 
 data/educmentor.db
 data/educmentor.db-shm

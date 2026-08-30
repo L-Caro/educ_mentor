@@ -6,7 +6,7 @@ export const memoryApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     startMemorySession: builder.mutation<
       MemorySessionResponse,
-      { pairs_count: number; mode: MemoryMode; categories?: string[] }
+      { pairs_count: number; mode: MemoryMode }
     >({
       query: (body) => ({ url: '/memory/session', method: 'POST', body }),
     }),

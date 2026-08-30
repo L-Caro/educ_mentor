@@ -1,18 +1,6 @@
-import store from 'src/store';
-import { sharedApi } from 'src/store/api/sharedApi.ts';
-import { getCategoryConfig } from 'src/modules/imagier/constants/categories.ts';
 import type { SetupOption } from 'src/types/game.types.ts';
 
-async function loadCategories() {
-  const categories = await store.dispatch(sharedApi.endpoints.getImagierCategories.initiate()).unwrap();
-  return categories
-    .filter((c) => c.active_count > 0)
-    .map((c) => {
-      const config = getCategoryConfig(c.category);
-      return { value: c.category, label: config.label, icon: config.icon };
-    });
-}
-
+// Memory tire ses cartes d'un pool figé (76 animaux) : plus de sélecteur de thème.
 export const MEMORY_SETUP_OPTIONS: SetupOption[] = [
   {
     key: 'pairs_count',
@@ -40,12 +28,5 @@ export const MEMORY_SETUP_OPTIONS: SetupOption[] = [
       { value: 'image_word_fr', icon: '🇫🇷', label: 'Image + mot français' },
       { value: 'image_word_en', icon: '🇬🇧', label: 'Image + mot anglais' },
     ],
-  },
-  {
-    key: 'categories',
-    type: 'multi',
-    label: 'Thèmes',
-    loader: loadCategories,
-    emptyMessage: 'Aucun thème disponible',
   },
 ];

@@ -7,7 +7,9 @@
     "assets": [
       { "include": "modules/conjugaison/data/*.json", "outDir": "./dist" },
       { "include": "modules/geo/data/*.json", "outDir": "./dist" },
-      { "include": "modules/france/data/*.json", "outDir": "./dist" }
+      { "include": "modules/france/data/*.json", "outDir": "./dist" },
+      { "include": "modules/memory/memory-card.seed.json", "outDir": "./dist" },
+      { "include": "modules/memory/seed-images/*.webp", "outDir": "./dist" }
     ]
   }
 }
