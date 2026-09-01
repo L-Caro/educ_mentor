@@ -95,4 +95,71 @@ describe("Démarrage de l'application (e2e)", () => {
   it('renvoie 404 sur une route d’API inconnue', async () => {
     await request(server()).get('/api/nexistepas').expect(404);
   });
+
+  // ── Module dictée : import → pré-jeu → partie → correction ────────────────
+  // Couvre les deux migrations du module et tout le chemin de requête sur une base neuve.
+  it('joue une dictée de bout en bout', async () => {
+    const importResponse = await request(server())
+      .post('/api/dictee/import')
+      .send({
+        json: JSON.stringify({
+          items: [
+            {
+              niveau: 'normal',
+              contenu: 'Le chat gris dort.',
+              notions: ['accents : é è ê'],
+            },
+            {
+              niveau: 'normal',
+              contenu: 'La souris mange le fromage.',
+              notions: ['accord sujet-verbe'],
+            },
+          ],
+        }),
+        activate: true,
+      })
+      .expect(201);
+    expect(importResponse.body).toMatchObject({ inserted: 2, replaced: false });
+
+    const notions = (
+      await request(server()).get('/api/dictee/notions').expect(200)
+    ).body as string[];
+    expect(notions).toContain('accents : é è ê');
+
+    const session = (
+      await request(server())
+        .post('/api/dictee/session')
+        .send({ niveau: 'normal', longueur: 'moyenne' })
+        .expect(201)
+    ).body as { session_id: string; items: unknown[]; total_words: number };
+    expect(session.items).toHaveLength(2);
+    expect(session.total_words).toBeGreaterThan(0);
+
+    await request(server())
+      .post(`/api/dictee/session/${session.session_id}/complete`)
+      .send({ wrongWords: ['chat', 'fromage'] })
+      .expect(201);
+
+    const progression = (
+      await request(server()).get('/api/dictee/progression').expect(200)
+    ).body as { incorrect_count: number }[];
+    expect(progression.reduce((sum, row) => sum + row.incorrect_count, 0)).toBe(
+      2,
+    );
+
+    const errors = (
+      await request(server()).get('/api/dictee/mots-difficiles').expect(200)
+    ).body as { word: string }[];
+    expect(errors.map((entry) => entry.word).sort()).toEqual([
+      'chat',
+      'fromage',
+    ]);
+  });
+
+  it('refuse une session de dictée sur un niveau sans contenu', async () => {
+    await request(server())
+      .post('/api/dictee/session')
+      .send({ niveau: 'difficile', longueur: 'courte' })
+      .expect(400);
+  });
 });

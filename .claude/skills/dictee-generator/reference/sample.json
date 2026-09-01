@@ -1,0 +1,43 @@
+{
+  "items": [
+    { "niveau": "debutant", "contenu": "cheval", "notions": ["son [ʃ] : ch"] },
+    { "niveau": "debutant", "contenu": "éléphant", "notions": ["accents : é è ê", "lettres muettes finales"] },
+    { "niveau": "debutant", "contenu": "maîtresse", "notions": ["tréma", "doubles consonnes"] },
+    { "niveau": "debutant", "contenu": "garçon", "notions": ["cédille", "son [ɔ̃] : on, om"] },
+    { "niveau": "debutant", "contenu": "tomber", "notions": ["m devant m, b, p"] },
+    { "niveau": "debutant", "contenu": "bateau", "notions": ["son [o] : o, au, eau"] },
+    { "niveau": "debutant", "contenu": "oiseau", "notions": ["son [wa] : oi", "son [o] : o, au, eau"] },
+    { "niveau": "debutant", "contenu": "fille", "notions": ["son [j] : ill, y, i"] },
+    { "niveau": "debutant", "contenu": "nuage", "notions": ["sons simples : voyelles et consonnes"] },
+    { "niveau": "debutant", "contenu": "jouet", "notions": ["son [ʒ] : g, ge, j", "lettres muettes finales"] },
+    { "niveau": "debutant", "contenu": "manteau", "notions": ["son [ɑ̃] : an, en, am, em", "son [o] : o, au, eau"] },
+    { "niveau": "debutant", "contenu": "cheveux", "notions": ["pluriel en -x : -eau, -eu, -ou", "son [ø œ] : eu, œu"] },
+    { "niveau": "debutant", "contenu": "hibou", "notions": ["h muet en début de mot"] },
+    { "niveau": "debutant", "contenu": "fenêtre", "notions": ["accents : é è ê"] },
+    { "niveau": "debutant", "contenu": "dimanche", "notions": ["son [ʃ] : ch", "son [ɑ̃] : an, en, am, em"] },
+    { "niveau": "debutant", "contenu": "framboise", "notions": ["m devant m, b, p", "son [wa] : oi"] },
+    { "niveau": "debutant", "contenu": "lapin", "notions": ["son [ɛ̃] : in, ain, ein"] },
+    { "niveau": "debutant", "contenu": "balançoire", "notions": ["cédille", "son [wa] : oi"] },
+    { "niveau": "debutant", "contenu": "fromage", "notions": ["son [ʒ] : g, ge, j"] },
+    { "niveau": "debutant", "contenu": "montagne", "notions": ["son [ɔ̃] : on, om"] },
+
+    { "niveau": "normal", "contenu": "Le chat noir dort sur le vieux fauteuil.", "notions": ["accord dans le groupe nominal", "lettres muettes finales"] },
+    { "niveau": "normal", "contenu": "Ma sœur range ses livres dans son cartable.", "notions": ["homophones : ces / ses", "accord dans le groupe nominal"] },
+    { "niveau": "normal", "contenu": "Papa et maman préparent le dîner ensemble.", "notions": ["homophones : et / est", "verbes du 1er groupe au présent"] },
+    { "niveau": "normal", "contenu": "Les oiseaux chantent dans les grands arbres.", "notions": ["pluriel en -s", "accord sujet-verbe"] },
+    { "niveau": "normal", "contenu": "Il a mangé toute la tarte aux pommes.", "notions": ["homophones : a / à", "participe passé en -é"] },
+    { "niveau": "normal", "contenu": "Où est passé mon crayon rouge ?", "notions": ["homophones : ou / où", "ponctuation : point d'interrogation"] },
+    { "niveau": "normal", "contenu": "La maîtresse écrit la date au tableau.", "notions": ["tréma", "verbes du 1er groupe au présent"] },
+    { "niveau": "normal", "contenu": "Nous jouons dans la cour pendant la récréation.", "notions": ["verbes du 1er groupe au présent", "accents : é è ê"] },
+    { "niveau": "normal", "contenu": "Le petit garçon a perdu son ballon.", "notions": ["cédille", "homophones : a / à"] },
+    { "niveau": "normal", "contenu": "Elle est très contente de revoir ses amies.", "notions": ["homophones : et / est", "féminin des noms et des adjectifs"] },
+    { "niveau": "normal", "contenu": "Ils ont trouvé un trésor dans le jardin.", "notions": ["homophones : on / ont", "accents : é è ê"] },
+    { "niveau": "normal", "contenu": "Le vent souffle fort et la pluie tombe.", "notions": ["homophones : et / est", "m devant m, b, p"] },
+
+    { "niveau": "difficile", "contenu": "Ce matin, la neige recouvre tout le village. Les enfants mettent leurs bottes et leurs manteaux. Ils courent dehors pour faire un bonhomme de neige. Le chien aboie et saute autour d'eux. À midi, tout le monde rentre se réchauffer près du feu.", "notions": ["accord dans le groupe nominal", "pluriel en -s", "homophones : et / est"] },
+    { "niveau": "difficile", "contenu": "La cloche sonne à huit heures et demie. Les élèves entrent en classe et rangent leurs affaires. La maîtresse demande le silence, puis elle commence la leçon. Aujourd'hui, nous apprenons à écrire les verbes du premier groupe. À la fin de la matinée, chacun relit son travail.", "notions": ["homophones : a / à", "accord sujet-verbe", "apostrophe / élision"] },
+    { "niveau": "difficile", "contenu": "Au printemps, le jardin de ma grand-mère se réveille doucement. Les fleurs poussent le long du mur et les abeilles butinent. Mon frère et moi aidons à planter des graines de tomates. Chaque soir, nous arrosons la terre avec un grand arrosoir. Bientôt, les premiers légumes seront prêts.", "notions": ["accord dans le groupe nominal", "trait d'union", "pluriel en -s"] },
+    { "niveau": "difficile", "contenu": "Le samedi, papa m'emmène au marché du centre-ville. Les marchands installent leurs étals dès le matin. On y trouve des fruits, des légumes, du fromage et du poisson frais. Maman choisit toujours des pommes rouges et une salade verte. Nous rentrons à la maison les paniers bien remplis.", "notions": ["trait d'union", "pluriel en -s", "homophones : on / ont"] },
+    { "niveau": "difficile", "contenu": "Quand la nuit tombe, la maison devient silencieuse. Je monte dans ma chambre et je choisis un livre sur l'étagère. Mon petit chat vient se coucher en boule au bout du lit. Maman éteint la lumière et me souhaite une bonne nuit. Je ferme les yeux en pensant à la journée de demain.", "notions": ["m devant m, b, p", "apostrophe / élision", "homophones : a / à"] }
+  ]
+}

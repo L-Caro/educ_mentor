@@ -1,0 +1,280 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.DicteeGame {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-6;
+  padding: $space-5;
+  overflow-y: auto;
+
+  &--centered {
+    justify-content: center;
+    text-align: center;
+  }
+
+  &__hint {
+    max-width: 32rem;
+    text-align: center;
+    color: var(--color-base-content);
+    opacity: 0.7;
+    font-size: $font-size-sm;
+  }
+
+  &__counter {
+    font-size: $font-size-sm;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  &__error {
+    color: var(--color-error);
+    font-weight: 600;
+    text-align: center;
+  }
+
+  // ── Préparation ──────────────────────────────────────────────────────────
+  &__study {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: $space-3 $space-5;
+    max-width: 40rem;
+
+    &--debutant .DicteeGame__studyLine {
+      font-size: $font-size-xl;
+      font-weight: 700;
+    }
+  }
+
+  &__studyLine {
+    margin: 0;
+    font-size: $font-size-lg;
+    line-height: 1.6;
+    color: var(--color-base-content);
+  }
+
+  &__study--normal,
+  &__study--difficile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  // ── Dictée (script de l'adulte) ──────────────────────────────────────────
+  &__prompt {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 8rem;
+    max-width: 44rem;
+    padding: $space-6;
+    border: 2px solid var(--color-base-300);
+    border-radius: $radius-lg;
+    background: var(--color-base-100);
+    text-align: center;
+    line-height: 1.7;
+    color: var(--color-base-content);
+
+    &--debutant {
+      font-size: $font-size-3xl;
+      font-weight: 700;
+    }
+
+    &--normal {
+      font-size: $font-size-xl;
+    }
+
+    &--difficile {
+      font-size: $font-size-lg;
+      text-align: left;
+    }
+  }
+
+  &__nav {
+    display: flex;
+    gap: $space-4;
+  }
+
+  // ── Correction ───────────────────────────────────────────────────────────
+  &__correction {
+    max-width: 44rem;
+    line-height: 2.2;
+    font-size: $font-size-lg;
+    color: var(--color-base-content);
+
+    &--debutant {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $space-2 $space-4;
+      justify-content: center;
+      line-height: 1.8;
+    }
+  }
+
+  &__correctionLine {
+    margin: 0 0 $space-3;
+  }
+
+  &__token {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: none;
+    border-radius: $radius-sm;
+    padding: 0 0.15em;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover {
+      background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    }
+
+    &--wrong {
+      background: color-mix(in srgb, var(--color-error) 18%, transparent);
+      color: var(--color-error);
+      font-weight: 700;
+      text-decoration: underline wavy var(--color-error);
+    }
+  }
+
+  // ── Récapitulatif ────────────────────────────────────────────────────────
+  &__recapTitle {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: var(--color-base-content);
+  }
+
+  &__recapWords {
+    max-width: 32rem;
+    font-size: $font-size-lg;
+    color: var(--color-error);
+  }
+}
+
+// ─── Administration ──────────────────────────────────────────────────────────
+
+.DicteeAdmin {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-4;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: $font-size-xl;
+  }
+
+  &__sectionTitle {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $space-3;
+    margin: 0 0 $space-3;
+    font-size: $font-size-md;
+  }
+
+  &__count {
+    font-size: $font-size-xs;
+    font-weight: 400;
+    color: var(--color-base-content);
+    opacity: 0.6;
+  }
+
+  &__empty {
+    color: var(--color-base-content);
+    opacity: 0.7;
+  }
+
+  &__import {
+    display: flex;
+    flex-direction: column;
+    gap: $space-3;
+  }
+
+  &__textarea {
+    min-height: 14rem;
+    resize: vertical;
+    font-family: monospace;
+    font-size: $font-size-xs;
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    font-size: $font-size-sm;
+  }
+
+  &__report {
+    font-size: $font-size-sm;
+  }
+
+  &__error {
+    color: var(--color-error);
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $space-3;
+    flex-wrap: wrap;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+    padding: $space-3 0;
+    border-top: 1px solid var(--color-base-300);
+
+    &:first-of-type {
+      border-top: none;
+    }
+  }
+
+  &__itemMain {
+    display: flex;
+    align-items: baseline;
+    gap: $space-3;
+  }
+
+  &__itemContenu {
+    margin: 0;
+    color: var(--color-base-content);
+  }
+
+  &__itemNotions {
+    margin: 0;
+    font-size: $font-size-xs;
+    color: var(--color-base-content);
+    opacity: 0.6;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th,
+    td {
+      text-align: left;
+      padding: $space-2 $space-3;
+      border-bottom: 1px solid var(--color-base-300);
+    }
+
+    th {
+      font-weight: 700;
+      opacity: 0.7;
+    }
+  }
+}
