@@ -16,6 +16,6 @@ export const baseApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ['Settings', 'Catalog', 'ImagierCategories', 'ImagierWords', 'Progression', 'Invitations', 'LectureTexts', 'LectureAdminTexts', 'LectureQuestions'],
+  tagTypes: ['Settings', 'Catalog', 'ImagierCategories', 'ImagierWords', 'Progression', 'Invitations', 'LectureTexts', 'LectureAdminTexts', 'LectureQuestions', 'DicteeItems'],
   endpoints: () => ({}),
 });

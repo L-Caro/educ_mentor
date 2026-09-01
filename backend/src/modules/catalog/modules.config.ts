@@ -122,4 +122,13 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 14,
   },
+  {
+    id: 'dictee',
+    name: 'Dictée',
+    description:
+      "Écrire sous la dictée d'un adulte : mots, phrases ou paragraphes selon le niveau",
+    icon: '📝',
+    is_active: false,
+    display_order: 15,
+  },
 ];
