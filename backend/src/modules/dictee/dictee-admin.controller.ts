@@ -63,4 +63,21 @@ export class DicteeAdminController {
       activate: dto.activate,
     });
   }
+
+  // ─── Progression ──────────────────────────────────────────────────────────
+
+  @Get('progression')
+  getProgression() {
+    return this.service.getProgression();
+  }
+
+  @Get('mots-difficiles')
+  getWordErrors() {
+    return this.service.getWordErrors();
+  }
+
+  @Delete('progression')
+  resetProgression() {
+    return this.service.resetProgression();
+  }
 }

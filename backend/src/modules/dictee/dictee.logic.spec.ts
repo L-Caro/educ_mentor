@@ -1,5 +1,8 @@
 import {
+  cleanWord,
+  distinctWordKeys,
   extractWords,
+  filterByNotion,
   normalizeWordKey,
   resolveItemCount,
 } from './dictee.logic';
@@ -52,10 +55,43 @@ describe('dictee.logic', () => {
       ]);
     });
 
-    it('conserve le mot brut pour l affichage, ponctuation de bord comprise', () => {
+    it('conserve le mot brut et la forme affichée', () => {
       const words = extractWords('Où est-il ?');
       expect(words.map((word) => word.raw)).toEqual(['Où', 'est-il']);
+      expect(words.map((word) => word.display)).toEqual(['Où', 'est-il']);
       expect(words.map((word) => word.key)).toEqual(['où', 'est-il']);
+    });
+  });
+
+  describe('cleanWord', () => {
+    it('retire la ponctuation de bord en gardant la casse', () => {
+      expect(cleanWord('Chat.')).toBe('Chat');
+      expect(cleanWord('«Neige»')).toBe('Neige');
+    });
+  });
+
+  describe('distinctWordKeys', () => {
+    it('déduplique les mots sur tout un lot de contenus', () => {
+      const keys = distinctWordKeys(['Le chat dort.', 'Le chien court.']);
+      expect(keys.sort()).toEqual(['chat', 'chien', 'court', 'dort', 'le']);
+    });
+  });
+
+  describe('filterByNotion', () => {
+    const items = [
+      { notions: ['accents : é è ê'] },
+      { notions: ['cédille', 'accents : é è ê'] },
+      { notions: ['pluriel en -s'] },
+    ];
+
+    it('garde tout quand aucune notion demandée', () => {
+      expect(filterByNotion(items, null)).toHaveLength(3);
+      expect(filterByNotion(items, '')).toHaveLength(3);
+    });
+
+    it('ne garde que les items travaillant la notion', () => {
+      expect(filterByNotion(items, 'accents : é è ê')).toHaveLength(2);
+      expect(filterByNotion(items, 'cédille')).toHaveLength(1);
     });
   });
 });

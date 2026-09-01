@@ -38,20 +38,24 @@ export function resolveItemCount(niveau: Niveau, longueur: Longueur): number {
  * internes sont conservés : « l'école », « arc-en-ciel » sont un seul mot). */
 const EDGE_PUNCTUATION = /^[«»"'’“”().,;:!?…—–-]+|[«»"'’“”().,;:!?…—–-]+$/g;
 
-/** Clé de suivi d'un mot : minuscules, apostrophe droite, ponctuation de bord retirée.
- * Deux écritures du même mot doivent produire la même clé pour être agrégées sur l'année.
- * Retourne '' si le token n'est que de la ponctuation. */
+/** Le mot débarrassé de la ponctuation de bord, casse et accents conservés :
+ * « Chat. » → « Chat », « l'école » → « l'école ». Forme affichée dans les listes. */
+export function cleanWord(token: string): string {
+  return token.trim().replace(/’/g, "'").replace(EDGE_PUNCTUATION, '');
+}
+
+/** Clé de suivi d'un mot : `cleanWord` mis en minuscules. Deux écritures du même mot
+ * produisent la même clé pour être agrégées sur l'année. '' si le token n'est que
+ * de la ponctuation. */
 export function normalizeWordKey(token: string): string {
-  return token
-    .trim()
-    .toLowerCase()
-    .replace(/’/g, "'")
-    .replace(EDGE_PUNCTUATION, '');
+  return cleanWord(token).toLowerCase();
 }
 
 export interface DicteeWord {
   /** Le mot tel qu'il apparaît dans le contenu, ponctuation de bord comprise. */
   raw: string;
+  /** Forme affichée, ponctuation de bord retirée. */
+  display: string;
   /** Sa clé de suivi normalisée. */
   key: string;
 }
@@ -62,6 +66,29 @@ export function extractWords(contenu: string): DicteeWord[] {
   return contenu
     .split(/\s+/)
     .filter(Boolean)
-    .map((raw) => ({ raw, key: normalizeWordKey(raw) }))
+    .map((raw) => ({
+      raw,
+      display: cleanWord(raw),
+      key: normalizeWordKey(raw),
+    }))
     .filter((word) => word.key.length > 0);
+}
+
+/** Clés de mots distinctes couvertes par un lot d'items : c'est sur cet ensemble que le
+ * suivi par mot s'incrémente (une fois par mot et par séance, pas une fois par occurrence). */
+export function distinctWordKeys(contenus: string[]): string[] {
+  const keys = new Set<string>();
+  for (const contenu of contenus) {
+    for (const word of extractWords(contenu)) keys.add(word.key);
+  }
+  return [...keys];
+}
+
+/** Garde les items qui travaillent la notion demandée. `notion` vide/absente = tous. */
+export function filterByNotion<T extends { notions: string[] }>(
+  items: T[],
+  notion?: string | null,
+): T[] {
+  if (!notion) return items;
+  return items.filter((item) => item.notions.includes(notion));
 }
