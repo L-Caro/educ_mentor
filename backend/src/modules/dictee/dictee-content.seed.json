@@ -1,0 +1,43 @@
+{
+  "items": [
+    { "niveau": "debutant", "contenu": "escargot", "notions": ["lettres muettes finales"] },
+    { "niveau": "debutant", "contenu": "jardin", "notions": ["son [ʒ] : g, ge, j", "son [ɛ̃] : in, ain, ein"] },
+    { "niveau": "debutant", "contenu": "quatre", "notions": ["son [k] : c, qu, k"] },
+    { "niveau": "debutant", "contenu": "maison", "notions": ["son [z] : s entre deux voyelles", "son [ɔ̃] : on, om"] },
+    { "niveau": "debutant", "contenu": "phoque", "notions": ["son [f] : f, ff, ph", "son [k] : c, qu, k"] },
+    { "niveau": "debutant", "contenu": "abeille", "notions": ["son [j] : ill, y, i"] },
+    { "niveau": "debutant", "contenu": "pinceau", "notions": ["son [ɛ̃] : in, ain, ein", "son [o] : o, au, eau"] },
+    { "niveau": "debutant", "contenu": "chapeau", "notions": ["son [ʃ] : ch", "son [o] : o, au, eau"] },
+    { "niveau": "debutant", "contenu": "hérisson", "notions": ["h muet en début de mot", "doubles consonnes"] },
+    { "niveau": "debutant", "contenu": "citron", "notions": ["son [s] : s, ss, c, ç", "son [ɔ̃] : on, om"] },
+    { "niveau": "debutant", "contenu": "glaçon", "notions": ["cédille", "son [ɔ̃] : on, om"] },
+    { "niveau": "debutant", "contenu": "guitare", "notions": ["son [ɡ] : g, gu"] },
+    { "niveau": "debutant", "contenu": "yaourt", "notions": ["son [j] : ill, y, i"] },
+    { "niveau": "debutant", "contenu": "horloge", "notions": ["h muet en début de mot", "son [ʒ] : g, ge, j"] },
+    { "niveau": "debutant", "contenu": "tambour", "notions": ["m devant m, b, p", "son [ɑ̃] : an, en, am, em"] },
+    { "niveau": "debutant", "contenu": "campagne", "notions": ["m devant m, b, p", "son [ɑ̃] : an, en, am, em"] },
+    { "niveau": "debutant", "contenu": "dauphin", "notions": ["son [o] : o, au, eau", "son [f] : f, ff, ph"] },
+    { "niveau": "debutant", "contenu": "écureuil", "notions": ["son [ø œ] : eu, œu", "son [j] : ill, y, i"] },
+    { "niveau": "debutant", "contenu": "koala", "notions": ["son [k] : c, qu, k"] },
+    { "niveau": "debutant", "contenu": "cerise", "notions": ["son [s] : s, ss, c, ç", "son [z] : s entre deux voyelles"] },
+
+    { "niveau": "normal", "contenu": "Les élèves rangent leurs cahiers dans le casier.", "notions": ["pluriel en -s", "accord dans le groupe nominal"] },
+    { "niveau": "normal", "contenu": "Mon frère a cassé son vélo hier soir.", "notions": ["homophones : a / à", "homophones : son / sont"] },
+    { "niveau": "normal", "contenu": "Est-ce que tu viens jouer avec nous ?", "notions": ["ponctuation : point d'interrogation", "trait d'union"] },
+    { "niveau": "normal", "contenu": "La maîtresse raconte une histoire aux enfants.", "notions": ["tréma", "verbes du 1er groupe au présent"] },
+    { "niveau": "normal", "contenu": "Ils ont planté des fleurs devant la maison.", "notions": ["homophones : on / ont", "participe passé en -é"] },
+    { "niveau": "normal", "contenu": "Où as-tu rangé ta trousse bleue ?", "notions": ["homophones : ou / où", "accord dans le groupe nominal"] },
+    { "niveau": "normal", "contenu": "Le boulanger prépare le pain très tôt.", "notions": ["verbes du 1er groupe au présent", "accents : é è ê"] },
+    { "niveau": "normal", "contenu": "Ma grande sœur est championne de natation.", "notions": ["homophones : et / est", "féminin des noms et des adjectifs"] },
+    { "niveau": "normal", "contenu": "Nous avons mangé une glace à la fraise.", "notions": ["homophones : a / à", "verbes être et avoir au présent"] },
+    { "niveau": "normal", "contenu": "Le chien de mes voisins aboie toute la nuit.", "notions": ["pluriel en -s", "accord sujet-verbe"] },
+    { "niveau": "normal", "contenu": "Papa range ses outils dans le garage.", "notions": ["homophones : ces / ses", "son [ʒ] : g, ge, j"] },
+    { "niveau": "normal", "contenu": "Range ta chambre avant de partir jouer.", "notions": ["m devant m, b, p", "infinitif en -er après une préposition"] },
+
+    { "niveau": "difficile", "contenu": "Le mercredi après-midi, nous allons à la piscine avec la classe. Le maître nous apprend à mettre la tête sous l'eau. Au début, j'avais un peu peur, mais maintenant je nage presque seul. Après la séance, nous avons droit à un goûter. Je rentre à la maison les cheveux encore mouillés.", "notions": ["homophones : a / à", "apostrophe / élision", "accord sujet-verbe"] },
+    { "niveau": "difficile", "contenu": "Samedi, c'était l'anniversaire de mon ami Malo. Sa maman avait préparé un grand gâteau au chocolat. Nous avons joué dans le jardin, puis nous avons ouvert les cadeaux. Malo a soufflé ses huit bougies d'un seul coup. Tout le monde a chanté très fort.", "notions": ["majuscule aux noms propres", "homophones : a / à", "pluriel en -s"] },
+    { "niveau": "difficile", "contenu": "En automne, les feuilles des arbres deviennent jaunes et rouges. Le vent les fait tomber sur le chemin du parc. Mon petit frère aime marcher dedans pour entendre le bruit. Nous ramassons les plus belles pour les coller dans un cahier. Le soir tombe de plus en plus tôt.", "notions": ["pluriel en -s", "accord dans le groupe nominal", "homophones : et / est"] },
+    { "niveau": "difficile", "contenu": "Chaque vendredi, la maîtresse nous emmène à la bibliothèque de l'école. Nous avons le droit de choisir deux livres à rapporter à la maison. J'aime surtout les histoires d'animaux et les bandes dessinées. Il faut faire attention à ne pas abîmer les pages. Quand j'ai fini un livre, je le range à sa place.", "notions": ["apostrophe / élision", "homophones : a / à", "pluriel en -s"] },
+    { "niveau": "difficile", "contenu": "Cet hiver, nous sommes partis une semaine à la montagne. Le matin, papa nous réveille tôt pour chausser les skis. Ma sœur descend la piste beaucoup plus vite que moi. À midi, nous mangeons une soupe chaude au chalet. Le dernier jour, il a neigé toute la journée.", "notions": ["homophones : a / à", "accord sujet-verbe", "accents : é è ê"] }
+  ]
+}
