@@ -1,0 +1,136 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.GrammairePrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-4;
+
+  &__question {
+    max-width: 30rem;
+    text-align: center;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: var(--color-base-content);
+  }
+}
+
+// La phrase, en lecture seule. Interligne large : les marques (fond, soulignement) ont
+// besoin d'air, et une phrase de dix mots passe à la ligne sur un téléphone.
+.PhraseMarquee {
+  max-width: 32rem;
+  text-align: center;
+  font-size: $font-size-xl;
+  line-height: 2;
+  color: var(--color-base-content);
+
+  &__mot {
+    background: transparent;
+    color: inherit;
+    padding: 0 0.1em;
+    border-radius: $radius-sm;
+
+    &--souligne {
+      font-weight: 700;
+      text-decoration: underline 3px var(--color-primary);
+      text-underline-offset: 0.25em;
+    }
+
+    &--surligne {
+      background: color-mix(in srgb, var(--color-primary) 20%, transparent);
+      font-weight: 700;
+    }
+  }
+}
+
+// La phrase touchable. Les mots sont des boutons, dimensionnés pour un doigt : la cible
+// tactile fait au moins 44 px de haut même quand le mot fait deux lettres.
+.PhraseCliquable {
+  max-width: 32rem;
+  margin: 0 auto;
+  text-align: center;
+  font-size: $font-size-xl;
+  line-height: 2.4;
+  color: var(--color-base-content);
+
+  &__mot {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 2px solid transparent;
+    border-radius: $radius-sm;
+    padding: 0.15em 0.25em;
+    min-height: 2.75rem;
+    cursor: pointer;
+    transition:
+      background 0.12s,
+      border-color 0.12s,
+      color 0.12s;
+
+    &:hover:not(:disabled) {
+      background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    &--touche {
+      background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+      border-color: var(--color-primary);
+      font-weight: 700;
+    }
+
+    // Après la réponse, trois états distincts et non deux : « oublié » et « en trop » ne
+    // sont pas la même erreur, et ne demandent pas la même correction.
+    &--juste {
+      background: color-mix(in srgb, var(--color-success) 22%, transparent);
+      border-color: var(--color-success);
+      font-weight: 700;
+    }
+
+    &--oublie {
+      border-color: var(--color-success);
+      border-style: dashed;
+      font-weight: 700;
+    }
+
+    &--enTrop {
+      background: color-mix(in srgb, var(--color-error) 18%, transparent);
+      border-color: var(--color-error);
+      text-decoration: line-through;
+    }
+  }
+}
+
+.GrammaireNotions {
+  &__sectionTitle {
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: var(--color-base-content);
+    margin-bottom: $space-2;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th,
+    td {
+      padding: $space-2 $space-3;
+      text-align: left;
+      border-bottom: 1px solid var(--color-base-300);
+    }
+
+    th {
+      font-weight: 700;
+      color: var(--color-base-content-muted, var(--color-base-content));
+    }
+
+    td:not(:first-child),
+    th:not(:first-child) {
+      text-align: right;
+    }
+  }
+}

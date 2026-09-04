@@ -25,6 +25,7 @@ import { MemoryModule } from './modules/memory/memory.module';
 import { PenduModule } from './modules/pendu/pendu.module';
 import { PoseModule } from './modules/pose/pose.module';
 import { DicteeModule } from './modules/dictee/dictee.module';
+import { GrammaireModule } from './modules/grammaire/grammaire.module';
 import { GeometrieModule } from './modules/geometrie/geometrie.module';
 import { InvitationModule } from './modules/invitation/invitation.module';
 import { AccessGuard } from './modules/invitation/access.guard';
@@ -72,6 +73,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     PoseModule,
     DicteeModule,
     GeometrieModule,
+    GrammaireModule,
     InvitationModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: AccessGuard }],

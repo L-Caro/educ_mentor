@@ -1,7 +1,7 @@
 # Chantiers — ÉducMentor
 
 > **Document vivant.** C'est le point de reprise : où on en est, ce qui est décidé, ce qui reste ouvert.
-> Dernière mise à jour : **2026-08-24**.
+> Dernière mise à jour : **2026-09-04**.
 
 ## Les documents du dossier
 
@@ -322,6 +322,84 @@ pas un cadre vide à l'écran.
   domaines où les Cours apportent une couverture nouvelle.
 - 75 % des exemples du corpus sont cuits dans les images ; 19 % des leçons seulement ont un
   résumé. La réécriture n'est donc pas une reformulation, c'est une rédaction.
+
+---
+
+# Chantier C — Le trou du français : `grammaire`
+
+Branche `module-grammaire`, worktree `../educ_mentor-grammaire` (l'arbre principal était
+occupé par `module-geometrie`).
+
+## Pourquoi ce module et pas un autre
+
+Le découpage du français en §B.4 compte 7 grandes notions. Trois portaient « aucune »
+tuile — **La nature des mots** (6 concepts), **Les accords** (5), **La fonction des mots**
+(3) — et « La phrase » était rattachée à `lecture`, qui fait de la compréhension, pas de la
+ponctuation. Soit **17 notions sur 33 sans aucun entraînement** : aucun autre trou n'en
+approche. Et les fiches de cours étaient déjà écrites, donc la pédagogie était déjà faite.
+
+`grammaire` couvre **La nature des mots + La fonction des mots**. « Les accords »
+(singulier↔pluriel) et « La phrase » (majuscule, point, types de phrase) sont des modules
+à part : saisie libre pour l'un, production pour l'autre. Cinq types d'interaction dans un
+seul module, c'est ce qui empêche de le finir.
+
+## Décisions de conception
+
+- **Le corpus est du CODE, pas de la base.** Même raison que `geometrie.shapes.ts` : une
+  phrase annotée mot par mot n'est pas du contenu qu'un parent édite, et une annotation
+  fausse enseigne du faux français. Conséquence assumée : pas de table de contenu, pas
+  d'import JSON, pas d'onglet « Contenu » — un textarea JSON était le seul endroit du
+  module capable d'injecter une annotation fausse. Étendre le corpus demande un déploiement,
+  comme pour une figure ou une fiche.
+- **L'annotation passe par des constructeurs, pas par des objets littéraux.**
+  `gnSujet(d('Le'), nc('chat'))` plutôt que `{ fonction: 'sujet', gn: 0 }` répété sur les
+  trois mots du groupe. Les index de groupe nominal sont attribués par l'aplatissement.
+- **Ce n'est PAS l'écran de correction de la dictée qui est réutilisé.** Celui-là est de
+  l'auto-correction : l'enfant coche ses propres fautes, l'application ne connaît aucune
+  vérité. Ici il y a une bonne réponse. Le vrai véhicule était `spec.map` +
+  `isMultiSelect`, déjà utilisé par les régions de `france` — timer, score, étoiles,
+  progression et fiche fournis par le moteur.
+- **Jamais la nature d'un mot hors phrase.** « Quelle est la nature de *ferme* ? » n'a pas
+  de réponse. C'est aussi ce que dit la fiche du cours : un enfant de CE1 classe les mots
+  par ce qu'ils font dans la phrase. Le corpus contient exprès des ambiguïtés — *ferme*,
+  *porte*, *gare*, *cuisine*.
+- **La difficulté porte la phrase, pas la forme de la réponse.** `qcmChoiceCount` de
+  `common/difficulty.ts` renvoie 0 en `hard` au sens « saisie libre » : faire taper
+  « déterminant » évalue l'orthographe, pas la grammaire. Ici `hard` = phrase complexe et
+  tous les choix ouverts.
+- **La porte d'administration filtre aussi les distracteurs.** Une notion inactive
+  n'apparaît pas non plus en mauvaise réponse, sinon le QCM divulgue une notion pas encore
+  vue en classe.
+- **`nature_mot` exige deux natures actives.** Un QCM à une proposition offre la réponse,
+  et classer un mot suppose plus d'une case où le ranger.
+- **Trois états de correction, pas deux.** Sur la phrase touchable : juste, oublié, en trop.
+  Un mot manqué et un mot ajouté ne se corrigent pas pareil. Chacun porte une marque de
+  forme en plus de la couleur (tirets, texte barré).
+
+## Ce qui existe
+
+| | |
+|---|---|
+| corpus | 62 phrases annotées, 3 niveaux, `grammaire.corpus.ts` |
+| notions | 7 natures + 3 fonctions, `grammaire.notions.ts` |
+| exercices | `nature_mot` (QCM) · `trouver_mots` · `trouver_fonction` · `groupe_nominal` (sélection) |
+| pré-jeu | une option `questionTypes`, plus la difficulté commune |
+| admin | un onglet « Notions actives » + tableau « Notions à retravailler » |
+| progression | par notion, jamais par phrase — c'est le grain actionnable pour le parent |
+| fiche | le texte des fiches de `cours/francais/`, l'exemple étant la phrase ratée |
+| tests | 41 backend (dont 14 invariants de corpus), 29 frontend |
+
+Les fiches de jeu reprennent le TEXTE des fiches de cours, volontairement. Ce qui doit
+rester commun c'est ce que l'enfant lit : elle ne doit pas rencontrer deux explications
+différentes du verbe selon qu'elle joue ou qu'elle révise.
+
+## Ce qui reste
+
+- **`db:check` non joué** : le worktree n'a pas de base. À vérifier avant fusion.
+- **Les accords** (singulier↔pluriel) et **La phrase** (majuscule, point, types de phrase)
+  restent à faire, chacun comme module distinct.
+- Le corpus est du CE1. CE2→CM2 demanderont d'autres phrases et probablement d'autres
+  notions (COD/COI, attribut) — les constructeurs tiendront, l'énumération devra grandir.
 
 ---
 
