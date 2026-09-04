@@ -18,6 +18,24 @@ const TRAIT = { fill: 'none', stroke: 'currentColor', strokeWidth: 2.5 } as cons
 const MARQUE = { fill: 'none', stroke: 'var(--fiche-accent)', strokeWidth: 2 } as const;
 const CONSTRUCTION = { ...TRAIT, strokeWidth: 1.5, strokeDasharray: '4 3' } as const;
 
+/** Sommets d'un polygone régulier à `n` côtés, inscrit dans un cercle de rayon `r`.
+ * Un seul calcul pour le triangle équilatéral et tous les polygones à 5 côtés et plus :
+ * les tracer à la main un par un les ferait diverger, et un polygone à 13 côtés le jour
+ * où il en faut un ne demande qu'un appel de plus, pas un nouveau tracé. */
+function pointsPolygoneRegulier(n: number, cx = 50, cy = 52, r = 38): string {
+  const points: string[] = [];
+  for (let i = 0; i < n; i++) {
+    // rotation de -90° : le premier sommet pointe vers le haut, comme un tracé à la main.
+    const angle = (-90 + (360 / n) * i) * (Math.PI / 180);
+    points.push(`${(cx + r * Math.cos(angle)).toFixed(1)},${(cy + r * Math.sin(angle)).toFixed(1)}`);
+  }
+  return points.join(' ');
+}
+
+function polygoneRegulier(n: number) {
+  return <polygon {...TRAIT} points={pointsPolygoneRegulier(n)} />;
+}
+
 /** Le petit carré qui signale un angle droit, orienté par les deux directions du coin. */
 function angleDroit(x: number, y: number, dx: number, dy: number, taille = 9) {
   return (
@@ -109,6 +127,17 @@ export const FORMES = {
     </>
   ),
 
+  triangleIsocele: <polygon {...TRAIT} points="50,14 82,84 18,84" />,
+
+  triangleEquilateral: polygoneRegulier(3),
+
+  // ── Quadrilatères ────────────────────────────────────────────────────────
+  losange: <polygon {...TRAIT} points="50,14 84,52 50,90 16,52" />,
+
+  parallelogramme: <polygon {...TRAIT} points="24,30 90,30 76,74 10,74" />,
+
+  trapeze: <polygon {...TRAIT} points="30,26 70,26 90,78 10,78" />,
+
   cercle: (
     <>
       <circle {...TRAIT} cx={50} cy={52} r={34} />
@@ -117,6 +146,17 @@ export const FORMES = {
       <text x={50} y={38} className="Forme__note">le centre</text>
     </>
   ),
+
+  // ── Polygones réguliers ─────────────────────────────────────────────────────
+  // Un seul tracé pour tous : voir `polygoneRegulier` en tête de fichier.
+  pentagone: polygoneRegulier(5),
+  hexagone: polygoneRegulier(6),
+  heptagone: polygoneRegulier(7),
+  octogone: polygoneRegulier(8),
+  enneagone: polygoneRegulier(9),
+  decagone: polygoneRegulier(10),
+  hendecagone: polygoneRegulier(11),
+  dodecagone: polygoneRegulier(12),
 
   // ── Symétrie ──────────────────────────────────────────────────────────────
   symetrie: (
@@ -169,6 +209,39 @@ export const FORMES = {
       <ellipse {...TRAIT} cx={50} cy={74} rx={34} ry={12} />
       <line {...TRAIT} x1={16} y1={74} x2={50} y2={12} />
       <line {...TRAIT} x1={84} y1={74} x2={50} y2={12} />
+    </>
+  ),
+
+  cylindre: (
+    <>
+      <ellipse {...TRAIT} cx={50} cy={24} rx={32} ry={10} />
+      <ellipse {...TRAIT} cx={50} cy={78} rx={32} ry={10} />
+      <line {...TRAIT} x1={18} y1={24} x2={18} y2={78} />
+      <line {...TRAIT} x1={82} y1={24} x2={82} y2={78} />
+    </>
+  ),
+
+  boule: (
+    <>
+      <circle {...TRAIT} cx={50} cy={52} r={36} />
+      <ellipse {...CONSTRUCTION} cx={50} cy={52} rx={36} ry={12} />
+    </>
+  ),
+
+  pyramideBaseTriangulaire: (
+    <>
+      <polygon {...TRAIT} points="50,14 82,80 18,80" />
+      <line {...TRAIT} x1={50} y1={14} x2={50} y2={80} />
+    </>
+  ),
+
+  prisme: (
+    <>
+      <polygon {...CONSTRUCTION} points="46,64 94,64 70,14" />
+      <polygon {...TRAIT} points="26,84 74,84 50,34" />
+      <line {...TRAIT} x1={26} y1={84} x2={46} y2={64} />
+      <line {...TRAIT} x1={74} y1={84} x2={94} y2={64} />
+      <line {...CONSTRUCTION} x1={50} y1={34} x2={70} y2={14} />
     </>
   ),
 
