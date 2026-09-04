@@ -162,4 +162,73 @@ describe("Démarrage de l'application (e2e)", () => {
       .send({ niveau: 'difficile', longueur: 'courte' })
       .expect(400);
   });
+
+  // ── Module géométrie : figures actives → partie → correction → progression ─
+  it('joue une partie de géométrie avec le socle CE1 par défaut', async () => {
+    const session = (
+      await request(server())
+        .post('/api/geometrie/session')
+        .send({})
+        .expect(201)
+    ).body as { session_id: string; questions: { skill_key: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    const [question] = session.questions;
+    await request(server())
+      .post(`/api/geometrie/session/${session.session_id}/answer`)
+      .send({ skill_key: question.skill_key, is_correct: true })
+      .expect(201);
+
+    await request(server())
+      .post(`/api/geometrie/session/${session.session_id}/complete`)
+      .send({ correct_answers: 1, total_questions: session.questions.length })
+      .expect(201);
+
+    const progression = (
+      await request(server()).get('/api/geometrie/progression').expect(200)
+    ).body as { skill_key: string; correct_count: number }[];
+    expect(
+      progression.find((row) => row.skill_key === question.skill_key)
+        ?.correct_count,
+    ).toBe(1);
+  });
+
+  it('les figures actives se règlent depuis l’admin et se répercutent sur les questions', async () => {
+    await request(server())
+      .patch('/api/geometrie/figures-actives')
+      .send({ keys: ['carre'] })
+      .expect(200);
+
+    // Une seule figure plane active : « propriétés » n'a personne à comparer.
+    await request(server())
+      .post('/api/geometrie/session')
+      .send({ question_types: ['proprietes'] })
+      .expect(400);
+
+    const nomFigure = (
+      await request(server())
+        .post('/api/geometrie/session')
+        .send({ question_types: ['nom_figure'] })
+        .expect(201)
+    ).body as { questions: { shape: string }[] };
+    expect(nomFigure.questions.every((q) => q.shape === 'carre')).toBe(true);
+
+    // On remet le socle par défaut pour ne pas influencer d'autres tests du fichier.
+    await request(server())
+      .patch('/api/geometrie/figures-actives')
+      .send({
+        keys: [
+          'triangle',
+          'triangleRectangle',
+          'carre',
+          'rectangle',
+          'cercle',
+          'cube',
+          'pave',
+          'pyramide',
+          'cone',
+        ],
+      })
+      .expect(200);
+  });
 });

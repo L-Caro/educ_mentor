@@ -1,4 +1,10 @@
-import { DEFAULT_ACTIVE_SHAPES, SHAPES, getShape, isShapeKey } from './geometrie.shapes';
+import {
+  DEFAULT_ACTIVE_SHAPES,
+  SHAPES,
+  getShape,
+  isShapeKey,
+} from './geometrie.shapes';
+import { DEFAULTS } from '../settings/settings.service';
 
 describe('geometrie.shapes', () => {
   it('isShapeKey reconnaît les clés déclarées et rejette le reste', () => {
@@ -47,5 +53,12 @@ describe('geometrie.shapes', () => {
         'triangleRectangle',
       ].sort(),
     );
+  });
+
+  it('le réglage par défaut du service Settings reste en accord avec le catalogue', () => {
+    // `settings.service.ts` ne peut pas importer ce module (généricité voulue) : cette
+    // valeur y est recopiée à la main. Ce test échoue si les deux divergent.
+    const declared = JSON.parse(DEFAULTS.geometrie_active_figures) as string[];
+    expect(declared.sort()).toEqual([...DEFAULT_ACTIVE_SHAPES].sort());
   });
 });

@@ -5,7 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { Setting } from './entities/setting.entity';
 
-const DEFAULTS = {
+// Exporté pour être vérifié par les modules qui dupliquent une de ces valeurs par
+// nécessité (ex. `geometrie_active_figures`, dérivé à la main de `DEFAULT_ACTIVE_SHAPES`
+// pour ne pas faire dépendre ce service générique du catalogue d'un module particulier).
+export const DEFAULTS = {
   // ── Paramètres globaux (tous modules) ──────────────────────────────────────
   questions_per_session: '10',
   question_timer_seconds: '0',
@@ -32,6 +35,11 @@ const DEFAULTS = {
   // choix de pré-jeu.
   pose_subtraction_method: 'compensation',
   pose_digits: '3',
+  // ── Géométrie ─────────────────────────────────────────────────────────────
+  // Socle CE1 : formes du programme, tout le reste s'active depuis l'admin quand la
+  // classe l'a vu (liste tenue en accord avec DEFAULT_ACTIVE_SHAPES, geometrie.shapes.ts).
+  geometrie_active_figures:
+    '["triangle","triangleRectangle","carre","rectangle","cercle","cube","pave","pyramide","cone"]',
 };
 
 /**
