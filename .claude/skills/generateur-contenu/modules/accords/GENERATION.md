@@ -1,14 +1,9 @@
----
-name: accords-corpus
-description: Ajoute des noms, adjectifs ou verbes au corpus du module Accords d'educ_mentor — genre, nombre, accord de l'adjectif, du groupe nominal et du sujet avec le verbe, pour un enfant de CE1. Produit du TypeScript à coller dans accords.corpus.ts. Se déclenche quand Lionel demande du vocabulaire pour les accords, veut enrichir le corpus, ajouter une famille de pluriels, ou fournit une liste de mots à intégrer. Pendant du skill grammaire-corpus, côté morphologie.
----
-
-# Générateur de contenu — module Accords
+# Module Accords — génération
 
 Ce skill produit des **entrées de corpus TypeScript** pour
 `backend/src/modules/accords/accords.corpus.ts`. Trois listes : `NOMS`, `ADJECTIFS`,
 `VERBES`. Aucun JSON, aucun import : c'est du code, pour les mêmes raisons que
-`grammaire-corpus`, en plus fort.
+`modules/grammaire/`, en plus fort.
 
 ## Le risque propre à ce module
 

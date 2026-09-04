@@ -129,7 +129,7 @@ Le corpus utilise l'apostrophe typographique `’`. Deux raisons, dans cet ordre
    (`'l\''`), illisible dans un corpus qu'on relit à l'œil.
 2. C'est l'apostrophe française correcte, et cette chaîne est **affichée** à l'enfant.
 
-C'est une divergence assumée avec le skill `dictee-generator`, qui impose `'`. Là-bas
+C'est une divergence assumée avec `modules/dictee/`, qui impose `'`. Là-bas
 l'apostrophe entre dans une clé de comparaison normalisée (`cleanWord`), donc sa forme
 compte pour l'égalité. Ici elle n'est que rendue. La détection d'élision de
 `grammaire.corpus.ts` accepte les deux, mais rester sur `’` par cohérence interne.

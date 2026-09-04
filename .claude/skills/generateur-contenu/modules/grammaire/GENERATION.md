@@ -1,9 +1,4 @@
----
-name: grammaire-corpus
-description: Ajoute des phrases annotées au corpus du module Grammaire d'educ_mentor — nature et fonction des mots, pour un enfant de CE1. Produit du TypeScript à coller dans grammaire.corpus.ts, PAS du JSON à importer. Se déclenche quand Lionel demande des phrases pour la grammaire, veut étendre le corpus, ajouter un niveau (CE2, CM1), couvrir une notion mal représentée, ou fournit une liste de phrases à annoter. Pendant du skill dictee-generator, côté grammaire.
----
-
-# Générateur de contenu — module Grammaire
+# Module Grammaire — génération
 
 Ce skill produit des **appels de constructeurs TypeScript** à insérer dans
 `backend/src/modules/grammaire/grammaire.corpus.ts`.
@@ -154,5 +149,5 @@ peuvent pas voir qu'un nom a été annoté verbe. C'est la seule relecture qui a
 
 ## Fichiers
 
-- `reference/annotation.md` — les cas d'annotation tranchés, avec leur raison. À consulter
-  au moindre doute sur un mot.
+- `modules/grammaire/reference/annotation.md` — les cas d'annotation tranchés, avec leur
+  raison. À consulter au moindre doute sur un mot.

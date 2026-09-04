@@ -113,7 +113,15 @@
       "Bash(mkdir -p \"/home/lionel/development/projets/maeve/vikidia-curator/public\")",
       "WebFetch(domain:claude.ai)",
       "PowerShell(wsl bash -c \"ls -la ~/.claude/skills/ 2>&1\")",
-      "PowerShell(wsl bash -c \"mkdir -p ~/.claude/skills && cp -r /mnt/c/Users/Lionel/.claude/skills/vps-mode ~/.claude/skills/ && find ~/.claude/skills/vps-mode -type f\")"
+      "PowerShell(wsl bash -c \"mkdir -p ~/.claude/skills && cp -r /mnt/c/Users/Lionel/.claude/skills/vps-mode ~/.claude/skills/ && find ~/.claude/skills/vps-mode -type f\")",
+      "Bash(ssh vps-missions:*)",
+      "Bash(tar:*)",
+      "PowerShell(Get-Command magick -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command ffmpeg -ErrorAction SilentlyContinue)",
+      "PowerShell(python --version)",
+      "PowerShell(python -c \"import PIL; print\\(PIL.__version__\\)\")",
+      "PowerShell(python \"C:\\\\Users\\\\Lionel\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\--wsl-localhost-fedora-home-lionel-development-projets-maeve-educ-mentor\\\\7fea566a-e634-4bc8-8b76-9e3af9ad7cb0\\\\scratchpad\\\\generate_icons.py\")"
     ]
   }
 }

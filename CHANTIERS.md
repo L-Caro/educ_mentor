@@ -470,17 +470,27 @@ suffit donc, et le message d'erreur « active telle notion » se rédige sans d�
 
 # Skills de contenu
 
-Les deux corpus étant du code, leur extension passe par un commit — d'où un skill par
-corpus, versionné dans le dépôt à côté de `dictee-generator` :
+Un seul skill, `.claude/skills/generateur-contenu/`, qui route vers un
+`modules/<module>/GENERATION.md` par module. La structure vient d'une refonte menée en
+parallèle (branche `refonte-skills-contenu`, fusionnée le 2026-09-05) ; les quatre modules
+générables y sont désormais réunis.
 
-| Skill | Produit | Pour |
+| Module | Produit | Livraison |
 |---|---|---|
-| `.claude/skills/grammaire-corpus/` | des appels `phrase(...)` | phrases annotées mot par mot |
-| `.claude/skills/accords-corpus/` | des appels `nom/adjectif/verbe(...)` | entrées morphologiques |
+| `modules/lecture/` | un texte et ses questions | JSON importé depuis l'administration |
+| `modules/dictee/` | mots, phrases, paragraphes | JSON importé depuis l'administration |
+| `modules/grammaire/` | des appels `phrase(...)` | TypeScript à committer |
+| `modules/accords/` | des appels `nom/adjectif/verbe(...)` | TypeScript à committer |
 
-Chacun porte les règles d'annotation, les cas déjà tranchés, le périmètre des fiches, et la
-commande de vérification. `grammaire-corpus/reference/annotation.md` détaille les décisions
-mot par mot (déterminants possessifs, `du` partitif contre `du` préposition, mots ambigus).
+**Le format de sortie diffère, et le routeur le dit.** Son en-tête annonçait « au format
+JSON, importable dans les écrans Administration » : vrai pour deux modules sur quatre. Le
+tableau des formats a été ajouté, parce qu'un générateur qui suppose un import JSON pour la
+grammaire produirait un fichier que rien ne lit.
+
+Chaque fichier porte les règles d'annotation, les cas déjà tranchés, le périmètre des
+fiches et la commande de vérification.
+`modules/grammaire/reference/annotation.md` détaille les décisions mot par mot
+(déterminants possessifs, `du` partitif contre `du` préposition, mots ambigus).
 
 ---
 
