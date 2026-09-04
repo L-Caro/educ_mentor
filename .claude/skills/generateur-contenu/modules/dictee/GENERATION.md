@@ -1,13 +1,8 @@
----
-name: dictee-generator
-description: Génère le contenu du module Dictée d'educ_mentor — mots, phrases et paragraphes à dicter à un enfant de CE1 (7 ans), au format JSON importable dans l'admin. Se déclenche quand Lionel demande une dictée, des mots de dictée, un lot de phrases à dicter, du contenu pour le module dictée, ou fournit une liste de mots (mots de la semaine, mots outils) à transformer en dictée. Miroir du skill reading-comprehension, côté orthographe.
----
+# Module Dictée — génération
 
-# Générateur de contenu — module Dictée
-
-Ce skill produit le JSON que l'écran **Administration → Dictée → Importer** attend. Le
-module ne génère rien à l'exécution : tout le contenu est écrit ici, relu par Lionel, puis
-importé. Même pipeline que `reading-comprehension` pour la lecture.
+Produit le JSON que l'écran **Administration → Dictée → Importer** attend : mots, phrases
+et paragraphes à dicter à un enfant de CE1 (7 ans). Le module ne génère rien à
+l'exécution : tout le contenu est écrit ici, relu par Lionel, puis importé.
 
 ## Ce que le module fait du contenu
 
@@ -76,7 +71,7 @@ Règles de forme, non négociables (le module et l'import les supposent) :
    ~5 `difficile`, en couvrant des notions variées (ne pas faire 20 items sur les accents).
 5. **Difficile = un vrai texte**. Les 4-5 phrases s'enchaînent (même scène, mêmes
    personnages), elles ne sont pas juxtaposées au hasard.
-6. **Vérifier chaque `contenu`** : orthographe, accord, ponctuation. C'est du contenu qu'une
+6. **Vérifier chaque `contenu`** : orthographe, accord, ponctuation. C'est du contenu qu'un
    enfant qui apprend à écrire va recopier — une faute ici s'apprend à l'envers.
 
 ## Après génération
