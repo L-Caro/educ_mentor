@@ -7,7 +7,13 @@ import { GeometrieProgression } from './entities/geometrie-progression.entity';
 import { SettingsService } from '../settings/settings.service';
 import { isMastered, masteryScore } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
-import { DEFAULT_ACTIVE_SHAPES, SHAPES, isShapeKey } from './geometrie.shapes';
+import {
+  DEFAULT_ACTIVE_SHAPES,
+  SHAPES,
+  getShape,
+  isShapeKey,
+  type ShapeMeta,
+} from './geometrie.shapes';
 import {
   QUESTION_TYPES,
   generateQuestions,
@@ -21,9 +27,17 @@ import type {
   StartGeometrieSessionDto,
 } from './dto/geometrie.dto';
 
+/** La question telle qu'envoyée au front : les propriétés complètes des formes en jeu
+ * sont attachées ici, pas dans `geometrie.logic.ts` — la génération reste pure et légère,
+ * et le front construit sa fiche d'erreur sans dupliquer le catalogue de métadonnées. */
+export interface GeometrieSessionQuestion extends GeometrieQuestion {
+  shape_meta: ShapeMeta;
+  shape_b_meta: ShapeMeta | null;
+}
+
 export interface GeometrieSessionResult {
   session_id: string;
-  questions: GeometrieQuestion[];
+  questions: GeometrieSessionQuestion[];
   timer_seconds: number;
   is_unlimited: boolean;
 }
@@ -66,7 +80,7 @@ export class GeometrieService {
     const isUnlimited = perSession === 0;
     const count = isUnlimited ? 50 : perSession;
 
-    const questions = generateQuestions(
+    const generated = generateQuestions(
       count,
       types,
       activeShapes,
@@ -74,11 +88,17 @@ export class GeometrieService {
       this.rand,
     );
 
-    if (questions.length === 0) {
+    if (generated.length === 0) {
       throw new BadRequestException(
         'Aucune question possible avec ces réglages : active plus de figures dans Administration → Géométrie.',
       );
     }
+
+    const questions: GeometrieSessionQuestion[] = generated.map((question) => ({
+      ...question,
+      shape_meta: getShape(question.shape),
+      shape_b_meta: question.shapeB ? getShape(question.shapeB) : null,
+    }));
 
     const session = this.sessionRepo.create({
       id: randomUUID(),
