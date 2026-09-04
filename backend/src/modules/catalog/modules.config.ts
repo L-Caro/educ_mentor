@@ -140,4 +140,22 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 16,
   },
+  {
+    id: 'grammaire',
+    name: 'Grammaire',
+    description:
+      'La nature des mots et leur fonction dans la phrase : nom, verbe, déterminant, sujet, groupe nominal',
+    icon: '🔤',
+    is_active: false,
+    display_order: 17,
+  },
+  {
+    id: 'accords',
+    name: 'Les accords',
+    description:
+      'Genre et nombre des noms, accord de l’adjectif, du groupe nominal et du sujet avec le verbe',
+    icon: '🔗',
+    is_active: false,
+    display_order: 18,
+  },
 ];

@@ -1,7 +1,7 @@
 # Chantiers — ÉducMentor
 
 > **Document vivant.** C'est le point de reprise : où on en est, ce qui est décidé, ce qui reste ouvert.
-> Dernière mise à jour : **2026-08-24**.
+> Dernière mise à jour : **2026-09-04**.
 
 ## Les documents du dossier
 
@@ -322,6 +322,165 @@ pas un cadre vide à l'écran.
   domaines où les Cours apportent une couverture nouvelle.
 - 75 % des exemples du corpus sont cuits dans les images ; 19 % des leçons seulement ont un
   résumé. La réécriture n'est donc pas une reformulation, c'est une rédaction.
+
+---
+
+# Chantier C — Le trou du français : `grammaire`
+
+Branche `module-grammaire`, worktree `../educ_mentor-grammaire` (l'arbre principal était
+occupé par `module-geometrie`).
+
+## Pourquoi ce module et pas un autre
+
+Le découpage du français en §B.4 compte 7 grandes notions. Trois portaient « aucune »
+tuile — **La nature des mots** (6 concepts), **Les accords** (5), **La fonction des mots**
+(3) — et « La phrase » était rattachée à `lecture`, qui fait de la compréhension, pas de la
+ponctuation. Soit **17 notions sur 33 sans aucun entraînement** : aucun autre trou n'en
+approche. Et les fiches de cours étaient déjà écrites, donc la pédagogie était déjà faite.
+
+`grammaire` couvre **La nature des mots + La fonction des mots**. « Les accords »
+(singulier↔pluriel) et « La phrase » (majuscule, point, types de phrase) sont des modules
+à part : saisie libre pour l'un, production pour l'autre. Cinq types d'interaction dans un
+seul module, c'est ce qui empêche de le finir.
+
+## Décisions de conception
+
+- **Le corpus est du CODE, pas de la base.** Même raison que `geometrie.shapes.ts` : une
+  phrase annotée mot par mot n'est pas du contenu qu'un parent édite, et une annotation
+  fausse enseigne du faux français. Conséquence assumée : pas de table de contenu, pas
+  d'import JSON, pas d'onglet « Contenu » — un textarea JSON était le seul endroit du
+  module capable d'injecter une annotation fausse. Étendre le corpus demande un déploiement,
+  comme pour une figure ou une fiche.
+- **L'annotation passe par des constructeurs, pas par des objets littéraux.**
+  `gnSujet(d('Le'), nc('chat'))` plutôt que `{ fonction: 'sujet', gn: 0 }` répété sur les
+  trois mots du groupe. Les index de groupe nominal sont attribués par l'aplatissement.
+- **Ce n'est PAS l'écran de correction de la dictée qui est réutilisé.** Celui-là est de
+  l'auto-correction : l'enfant coche ses propres fautes, l'application ne connaît aucune
+  vérité. Ici il y a une bonne réponse. Le vrai véhicule était `spec.map` +
+  `isMultiSelect`, déjà utilisé par les régions de `france` — timer, score, étoiles,
+  progression et fiche fournis par le moteur.
+- **Jamais la nature d'un mot hors phrase.** « Quelle est la nature de *ferme* ? » n'a pas
+  de réponse. C'est aussi ce que dit la fiche du cours : un enfant de CE1 classe les mots
+  par ce qu'ils font dans la phrase. Le corpus contient exprès des ambiguïtés — *ferme*,
+  *porte*, *gare*, *cuisine*.
+- **La difficulté porte la phrase, pas la forme de la réponse.** `qcmChoiceCount` de
+  `common/difficulty.ts` renvoie 0 en `hard` au sens « saisie libre » : faire taper
+  « déterminant » évalue l'orthographe, pas la grammaire. Ici `hard` = phrase complexe et
+  tous les choix ouverts.
+- **La porte d'administration filtre aussi les distracteurs.** Une notion inactive
+  n'apparaît pas non plus en mauvaise réponse, sinon le QCM divulgue une notion pas encore
+  vue en classe.
+- **`nature_mot` exige deux natures actives.** Un QCM à une proposition offre la réponse,
+  et classer un mot suppose plus d'une case où le ranger.
+- **Trois états de correction, pas deux.** Sur la phrase touchable : juste, oublié, en trop.
+  Un mot manqué et un mot ajouté ne se corrigent pas pareil. Chacun porte une marque de
+  forme en plus de la couleur (tirets, texte barré).
+
+## Ce qui existe
+
+| | |
+|---|---|
+| corpus | 62 phrases annotées, 3 niveaux, `grammaire.corpus.ts` |
+| notions | 7 natures + 3 fonctions, `grammaire.notions.ts` |
+| exercices | `nature_mot` (QCM) · `trouver_mots` · `trouver_fonction` · `groupe_nominal` (sélection) |
+| pré-jeu | une option `questionTypes`, plus la difficulté commune |
+| admin | un onglet « Notions actives » + tableau « Notions à retravailler » |
+| progression | par notion, jamais par phrase — c'est le grain actionnable pour le parent |
+| fiche | le texte des fiches de `cours/francais/`, l'exemple étant la phrase ratée |
+| tests | 41 backend (dont 14 invariants de corpus), 29 frontend |
+
+Les fiches de jeu reprennent le TEXTE des fiches de cours, volontairement. Ce qui doit
+rester commun c'est ce que l'enfant lit : elle ne doit pas rencontrer deux explications
+différentes du verbe selon qu'elle joue ou qu'elle révise.
+
+## Ce qui reste
+
+- **`db:check` non joué** : le worktree n'a pas de base. À vérifier après déploiement.
+- **La phrase** (majuscule, point, types de phrase) reste le dernier trou du français :
+  interaction de production, donc module distinct. Les accords sont faits, cf. chantier D.
+- Le corpus est du CE1. CE2→CM2 demanderont d'autres phrases et probablement d'autres
+  notions (COD/COI, attribut) — les constructeurs tiendront, l'énumération devra grandir.
+
+---
+
+# Chantier D — Les accords ✅
+
+Même branche `module-grammaire`, même worktree. Le module fait suite direct à `grammaire` :
+les fiches du cours le disent, « on ne peut pas accorder ce qu'on ne sait pas nommer ».
+
+## Les cinq exercices sont les cinq fiches
+
+Ici la notion et le type d'exercice **coïncident**, un pour un — contrairement à
+`grammaire` où quatre types d'exercice se partagent dix notions. Une seule énumération
+suffit donc, et le message d'erreur « active telle notion » se rédige sans détour.
+
+| Exercice | Ce qu'il demande | Mode |
+|---|---|---|
+| `genre_nom` | un ou une devant *table* | QCM |
+| `nombre_nom` | *un chat* → *des …* et l'inverse | saisie |
+| `accord_adjectif` | *la … école* (petit) | QCM des 4 formes |
+| `accord_gn` | *le petit chat* → *les petits chats* | saisie |
+| `accord_sujet_verbe` | *Les chats … sur le tapis.* (dormir) | QCM |
+
+## Décisions de conception
+
+- **Le corpus est morphologique, pas phrastique.** ~38 noms (les deux nombres + le genre),
+  20 adjectifs (les quatre formes), 20 verbes (les deux personnes). Les déterminants et les
+  groupes nominaux sont **dérivés** par `determinant()` et `groupeNominal()`. L'énoncé et la
+  réponse attendue sortent donc de la MÊME fonction : une divergence entre les deux est
+  impossible par construction, et c'était le risque principal — un « des gâteaux » construit
+  à la main d'un côté et par règle de l'autre finit par diverger, et l'enfant a raison
+  contre la machine.
+- **Le corpus ne dépasse jamais ce que la fiche explique.** Pas de -al → -aux (cheval), pas
+  de -ou → -oux (genou), pas de féminin irrégulier (belle, blanche, longue), pas d'adjectif
+  en -s/-x (gris, vieux). La fiche du nombre énumère +s, -eau/-au/-eu → x, et -s/-x/-z
+  invariables : elle s'arrête là, donc le module s'arrête là. Un enfant qui rate une
+  question doit pouvoir trouver la réponse dans la fiche.
+- **La validation n'enlève PAS les accents**, à l'inverse de `geometrie` qui accepte
+  « decagone ». Là-bas l'orthographe est hors sujet ; ici elle EST la réponse. Sont tolérés
+  la casse, les espaces en trop et la forme de l'apostrophe — un clavier donne `'`, l'énoncé
+  affiche `’`. `normaliseReponse` est **dupliquée** côté front (la saisie est validée par
+  `<GameEngine>`, et les deux paquets n'ont aucune dépendance) ; `accords-reponse.test.ts`
+  compare les deux corps de fonction sur disque.
+- **La difficulté suit l'oreille, pas l'irrégularité.** `est/sont` s'entend, donc c'est
+  FACILE ; `joue/jouent` ne s'entend pas, donc c'est difficile. La fiche le dit :
+  « il dort et ils dorment se prononcent presque pareil, mais ne s'écrivent pas pareil ».
+  Classer « irrégulier = difficile » aurait inversé la progression.
+- **Deux défauts trouvés en lisant la sortie réelle, pas les tests :**
+  1. *Le QCM à deux choix pouvait proposer l'infinitif* au lieu de la forme opposée —
+     « La fille ⬚ un gâteau (faire) » offrait `faire / fait`. Une question qui n'oppose plus
+     le singulier au pluriel n'interroge plus l'accord. Les distracteurs sont désormais
+     **ordonnés par valeur pédagogique** et retenus dans l'ordre, jamais tirés au hasard.
+  2. *La sémantique produisait des absurdités* : « les chapeaux sucrés », « les nez
+     contents », « Les chiens dessinent un soleil ». Grammaticalement juste, et l'enfant
+     s'arrête sur l'absurdité au lieu de compter les s. D'où `categorie` sur les noms,
+     `sappliqueA` + `famille` sur les adjectifs, `sujets` sur les verbes. Ces champs ne
+     servent pas l'accord, ils servent l'attention.
+
+## Ce qui existe
+
+| | |
+|---|---|
+| corpus | 38 noms · 20 adjectifs · 20 verbes, `accords.corpus.ts` |
+| admin | un onglet « Exercices actifs » + tableau « Accords à retravailler » |
+| défauts actifs | genre et nombre ; les trois accords s'activent au fil du programme |
+| tests | 63 backend (dont 32 invariants de corpus), 30 frontend, 4 e2e |
+
+---
+
+# Skills de contenu
+
+Les deux corpus étant du code, leur extension passe par un commit — d'où un skill par
+corpus, versionné dans le dépôt à côté de `dictee-generator` :
+
+| Skill | Produit | Pour |
+|---|---|---|
+| `.claude/skills/grammaire-corpus/` | des appels `phrase(...)` | phrases annotées mot par mot |
+| `.claude/skills/accords-corpus/` | des appels `nom/adjectif/verbe(...)` | entrées morphologiques |
+
+Chacun porte les règles d'annotation, les cas déjà tranchés, le périmètre des fiches, et la
+commande de vérification. `grammaire-corpus/reference/annotation.md` détaille les décisions
+mot par mot (déterminants possessifs, `du` partitif contre `du` préposition, mots ambigus).
 
 ---
 
