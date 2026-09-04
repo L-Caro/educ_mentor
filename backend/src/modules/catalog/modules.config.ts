@@ -131,4 +131,13 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 15,
   },
+  {
+    id: 'geometrie',
+    name: 'Géométrie',
+    description:
+      'Reconnaître les figures et les solides, compter côtés et sommets, repérer un angle droit',
+    icon: '📐',
+    is_active: false,
+    display_order: 16,
+  },
 ];

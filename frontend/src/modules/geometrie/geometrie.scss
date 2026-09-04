@@ -1,0 +1,65 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.GeometriePrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-5;
+
+  &__question {
+    max-width: 28rem;
+    text-align: center;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: var(--color-base-content);
+  }
+
+  &__figures {
+    display: flex;
+    gap: $space-6;
+    justify-content: center;
+  }
+}
+
+.GeometrieFigure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-2;
+
+  svg {
+    color: var(--color-base-content);
+
+    // Quelques tracés du catalogue (rectangle, cercle) portent une annotation texte
+    // pensée pour la fiche de cours (« la longueur », « le centre »), stylée par
+    // `etapes.scss` — un fichier propre au dossier `cours/`, jamais importé ici. Sans sa
+    // règle de taille, ce texte s'affichait à la taille par défaut du navigateur, énorme
+    // et hors-sujet pendant une question. Le jeu n'en a pas besoin : on le masque.
+    .Forme__note {
+      display: none;
+    }
+  }
+
+  &--lg svg {
+    width: 9rem;
+    height: 9rem;
+  }
+
+  &--sm svg {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  &__legende {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+}
+
+.GeometrieFiche__paire {
+  display: flex;
+  gap: $space-5;
+  justify-content: center;
+}
