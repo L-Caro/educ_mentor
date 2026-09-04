@@ -16,6 +16,7 @@ import { poseModule } from 'src/modules/pose/pose.module';
 import { dicteeModule } from 'src/modules/dictee/dictee.module';
 import { geometrieModule } from 'src/modules/geometrie/geometrie.module';
 import { grammaireModule } from 'src/modules/grammaire/grammaire.module';
+import { accordsModule } from 'src/modules/accords/accords.module';
 
 // Re-export pour compat des imports existants (`from 'src/modules.manifest'`).
 export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts';
@@ -24,4 +25,4 @@ export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts
  * Agrégateur : la source unique des modules. Ajouter un module = créer son dossier avec
  * `<id>.module.tsx` (descripteur co-localisé) + une ligne d'import ici.
  */
-export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule, franceModule, lectureModule, numerationModule, memoryModule, penduModule, poseModule, dicteeModule, geometrieModule, grammaireModule];
+export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule, franceModule, lectureModule, numerationModule, memoryModule, penduModule, poseModule, dicteeModule, geometrieModule, grammaireModule, accordsModule];

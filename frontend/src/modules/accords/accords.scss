@@ -1,0 +1,121 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.AccordsPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-3;
+
+  &__consigne {
+    max-width: 30rem;
+    text-align: center;
+    font-size: $font-size-lg;
+    font-weight: 600;
+    color: var(--color-base-content);
+  }
+
+  &__depart {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    font-size: $font-size-xl;
+    color: var(--color-base-content);
+    opacity: 0.75;
+  }
+
+  &__fleche {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  &__ligne {
+    max-width: 32rem;
+    text-align: center;
+    font-size: $font-size-xl;
+    line-height: 2;
+    color: var(--color-base-content);
+  }
+
+  // Les espaces de `avant` et `apres` font partie de l'énoncé : « Les filles ⬚ dans le
+  // jardin. » Sans `pre-wrap`, HTML les replie et le trou se colle au mot voisin —
+  // « ⬚pomme » au lieu de « ⬚ pomme ».
+  &__segment {
+    white-space: pre-wrap;
+  }
+
+  // Un ⬚ et non un `_____` : la longueur d'un tiret bas indiquerait involontairement la
+  // longueur de la réponse, et « les petits chats » ne fait pas la taille de
+  // « le petit chat ».
+  &__trou {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  &__indice {
+    font-size: $font-size-lg;
+    font-style: italic;
+    color: var(--color-primary);
+  }
+}
+
+.AccordsExemple {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  font-size: $font-size-lg;
+  color: var(--color-base-content);
+
+  &__depart {
+    opacity: 0.7;
+  }
+
+  &__fleche {
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+
+  &__segment {
+    white-space: pre-wrap;
+  }
+
+  &__reponse {
+    background: color-mix(in srgb, var(--color-primary) 22%, transparent);
+    color: inherit;
+    font-weight: 700;
+    padding: 0 0.2em;
+    border-radius: $radius-sm;
+  }
+}
+
+.AccordsNotions {
+  &__sectionTitle {
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: var(--color-base-content);
+    margin-bottom: $space-2;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th,
+    td {
+      padding: $space-2 $space-3;
+      text-align: left;
+      border-bottom: 1px solid var(--color-base-300);
+    }
+
+    th {
+      font-weight: 700;
+    }
+
+    td:not(:first-child),
+    th:not(:first-child) {
+      text-align: right;
+    }
+  }
+}

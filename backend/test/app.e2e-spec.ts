@@ -231,4 +231,137 @@ describe("Démarrage de l'application (e2e)", () => {
       })
       .expect(200);
   });
+
+  // ─── Grammaire ──────────────────────────────────────────────────────────────
+
+  it('joue une partie de grammaire et suit la progression par notion', async () => {
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({})
+        .expect(201)
+    ).body as {
+      session_id: string;
+      questions: {
+        skill_key: string;
+        mots: Record<string, unknown>[];
+        answer_indices: number[];
+      }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    // La nature et la fonction des mots ne voyagent pas : elles SONT la réponse.
+    for (const question of session.questions) {
+      for (const mot of question.mots) {
+        expect(Object.keys(mot).sort()).toEqual(['apres', 'colle', 'mot']);
+      }
+    }
+
+    const [question] = session.questions;
+    await request(server())
+      .post(`/api/grammaire/session/${session.session_id}/answer`)
+      .send({ skill_key: question.skill_key, is_correct: true })
+      .expect(201);
+
+    await request(server())
+      .post(`/api/grammaire/session/${session.session_id}/complete`)
+      .send({ correct_answers: 1, total_questions: session.questions.length })
+      .expect(201);
+
+    const progression = (
+      await request(server()).get('/api/grammaire/progression').expect(200)
+    ).body as { skill_key: string; correct_count: number }[];
+    expect(
+      progression.find((row) => row.skill_key === question.skill_key)
+        ?.correct_count,
+    ).toBe(1);
+  });
+
+  it('la porte des notions de grammaire ferme les exercices non activés', async () => {
+    // `groupe_nominal` est inactif au démarrage : la fonction des mots vient après leur
+    // nature, dans les fiches comme dans le socle par défaut.
+    const refus = await request(server())
+      .post('/api/grammaire/session')
+      .send({ question_types: ['groupe_nominal'] })
+      .expect(400);
+    expect((refus.body as { message: string }).message).toMatch(
+      /groupe nominal/,
+    );
+
+    await request(server())
+      .patch('/api/grammaire/notions-actives')
+      .send({ keys: ['nom_commun', 'verbe', 'groupe_nominal'] })
+      .expect(200);
+
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({ question_types: ['groupe_nominal'] })
+        .expect(201)
+    ).body as { questions: { skill_key: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.skill_key).toBe('groupe_nominal');
+    }
+  });
+
+  // ─── Accords ────────────────────────────────────────────────────────────────
+
+  it('joue une partie d’accords et suit la progression par notion', async () => {
+    const session = (
+      await request(server()).post('/api/accords/session').send({}).expect(201)
+    ).body as {
+      session_id: string;
+      questions: { skill_key: string; answer: string }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    const [question] = session.questions;
+    expect(question.answer.length).toBeGreaterThan(0);
+
+    await request(server())
+      .post(`/api/accords/session/${session.session_id}/answer`)
+      .send({ skill_key: question.skill_key, is_correct: true })
+      .expect(201);
+
+    await request(server())
+      .post(`/api/accords/session/${session.session_id}/complete`)
+      .send({ correct_answers: 1, total_questions: session.questions.length })
+      .expect(201);
+
+    const progression = (
+      await request(server()).get('/api/accords/progression').expect(200)
+    ).body as { skill_key: string; correct_count: number }[];
+    expect(
+      progression.find((row) => row.skill_key === question.skill_key)
+        ?.correct_count,
+    ).toBe(1);
+  });
+
+  it('la porte des accords ferme les exercices non activés', async () => {
+    // `accord_sujet_verbe` est inactif au démarrage : il vient après le genre et le nombre.
+    const refus = await request(server())
+      .post('/api/accords/session')
+      .send({ question_types: ['accord_sujet_verbe'] })
+      .expect(400);
+    expect((refus.body as { message: string }).message).toMatch(/sujet-verbe/);
+
+    await request(server())
+      .patch('/api/accords/notions-actives')
+      .send({ keys: ['genre_nom', 'accord_sujet_verbe'] })
+      .expect(200);
+
+    const session = (
+      await request(server())
+        .post('/api/accords/session')
+        .send({ question_types: ['accord_sujet_verbe'] })
+        .expect(201)
+    ).body as { questions: { skill_key: string; choices: string[] }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.skill_key).toBe('accord_sujet_verbe');
+      // Le QCM oppose toujours deux formes du même verbe : c'est toute la notion.
+      expect(question.choices.length).toBeGreaterThanOrEqual(2);
+    }
+  });
 });

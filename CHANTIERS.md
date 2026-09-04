@@ -395,11 +395,92 @@ différentes du verbe selon qu'elle joue ou qu'elle révise.
 
 ## Ce qui reste
 
-- **`db:check` non joué** : le worktree n'a pas de base. À vérifier avant fusion.
-- **Les accords** (singulier↔pluriel) et **La phrase** (majuscule, point, types de phrase)
-  restent à faire, chacun comme module distinct.
+- **`db:check` non joué** : le worktree n'a pas de base. À vérifier après déploiement.
+- **La phrase** (majuscule, point, types de phrase) reste le dernier trou du français :
+  interaction de production, donc module distinct. Les accords sont faits, cf. chantier D.
 - Le corpus est du CE1. CE2→CM2 demanderont d'autres phrases et probablement d'autres
   notions (COD/COI, attribut) — les constructeurs tiendront, l'énumération devra grandir.
+
+---
+
+# Chantier D — Les accords ✅
+
+Même branche `module-grammaire`, même worktree. Le module fait suite direct à `grammaire` :
+les fiches du cours le disent, « on ne peut pas accorder ce qu'on ne sait pas nommer ».
+
+## Les cinq exercices sont les cinq fiches
+
+Ici la notion et le type d'exercice **coïncident**, un pour un — contrairement à
+`grammaire` où quatre types d'exercice se partagent dix notions. Une seule énumération
+suffit donc, et le message d'erreur « active telle notion » se rédige sans détour.
+
+| Exercice | Ce qu'il demande | Mode |
+|---|---|---|
+| `genre_nom` | un ou une devant *table* | QCM |
+| `nombre_nom` | *un chat* → *des …* et l'inverse | saisie |
+| `accord_adjectif` | *la … école* (petit) | QCM des 4 formes |
+| `accord_gn` | *le petit chat* → *les petits chats* | saisie |
+| `accord_sujet_verbe` | *Les chats … sur le tapis.* (dormir) | QCM |
+
+## Décisions de conception
+
+- **Le corpus est morphologique, pas phrastique.** ~38 noms (les deux nombres + le genre),
+  20 adjectifs (les quatre formes), 20 verbes (les deux personnes). Les déterminants et les
+  groupes nominaux sont **dérivés** par `determinant()` et `groupeNominal()`. L'énoncé et la
+  réponse attendue sortent donc de la MÊME fonction : une divergence entre les deux est
+  impossible par construction, et c'était le risque principal — un « des gâteaux » construit
+  à la main d'un côté et par règle de l'autre finit par diverger, et l'enfant a raison
+  contre la machine.
+- **Le corpus ne dépasse jamais ce que la fiche explique.** Pas de -al → -aux (cheval), pas
+  de -ou → -oux (genou), pas de féminin irrégulier (belle, blanche, longue), pas d'adjectif
+  en -s/-x (gris, vieux). La fiche du nombre énumère +s, -eau/-au/-eu → x, et -s/-x/-z
+  invariables : elle s'arrête là, donc le module s'arrête là. Un enfant qui rate une
+  question doit pouvoir trouver la réponse dans la fiche.
+- **La validation n'enlève PAS les accents**, à l'inverse de `geometrie` qui accepte
+  « decagone ». Là-bas l'orthographe est hors sujet ; ici elle EST la réponse. Sont tolérés
+  la casse, les espaces en trop et la forme de l'apostrophe — un clavier donne `'`, l'énoncé
+  affiche `’`. `normaliseReponse` est **dupliquée** côté front (la saisie est validée par
+  `<GameEngine>`, et les deux paquets n'ont aucune dépendance) ; `accords-reponse.test.ts`
+  compare les deux corps de fonction sur disque.
+- **La difficulté suit l'oreille, pas l'irrégularité.** `est/sont` s'entend, donc c'est
+  FACILE ; `joue/jouent` ne s'entend pas, donc c'est difficile. La fiche le dit :
+  « il dort et ils dorment se prononcent presque pareil, mais ne s'écrivent pas pareil ».
+  Classer « irrégulier = difficile » aurait inversé la progression.
+- **Deux défauts trouvés en lisant la sortie réelle, pas les tests :**
+  1. *Le QCM à deux choix pouvait proposer l'infinitif* au lieu de la forme opposée —
+     « La fille ⬚ un gâteau (faire) » offrait `faire / fait`. Une question qui n'oppose plus
+     le singulier au pluriel n'interroge plus l'accord. Les distracteurs sont désormais
+     **ordonnés par valeur pédagogique** et retenus dans l'ordre, jamais tirés au hasard.
+  2. *La sémantique produisait des absurdités* : « les chapeaux sucrés », « les nez
+     contents », « Les chiens dessinent un soleil ». Grammaticalement juste, et l'enfant
+     s'arrête sur l'absurdité au lieu de compter les s. D'où `categorie` sur les noms,
+     `sappliqueA` + `famille` sur les adjectifs, `sujets` sur les verbes. Ces champs ne
+     servent pas l'accord, ils servent l'attention.
+
+## Ce qui existe
+
+| | |
+|---|---|
+| corpus | 38 noms · 20 adjectifs · 20 verbes, `accords.corpus.ts` |
+| admin | un onglet « Exercices actifs » + tableau « Accords à retravailler » |
+| défauts actifs | genre et nombre ; les trois accords s'activent au fil du programme |
+| tests | 63 backend (dont 32 invariants de corpus), 30 frontend, 4 e2e |
+
+---
+
+# Skills de contenu
+
+Les deux corpus étant du code, leur extension passe par un commit — d'où un skill par
+corpus, versionné dans le dépôt à côté de `dictee-generator` :
+
+| Skill | Produit | Pour |
+|---|---|---|
+| `.claude/skills/grammaire-corpus/` | des appels `phrase(...)` | phrases annotées mot par mot |
+| `.claude/skills/accords-corpus/` | des appels `nom/adjectif/verbe(...)` | entrées morphologiques |
+
+Chacun porte les règles d'annotation, les cas déjà tranchés, le périmètre des fiches, et la
+commande de vérification. `grammaire-corpus/reference/annotation.md` détaille les décisions
+mot par mot (déterminants possessifs, `du` partitif contre `du` préposition, mots ambigus).
 
 ---
 
