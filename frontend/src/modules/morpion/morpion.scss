@@ -61,6 +61,24 @@
       background: color-mix(in srgb, var(--color-success) 22%, transparent);
       border-color: var(--color-success);
     }
+
+    // Le pion pris en main, en règle à trois pions. Il est soulevé et cerné, pas
+    // seulement recoloré : à trois pions identiques sur la grille, la couleur seule ne
+    // dirait pas lequel on tient.
+    &--prise {
+      border-color: var(--color-primary);
+      border-width: 3px;
+      transform: translateY(-3px);
+      background: color-mix(in srgb, var(--color-primary) 12%, transparent);
+    }
+  }
+
+  // Le compte des pions restant à poser. Discret : c'est un rappel, pas une consigne —
+  // celle-ci est déjà dans le message au-dessus de la grille.
+  &__reste {
+    margin: 0;
+    font-size: $font-size-sm;
+    opacity: 0.75;
   }
 
   &__actions {

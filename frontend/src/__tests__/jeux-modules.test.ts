@@ -84,11 +84,17 @@ describe('choix de conception à ne pas défaire', () => {
   });
 
   it('se garde du double coup', () => {
-    // Un clic pendant que l'ordinateur réfléchit, ou deux clics rapides sur la même
-    // case, ne doivent pas écraser le plateau.
-    for (const source of [MORPION, P4]) {
-      expect(source).toMatch(/precedent\.cases\[cellule\] !== 0/);
-    }
+    // Un clic pendant que l'ordinateur réfléchit, ou deux clics plus rapides qu'un rendu,
+    // ne doivent pas écraser le plateau. La garde doit vivre DANS la mise à jour, contre
+    // l'état réellement courant — la lire depuis le rendu, c'est la lire périmée.
+    expect(P4).toMatch(/precedent\.cases\[cellule\] !== 0/);
+
+    // Le morpion va plus loin depuis la règle à trois pions : le tour changeait hors de
+    // la garde, si bien que deux clics dans le même lot posaient deux pions d'affilée.
+    // Plateau, tour et historique ne font plus qu'un état, et tout est revérifié.
+    expect(MORPION).toMatch(/precedent\.tour !== joueur/);
+    expect(MORPION).toMatch(/precedent\.cases\[coup\.vers\] !== 0/);
+    expect(MORPION).toMatch(/precedent\.cases\[coup\.depuis\] !== joueur/);
   });
 
   it('promet l’imbattabilité pour le morpion et pas pour le Puissance 4', () => {
@@ -99,14 +105,36 @@ describe('choix de conception à ne pas défaire', () => {
     // version cherchait « ne perd jamais » dans la source et butait sur le commentaire
     // qui explique justement son absence. Un test qui lit du code attrape aussi ce qu'on
     // écrit à son sujet.
+    //
+    // L'option se cherche par sa CLÉ et non à l'index 0 : ajouter une question devant —
+    // ce qu'a fait la règle à trois pions — faisait échouer ce test sans que rien de ce
+    // qu'il garde n'ait bougé.
     const description = (id: string, valeur: string) =>
       MODULES.find((m) => m.id === id)
-        ?.setupOptions?.[0]?.choices?.find((c) => c.value === valeur)
-        ?.description ?? '';
+        ?.setupOptions?.find((o) => o.key === 'adversaire')
+        ?.choices?.find((c) => c.value === valeur)?.description ?? '';
 
     expect(description('morpion', 'difficile')).toMatch(/ne perd jamais/);
     expect(description('puissance4', 'difficile')).not.toMatch(/ne perd jamais/);
     expect(MORPION).toMatch(/difficile: 9/);
+  });
+
+  it('propose la règle à trois pions, et la décrit sans jargon', () => {
+    // « Trois hommes de moulin » ne dit rien à personne : ce qu'il faut annoncer, c'est
+    // qu'on pose puis qu'on déplace.
+    const regle = MODULES.find((m) => m.id === 'morpion')?.setupOptions?.find(
+      (o) => o.key === 'variante',
+    );
+    expect(regle?.choices?.map((c) => c.value)).toEqual(['classique', 'trois']);
+    expect(regle?.choices?.[1].description).toMatch(/déplace/);
+  });
+
+  it('donne une fin à la règle à trois pions, qui ne peut pas se remplir', () => {
+    // La grille garde toujours trois cases libres : sans règle de répétition, deux
+    // joueurs qui ne trouvent rien se déplaceraient sans fin. La résolution exacte montre
+    // que 400 positions sont nulles PAR BOUCLE — ce n'est pas un cas d'école.
+    expect(MORPION).toMatch(/REPETITIONS_NULLES/);
+    expect(MORPION).toMatch(/tourne en rond/);
   });
 
   it('propose de jouer à deux sur le même écran', () => {
