@@ -15,6 +15,8 @@ interface ProgressionSummary {
   mastered: number;
   inProgress: number;
   accuracy: number | null;
+  /** La requête a échoué : on ne sait RIEN, ce qui n'est pas la même chose que zéro. */
+  indisponible?: true;
 }
 
 function computeStats(items: ProgressionStat[]): ProgressionSummary {
@@ -31,15 +33,30 @@ export default function AdminDashboard() {
   const getModuleMeta = useModuleMetaResolver();
   const [statsMap, setStatsMap] = useState<Partial<Record<string, ProgressionSummary>>>({});
   const [loading, setLoading] = useState(true);
-  const { data: catalogModules = [] } = useGetModulesQuery();
+  const {
+    data: catalogModules = [],
+    isError: catalogueEnPanne,
+    refetch: rechargerCatalogue,
+  } = useGetModulesQuery();
   const [updateModule] = useUpdateModuleMutation();
 
   const fetchStats = useCallback(async (): Promise<Partial<Record<string, ProgressionSummary>>> => {
     const entries = await Promise.all(
       MODULES.map(async (module): Promise<[string, ProgressionSummary | undefined]> => {
         if (!module.progression) return [module.id, undefined];
-        const items = await module.progression.getStats().catch(() => []);
-        return [module.id, computeStats(items)];
+        // Avaler l'erreur en rendant un tableau vide transformait une panne réseau en
+        // « aucune donnée », et l'écran annonçait « Aucune session jouée » pour dix-huit
+        // modules alors que le backend était mort. Ne pas savoir et savoir qu'il n'y a
+        // rien sont deux états différents ; les confondre envoie chercher le problème au
+        // mauvais endroit.
+        try {
+          return [module.id, computeStats(await module.progression.getStats())];
+        } catch {
+          return [
+            module.id,
+            { mastered: 0, inProgress: 0, accuracy: null, indisponible: true },
+          ];
+        }
       }),
     );
     return Object.fromEntries(entries);
@@ -77,13 +94,40 @@ export default function AdminDashboard() {
       <div className="AdminDashboard__progression">
         <p className="AdminDashboard__progressionTitle">Modules</p>
 
-        {loading ? (
+        {/* Sans catalogue, rien de ce qui suit n'est fiable : les noms et les icônes en
+            viennent, et l'interrupteur ne s'affiche que si le module y est trouvé. Les
+            cartes se dégradaient donc en silence — ids bruts, pas d'icône, pas
+            d'interrupteur — ce qui ressemble à « rien n'est configuré » alors que la
+            cause est « le serveur ne répond pas ». Mieux vaut le dire et ne rien
+            afficher que présenter une liste dont on ne peut rien faire. */}
+        {catalogueEnPanne ? (
+          <div className="AdminDashboard__panne" role="alert">
+            <p className="AdminDashboard__panneTitre">
+              Impossible de joindre le serveur.
+            </p>
+            <p className="AdminDashboard__panneTexte">
+              Le catalogue des modules n&apos;a pas pu être chargé : ni les noms, ni les
+              icônes, ni les interrupteurs d&apos;activation ne sont disponibles. Rien
+              n&apos;est perdu — vérifie que le backend tourne, puis recharge.
+            </p>
+            <button
+              className="AdminBtn"
+              onClick={() => void rechargerCatalogue()}
+            >
+              Recharger
+            </button>
+          </div>
+        ) : loading ? (
           <Spinner size="sm" />
         ) : (
           <div className="AdminDashboard__modules">
             {MODULES.map((module) => {
               const stats = statsMap[module.id];
-              const hasData = stats !== undefined && (stats.mastered > 0 || stats.inProgress > 0);
+              const indisponible = stats?.indisponible === true;
+              const hasData =
+                stats !== undefined &&
+                !indisponible &&
+                (stats.mastered > 0 || stats.inProgress > 0);
               const catalogMod = catalogModules.find((m) => m.id === module.id);
 
               return (
@@ -122,6 +166,10 @@ export default function AdminDashboard() {
                         <p className="AdminDashboard__moduleAccuracy">Précision : {stats.accuracy}%</p>
                       )}
                     </>
+                  ) : indisponible ? (
+                    <p className="AdminDashboard__moduleEmpty AdminDashboard__moduleEmpty--panne">
+                      Progression indisponible
+                    </p>
                   ) : (
                     <p className="AdminDashboard__moduleEmpty">Aucune session jouée</p>
                   )}

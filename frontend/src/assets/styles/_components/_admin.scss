@@ -273,6 +273,37 @@
 		color: var(--color-base-content);
 		opacity: 0.35;
 		margin: 0;
+
+		// « Aucune session jouée » est un état normal, à peine visible. « Progression
+		// indisponible » est une panne : elle doit se distinguer du silence, sinon on
+		// cherche le problème au mauvais endroit — c'est exactement ce qui est arrivé.
+		&--panne {
+			opacity: 0.8;
+			font-style: italic;
+			color: var(--color-warning, var(--color-base-content));
+		}
+	}
+
+	// Catalogue injoignable. On préfère le dire et ne rien afficher que présenter dix-huit
+	// cartes dégradées — ids bruts, sans icône ni interrupteur — qui ressemblent à
+	// « rien n'est configuré » alors que le serveur ne répond pas.
+	&__panne {
+		border-radius: v.$border-radius;
+		border: 2px solid var(--color-warning, var(--color-base-300));
+		background: var(--color-base-100);
+		padding: v.$space-6;
+		max-width: 42rem;
+	}
+
+	&__panneTitre {
+		font-weight: 700;
+		margin: 0 0 v.$space-3;
+	}
+
+	&__panneTexte {
+		margin: 0 0 v.$space-5;
+		opacity: 0.85;
+		font-size: v.$font-size-sm;
 	}
 
 	&__moduleReset { align-self: flex-start; margin-top: auto; }
