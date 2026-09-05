@@ -170,8 +170,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'puissance4',
     name: 'Puissance 4',
-    description:
-      'Aligner quatre jetons — les pions tombent, la colonne décide',
+    description: 'Aligner quatre jetons — les pions tombent, la colonne décide',
     icon: '🔴',
     is_active: false,
     display_order: 20,
