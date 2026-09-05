@@ -42,3 +42,9 @@ export class UpdateActiveNotionsDto {
   @IsIn(NOTION_KEYS, { each: true })
   keys: NotionKey[];
 }
+
+export class UpdateActiveClassesDto {
+  @IsArray()
+  @IsString({ each: true })
+  keys: string[];
+}

@@ -91,6 +91,42 @@ quand, comment ». L'annoter complément enseignerait quelque chose que la fiche
 Une phrase peut parfaitement n'avoir aucun complément : elle sert alors aux questions de
 nature et de groupe nominal.
 
+## Le complément d'objet (CE2) et l'attribut (CM1)
+
+Ces deux fonctions n'existent pas avant le CE2 et le CM1. Une phrase du socle qui en
+porterait une serait servie à un CE1, la phrase étant ouverte et la notion fermée.
+
+**Le complément d'objet** — ce sur quoi porte l'action. Il suit le verbe, sans préposition
+pour un COD, avec `à` ou `de` pour un COI.
+
+```ts
+gnSujet(np('Léa')), v('mange'), objet(gn(d('une'), nc('pomme', '.')))
+```
+
+Avant le CE2, le même groupe reste un `gn(...)` nu, sans fonction. Ce n'est pas un oubli :
+la notion n'est pas enseignée, et lui donner une fonction reviendrait à l'enseigner.
+
+**L'attribut du sujet** — ce que le sujet EST. Il suit un verbe d'état : être, sembler,
+devenir, paraître, rester, demeurer.
+
+```ts
+gnSujet(d('Le'), nc('chat')), v('est'), attribut(adj('noir', '.'))
+```
+
+Le test qui sépare les deux, et qu'il faut appliquer à chaque annotation :
+
+| | s'accorde avec le sujet ? | exemple |
+|---|---|---|
+| attribut | **oui** | les fleurs semblent fané**es** |
+| complément d'objet | non | les fleurs sentent bon |
+
+Un attribut ne va **jamais** dans un `gn` : ce n'est pas un groupe nominal, c'est ce qu'on
+dit du sujet. Un adjectif attribut n'appartient donc à aucun groupe nominal, contrairement
+à l'adjectif épithète (« le chat noir ») qui est dans celui de son nom.
+
+Les verbes d'état sont aussi la seule raison d'écrire « être » suivi d'un adjectif — ce
+que le socle CE1 s'interdit explicitement, faute de pouvoir annoter l'attribut.
+
 ## Mots ambigus — le cœur du module
 
 Ces mots n'ont pas de nature hors phrase. Ils justifient à eux seuls qu'on ne demande

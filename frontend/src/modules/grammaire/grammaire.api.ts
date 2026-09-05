@@ -64,6 +64,28 @@ export const grammaireApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'grammaire' }],
     }),
 
+    // ─── Admin — classes de phrases ──────────────────────────────────────────
+    getGrammaireClasses: builder.query<
+      { key: string; label: string; phrases: number; defaultActive: boolean }[],
+      void
+    >({
+      query: () => '/grammaire/classes',
+    }),
+
+    getGrammaireActiveClasses: builder.query<string[], void>({
+      query: () => '/grammaire/classes-actives',
+      providesTags: ['GrammaireActiveClasses'],
+    }),
+
+    updateGrammaireActiveClasses: builder.mutation<string[], string[]>({
+      query: (keys) => ({
+        url: '/grammaire/classes-actives',
+        method: 'PATCH',
+        body: { keys },
+      }),
+      invalidatesTags: ['GrammaireActiveClasses'],
+    }),
+
     // ─── Admin — notions actives ──────────────────────────────────────────────
     getGrammaireNotions: builder.query<NotionMeta[], void>({
       query: () => '/grammaire/notions',
@@ -86,6 +108,9 @@ export const grammaireApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetGrammaireClassesQuery,
+  useGetGrammaireActiveClassesQuery,
+  useUpdateGrammaireActiveClassesMutation,
   useStartGrammaireSessionMutation,
   useRecordGrammaireAnswerMutation,
   useCompleteGrammaireSessionMutation,

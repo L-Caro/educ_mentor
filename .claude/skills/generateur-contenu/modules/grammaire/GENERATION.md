@@ -3,6 +3,58 @@
 Ce skill produit des **appels de constructeurs TypeScript** à insérer dans
 `backend/src/modules/grammaire/grammaire.corpus.ts`.
 
+## Demander la classe — avant tout le reste
+
+**Ne jamais générer sans avoir demandé la classe visée.** Une phrase de CE1 et une phrase
+de CM2 ne diffèrent pas par le nombre de mots : elles diffèrent par les NOTIONS qu'elles
+mettent en jeu, et une phrase annotée au mauvais niveau se retrouve servie à un enfant qui
+n'a pas les moyens de la lire.
+
+Poser ces questions en une seule salve, avant toute génération (outil de question fermé
+si disponible, sinon en Markdown numéroté) :
+
+| # | Paramètre | Options |
+|---|---|---|
+| 1 | **Classe** | CP · CE1 · CE2 · CM1 · CM2 |
+| 2 | **Combien de phrases** | 10 · 15 · 20 · personnalisé |
+| 3 | **Notion à travailler en priorité** | au choix dans le tableau ci-dessous, ou « varié » |
+| 4 | **Thème** *(optionnel)* | libre — école, animaux, saisons… Défaut : varié |
+
+La classe devient le 4ᵉ argument de `phrase(...)`, et c'est elle que la porte
+« Classes de phrases » d'Administration → Grammaire ouvre ou ferme.
+
+```ts
+phrase('ce2-lea-mange-pomme', 'simple', [...], 'ce2')
+//      clé                    difficulté        classe
+```
+
+**`ce1` est la valeur par défaut** quand l'argument est omis : les soixante-deux phrases
+d'origine s'en passent. Toute phrase d'une autre classe doit le passer explicitement.
+
+## Ce que chaque classe autorise
+
+Le corpus va du CP au CM2. Chaque classe ajoute des notions, et **n'utiliser que ce qui
+est disponible à la classe demandée** est la règle qui compte : une phrase de CE1 qui
+porterait un attribut du sujet serait servie à un CE1, la notion étant fermée mais la
+phrase ouverte.
+
+| Classe | Ce qui s'ajoute | Constructeurs |
+|---|---|---|
+| CP · CE1 | nom, verbe, déterminant, adjectif, pronom sujet, mot invariable, groupe nominal, sujet, complément circonstanciel | `nc` `np` `v` `d` `adj` `pron` `inv` · `gn` `sujet` `complement` |
+| CE2 | le **complément d'objet**, nommé pour lui-même | `objet(...)` |
+| CM1 | l'**attribut du sujet**, après être, sembler, devenir, paraître, rester | `attribut(...)` |
+| CM2 | rien de neuf : des phrases plus longues, plusieurs fonctions dans la même phrase | — |
+
+**Le complément d'objet change une règle du CE1.** Jusque-là, un groupe nominal objet
+restait sans fonction : dans « Maëve mange une pomme », `une pomme` était un `gn(...)` nu,
+parce que le CE1 n'apprend pas cette notion. À partir du CE2 il s'annote `objet(gn(...))`.
+Les phrases du socle ont été réannotées ; l'annotation ne gêne pas un CE1, puisque la
+notion reste fermée.
+
+**L'attribut n'est pas un complément d'objet.** Le test qui les sépare : l'attribut
+s'ACCORDE avec le sujet (« les fleurs semblent fanées »), le complément d'objet non
+(« les fleurs sentent bon »). Un attribut ne va jamais dans un `gn`.
+
 ## Pourquoi ce n'est pas du JSON, contrairement à la dictée
 
 Le module Dictée stocke son contenu en base et l'importe par un textarea JSON. La grammaire
@@ -16,7 +68,7 @@ module capable d'injecter ça.
 
 Conséquence pratique : **étendre le corpus demande un commit et un déploiement**, comme
 pour une figure de géométrie ou une fiche de cours. En échange, `grammaire.corpus.spec.ts`
-tient quatorze invariants, et la barrière de déploiement les rejoue.
+tient 18 invariants, et la barrière de déploiement les rejoue.
 
 ## Les constructeurs
 
@@ -36,12 +88,14 @@ Second argument facultatif : la **ponctuation accolée**, affichée mais jamais 
 `v('dort', '.')`, `nc('matin', ',')`, `v('viens', ' ?')` (espace insécable avant `?` en
 français — l'écrire dans la chaîne).
 
-| Groupe | Effet |
-|---|---|
-| `gn(...)` | un groupe nominal — index attribué automatiquement, jamais à la main |
-| `sujet(...)` | pose `fonction: 'sujet'` sur tout ce qu'il contient |
-| `complement(...)` | pose `fonction: 'complement'` |
-| `gnSujet(...)` | raccourci pour `sujet(gn(...))` — le cas courant |
+| Groupe | Effet | Classe |
+|---|---|---|
+| `gn(...)` | un groupe nominal — index attribué automatiquement, jamais à la main | CE1 |
+| `sujet(...)` | pose `fonction: 'sujet'` sur tout ce qu'il contient | CE1 |
+| `complement(...)` | pose `fonction: 'complement'` — circonstanciel : où, quand, comment | CE1 |
+| `gnSujet(...)` | raccourci pour `sujet(gn(...))` — le cas courant | CE1 |
+| `objet(...)` | pose `fonction: 'complement_objet'` — ce sur quoi porte l'action | CE2 |
+| `attribut(...)` | pose `fonction: 'attribut'` — ce que le sujet EST | CM1 |
 
 ```ts
 phrase('chat-dort-tapis', 'moyen', [
@@ -76,11 +130,15 @@ ne vérifie — les tenir à la main.
 9. **Pas d'espace après une élision.** Écrire `d('l’')` puis `nc('oiseau')` : le collage se
    déduit de l'apostrophe, il n'y a pas de drapeau à poser.
 10. **Clé unique**, en kebab-case, tirée des mots porteurs : `petit-chat-noir-dort`.
-11. **Le complément est CIRCONSTANCIEL uniquement** — où, quand, comment. C'est la
-    définition de la fiche du cours, et le CE1 n'apprend pas le complément d'objet. Un
-    groupe nominal objet reste un `gn(...)` **sans fonction** : dans « Maëve mange une
-    pomme rouge », `une pomme rouge` n'est ni sujet ni complément. La phrase sert alors aux
-    questions de nature et de groupe nominal, pas à celles de fonction. C'est normal.
+11. **`complement(...)` reste CIRCONSTANCIEL** — où, quand, comment — à toutes les
+    classes. Ce qui change avec la classe, c'est le sort du groupe objet :
+    - **CP · CE1** : il reste un `gn(...)` **sans fonction**. La phrase sert aux questions
+      de nature et de groupe nominal, pas à celles de fonction. C'est normal.
+    - **CE2 et au-delà** : il s'annote `objet(gn(...))`.
+
+    Ne jamais annoter un objet en `complement(...)` : ce sont deux notions distinctes, que
+    le module interroge séparément, et les confondre enseignerait qu'un objet est un
+    circonstanciel.
 12. **Jamais deux compléments côte à côte.** Le module compte les compléments par suites
     consécutives : deux groupes adjacents seraient lus comme un seul. Toujours du texte
     entre eux (verbe, sujet). Deux compléments séparés sont permis — la phrase est
@@ -106,29 +164,40 @@ Ces tournures ne sont pas annotables proprement au CE1. Les tests ne les attrape
 `du` **partitif** est en revanche un déterminant, et il est accepté : « le boulanger vend
 du pain ».
 
-## Les niveaux
+## La difficulté — à ne pas confondre avec la classe
 
-| Niveau | Contenu | Repère |
+Le 2ᵉ argument de `phrase(...)` est la **complexité syntaxique**, pas la classe. Les deux
+axes sont indépendants : une phrase de CM1 peut être syntaxiquement simple (« Le chat est
+noir »), et une phrase de CE1 complexe (« Sous la table dort le chat »).
+
+| Difficulté | Contenu | Repère |
 |---|---|---|
 | `simple` | déterminant + nom + verbe | 2 à 3 mots porteurs, aucun adjectif |
 | `moyen` | + un adjectif, + un complément, + un invariable | 4 à 6 mots |
 | `complexe` | groupe nominal étendu, sujet inversé, sujet coordonné, mot ambigu | 6 à 10 mots |
 
-Le niveau est **annoté, pas calculé**. Ne pas le déduire du nombre de mots : une phrase
-courte avec *ferme* est plus dure qu'une longue phrase plate.
+La difficulté est **annotée, pas calculée**. Ne pas la déduire du nombre de mots : une
+phrase courte avec *ferme* est plus dure qu'une longue phrase plate.
+
+Le pré-jeu de l'enfant règle la difficulté ; l'administration règle la classe. Une phrase
+n'est servie que si les DEUX l'autorisent.
 
 ## Méthode
 
-1. **Regarder ce qui manque avant d'écrire.** Quelle notion est sous-représentée ? Le
-   pronom sujet, le mot invariable et le nom propre sont les plus faciles à oublier.
-2. **Doser.** Sauf demande précise, un lot de 12 à 20 phrases, réparties sur les trois
-   niveaux, en couvrant plusieurs notions.
-3. **Sujets familiers.** École, maison, animaux, saisons, jeux. La difficulté est
-   grammaticale, pas lexicale : un mot inconnu déplace la question.
-4. **Écrire la phrase d'abord, l'annoter ensuite.** Annoter en écrivant produit des phrases
+1. **Demander la classe** (étape 1), et n'utiliser que les notions qu'elle autorise.
+2. **Regarder ce qui manque avant d'écrire.** Quelle notion est sous-représentée à cette
+   classe ? Le pronom sujet, le mot invariable et le nom propre sont les plus faciles à
+   oublier. Le compte de phrases par classe est affiché dans Administration → Grammaire.
+3. **Doser.** Sauf demande précise, un lot de 12 à 20 phrases pour la classe demandée,
+   réparties sur les trois difficultés, en couvrant plusieurs notions.
+4. **Adapter le vocabulaire à la classe.** École, maison, animaux, saisons, jeux au CE1 ;
+   un lexique plus large au CM. La difficulté doit rester grammaticale, pas lexicale : un
+   mot inconnu déplace la question.
+5. **Écrire la phrase d'abord, l'annoter ensuite.** Annoter en écrivant produit des phrases
    tordues pour arranger l'annotation.
-5. **Relire chaque annotation en se posant la question du test**, pas celle du sens : ce mot
-   est-il dans le bon groupe ? le complément est-il bien circonstanciel ?
+6. **Relire chaque annotation en se posant la question du test**, pas celle du sens : ce mot
+   est-il dans le bon groupe ? le complément est-il bien circonstanciel, ou est-ce un
+   objet ? l'attribut s'accorde-t-il avec le sujet ?
 
 ## Après génération — obligatoire
 
@@ -140,12 +209,16 @@ node ./node_modules/jest/bin/jest.js src/modules/grammaire
 npm run lint:fix && npm run typecheck
 ```
 
-Les quatorze invariants de `grammaire.corpus.spec.ts` rendent la **liste** des phrases
+Les 18 invariants de `grammaire.corpus.spec.ts` rendent la **liste** des phrases
 fautives, par leur clé — pas seulement la première. Une annotation qui passe le typage
 mais viole une règle est attrapée là, et nulle part ailleurs.
 
 Puis relire à l'œil les phrases ajoutées : les tests vérifient la STRUCTURE, ils ne
 peuvent pas voir qu'un nom a été annoté verbe. C'est la seule relecture qui attrape ça.
+
+Enfin, **le rappeler à Lionel** : une classe neuve n'est pas servie tant qu'elle n'est pas
+ouverte dans Administration → Grammaire → Classes de phrases. Le compte affiché à côté de
+chaque classe permet de vérifier que les phrases sont bien arrivées.
 
 ## Fichiers
 

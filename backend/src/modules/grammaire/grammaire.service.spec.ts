@@ -97,7 +97,7 @@ describe('GrammaireService', () => {
       const saved = await service.setActiveNotionKeys([
         'verbe',
         'sujet',
-        'attribut',
+        'complement-du-nom',
       ] as never);
       expect(saved).toEqual(['verbe', 'sujet']);
       expect(await service.getActiveNotionKeys()).toEqual(saved);

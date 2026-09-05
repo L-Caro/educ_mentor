@@ -8,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { GrammaireService } from './grammaire.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UpdateActiveNotionsDto } from './dto/grammaire.dto';
+import {
+  UpdateActiveClassesDto,
+  UpdateActiveNotionsDto,
+} from './dto/grammaire.dto';
 
 @Controller('grammaire')
 @UseGuards(JwtAuthGuard)
@@ -30,6 +33,23 @@ export class GrammaireAdminController {
   @Patch('notions-actives')
   setActiveNotions(@Body() dto: UpdateActiveNotionsDto) {
     return this.grammaireService.setActiveNotionKeys(dto.keys);
+  }
+
+  // ─── Classes de phrases ───────────────────────────────────────────────────
+
+  @Get('classes')
+  getClasses() {
+    return this.grammaireService.getClasses();
+  }
+
+  @Get('classes-actives')
+  getActiveClasses() {
+    return this.grammaireService.getActiveClassKeys();
+  }
+
+  @Patch('classes-actives')
+  setActiveClasses(@Body() dto: UpdateActiveClassesDto) {
+    return this.grammaireService.setActiveClassKeys(dto.keys);
   }
 
   // ─── Progression ──────────────────────────────────────────────────────────

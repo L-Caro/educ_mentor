@@ -8,6 +8,9 @@ import type { Server } from 'node:http';
 import { AppModule } from './../src/app.module';
 import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.service';
 import { AccordsService } from './../src/modules/accords/accords.service';
+import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
+import { NOMS } from './../src/modules/accords/accords.corpus';
+import { familleDuNom } from './../src/modules/accords/accords.familles';
 
 interface CatalogModule {
   id: string;
@@ -58,6 +61,12 @@ describe("Démarrage de l'application (e2e)", () => {
   }, 60_000);
 
   const server = () => app.getHttpServer() as Server;
+
+  /** Les pluriels réellement classés en `pluriel_aux` — chevaux, animaux, journaux,
+   * hôpitaux. Lus du corpus plutôt que devinés d'une terminaison. */
+  const PLURIELS_EN_AUX = NOMS.filter(
+    (nom) => familleDuNom(nom) === 'pluriel_aux',
+  ).map((nom) => nom.pluriel);
 
   afterAll(async () => {
     await app?.close();
@@ -435,8 +444,11 @@ describe("Démarrage de l'application (e2e)", () => {
         .send({ question_types: ['nombre_nom'], difficulty: 'hard' })
         .expect(201)
     ).body as { questions: { answer: string }[] };
+    // Comparer à la LISTE réelle, pas à une terminaison : « eaux », pluriel de « eau »,
+    // se termine par `aux` sans être un pluriel en -aux. C'est exactement le piège que
+    // `familleDuNom` évite en testant aussi le singulier.
     for (const question of session.questions) {
-      expect(question.answer).not.toMatch(/aux$/);
+      expect(PLURIELS_EN_AUX).not.toContain(question.answer);
     }
   });
 
@@ -460,8 +472,58 @@ describe("Démarrage de l'application (e2e)", () => {
       ).body as { questions: { answer: string }[] };
       for (const question of session.questions) vus.add(question.answer);
     }
-    expect([...vus].some((forme) => /aux$/.test(forme))).toBe(true);
+    expect([...vus].some((forme) => PLURIELS_EN_AUX.includes(forme))).toBe(
+      true,
+    );
 
     await service.setActiveFamilleKeys(socle);
+  });
+
+  // ─── Grammaire : les classes de phrases ─────────────────────────────────────
+
+  it('ne sert aucune phrase de grande classe tant qu’elle est fermée', async () => {
+    const service = app.get(GrammaireService);
+    await service.setActiveNotionKeys(['nom_commun', 'verbe', 'determinant']);
+
+    const grandes = new Set(
+      (await service.getClasses())
+        .filter((c) => !c.defaultActive)
+        .map((c) => c.key),
+    );
+    expect(grandes.size).toBeGreaterThan(0);
+    expect(await service.getActiveClassKeys()).toEqual(['cp', 'ce1']);
+
+    // Les phrases de CE2+ portent un complément d'objet annoté ; aucune ne doit sortir.
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({ question_types: ['nature_mot'], difficulty: 'hard' })
+        .expect(201)
+    ).body as { questions: { item_key: string }[] };
+    for (const question of session.questions) {
+      expect(question.item_key).not.toMatch(/_(ce2|cm1|cm2)-/);
+    }
+  });
+
+  it('sert les phrases de CM1 et interroge l’attribut une fois ouverts', async () => {
+    const service = app.get(GrammaireService);
+    await service.setActiveClassKeys(['cp', 'ce1', 'ce2', 'cm1', 'cm2']);
+    await service.setActiveNotionKeys(['attribut']);
+
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({ question_types: ['trouver_fonction'], difficulty: 'hard' })
+        .expect(201)
+    ).body as {
+      questions: { skill_key: string; answer_indices: number[] }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.skill_key).toBe('attribut');
+      expect(question.answer_indices.length).toBeGreaterThan(0);
+    }
+
+    await service.setActiveClassKeys(['cp', 'ce1']);
   });
 });

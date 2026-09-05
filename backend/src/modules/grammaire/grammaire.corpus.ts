@@ -15,11 +15,20 @@
  * un verbe par phrase, un sujet par phrase, un nom dans chaque groupe nominal.
  */
 
+import type { Niveau } from '../../common/niveau';
 import type { Fonction, Nature } from './grammaire.notions';
 
-export type Niveau = 'simple' | 'moyen' | 'complexe';
+/** La complexité de la PHRASE — à ne pas confondre avec la classe scolaire, qui est le
+ * champ `niveau`. Une phrase de CM1 peut être syntaxiquement simple, et une phrase de CE1
+ * complexe. */
+export type Difficulte = 'simple' | 'moyen' | 'complexe';
 
-export const NIVEAUX: Niveau[] = ['simple', 'moyen', 'complexe'];
+export const DIFFICULTES: Difficulte[] = ['simple', 'moyen', 'complexe'];
+
+/** Les classes de phrases servies à l'installation. Le corpus va jusqu'au CM2 ; les
+ * phrases des grandes classes attendent d'être ouvertes en administration, comme les
+ * familles de mots des accords ou les figures de la géométrie. */
+export const DEFAULT_ACTIVE_CLASSES: Niveau[] = ['cp', 'ce1'];
 
 export interface MotAnnote {
   /** Le mot tel qu'écrit, majuscule comprise. */
@@ -37,6 +46,9 @@ export interface MotAnnote {
 
 export interface PhraseAnnotee {
   key: string;
+  difficulte: Difficulte;
+  /** La classe où la phrase devient abordable. ÉTIQUETTE : c'est la porte des classes
+   * actives, en administration, qui décide de la servir ou non. */
   niveau: Niveau;
   mots: MotAnnote[];
 }
@@ -101,6 +113,23 @@ const complement = (...blocs: Bloc[]): Groupe => ({
   blocs,
 });
 
+/** Le complément d'OBJET — ce sur quoi porte l'action. Il n'était pas annoté tant que le
+ * corpus s'arrêtait au CE1, où il n'est pas enseigné : « une pomme » dans « Maëve mange
+ * une pomme » restait un groupe nominal sans fonction. Il s'apprend au CE2. */
+const objet = (...blocs: Bloc[]): Groupe => ({
+  sorte: 'fonction',
+  fonction: 'complement_objet',
+  blocs,
+});
+
+/** L'attribut du sujet — ce que le sujet EST, après être, sembler, devenir. Il s'accorde
+ * avec le sujet, ce qui le distingue du complément d'objet, qui lui ne s'accorde pas. CM1. */
+const attribut = (...blocs: Bloc[]): Groupe => ({
+  sorte: 'fonction',
+  fonction: 'attribut',
+  blocs,
+});
+
 /** Le cas courant : un groupe nominal qui est le sujet du verbe. */
 const gnSujet = (...blocs: Bloc[]): Groupe => sujet(gn(...blocs));
 
@@ -147,8 +176,16 @@ function aplatir(blocs: Bloc[]): MotAnnote[] {
   return mots;
 }
 
-function phrase(key: string, niveau: Niveau, blocs: Bloc[]): PhraseAnnotee {
-  return { key, niveau, mots: aplatir(blocs) };
+/** La classe par défaut est le CE1 : c'est celle du corpus d'origine, et l'écrire sur
+ * soixante-deux appels n'aurait rien appris à personne. Les phrases des grandes classes
+ * la passent explicitement. */
+function phrase(
+  key: string,
+  difficulte: Difficulte,
+  blocs: Bloc[],
+  niveau: Niveau = 'ce1',
+): PhraseAnnotee {
+  return { key, difficulte, niveau, mots: aplatir(blocs) };
 }
 
 // ─── Le corpus ──────────────────────────────────────────────────────────────
@@ -252,7 +289,7 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('maeve-mange-pomme', 'moyen', [
     gnSujet(np('Maëve')),
     v('mange'),
-    gn(d('une'), nc('pomme'), adj('rouge', '.')),
+    objet(gn(d('une'), nc('pomme'), adj('rouge', '.'))),
   ]),
   phrase('chien-court-vite', 'moyen', [
     gnSujet(d('Le'), nc('chien')),
@@ -267,12 +304,12 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('voisine-arrose-fleurs', 'moyen', [
     gnSujet(d('La'), nc('voisine')),
     v('arrose'),
-    gn(d('ses'), nc('fleurs', '.')),
+    objet(gn(d('ses'), nc('fleurs', '.'))),
   ]),
   phrase('facteur-apporte-lettre', 'moyen', [
     gnSujet(d('Le'), nc('facteur')),
     v('apporte'),
-    gn(d('une'), nc('lettre', '.')),
+    objet(gn(d('une'), nc('lettre', '.'))),
   ]),
   phrase('ce-matin-chat-dort', 'moyen', [
     complement(gn(d('Ce'), nc('matin', ','))),
@@ -282,7 +319,7 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('eleves-ecoutent-maitresse', 'moyen', [
     gnSujet(d('Les'), nc('élèves')),
     v('écoutent'),
-    gn(d('la'), nc('maîtresse', '.')),
+    objet(gn(d('la'), nc('maîtresse', '.'))),
   ]),
   phrase('vieux-chien-dort-dehors', 'moyen', [
     gnSujet(d('Le'), adj('vieux'), nc('chien')),
@@ -292,7 +329,7 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('papa-gare-voiture', 'moyen', [
     gnSujet(np('Papa')),
     v('gare'),
-    gn(d('la'), nc('voiture', '.')),
+    objet(gn(d('la'), nc('voiture', '.'))),
   ]),
   phrase('lea-joue-avec-maeve', 'moyen', [
     gnSujet(np('Léa')),
@@ -302,7 +339,7 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('boulanger-vend-pain', 'moyen', [
     gnSujet(d('Le'), nc('boulanger')),
     v('vend'),
-    gn(d('du'), nc('pain', '.')),
+    objet(gn(d('du'), nc('pain', '.'))),
   ]),
   phrase('nuages-gris-arrivent', 'moyen', [
     gnSujet(d('Les'), nc('nuages'), adj('gris')),
@@ -316,17 +353,17 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('chat-noir-traverse-rue', 'moyen', [
     gnSujet(d('Le'), nc('chat'), adj('noir')),
     v('traverse'),
-    gn(d('la'), nc('rue', '.')),
+    objet(gn(d('la'), nc('rue', '.'))),
   ]),
   phrase('petite-fille-dessine-soleil', 'moyen', [
     gnSujet(d('La'), adj('petite'), nc('fille')),
     v('dessine'),
-    gn(d('un'), nc('soleil', '.')),
+    objet(gn(d('un'), nc('soleil', '.'))),
   ]),
   phrase('elle-range-chambre', 'moyen', [
     sujet(pron('Elle')),
     v('range'),
-    gn(d('sa'), nc('chambre', '.')),
+    objet(gn(d('sa'), nc('chambre', '.'))),
   ]),
   phrase('train-part-bientot', 'moyen', [
     gnSujet(d('Le'), nc('train')),
@@ -341,7 +378,7 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('maitresse-raconte-histoire', 'moyen', [
     gnSujet(d('La'), nc('maîtresse')),
     v('raconte'),
-    gn(d('une'), adj('longue'), nc('histoire', '.')),
+    objet(gn(d('une'), adj('longue'), nc('histoire', '.'))),
   ]),
 
   // ── complexe ──────────────────────────────────────────────────────────────
@@ -372,17 +409,17 @@ export const CORPUS: PhraseAnnotee[] = [
   phrase('fermier-ferme-porte', 'complexe', [
     gnSujet(d('Le'), nc('fermier')),
     v('ferme'),
-    gn(d('la'), adj('grande'), nc('porte', '.')),
+    objet(gn(d('la'), adj('grande'), nc('porte', '.'))),
   ]),
   phrase('elle-porte-robe-bleue', 'complexe', [
     sujet(pron('Elle')),
     v('porte'),
-    gn(d('une'), adj('jolie'), nc('robe'), adj('bleue', '.')),
+    objet(gn(d('une'), adj('jolie'), nc('robe'), adj('bleue', '.'))),
   ]),
   phrase('eleves-attentifs-ecoutent', 'complexe', [
     gnSujet(d('Les'), nc('élèves'), adj('attentifs')),
     v('écoutent'),
-    gn(d('la'), adj('longue'), nc('histoire', '.')),
+    objet(gn(d('la'), adj('longue'), nc('histoire', '.'))),
   ]),
   phrase('derriere-la-maison-chien-dort', 'complexe', [
     complement(inv('Derrière'), gn(d('la'), nc('maison', ','))),
@@ -399,13 +436,13 @@ export const CORPUS: PhraseAnnotee[] = [
     complement(gn(d('Ce'), nc('matin', ','))),
     gnSujet(d('le'), nc('facteur')),
     v('apporte'),
-    gn(d('une'), adj('belle'), nc('lettre', '.')),
+    objet(gn(d('une'), adj('belle'), nc('lettre', '.'))),
   ]),
   phrase('sur-la-table-maeve-pose', 'complexe', [
     complement(inv('Sur'), gn(d('la'), nc('table', ','))),
     gnSujet(np('Maëve')),
     v('pose'),
-    gn(d('son'), nc('cartable', '.')),
+    objet(gn(d('son'), nc('cartable', '.'))),
   ]),
   phrase('chat-et-chien-dorment', 'complexe', [
     sujet(gn(d('Le'), nc('chat')), inv('et'), gn(d('le'), nc('chien'))),
@@ -429,6 +466,131 @@ export const CORPUS: PhraseAnnotee[] = [
     v('dort'),
     complement(inv('sur'), gn(d('le'), adj('vieux'), nc('tapis', '.'))),
   ]),
+  // ── CE2 : le complément d'objet, nommé pour lui-même ──────────────────────
+  phrase(
+    'ce2-lea-mange-pomme',
+    'simple',
+    [gnSujet(np('Léa')), v('mange'), objet(gn(d('une'), nc('pomme', '.')))],
+    'ce2',
+  ),
+  phrase(
+    'ce2-eleves-rangent-cahiers',
+    'moyen',
+    [
+      gnSujet(d('Les'), nc('élèves')),
+      v('rangent'),
+      objet(gn(d('leurs'), nc('cahiers', '.'))),
+    ],
+    'ce2',
+  ),
+  phrase(
+    'ce2-jardinier-arrose-fleurs',
+    'moyen',
+    [
+      gnSujet(d('Le'), nc('jardinier')),
+      v('arrose'),
+      objet(gn(d('les'), adj('jolies'), nc('fleurs'))),
+      complement(inv('chaque'), gn(nc('matin', '.'))),
+    ],
+    'ce2',
+  ),
+  phrase(
+    'ce2-maeve-offre-cadeau',
+    'complexe',
+    [
+      gnSujet(np('Maëve')),
+      v('offre'),
+      objet(gn(d('un'), adj('joli'), nc('cadeau'))),
+      complement(inv('à'), gn(d('sa'), nc('sœur', '.'))),
+    ],
+    'ce2',
+  ),
+
+  // ── CM1 : l'attribut du sujet ─────────────────────────────────────────────
+  phrase(
+    'cm1-chat-est-noir',
+    'simple',
+    [gnSujet(d('Le'), nc('chat')), v('est'), attribut(adj('noir', '.'))],
+    'cm1',
+  ),
+  phrase(
+    'cm1-fleurs-semblent-fanees',
+    'moyen',
+    [
+      gnSujet(d('Les'), nc('fleurs')),
+      v('semblent'),
+      attribut(adj('fanées', '.')),
+    ],
+    'cm1',
+  ),
+  phrase(
+    'cm1-eleves-deviennent-attentifs',
+    'moyen',
+    [
+      gnSujet(d('Les'), nc('élèves')),
+      v('deviennent'),
+      attribut(adj('attentifs', '.')),
+    ],
+    'cm1',
+  ),
+  phrase(
+    'cm1-histoire-parait-longue',
+    'complexe',
+    [
+      gnSujet(d('Cette'), nc('histoire')),
+      v('paraît'),
+      attribut(adj('longue'), inv('et'), adj('ennuyeuse', '.')),
+    ],
+    'cm1',
+  ),
+
+  // ── CM2 : phrases longues, objet et circonstanciel dans la même phrase ────
+  phrase(
+    'cm2-boulanger-prepare-pains',
+    'complexe',
+    [
+      complement(inv('Chaque'), gn(nc('matin', ','))),
+      gnSujet(d('le'), nc('boulanger')),
+      v('prépare'),
+      objet(gn(d('de'), adj('bons'), nc('pains'))),
+      complement(inv('dans'), gn(d('son'), nc('fournil', '.'))),
+    ],
+    'cm2',
+  ),
+  phrase(
+    'cm2-voisine-cueille-pommes',
+    'complexe',
+    [
+      gnSujet(d('La'), adj('vieille'), nc('voisine')),
+      v('cueille'),
+      objet(gn(d('les'), nc('pommes'), adj('mûres'))),
+      complement(inv('soigneusement', '.')),
+    ],
+    'cm2',
+  ),
+  phrase(
+    'cm2-enfants-restent-silencieux',
+    'complexe',
+    [
+      complement(inv('Pendant'), gn(d('la'), nc('lecture', ','))),
+      gnSujet(d('les'), adj('jeunes'), nc('enfants')),
+      v('restent'),
+      attribut(adj('silencieux', '.')),
+    ],
+    'cm2',
+  ),
+  phrase(
+    'cm2-facteur-depose-lettres',
+    'complexe',
+    [
+      gnSujet(d('Le'), nc('facteur')),
+      v('dépose'),
+      objet(gn(d('les'), nc('lettres'), adj('importantes'))),
+      complement(inv('devant'), gn(d('la'), adj('grande'), nc('porte', '.'))),
+    ],
+    'cm2',
+  ),
+
   phrase('dehors-grands-arbres-bougent', 'complexe', [
     complement(inv('Dehors', ',')),
     gnSujet(d('les'), adj('grands'), nc('arbres')),
