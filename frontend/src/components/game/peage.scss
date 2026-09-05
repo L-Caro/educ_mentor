@@ -1,0 +1,123 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Le péage ─────────────────────────────────────────────────────────────────
+// Une carte seule au milieu de l'écran. Rien d'autre : elle est venue jouer, et tout ce
+// qui n'est pas la question la détournerait de la seule chose à faire pour y arriver.
+
+.Peage {
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: v.$space-6 v.$space-5;
+}
+
+.Peage__carte {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: v.$space-5;
+	width: 100%;
+	max-width: 46rem;
+	padding: v.$space-8 v.$space-6;
+	border-radius: v.$radius-lg;
+	background: var(--color-base-100);
+	box-shadow: var(--shadow-md);
+	text-align: center;
+}
+
+.Peage__entete {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: v.$space-5;
+	width: 100%;
+	margin: 0;
+	font-size: v.$font-size-sm;
+	opacity: 0.75;
+}
+
+.Peage__module {
+	font-weight: 700;
+}
+
+.Peage__consigne {
+	margin: 0;
+	font-size: v.$font-size-md;
+}
+
+// L'énoncé porte tout : il est le plus gros élément de la carte.
+.Peage__enonce {
+	margin: 0;
+	font-size: v.$font-size-2xl;
+	font-weight: 800;
+	line-height: 1.25;
+	font-variant-numeric: tabular-nums;
+}
+
+.Peage__choix {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: v.$space-4;
+	width: 100%;
+}
+
+.Peage__choixBouton {
+	flex: 1 1 12rem;
+	min-height: 4.4rem;
+	padding: v.$space-4 v.$space-5;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$radius-md;
+	background: var(--color-base-200);
+	color: var(--color-base-content);
+	font-family: v.$font-family;
+	font-size: v.$font-size-lg;
+	font-weight: 700;
+	cursor: pointer;
+
+	&:not(:disabled):hover {
+		border-color: var(--color-primary);
+	}
+
+	// Une fois répondu, les boutons restent lisibles : les griser comme des boutons morts
+	// effacerait justement la correction qu'on vient afficher.
+	&:disabled {
+		cursor: default;
+		opacity: 1;
+	}
+}
+
+// La bonne réponse se montre TOUJOURS, juste ou faux : c'est elle qu'on est venu
+// apprendre, pas le fait d'avoir eu tort.
+.Peage__choixBouton--bonne {
+	border-color: var(--color-success);
+	background: color-mix(in srgb, var(--color-success) 20%, transparent);
+}
+
+.Peage__choixBouton--mauvaise {
+	border-color: var(--color-error);
+	background: color-mix(in srgb, var(--color-error) 14%, transparent);
+	text-decoration: line-through;
+}
+
+.Peage__verdict {
+	margin: 0;
+	font-size: v.$font-size-md;
+	font-weight: 700;
+
+	&--juste { color: var(--color-success); }
+	&--faux { color: var(--color-error); }
+}
+
+// Discret, mais toujours là : sans lui, une enfant qui ne veut plus répondre n'aurait
+// que le bouton « précédent » du navigateur.
+.Peage__renoncer {
+	border: none;
+	background: none;
+	color: var(--color-base-content);
+	font-family: v.$font-family;
+	font-size: v.$font-size-sm;
+	text-decoration: underline;
+	opacity: 0.7;
+	cursor: pointer;
+}

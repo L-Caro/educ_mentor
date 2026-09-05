@@ -20,6 +20,7 @@ import Settings from 'src/components/admin/settings/Settings';
 
 import ModulePreSetup from 'src/components/game/ModulePreSetup';
 import LazyGame from 'src/components/game/LazyGame';
+import Peage from 'src/components/game/Peage';
 import GameResultView from 'src/components/game/result/GameResultView.tsx';
 
 // Source unique des modules
@@ -54,10 +55,20 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
       ? <Game />
       : null;
 
+  // Péage : quelques questions d'un autre module avant d'ouvrir un plateau, si l'adulte
+  // l'a réglé. Il n'enveloppe QUE les jeux, et il laisse passer par défaut — le composant
+  // décide, pas la route, parce que le réglage se lit à l'exécution.
+  const jouable =
+    module.category === 'jeux' && playElement ? (
+      <Peage moduleId={module.id}>{playElement}</Peage>
+    ) : (
+      playElement
+    );
+
   // Pré-jeu : écran générique piloté par setupOptions, ou direct vers le jeu si aucune option.
   const homeElement = module.setupOptions
     ? <ModulePreSetup module={module} />
-    : playElement;
+    : jouable;
 
   // Résultats : tous les modules avec un jeu (spec ou composant dédié) passent par GameResultView.
   const resultElement = (module.loadGameSpec || Game)
@@ -66,7 +77,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
 
   return [
     { path: `/module/${module.id}`, element: homeElement, handle },
-    { path: `/module/${module.id}/play`, element: playElement, handle },
+    { path: `/module/${module.id}/play`, element: jouable, handle },
     { path: `/module/${module.id}/result`, element: resultElement, handle },
   ];
 }

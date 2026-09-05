@@ -15,6 +15,9 @@ import { SettingsModule } from '../settings/settings.module';
     SettingsModule,
   ],
   providers: [AccordsService],
+  // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
+  // enregistrer — voir `PeageService`.
+  exports: [AccordsService],
   controllers: [AccordsGameController, AccordsAdminController],
 })
 export class AccordsModule {}

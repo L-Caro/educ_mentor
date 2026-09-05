@@ -14,5 +14,8 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   controllers: [ConjugaisonGameController, ConjugaisonAdminController],
   providers: [ConjugaisonService],
+  // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
+  // enregistrer — voir `PeageService`.
+  exports: [ConjugaisonService],
 })
 export class ConjugaisonModule {}

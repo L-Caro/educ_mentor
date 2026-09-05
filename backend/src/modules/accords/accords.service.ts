@@ -55,9 +55,21 @@ export class AccordsService {
 
   // ─── Jeu ──────────────────────────────────────────────────────────────────
 
-  async startSession(
-    dto: StartAccordsSessionDto,
-  ): Promise<AccordsSessionResult> {
+  /** Construire les questions, et RIEN d'autre : aucune écriture en base.
+   *
+   * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
+   * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
+   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * savoir ce qui a été travaillé.
+   *
+   * La description de la séance sort d'ici elle aussi : elle se compose des mêmes
+   * variables que les questions, et la recalculer dans `startSession` aurait été un
+   * deuxième endroit à tenir d'accord avec le premier.
+   */
+  async construireQuestions(dto: StartAccordsSessionDto): Promise<{
+    resultat: Omit<AccordsSessionResult, 'session_id'>;
+    seance: Partial<AccordsSession>;
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const notionsActives = await this.getActiveNotionKeys();
 
@@ -91,20 +103,29 @@ export class AccordsService {
       );
     }
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      question_types: types.join(','),
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
+      seance: {
+        difficulty,
+        question_types: types.join(','),
+        timer_seconds: timerSeconds,
+      },
+    };
+  }
+
+  async startSession(
+    dto: StartAccordsSessionDto,
+  ): Promise<AccordsSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   /** Un message qui dit quoi faire. Ici le type d'exercice EST la notion, donc ce qui

@@ -45,7 +45,17 @@ export class CalculService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(dto: StartCalculSessionDto): Promise<CalculSessionResult> {
+  /** Construire les questions, et RIEN d'autre : aucune écriture en base.
+   *
+   * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
+   * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
+   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * savoir ce qui a été travaillé.
+   */
+  async construireQuestions(dto: StartCalculSessionDto): Promise<{
+    resultat: Omit<CalculSessionResult, 'session_id'>;
+    seance: Partial<CalculSession>;
+  }> {
     const minValue = parseInt(
       (await this.settingsService.get('calcul_min_value')) ?? '0',
       10,
@@ -87,22 +97,29 @@ export class CalculService {
       choicesCount,
     );
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      min_value: minValue,
-      max_value: maxValue,
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        min_value: minValue,
+        max_value: maxValue,
+        is_unlimited: isUnlimited,
+      },
+      seance: {
+        min_value: minValue,
+        max_value: maxValue,
+        timer_seconds: timerSeconds,
+      },
+    };
+  }
+
+  async startSession(dto: StartCalculSessionDto): Promise<CalculSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      min_value: minValue,
-      max_value: maxValue,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(

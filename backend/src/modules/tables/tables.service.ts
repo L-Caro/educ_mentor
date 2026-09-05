@@ -48,7 +48,17 @@ export class TablesService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(dto: StartTablesSessionDto): Promise<TablesSessionResult> {
+  /** Construire les questions, et RIEN d'autre : aucune écriture en base.
+   *
+   * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais
+   * pas d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une
+   * séance fantôme d'une question dans « séances récentes » — la liste que lit l'adulte
+   * pour savoir ce qui a été travaillé.
+   */
+  async construireQuestions(dto: StartTablesSessionDto): Promise<{
+    resultat: Omit<TablesSessionResult, 'session_id'>;
+    seance: Partial<TablesSession>;
+  }> {
     const timerSeconds = parseInt(
       (await this.settingsService.get('question_timer_seconds')) ?? '0',
       10,
@@ -97,10 +107,12 @@ export class TablesService {
 
     if (factSet.size === 0) {
       return {
-        session_id: randomUUID(),
-        questions: [],
-        timer_seconds: timerSeconds,
-        is_unlimited: isUnlimited,
+        resultat: {
+          questions: [],
+          timer_seconds: timerSeconds,
+          is_unlimited: isUnlimited,
+        },
+        seance: { selected_tables: JSON.stringify(dto.selected_tables) },
       };
     }
 
@@ -168,18 +180,30 @@ export class TablesService {
       return { fact_id: key, display_a, display_b, answer, choices };
     });
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      selected_tables: JSON.stringify(dto.selected_tables),
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
+      seance: { selected_tables: JSON.stringify(dto.selected_tables) },
+    };
+  }
+
+  async startSession(dto: StartTablesSessionDto): Promise<TablesSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    // Aucune question à poser : on n'enregistre pas de séance. C'était déjà le cas avant
+    // la coupure, et ça doit le rester — une séance vide en base n'apprend rien à
+    // personne et brouillerait « séances récentes ».
+    if (resultat.questions.length === 0) {
+      return { session_id: randomUUID(), ...resultat };
+    }
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(
