@@ -5,7 +5,7 @@ import { buildInitialValues } from 'src/components/game/setup/setupOptions.ts';
 /**
  * Le pré-jeu de la dictée : niveau, longueur, notion (chargée dynamiquement) et dictée
  * préparée. Les valeurs de `niveau` et `longueur` sont exactement celles que le backend
- * accepte (`StartDicteeSessionDto`) — un libellé qui diverge casse le démarrage de partie.
+ * accepte (`StartDicteeSessionDto`) : un libellé qui diverge casse le démarrage de partie.
  */
 
 const byKey = Object.fromEntries(

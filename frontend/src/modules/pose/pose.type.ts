@@ -28,7 +28,7 @@ export interface PoseQuestion {
   /** Comment lire les marques du haut : par compensation elles s'ajoutent au chiffre,
    *  par cassage elles le remplacent, et le chiffre d'origine est alors barré. */
   method: MethodeSoustraction;
-  /** Les produits partiels — multiplication seulement, vide ailleurs. */
+  /** Les produits partiels : multiplication seulement, vide ailleurs. */
   partiels: ProduitPartiel[];
 }
 

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
  *
  * Pourquoi tester du CSS : `Fiche.regle` accepte plusieurs lignes, et l'encart ne les empile
  * que grâce à `flex-direction: column`. Une modification qui perd cette déclaration laisse
- * un `display: flex` qui met les lignes EN RANG, avec un défilement horizontal — c'est
+ * un `display: flex` qui met les lignes EN RANG, avec un défilement horizontal : c'est
  * exactement ce qui est arrivé, et rien ne l'avait signalé : ni le typage, ni le lint, ni
  * les tests de contenu. Le symptôme n'est visible qu'à l'écran.
  */

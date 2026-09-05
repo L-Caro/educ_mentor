@@ -8,7 +8,7 @@ import {
 
 /** Routes accessibles sans authentification admin : lancées par l'enfant pendant une partie
  * (session de jeu + liste des catégories nécessaire au pré-jeu). Ne pas ajouter @UseGuards(JwtAuthGuard)
- * ici — ces routes doivent rester ouvertes à tout appareil autorisé (cf. AccessGuard global). */
+ * ici : ces routes doivent rester ouvertes à tout appareil autorisé (cf. AccessGuard global). */
 @Controller('imagier')
 export class ImagierGameController {
   constructor(private readonly imagierService: ImagierService) {}

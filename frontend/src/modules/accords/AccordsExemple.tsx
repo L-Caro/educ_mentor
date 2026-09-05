@@ -3,7 +3,7 @@ import type { AccordsQuestion } from './accords.type';
 /**
  * La réponse remise à sa place dans l'énoncé, pour la fiche.
  *
- * C'est la question que l'enfant vient de rater, complétée — pas un exemple neuf. Lui en
+ * C'est la question que l'enfant vient de rater, complétée : pas un exemple neuf. Lui en
  * donner un autre lui demanderait de refaire deux fois le chemin, au moment où elle est
  * bloquée. Même parti pris que la fiche du module grammaire.
  */

@@ -24,7 +24,7 @@ const PORTE_TITRE = {
   adjectif: "Féminin et pluriel de l'adjectif",
 } as const;
 
-/** Les familles de mots ouvertes. Le corpus contient toutes celles du CE1 au CM2 — les
+/** Les familles de mots ouvertes. Le corpus contient toutes celles du CE1 au CM2 : les
  * pluriels en -aux, les féminins irréguliers, les adjectifs invariables. On les ouvre
  * quand la classe les a vues, comme les figures de la géométrie.
  *
@@ -51,7 +51,7 @@ function FamillesActives() {
     <>
       <p className="GameSettings__hint">
         Les familles de mots vont du CE1 au CM2. La classe indiquée dit quand les
-        ouvrir — rien n&rsquo;empêche d&rsquo;ouvrir plus tôt. Un adjectif comme
+        ouvrir : rien n&rsquo;empêche d&rsquo;ouvrir plus tôt. Un adjectif comme
         <em> gros</em> appartient à deux familles : il n&rsquo;apparaît que si les
         deux sont ouvertes, sinon il enseignerait au passage celle qui est fermée.
         {saving && <Spinner size="xs" />}
@@ -166,7 +166,7 @@ export default function AccordsNotions() {
       <div className="GameSettings__header">
         <p className="GameSettings__hint">
           Les exercices actifs déterminent ce qui peut être demandé en partie. Active-les
-          au fil du programme — un accord qui n&rsquo;a pas été vu en classe ne donne pas
+          au fil du programme : un accord qui n&rsquo;a pas été vu en classe ne donne pas
           une question difficile, il donne une question incompréhensible.
         </p>
         {saving && <Spinner size="xs" />}

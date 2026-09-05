@@ -6,7 +6,7 @@
  * les tests passent un tirage déterministe.
  *
  * Un principe traverse tout le fichier : **on ne demande jamais la nature d'un mot hors
- * phrase**. « Quelle est la nature de ferme ? » n'a pas de réponse — nom dans « la ferme
+ * phrase**. « Quelle est la nature de ferme ? » n'a pas de réponse : nom dans « la ferme
  * du voisin », verbe dans « le fermier ferme la porte ». La phrase n'est pas un décor,
  * c'est ce qui rend la question décidable. Et c'est aussi ce que dit la fiche du cours :
  * un enfant de CE1 classe les mots par ce qu'ils font dans la phrase.
@@ -66,13 +66,13 @@ export interface GrammaireQuestion {
   skill_key: NotionKey;
   display: string;
   mots: MotAffiche[];
-  /** Index du mot souligné — `nature_mot` seulement. */
+  /** Index du mot souligné : `nature_mot` seulement. */
   cible: number | null;
-  /** Choix du QCM — `nature_mot` seulement. */
+  /** Choix du QCM : `nature_mot` seulement. */
   choices: string[];
   /** La bonne réponse, telle qu'affichée en correction. */
   answer: string;
-  /** Index des mots à toucher — types de sélection seulement. */
+  /** Index des mots à toucher : types de sélection seulement. */
   answer_indices: number[];
 }
 
@@ -152,8 +152,8 @@ function indicesParFonction(
 
 /** Nombre de suites consécutives de mots portant cette fonction.
  *
- * Deux compléments dans la même phrase — « Derrière la maison, un vieux chien dort
- * tranquillement » — donneraient une consigne au pluriel qui demande de toucher deux
+ * Deux compléments dans la même phrase : « Derrière la maison, un vieux chien dort
+ * tranquillement » : donneraient une consigne au pluriel qui demande de toucher deux
  * groupes séparés d'un coup. On préfère écarter ces phrases de la question de fonction
  * plutôt que de tordre la consigne ; elles restent utiles pour tout le reste. */
 function nombreDeGroupes(phrase: PhraseAnnotee, fonction: Fonction): number {
@@ -183,7 +183,7 @@ function groupesNominaux(phrase: PhraseAnnotee): number[] {
 }
 
 /** Le nom qui porte le groupe : c'est par lui qu'on désigne le groupe dans la consigne,
- * parce que c'est ainsi qu'on l'apprend — on trouve le nom, puis ce qui va avec. */
+ * parce que c'est ainsi qu'on l'apprend : on trouve le nom, puis ce qui va avec. */
 function nomDuGroupe(phrase: PhraseAnnotee, gn: number): MotAnnote | null {
   return (
     phrase.mots.find(
@@ -194,7 +194,7 @@ function nomDuGroupe(phrase: PhraseAnnotee, gn: number): MotAnnote | null {
   );
 }
 
-/** Les mots visés, recollés — « le petit chat », « sur le tapis ». */
+/** Les mots visés, recollés : « le petit chat », « sur le tapis ». */
 function extrait(phrase: PhraseAnnotee, indices: number[]): string {
   return indices
     .map((index, rang) => {
@@ -216,7 +216,7 @@ function genererNatureMot(
   // Un QCM a besoin d'au moins deux propositions, sinon la réponse est offerte. Et le
   // cas est plus profond que cosmétique : demander de quelle nature est un mot quand
   // l'enfant n'en connaît qu'une seule ne teste rien. On laisse alors les questions de
-  // sélection faire le travail — « touche le verbe » reste une vraie question.
+  // sélection faire le travail : « touche le verbe » reste une vraie question.
   if (naturesActives.length < 2) return null;
 
   const candidates = phrases.filter((phrase) =>
@@ -392,9 +392,9 @@ export function generateQuestions(
   classesActives: Niveau[] = DEFAULT_ACTIVE_CLASSES,
 ): GrammaireQuestion[] {
   const difficultes = difficultesPour(difficulty);
-  // Deux filtres, deux axes : la CLASSE dit si la phrase est abordable — « Chaque matin,
+  // Deux filtres, deux axes : la CLASSE dit si la phrase est abordable, « Chaque matin,
   // le boulanger prépare de bons pains dans son fournil » n'est pas pour un CE1, quelle
-  // que soit la question posée — et la DIFFICULTÉ dit sa complexité syntaxique.
+  // que soit la question posée, et la DIFFICULTÉ dit sa complexité syntaxique.
   const phrases = corpus.filter(
     (phrase) =>
       classesActives.includes(phrase.niveau) &&

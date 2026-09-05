@@ -1,7 +1,7 @@
 /** Les types de calcul mental, du CP au CM2, et la classe où chacun s'apprend.
  *
  * Le module s'arrêtait aux quatre opérations additives plus doubles et moitiés, et la
- * liste vivait en dur dans le pré-jeu — sans porte d'administration. Un enfant de CE1
+ * liste vivait en dur dans le pré-jeu, sans porte d'administration. Un enfant de CE1
  * aurait vu « division » dans ses cases, et rien ne l'aurait filtrée.
  *
  * Désormais : catalogue ici, porte en administration, pré-jeu chargé depuis le serveur.
@@ -11,7 +11,7 @@
  * ── Deux façons de borner ────────────────────────────────────────────────────────────
  *
  * `calcul_max_value` (20 par défaut) borne le calcul ADDITIF : « jusqu'à combien elle
- * additionne de tête ». Elle n'a aucun sens pour une multiplication — avec 20, seuls
+ * additionne de tête ». Elle n'a aucun sens pour une multiplication, avec 20, seuls
  * 2×2 à 4×5 passeraient, et la table de 7 ne sortirait jamais. Les types multiplicatifs
  * portent donc leurs propres bornes, tirées des tables.
  */

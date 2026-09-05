@@ -1,6 +1,6 @@
 /** Catalogue des formes du module géométrie : source unique des propriétés utilisées par
  * le générateur de questions. Les clés (`key`) doivent correspondre exactement à celles du
- * catalogue SVG frontend (`frontend/src/cours/components/catalogue-formes.tsx`) — un test de
+ * catalogue SVG frontend (`frontend/src/cours/components/catalogue-formes.tsx`) : un test de
  * cohérence (`frontend/src/__tests__/geometrie-shapes.test.ts`) le vérifie.
  *
  * `cotes`/`sommets`/`angleDroit`/`cotesEgaux` ne concernent que les figures planes ;
@@ -8,7 +8,7 @@
  * forme (un cercle n'a pas d'angle droit à avoir ou pas).
  *
  * `defaultActive` : les formes du programme CE1 (le gros des figures et solides « simples »).
- * Le reste — quadrilatères plus fins, polygones réguliers, solides moins courants — existe
+ * Le reste, quadrilatères plus fins, polygones réguliers, solides moins courants, existe
  * dans le catalogue mais reste éteint tant qu'un réglage admin ne l'active pas : le module
  * grandit avec l'enfant sans jamais lui montrer plus que ce qu'elle a vu en classe.
  */

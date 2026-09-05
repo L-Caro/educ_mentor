@@ -12,8 +12,8 @@ import type { NotionKey, NotionMeta } from '../grammaire.type';
 import '../grammaire.scss';
 
 const CATEGORIE_TITRE: Record<NotionMeta['categorie'], string> = {
-  nature: 'La nature des mots — ce que le mot EST',
-  fonction: 'La fonction des mots — ce qu’il FAIT dans la phrase',
+  nature: 'La nature des mots : ce que le mot EST',
+  fonction: 'La fonction des mots : ce qu’il FAIT dans la phrase',
 };
 
 const CATEGORIE_ORDRE: NotionMeta['categorie'][] = ['nature', 'fonction'];
@@ -55,7 +55,7 @@ function ClassesActives() {
       </div>
       <p className="GameSettings__hint">
         Les phrases portent la classe où elles deviennent abordables. Ouvre-les au fil
-        du programme. Le nombre indique combien le corpus en contient — une classe
+        du programme. Le nombre indique combien le corpus en contient : une classe
         vide donnerait un exercice muet.
       </p>
       <div className="GameSettings__denominations">
@@ -155,7 +155,7 @@ export default function GrammaireNotions() {
     <div className="GameSettings">
       <div className="GameSettings__header">
         <p className="GameSettings__hint">
-          Les notions actives déterminent ce qui peut être demandé en partie — et ce
+          Les notions actives déterminent ce qui peut être demandé en partie, et ce
           qui peut apparaître comme mauvaise réponse dans un QCM. Une notion inactive
           n&rsquo;est donc jamais divulguée. Active-les au fil du programme.
         </p>

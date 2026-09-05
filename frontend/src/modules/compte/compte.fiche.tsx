@@ -6,7 +6,7 @@ import { ecrireEtape } from './compteValue';
  * La fiche d'un compte manqué montre UN CHEMIN, pas la méthode.
  *
  * Il n'y a pas de règle à réciter : chercher 348 avec 100, 75, 8, 4, 3, 2 ne s'apprend
- * pas par une procédure. Ce qui s'apprend, c'est le réflexe — regarder la cible, chercher
+ * pas par une procédure. Ce qui s'apprend, c'est le réflexe : regarder la cible, chercher
  * la grande plaque qui en approche, viser l'écart. Alors la fiche donne la solution de
  * référence étape par étape, et nomme le geste qui l'a rendue possible.
  */

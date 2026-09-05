@@ -52,7 +52,7 @@ export class TablesService {
    *
    * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais
    * pas d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une
-   * séance fantôme d'une question dans « séances récentes » — la liste que lit l'adulte
+   * séance fantôme d'une question dans « séances récentes » : la liste que lit l'adulte
    * pour savoir ce qui a été travaillé.
    */
   async construireQuestions(dto: StartTablesSessionDto): Promise<{
@@ -194,7 +194,7 @@ export class TablesService {
     const { resultat, seance } = await this.construireQuestions(dto);
 
     // Aucune question à poser : on n'enregistre pas de séance. C'était déjà le cas avant
-    // la coupure, et ça doit le rester — une séance vide en base n'apprend rien à
+    // la coupure, et ça doit le rester : une séance vide en base n'apprend rien à
     // personne et brouillerait « séances récentes ».
     if (resultat.questions.length === 0) {
       return { session_id: randomUUID(), ...resultat };

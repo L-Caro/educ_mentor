@@ -17,7 +17,7 @@ const store = configureStore({
   reducer: rootReducers,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      // GameResultEntry contient des ReactNode (non-sérialisables) — même situation qu'avec location.state
+      // GameResultEntry contient des ReactNode (non-sérialisables) : même situation qu'avec location.state
       serializableCheck: { ignoredPaths: ['gameResult.current'] },
     }).concat(baseApi.middleware),
 });

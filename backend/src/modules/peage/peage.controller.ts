@@ -8,7 +8,7 @@ export class PeageController {
 
   /** Le péage tel qu'il s'applique maintenant : combien de questions, et lesquels des
    * cinq modules peuvent en fournir. Le front s'en sert pour NE PAS afficher de péage
-   * quand il n'y en a pas — plutôt que de demander une question pour découvrir qu'il n'y
+   * quand il n'y en a pas : plutôt que de demander une question pour découvrir qu'il n'y
    * en a pas. */
   @Get()
   async etat() {
@@ -19,7 +19,7 @@ export class PeageController {
   }
 
   /** Une question, ou `null`. `null` n'est pas une erreur : il veut dire « laisse-la
-   * jouer » — voir `PeageService.tirerQuestion`. */
+   * jouer » : voir `PeageService.tirerQuestion`. */
   @Get('question')
   async question() {
     return { question: await this.peageService.tirerQuestion() };

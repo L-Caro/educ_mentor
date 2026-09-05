@@ -1,22 +1,22 @@
 /** Les temps dérivés, et le niveau auquel chaque temps s'introduit.
  *
- * Le fichier de données ne porte que trois temps saisis à la main — présent, imparfait,
- * futur — plus, par verbe, un participe passé, un auxiliaire et le radical du passé
+ * Le fichier de données ne porte que trois temps saisis à la main : présent, imparfait,
+ * futur : plus, par verbe, un participe passé, un auxiliaire et le radical du passé
  * simple. Les quatre autres temps sont CALCULÉS ici.
  *
  * C'est délibéré, et c'est la même règle que `groupeNominal()` dans le module accords :
  * saisir quatre temps pour cinquante verbes et neuf pronoms ferait 1 800 formes écrites à
  * la main, dans le fichier où une faute enseigne une conjugaison fausse. Trois champs par
- * verbe, dérivés par des fonctions testées, en font 150 — et chacune est vérifiable.
+ * verbe, dérivés par des fonctions testées, en font 150, et chacune est vérifiable.
  *
  * Ce qui rend la dérivation possible :
- *   — le conditionnel présent est le RADICAL DU FUTUR plus les terminaisons de
+ *   - le conditionnel présent est le RADICAL DU FUTUR plus les terminaisons de
  *     l'imparfait. Le radical se lit sur la forme « je » du futur, en retirant son `ai` :
  *     `irai → ir`, `pourrai → pourr`, `serai → ser`. Vrai pour les irréguliers aussi,
  *     c'est ce qui rend la règle sûre.
- *   — les temps composés sont l'auxiliaire conjugué plus le participe passé, et les
+ *   - les temps composés sont l'auxiliaire conjugué plus le participe passé, et les
  *     auxiliaires sont déjà dans le fichier avec leurs propres temps simples.
- *   — le passé simple est un radical plus l'une des quatre familles de terminaisons.
+ *   - le passé simple est un radical plus l'une des quatre familles de terminaisons.
  */
 
 import type { Niveau } from '../../common/niveau';
@@ -77,7 +77,7 @@ export interface TenseMeta {
    * ouvrir depuis l'administration, elle n'ouvre rien elle-même. */
   niveau: Niveau;
   /** Actif à l'installation. Les temps des classes supérieures sont présents mais
-   * FERMÉS — on les ouvre quand la classe les a vus. */
+   * FERMÉS : on les ouvre quand la classe les a vus. */
   defaultActive: boolean;
   /** Saisi dans le fichier de données, ou calculé ici. */
   source: 'donnee' | 'derive';
@@ -178,7 +178,7 @@ const TERMINAISONS_CONDITIONNEL: Formes = {
 };
 
 /** Le radical du futur, lu sur la forme « je » : `chanterai → chanter`, `irai → ir`.
- * Toutes les formes de futur en français se terminent par `ai` à la première personne —
+ * Toutes les formes de futur en français se terminent par `ai` à la première personne :
  * c'est ce qui rend la règle sûre y compris pour les verbes irréguliers. */
 export function radicalDuFutur(futurJe: string): string {
   if (!futurJe.endsWith('ai')) {
@@ -257,7 +257,7 @@ export function passeSimple(
 
 /** L'accord du participe passé employé avec ÊTRE : il s'accorde avec le sujet.
  *
- * `je`, `tu` et `on` prennent le masculin, faute de genre connu — c'est la convention des
+ * `je`, `tu` et `on` prennent le masculin, faute de genre connu : c'est la convention des
  * tableaux de conjugaison, et c'est ce que l'enfant verra dans son cahier. */
 function accorder(participe: string, pronom: Pronom): string {
   switch (pronom) {
@@ -339,7 +339,7 @@ export function conjugaisonsCompletes(
     if (!simples?.[temps]) {
       throw new Error(
         `Conjugaison de « ${infinitif} » : le temps « ${temps} » manque dans ` +
-          `conjugaisons.json — les quatre autres s'en dérivent.`,
+          `conjugaisons.json : les quatre autres s'en dérivent.`,
       );
     }
   }

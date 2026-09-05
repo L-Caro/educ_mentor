@@ -29,7 +29,7 @@ export const compteGameSpec: GameModuleSpec<
     parse: (raw) => raw,
     isCorrect: (question, given) =>
       typeof given === 'string' && estCorrecte(question, decode(given)),
-    // Une étape suffit à valider. Rien n'oblige à s'arrêter là — mais valider un plateau
+    // Une étape suffit à valider. Rien n'oblige à s'arrêter là, mais valider un plateau
     // vide n'aurait rien à juger.
     isReady: (_question, input) => decode(input).length > 0,
     inputComponent: ComptePlateau,

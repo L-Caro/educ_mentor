@@ -29,7 +29,7 @@ describe('ce que l’enfant a le droit de poser', () => {
     // Ce n'est pas une divergence par négligence, c'est la décision : le générateur
     // refuse « × 1 » parce qu'une étape morte dans une solution DONNÉE EN EXEMPLE est
     // absurde. Griser la touche pour l'enfant lui apprendrait que l'application a un
-    // avis, pas que le coup est inutile — elle le découvre en le jouant.
+    // avis, pas que le coup est inutile : elle le découvre en le jouant.
     expect(appliquer(7, '×', 1)).toBe(7);
     expect(appliquer(7, '÷', 1)).toBe(7);
   });

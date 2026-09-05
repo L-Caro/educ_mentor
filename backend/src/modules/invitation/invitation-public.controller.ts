@@ -19,7 +19,7 @@ export class InvitationPublicController {
     private readonly configService: ConfigService,
   ) {}
 
-  /** Bootstrap admin — exemptée du AccessGuard.
+  /** Bootstrap admin : exemptée du AccessGuard.
    * Vérifie le token secret (.env ADMIN_BOOTSTRAP_TOKEN), crée une invitation auto-utilisée,
    * pose le cookie access_token. Réutilisable : chaque appel crée une entrée distincte. */
   @Get('admin-access')
@@ -35,7 +35,7 @@ export class InvitationPublicController {
     }
 
     const invitation =
-      await this.invitationService.createAndUse('Admin — bootstrap');
+      await this.invitationService.createAndUse('Admin : bootstrap');
     const pinEnabled = this.configService.get<boolean>('adminPinEnabled');
     response.cookie('access_token', invitation.token, {
       httpOnly: true,
@@ -47,7 +47,7 @@ export class InvitationPublicController {
     return { ok: true };
   }
 
-  /** Route publique — exemptée du AccessGuard.
+  /** Route publique : exemptée du AccessGuard.
    * Valide le token, pose le cookie access_token (1 an), retourne 200.
    * Le frontend redirige ensuite vers / après réception du 200. */
   @Get('invite/:token')

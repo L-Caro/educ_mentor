@@ -9,7 +9,7 @@ import { GrammaireService } from '../grammaire/grammaire.service';
 import { AccordsService } from '../accords/accords.service';
 import { MAXIMUM_QUESTIONS } from './peage.types';
 
-/** Une réponse de service qui ne produit aucune question — module éteint côté notions. */
+/** Une réponse de service qui ne produit aucune question : module éteint côté notions. */
 const RIEN = {
   resultat: { questions: [], timer_seconds: 0, is_unlimited: false },
   seance: {},
@@ -182,7 +182,7 @@ describe('PeageService', () => {
       // L'ordre d'essai est TIRÉ AU SORT, donc on répète : une seule passe aurait pu
       // tomber sur `calcul` en premier et ne rien prouver du tout. C'est exactement ce
       // qu'a fait la première version de ce test, qui vérifiait que `tables` avait été
-      // interrogé — vrai une fois sur deux, donc instable en intégration continue.
+      // interrogé : vrai une fois sur deux, donc instable en intégration continue.
       actifs = ['tables', 'calcul-mental'];
       faux.calcul.construireQuestions.mockResolvedValue({
         resultat: {

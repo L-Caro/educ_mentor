@@ -7,7 +7,7 @@ import type { GameModuleSpec } from 'src/types/game.types';
 import './geometrie.scss';
 
 /** Minuscules, sans accents : un enfant qui tape « decagone » ou « heptagone » sans les
- * accents ne doit pas être sanctionné pour ça — ce module évalue la géométrie, pas l'orthographe. */
+ * accents ne doit pas être sanctionné pour ça : ce module évalue la géométrie, pas l'orthographe. */
 function normalizeText(value: string): string {
   return value
     .trim()

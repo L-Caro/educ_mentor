@@ -56,7 +56,7 @@ function buildChildRoutes(module: ModuleManifest): RouteObject[] {
       : null;
 
   // Péage : quelques questions d'un autre module avant d'ouvrir un plateau, si l'adulte
-  // l'a réglé. Il n'enveloppe QUE les jeux, et il laisse passer par défaut — le composant
+  // l'a réglé. Il n'enveloppe QUE les jeux, et il laisse passer par défaut : le composant
   // décide, pas la route, parce que le réglage se lit à l'exécution.
   const jouable =
     module.category === 'jeux' && playElement ? (
@@ -109,7 +109,7 @@ const Router = createBrowserRouter([
     ],
   },
 
-  // ── Routes publiques — sans layout, sans AccessGate ──────────────────────
+  // ── Routes publiques, sans layout, sans AccessGate ──────────────────────
   { path: '/invite/:token', element: <InvitePage /> },
   { path: '/admin-access', element: <AdminAccessPage /> },
 

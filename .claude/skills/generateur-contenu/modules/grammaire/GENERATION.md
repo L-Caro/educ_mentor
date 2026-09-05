@@ -1,9 +1,9 @@
-# Module Grammaire — génération
+# Module Grammaire : génération
 
 Ce skill produit des **appels de constructeurs TypeScript** à insérer dans
 `backend/src/modules/grammaire/grammaire.corpus.ts`.
 
-## Demander la classe — avant tout le reste
+## Demander la classe : avant tout le reste
 
 **Ne jamais générer sans avoir demandé la classe visée.** Une phrase de CE1 et une phrase
 de CM2 ne diffèrent pas par le nombre de mots : elles diffèrent par les NOTIONS qu'elles
@@ -18,7 +18,7 @@ si disponible, sinon en Markdown numéroté) :
 | 1 | **Classe** | CP · CE1 · CE2 · CM1 · CM2 |
 | 2 | **Combien de phrases** | 10 · 15 · 20 · personnalisé |
 | 3 | **Notion à travailler en priorité** | au choix dans le tableau ci-dessous, ou « varié » |
-| 4 | **Thème** *(optionnel)* | libre — école, animaux, saisons… Défaut : varié |
+| 4 | **Thème** *(optionnel)* | libre, école, animaux, saisons… Défaut : varié |
 
 La classe devient le 4ᵉ argument de `phrase(...)`, et c'est elle que la porte
 « Classes de phrases » d'Administration → Grammaire ouvre ou ferme.
@@ -43,7 +43,7 @@ phrase ouverte.
 | CP · CE1 | nom, verbe, déterminant, adjectif, pronom sujet, mot invariable, groupe nominal, sujet, complément circonstanciel | `nc` `np` `v` `d` `adj` `pron` `inv` · `gn` `sujet` `complement` |
 | CE2 | le **complément d'objet**, nommé pour lui-même | `objet(...)` |
 | CM1 | l'**attribut du sujet**, après être, sembler, devenir, paraître, rester | `attribut(...)` |
-| CM2 | rien de neuf : des phrases plus longues, plusieurs fonctions dans la même phrase | — |
+| CM2 | rien de neuf : des phrases plus longues, plusieurs fonctions dans la même phrase |, |
 
 **Le complément d'objet change une règle du CE1.** Jusque-là, un groupe nominal objet
 restait sans fonction : dans « Maëve mange une pomme », `une pomme` était un `gn(...)` nu,
@@ -61,7 +61,7 @@ Le module Dictée stocke son contenu en base et l'importe par un textarea JSON. 
 non : son corpus est du **code**, et c'est délibéré.
 
 Un item de dictée est une chaîne. Une phrase de grammaire est une structure où **chaque mot
-porte une nature et une fonction** — et une annotation fausse n'est pas un contenu médiocre,
+porte une nature et une fonction**, et une annotation fausse n'est pas un contenu médiocre,
 c'est du faux français enseigné à un enfant qui apprend. `nc('dort')` compile parfaitement
 et affirme que « dort » est un nom. Un textarea d'import aurait été le seul endroit du
 module capable d'injecter ça.
@@ -72,7 +72,7 @@ tient 18 invariants, et la barrière de déploiement les rejoue.
 
 ## Les constructeurs
 
-Ils sont privés au fichier — on écrit dans `grammaire.corpus.ts`, pas ailleurs.
+Ils sont privés au fichier : on écrit dans `grammaire.corpus.ts`, pas ailleurs.
 
 | Mot | Nature |
 |---|---|
@@ -86,16 +86,16 @@ Ils sont privés au fichier — on écrit dans `grammaire.corpus.ts`, pas ailleu
 
 Second argument facultatif : la **ponctuation accolée**, affichée mais jamais cliquable.
 `v('dort', '.')`, `nc('matin', ',')`, `v('viens', ' ?')` (espace insécable avant `?` en
-français — l'écrire dans la chaîne).
+français : l'écrire dans la chaîne).
 
 | Groupe | Effet | Classe |
 |---|---|---|
-| `gn(...)` | un groupe nominal — index attribué automatiquement, jamais à la main | CE1 |
+| `gn(...)` | un groupe nominal : index attribué automatiquement, jamais à la main | CE1 |
 | `sujet(...)` | pose `fonction: 'sujet'` sur tout ce qu'il contient | CE1 |
-| `complement(...)` | pose `fonction: 'complement'` — circonstanciel : où, quand, comment | CE1 |
-| `gnSujet(...)` | raccourci pour `sujet(gn(...))` — le cas courant | CE1 |
-| `objet(...)` | pose `fonction: 'complement_objet'` — ce sur quoi porte l'action | CE2 |
-| `attribut(...)` | pose `fonction: 'attribut'` — ce que le sujet EST | CM1 |
+| `complement(...)` | pose `fonction: 'complement'`, circonstanciel : où, quand, comment | CE1 |
+| `gnSujet(...)` | raccourci pour `sujet(gn(...))` : le cas courant | CE1 |
+| `objet(...)` | pose `fonction: 'complement_objet'` : ce sur quoi porte l'action | CE2 |
+| `attribut(...)` | pose `fonction: 'attribut'` : ce que le sujet EST | CM1 |
 
 ```ts
 phrase('chat-dort-tapis', 'moyen', [
@@ -113,7 +113,7 @@ divergence. Les constructeurs suppriment cette classe d'erreur.
 
 Les dix premières sont **vérifiées par les tests** : les enfreindre casse la barrière de
 déploiement, pas la production. Les trois dernières sont des choix de conception que rien
-ne vérifie — les tenir à la main.
+ne vérifie : les tenir à la main.
 
 1. **Un seul verbe par phrase.** Donc **temps simples uniquement** : présent, imparfait,
    futur. « a dessiné » compte pour deux mots et casse l'invariant.
@@ -124,13 +124,13 @@ ne vérifie — les tenir à la main.
 5. **Un groupe nominal ne contient que** déterminant, nom, adjectif. Une préposition n'y
    entre pas : elle est dans le `complement`, à côté du `gn`.
 6. **Un groupe nominal est contigu.** Ses mots se suivent, sans rien entre eux.
-7. **Le pronom sujet n'entre jamais dans un `gn`** — il prend la place du groupe nominal,
+7. **Le pronom sujet n'entre jamais dans un `gn`** : il prend la place du groupe nominal,
    il ne s'y ajoute pas. Toujours `sujet(pron('Elle'))`.
 8. **Majuscule au premier mot, ponctuation finale** (`.` `!` `?`).
 9. **Pas d'espace après une élision.** Écrire `d('l’')` puis `nc('oiseau')` : le collage se
    déduit de l'apostrophe, il n'y a pas de drapeau à poser.
 10. **Clé unique**, en kebab-case, tirée des mots porteurs : `petit-chat-noir-dort`.
-11. **`complement(...)` reste CIRCONSTANCIEL** — où, quand, comment — à toutes les
+11. **`complement(...)` reste CIRCONSTANCIEL**, où, quand, comment, à toutes les
     classes. Ce qui change avec la classe, c'est le sort du groupe objet :
     - **CP · CE1** : il reste un `gn(...)` **sans fonction**. La phrase sert aux questions
       de nature et de groupe nominal, pas à celles de fonction. C'est normal.
@@ -141,11 +141,11 @@ ne vérifie — les tenir à la main.
     circonstanciel.
 12. **Jamais deux compléments côte à côte.** Le module compte les compléments par suites
     consécutives : deux groupes adjacents seraient lus comme un seul. Toujours du texte
-    entre eux (verbe, sujet). Deux compléments séparés sont permis — la phrase est
+    entre eux (verbe, sujet). Deux compléments séparés sont permis : la phrase est
     simplement écartée des questions de complément, et reste utilisable ailleurs.
 13. **Une seule ambiguïté par phrase, et jamais dans le mot interrogé par erreur.** Le
-    corpus contient exprès des mots ambigus hors contexte — *ferme*, *porte*, *gare*,
-    *cuisine* — parce qu'ils justifient tout le module. Les annoter selon le sens
+    corpus contient exprès des mots ambigus hors contexte : *ferme*, *porte*, *gare*,
+    *cuisine* : parce qu'ils justifient tout le module. Les annoter selon le sens
     RÉELLEMENT employé dans la phrase, jamais selon le sens le plus courant.
 
 ## Ce qu'il faut éviter d'écrire
@@ -164,7 +164,7 @@ Ces tournures ne sont pas annotables proprement au CE1. Les tests ne les attrape
 `du` **partitif** est en revanche un déterminant, et il est accepté : « le boulanger vend
 du pain ».
 
-## La difficulté — à ne pas confondre avec la classe
+## La difficulté : à ne pas confondre avec la classe
 
 Le 2ᵉ argument de `phrase(...)` est la **complexité syntaxique**, pas la classe. Les deux
 axes sont indépendants : une phrase de CM1 peut être syntaxiquement simple (« Le chat est
@@ -199,7 +199,7 @@ n'est servie que si les DEUX l'autorisent.
    est-il dans le bon groupe ? le complément est-il bien circonstanciel, ou est-ce un
    objet ? l'attribut s'accorde-t-il avec le sujet ?
 
-## Après génération — obligatoire
+## Après génération : obligatoire
 
 Insérer les phrases dans la section du bon niveau de `CORPUS`, puis **jouer les tests** :
 
@@ -210,7 +210,7 @@ npm run lint:fix && npm run typecheck
 ```
 
 Les 18 invariants de `grammaire.corpus.spec.ts` rendent la **liste** des phrases
-fautives, par leur clé — pas seulement la première. Une annotation qui passe le typage
+fautives, par leur clé : pas seulement la première. Une annotation qui passe le typage
 mais viole une règle est attrapée là, et nulle part ailleurs.
 
 Puis relire à l'œil les phrases ajoutées : les tests vérifient la STRUCTURE, ils ne
@@ -222,5 +222,5 @@ chaque classe permet de vérifier que les phrases sont bien arrivées.
 
 ## Fichiers
 
-- `modules/grammaire/reference/annotation.md` — les cas d'annotation tranchés, avec leur
+- `modules/grammaire/reference/annotation.md` : les cas d'annotation tranchés, avec leur
   raison. À consulter au moindre doute sur un mot.

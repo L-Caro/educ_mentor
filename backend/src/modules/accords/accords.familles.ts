@@ -1,7 +1,7 @@
 /** Les familles morphologiques, et la classe où chacune s'apprend.
  *
  * Le corpus va jusqu'au CM2 : il contient les pluriels en -aux, les féminins irréguliers,
- * les adjectifs invariables au masculin pluriel. Tout cela est PRÉSENT mais FERMÉ — on
+ * les adjectifs invariables au masculin pluriel. Tout cela est PRÉSENT mais FERMÉ : on
  * ouvre une famille depuis l'administration quand la classe l'a vue, comme les figures de
  * la géométrie ou les temps de la conjugaison.
  *
@@ -161,7 +161,7 @@ export function familleDuNom(nom: NomMeta): FamilleKey {
   return 'pluriel_s';
 }
 
-/** Les familles d'un adjectif — il en a DEUX, indépendantes : la façon dont il forme son
+/** Les familles d'un adjectif, il en a DEUX, indépendantes : la façon dont il forme son
  * féminin, et la façon dont il forme son masculin pluriel.
  *
  * « gros / grosse / gros / grosses » double sa consonne au féminin (CE2) ET reste
@@ -174,7 +174,7 @@ export function familleDuNom(nom: NomMeta): FamilleKey {
 export function famillesDeLAdjectif(adj: AdjectifMeta): FamilleKey[] {
   const familles: FamilleKey[] = [];
 
-  // Féminin. L'ordre compte : « grosse » ajoute bien un e, mais en doublant la consonne —
+  // Féminin. L'ordre compte : « grosse » ajoute bien un e, mais en doublant la consonne :
   // testé après le cas régulier, sinon celui-ci l'attraperait à tort.
   if (adj.fs === adj.ms) familles.push('feminin_identique');
   else if (adj.fs === `${adj.ms}e`) familles.push('feminin_e');

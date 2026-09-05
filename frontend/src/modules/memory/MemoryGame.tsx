@@ -165,7 +165,7 @@ export default function MemoryGame() {
   return (
     <div className="MemoryGame">
       <p className="MemoryGame__counter">
-        {matchedCount} / {session.pairs.length} paires — {attempts} coup{attempts > 1 ? 's' : ''}
+        {matchedCount} / {session.pairs.length} paires, {attempts} coup{attempts > 1 ? 's' : ''}
       </p>
 
       <div

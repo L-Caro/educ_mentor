@@ -6,7 +6,7 @@ import { franceGameSpec } from 'src/modules/france/france.game';
  * `getComponent` doit renvoyer un type de composant STABLE.
  *
  * geo et france renvoyaient une fonction fléchée créée à l'appel : React voyait un type de
- * composant différent à chaque rendu et démontait puis remontait tout le sous-arbre — la
+ * composant différent à chaque rendu et démontait puis remontait tout le sous-arbre : la
  * carte SVG entière était reconstruite à chaque clic, chaque sélection, chaque tick du
  * minuteur. Le symptôme est diffus et purement visuel : rien ne le signale.
  *
@@ -29,7 +29,7 @@ const franceQuestions = [
   { type: 'locate_city' },
 ];
 
-describe('geo — stabilité du composant de carte', () => {
+describe('geo : stabilité du composant de carte', () => {
   it('renvoie la même référence pour deux appels sur la même question', () => {
     for (const question of geoQuestions) {
       const first = geoGameSpec.map!.getComponent(question as never);
@@ -58,7 +58,7 @@ describe('geo — stabilité du composant de carte', () => {
   });
 });
 
-describe('france — stabilité du composant de carte à point', () => {
+describe('france : stabilité du composant de carte à point', () => {
   it('renvoie toujours la même référence, masquage des frontières compris', () => {
     const components = new Set(
       franceQuestions.map((q) => franceGameSpec.pointMap!.getComponent(q as never)),

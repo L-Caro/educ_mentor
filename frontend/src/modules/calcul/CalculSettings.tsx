@@ -37,7 +37,7 @@ function TypesActifs() {
         {saving && <Spinner size="xs" />}
       </div>
       <p className="GameSettings__hint">
-        Du CP au CM2. La classe indiquée dit quand ouvrir — rien n&rsquo;empêche
+        Du CP au CM2. La classe indiquée dit quand ouvrir : rien n&rsquo;empêche
         d&rsquo;ouvrir plus tôt. La plage de nombres ci-dessous ne borne que
         l&rsquo;additif : les multiplications et divisions tirent leurs bornes des
         tables.

@@ -151,7 +151,7 @@ const kmsPerSvgUnit = realKm / svgDist;
 console.log(`kmsPerSvgUnit : ${kmsPerSvgUnit.toFixed(4)} (Paris→Brest ${realKm.toFixed(0)}km, SVG dist ${svgDist.toFixed(1)}px)`);
 
 // ─── 5. Sélection curatoriale ───────────────────────────────────────────────
-// Rangs retenus par département — critère : notoriété nationale, pas juste taille.
+// Rangs retenus par département, critère : notoriété nationale, pas juste taille.
 // Grandes métropoles : top 3-5 si toutes connues.
 // Depts moyens : top 1-2.
 // Petits depts ruraux : rang 1 seulement.

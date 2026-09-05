@@ -64,7 +64,7 @@ export const grammaireApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'grammaire' }],
     }),
 
-    // ─── Admin — classes de phrases ──────────────────────────────────────────
+    // ─── Admin : classes de phrases ──────────────────────────────────────────
     getGrammaireClasses: builder.query<
       { key: string; label: string; phrases: number; defaultActive: boolean }[],
       void
@@ -86,7 +86,7 @@ export const grammaireApi = baseApi.injectEndpoints({
       invalidatesTags: ['GrammaireActiveClasses'],
     }),
 
-    // ─── Admin — notions actives ──────────────────────────────────────────────
+    // ─── Admin : notions actives ──────────────────────────────────────────────
     getGrammaireNotions: builder.query<NotionMeta[], void>({
       query: () => '/grammaire/notions',
     }),

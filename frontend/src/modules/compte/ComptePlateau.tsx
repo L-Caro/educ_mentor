@@ -26,7 +26,7 @@ interface Props {
  * autre compétence, et qu'elle cache l'essentiel du jeu. Ce qui s'apprend ici, c'est de
  * regarder les nombres dont on dispose et d'en fabriquer un nouveau. Poser une étape,
  * voir la plaque apparaître et les deux autres disparaître, c'est exactement le geste du
- * jeu de plateau — et ça rend impossible d'employer deux fois la même plaque, faute
+ * jeu de plateau, et ça rend impossible d'employer deux fois la même plaque, faute
  * numéro un quand on écrit une expression à la main.
  *
  * L'enchaînement est strict : une plaque, une opération, une plaque. Un opérateur seul
@@ -36,7 +36,7 @@ interface Props {
 export default function ComptePlateau(props: Props) {
   // La sélection en cours appartient AU TIRAGE, pas au module : une plaque choisie n'a
   // aucun sens sur le tirage suivant. La clé le dit à React, qui remonte le plateau à
-  // chaque question — et une remise à zéro par `useEffect` deviendrait inutile.
+  // chaque question, et une remise à zéro par `useEffect` deviendrait inutile.
   //
   // Le composant exporté, lui, reste une référence stable : c'est ce que le moteur exige
   // d'un `inputComponent`, sans quoi il démonterait la saisie à chaque frappe.
@@ -207,7 +207,7 @@ function Plateau({ question, value, onChange, answerState }: Props) {
 /** Dire POURQUOI un coup est refusé, jamais seulement qu'il l'est.
  *
  * « 3 − 8 » et « 7 ÷ 2 » sont refusés pour deux raisons différentes, et les deux sont des
- * choses à apprendre. Un message unique — « coup impossible » — les rendrait toutes les
+ * choses à apprendre. Un message unique, « coup impossible », les rendrait toutes les
  * deux mystérieuses. */
 function pourquoiRefusee(a: number, operation: Operation, b: number): string {
   if (operation === '-') {

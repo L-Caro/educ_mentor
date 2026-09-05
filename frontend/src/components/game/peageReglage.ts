@@ -4,7 +4,7 @@ export const MAXIMUM_QUESTIONS = 5;
 
 /** Le nombre de questions à poser avant d'ouvrir un plateau, lu depuis les réglages.
  *
- * `0` — la valeur par défaut, l'illisible et le négatif — veut dire « pas de péage ». Un
+ * `0`, la valeur par défaut, l'illisible et le négatif, veut dire « pas de péage ». Un
  * péage qui s'installerait tout seul changerait l'application sous les pieds de l'enfant,
  * sans que personne l'ait décidé.
  *

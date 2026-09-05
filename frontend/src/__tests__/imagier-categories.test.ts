@@ -8,7 +8,7 @@ import {
 /**
  * Le pré-jeu imagier affiche une tuile par catégorie, avec le label et l'emoji résolus par
  * `getCategoryConfig`. Une catégorie du catalogue absente du registre retombe sur le
- * fallback 📚 + label anglais brut — visible et moche. Ce test fige la correspondance entre
+ * fallback 📚 + label anglais brut : visible et moche. Ce test fige la correspondance entre
  * les 18 thèmes importés (cf. `poc/category-map.json`) et le registre.
  */
 

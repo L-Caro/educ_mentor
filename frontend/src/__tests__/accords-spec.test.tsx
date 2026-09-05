@@ -11,7 +11,7 @@ import type {
  *
  * Le moteur dérive le mode de la seule présence de choix : `getChoices` vide = saisie
  * libre. Une question de saisie qui repartirait avec des choix basculerait en QCM
- * silencieusement — et un QCM dont la réponse attendue est « les petits chats » listerait
+ * silencieusement, et un QCM dont la réponse attendue est « les petits chats » listerait
  * la réponse parmi les propositions.
  */
 

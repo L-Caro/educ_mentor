@@ -40,7 +40,7 @@ export default function HangmanSVG({ wrongCount }: HangmanSVGProps) {
       style={{ width: '100%', maxWidth: '200px', display: 'block', margin: '0 auto' }}
       aria-hidden="true"
     >
-      {/* Potence — toujours visible */}
+      {/* Potence : toujours visible */}
       <line x1={20} y1={225} x2={100} y2={225} {...STROKE_PROPS} />
       <line x1={40} y1={225} x2={40} y2={20} {...STROKE_PROPS} />
       <line x1={40} y1={20} x2={140} y2={20} {...STROKE_PROPS} />

@@ -16,12 +16,12 @@ export type ExerciseType = 'reconnaitre' | 'total' | 'rendre';
 
 export interface MonnaieQuestion {
   type: ExerciseType;
-  coins?: number[]; // centimes — liste de pièces/billets (reconnaitre)
-  prices?: number[]; // centimes — liste de prix d'articles (total)
-  price?: number; // centimes — prix de l'article (rendre)
-  payment?: number; // centimes — somme donnée (rendre)
-  answer: number; // centimes — réponse attendue
-  choices: number[]; // centimes — QCM : 2 ou 4 ; saisie libre : []
+  coins?: number[]; // centimes : liste de pièces/billets (reconnaitre)
+  prices?: number[]; // centimes : liste de prix d'articles (total)
+  price?: number; // centimes : prix de l'article (rendre)
+  payment?: number; // centimes : somme donnée (rendre)
+  answer: number; // centimes : réponse attendue
+  choices: number[]; // centimes, QCM : 2 ou 4 ; saisie libre : []
 }
 
 export interface MonnaieSessionResult {
@@ -272,7 +272,7 @@ export class MonnaieService {
     }
   }
 
-  /** Affiche une collection de pièces/billets — trouver le total. */
+  /** Affiche une collection de pièces/billets : trouver le total. */
   private generateReconnaitre(
     denominations: number[],
     maxCents: number,
@@ -289,7 +289,7 @@ export class MonnaieService {
     return { type: 'reconnaitre', coins, answer: target, choices: [] };
   }
 
-  /** Affiche N prix d'articles — calculer le total à payer. */
+  /** Affiche N prix d'articles : calculer le total à payer. */
   private generateTotal(
     denominations: number[],
     maxCents: number,
@@ -311,7 +311,7 @@ export class MonnaieService {
     return { type: 'total', prices, answer, choices: [] };
   }
 
-  /** Prix + somme donnée — trouver la monnaie à rendre. */
+  /** Prix + somme donnée : trouver la monnaie à rendre. */
   private generateRendre(
     denominations: number[],
     maxCents: number,

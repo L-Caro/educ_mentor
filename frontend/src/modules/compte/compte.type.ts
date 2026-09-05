@@ -14,7 +14,7 @@ export interface CompteQuestion {
   skill_key: string;
   cible: number;
   plaques: number[];
-  /** Une solution — pas LA solution. Sert à montrer un chemin après un échec. */
+  /** Une solution : pas LA solution. Sert à montrer un chemin après un échec. */
   solution: Etape[];
   /** Les opérations ouvertes : le clavier d'opérateurs se construit depuis là. */
   operations: Operation[];

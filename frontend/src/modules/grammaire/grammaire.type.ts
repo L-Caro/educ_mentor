@@ -27,7 +27,7 @@ export interface NotionMeta {
   defaultActive: boolean;
 }
 
-/** Le mot tel qu'il arrive du serveur : sa nature n'y est pas — c'est la réponse. */
+/** Le mot tel qu'il arrive du serveur : sa nature n'y est pas, c'est la réponse. */
 export interface MotAffiche {
   mot: string;
   /** Ponctuation accolée, affichée mais jamais cliquable. */
@@ -42,11 +42,11 @@ export interface GrammaireQuestion {
   skill_key: NotionKey;
   display: string;
   mots: MotAffiche[];
-  /** Index du mot souligné — `nature_mot` seulement. */
+  /** Index du mot souligné : `nature_mot` seulement. */
   cible: number | null;
   choices: string[];
   answer: string;
-  /** Index des mots à toucher — types de sélection seulement. */
+  /** Index des mots à toucher : types de sélection seulement. */
   answer_indices: number[];
 }
 
@@ -57,7 +57,7 @@ export interface GrammaireSessionResponse {
   is_unlimited: boolean;
 }
 
-/** Une ligne de progression, avec sa notion — c'est ce qui rend la table
+/** Une ligne de progression, avec sa notion : c'est ce qui rend la table
  * « notions à retravailler » lisible par le parent. */
 export interface GrammaireProgressionStat {
   skill_key: NotionKey;

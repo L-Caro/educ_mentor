@@ -4,7 +4,7 @@ import { Column, Entity, PrimaryColumn } from 'typeorm';
  *
  * C'est là que la difficulté se joue, et nulle part ailleurs : atteindre 348 en deux
  * coups relève du coup d'œil, en quatre coups d'une recherche. La taille de la cible, en
- * revanche, ne dit presque rien — 100 avec 25 × 4 est plus simple que 37. */
+ * revanche, ne dit presque rien : 100 avec 25 × 4 est plus simple que 37. */
 @Entity('compte_progression')
 export class CompteProgression {
   @PrimaryColumn()

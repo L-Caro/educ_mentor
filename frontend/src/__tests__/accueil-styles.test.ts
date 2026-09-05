@@ -58,10 +58,10 @@ describe('accueil', () => {
 
   it('fait tenir l’attribut `hidden` contre le display de la grille', () => {
     // `[hidden] { display: none }` vient de la feuille du NAVIGATEUR, et toute règle
-    // d'auteur posant un `display` la bat — l'origine auteur l'emporte sur l'origine
+    // d'auteur posant un `display` la bat : l'origine auteur l'emporte sur l'origine
     // navigateur, quelle que soit la spécificité. Sans cette règle, une section repliée
     // par `hidden={vrai}` reste affichée : le chevron passe à « replié » et les tuiles
-    // ne bougent pas. C'est arrivé, et ce test ne le voyait pas — il vérifiait la
+    // ne bougent pas. C'est arrivé, et ce test ne le voyait pas : il vérifiait la
     // grille, jamais le pliage.
     expect(RESET).toMatch(/\[hidden\]\s*\{[^}]*display\s*:\s*none\s*!important/);
   });

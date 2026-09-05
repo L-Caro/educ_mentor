@@ -8,13 +8,13 @@ import type {
 /**
  * La fiche de grammaire est le seul endroit du module qui porte du TEXTE pédagogique, et
  * ce texte est celui des fiches déjà validées de `cours/francais/`. Ce qui est vérifié ici
- * n'est donc pas la formulation — elle a été relue ailleurs — mais deux choses que le
+ * n'est donc pas la formulation, elle a été relue ailleurs, mais deux choses que le
  * typage laisse passer :
  *
- *   — la fiche donne un TEST et pas une définition. « Le verbe sert à décrire une action »
+ *   - la fiche donne un TEST et pas une définition. « Le verbe sert à décrire une action »
  *     ne permet de reconnaître aucun verbe. Le parti pris est explicite dans les fiches du
  *     cours et se perdrait à la première réécriture bien intentionnée.
- *   — l'exemple est la phrase que l'enfant vient de rater, avec la réponse marquée, et pas
+ *   - l'exemple est la phrase que l'enfant vient de rater, avec la réponse marquée, et pas
  *     un exemple neuf : lui en donner un autre lui demanderait de refaire deux fois le
  *     chemin, au moment précis où elle est bloquée.
  */

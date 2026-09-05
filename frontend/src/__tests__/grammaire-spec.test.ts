@@ -6,13 +6,13 @@ import type { GrammaireQuestion } from 'src/modules/grammaire/grammaire.type';
 /**
  * L'aiguillage du descripteur, et lui seul : `nature_mot` passe par le QCM du moteur, les
  * trois autres types par la sélection multiple sur la phrase (`spec.map` +
- * `isMultiSelect`). C'est ce qui permet de ne pas réécrire un moteur de jeu — le même
+ * `isMultiSelect`). C'est ce qui permet de ne pas réécrire un moteur de jeu : le même
  * mécanisme sert déjà aux régions de `france`.
  *
  * Deux pannes silencieuses sont visées :
- *   — un `isMapQuestion` trop large enverrait `nature_mot` dans la zone de sélection, où
+ *   - un `isMapQuestion` trop large enverrait `nature_mot` dans la zone de sélection, où
  *     l'enfant devrait toucher un mot au lieu de choisir sa nature. Rien ne planterait.
- *   — un `getComponent` qui renvoie une fonction créée à l'appel donne un type de
+ *   - un `getComponent` qui renvoie une fonction créée à l'appel donne un type de
  *     composant neuf à chaque rendu, et React remonte la phrase entière à chaque clic.
  *     Le symptôme est purement visuel, cf. `map-components-stable.test.ts`.
  */
@@ -124,7 +124,7 @@ describe('liste d’erreurs de fin de partie', () => {
     );
   });
 
-  it('rend null quand rien n’a été touché — pas un tableau vide affiché brut', () => {
+  it('rend null quand rien n’a été touché : pas un tableau vide affiché brut', () => {
     expect(
       grammaireGameSpec.buildResultEntry(question(), [], false, true).given,
     ).toBeNull();

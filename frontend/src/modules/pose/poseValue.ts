@@ -112,7 +112,7 @@ export function estComplete(question: PoseQuestion, saisie: PoseSaisie): boolean
 
   // Les produits partiels sont l'exercice de la multiplication posée, pas un échafaudage :
   // on exige qu'ils soient écrits, sinon l'enfant pourrait sauter directement au résultat
-  // et le décalage — la seule vraie difficulté — ne serait jamais travaillé.
+  // et le décalage, la seule vraie difficulté, ne serait jamais travaillé.
   const partiels = lignesPartielles(question);
   const partielsComplets = partiels.every((partiel, ligne) => {
     const attendu = partielAttendu(question, partiel);

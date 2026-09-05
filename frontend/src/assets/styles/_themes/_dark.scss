@@ -1,4 +1,4 @@
-// Dark mode — surcharge les variables CSS définies dans :root
+// Dark mode : surcharge les variables CSS définies dans :root
 html.dark {
   color-scheme: dark;
   --color-primary:           #9aabda;
@@ -20,7 +20,7 @@ html.dark {
   --color-warning:           #f4a261;
   --color-error:             #e76f51;
 
-  // Ombres renforcées — fond sombre nécessite plus d'opacité pour voir l'élévation
+  // Ombres renforcées : fond sombre nécessite plus d'opacité pour voir l'élévation
   --shadow-sm:  0 1px 3px 0 rgba(0, 0, 0, 0.35), 0 1px 5px 0 rgba(0, 0, 0, 0.25);
   --shadow-md:  0 4px 16px 0 rgba(0, 0, 0, 0.40);
   --shadow-nav: 0 2px 18px 0 rgba(0, 0, 0, 0.50);

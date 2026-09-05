@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest';
  *
  * Les segments `avant` et `apres` d'une question portent des espaces SIGNIFICATIFS :
  * « Les filles ⬚ dans le jardin. » Sans `white-space: pre-wrap`, HTML replie ces espaces
- * et le trou se colle au mot voisin — « ⬚pomme » au lieu de « ⬚ pomme ». La question
+ * et le trou se colle au mot voisin : « ⬚pomme » au lieu de « ⬚ pomme ». La question
  * reste jouable, la réponse reste juste, et l'énoncé devient illisible.
  *
  * Même raisonnement que `fiche-styles.test.ts`, `pose-styles.test.ts` et

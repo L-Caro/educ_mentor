@@ -6,7 +6,7 @@ import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 
 /** Les opérations viennent du SERVEUR : ce sont celles ouvertes dans Administration →
  * Le compte est bon. Les coder en dur laisserait cocher la division avant qu'elle ait
- * été vue en classe, et le service filtrerait ensuite la case — une partie qui sert autre
+ * été vue en classe, et le service filtrerait ensuite la case : une partie qui sert autre
  * chose que ce qui a été demandé. */
 async function loadOperations(): Promise<SetupChoice[]> {
   try {
@@ -28,7 +28,7 @@ async function loadOperations(): Promise<SetupChoice[]> {
   }
 }
 
-/** La difficulté commune du moteur décrit un nombre de choix de QCM — ce qui ne veut rien
+/** La difficulté commune du moteur décrit un nombre de choix de QCM : ce qui ne veut rien
  * dire ici. Le module déclare donc sa propre clé `difficulty`, et le pré-jeu n'injecte
  * plus la sienne : ce qui se règle, c'est la LONGUEUR de la chaîne à trouver. */
 const COMPTE_SETUP_OPTIONS: SetupOption[] = [

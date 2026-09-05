@@ -69,7 +69,7 @@ describe("Démarrage de l'application (e2e)", () => {
 
   const server = () => app.getHttpServer() as Server;
 
-  /** Les pluriels réellement classés en `pluriel_aux` — chevaux, animaux, journaux,
+  /** Les pluriels réellement classés en `pluriel_aux` : chevaux, animaux, journaux,
    * hôpitaux. Lus du corpus plutôt que devinés d'une terminaison. */
   const PLURIELS_EN_AUX = NOMS.filter(
     (nom) => familleDuNom(nom) === 'pluriel_aux',
@@ -741,7 +741,7 @@ describe("Démarrage de l'application (e2e)", () => {
   // ─── Le compte est bon ──────────────────────────────────────────────────────
 
   it('sert des tirages TOUJOURS solubles, vérifiés en rejouant', async () => {
-    // Le tirage traverse ici toute la pile — service, contrôleur, sérialisation JSON.
+    // Le tirage traverse ici toute la pile : service, contrôleur, sérialisation JSON.
     // Et il est jugé comme l'enfant le jugera : en rejouant la solution sur les plaques
     // reçues. Recalculer avec le code qui l'a produite ne vérifierait rien.
     const session = (
@@ -832,8 +832,8 @@ describe("Démarrage de l'application (e2e)", () => {
 
   it('pose une question COMPLÈTE une fois les modules activés', async () => {
     // Le test qui compte : il traverse les vrais adaptateurs des cinq modules, pas des
-    // doublures. Une question mal formée — sans bonne réponse dans ses propositions, ou
-    // sans propositions du tout — bloquerait l'enfant à la porte d'un jeu.
+    // doublures. Une question mal formée, sans bonne réponse dans ses propositions, ou
+    // sans propositions du tout : bloquerait l'enfant à la porte d'un jeu.
     const catalog = app.get(CatalogService);
     for (const { id } of MODULES_DE_PEAGE) {
       await catalog.update(id, { is_active: true });
@@ -865,7 +865,7 @@ describe("Démarrage de l'application (e2e)", () => {
       expect(new Set(question!.choix).size).toBe(question!.choix.length);
     }
 
-    // Sur quarante tirages, le hasard doit avoir visité plusieurs modules — sinon c'est
+    // Sur quarante tirages, le hasard doit avoir visité plusieurs modules, sinon c'est
     // qu'un seul répond, et les quatre autres sont muets sans qu'on le sache.
     expect(vus.size).toBeGreaterThan(1);
 

@@ -3,7 +3,7 @@
 # Sauvegarde complète de la base ÉducMentor.
 #
 # Pourquoi : les scripts backup-invitations.sh / restore-invitations.sh ne couvrent QUE la table
-# des invitations. La progression de l'enfant — la seule donnée irremplaçable du projet — n'était
+# des invitations. La progression de l'enfant, la seule donnée irremplaçable du projet, n'était
 # sauvegardée nulle part.
 #
 # La copie passe par l'API de sauvegarde SQLite (`.backup`) et non par un `cp` : un `cp` sur une
@@ -59,7 +59,7 @@ fi
 SIZE="$(du -h "$FINAL" | cut -f1)"
 echo "✓ $(date '+%Y-%m-%d %H:%M:%S')  $FINAL  ($SIZE)"
 
-# Rotation — ne garder que les KEEP plus récentes.
+# Rotation : ne garder que les KEEP plus récentes.
 # `|| true` sur le pipe : `ls` sort en erreur si le motif ne correspond à rien, et un `set -e`
 # ferait échouer une sauvegarde par ailleurs réussie.
 OLD="$(ls -1t "$BACKUP_DIR"/educmentor-*.db.gz 2>/dev/null | tail -n "+$((KEEP + 1))" || true)"

@@ -132,7 +132,7 @@ export default function GameEngine<TSession, TQuestion>({
 
     // Sur une erreur, si le module sait expliquer, on suspend l'avance automatique :
     // 1600 ms ne laissent pas le temps de repérer un bouton. La main revient à l'enfant.
-    // Sur une bonne réponse, rien ne change — on n'interrompt pas une série.
+    // Sur une bonne réponse, rien ne change : on n'interrompt pas une série.
     const explains = !correct && spec.fiche?.(question) != null;
 
     submitAnswer(
@@ -186,8 +186,8 @@ export default function GameEngine<TSession, TQuestion>({
   const mapCorrectKeys = isMap ? spec.map!.correctKeys(question) : [];
   // La stabilité de ces composants est une clause du contrat, documentée sur
   // `map.getComponent` / `pointMap.getComponent` dans game.types.ts : ils doivent être définis
-  // au niveau module. ESLint ne peut pas le vérifier à travers l'indirection du spec — il voit
-  // seulement un appel de fonction renvoyant un composant — d'où ces dérogations ciblées.
+  // au niveau module. ESLint ne peut pas le vérifier à travers l'indirection du spec : il voit
+  // seulement un appel de fonction renvoyant un composant : d'où ces dérogations ciblées.
   // La règle reste active partout ailleurs, et c'est elle qui avait révélé le problème réel :
   // geo et france renvoyaient une closure, donc un type de composant neuf à chaque rendu, et
   // React reconstruisait la carte SVG entière à chaque clic.

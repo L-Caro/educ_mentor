@@ -10,13 +10,13 @@ interface CompteOperationMeta {
 
 export const compteApi = sharedApi.injectEndpoints({
   endpoints: (builder) => ({
-    /** Les opérations ACTIVES — pré-jeu. */
+    /** Les opérations ACTIVES : pré-jeu. */
     getCompteOperations: builder.query<CompteOperationMeta[], void>({
       query: () => '/compte/operations',
       providesTags: ['CompteActiveOperations'],
     }),
 
-    /** Le catalogue COMPLET, fermées comprises — administration. */
+    /** Le catalogue COMPLET, fermées comprises : administration. */
     getCompteCatalogue: builder.query<
       (CompteOperationMeta & { defaultActive: boolean })[],
       void

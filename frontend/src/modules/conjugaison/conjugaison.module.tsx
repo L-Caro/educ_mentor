@@ -5,7 +5,7 @@ import type { SetupChoice, SetupOption } from 'src/types/game.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 
 /** Les temps viennent du SERVEUR : ce sont ceux ouverts dans Administration → Conjugaison.
- * Les coder en dur laisserait cocher un temps fermé, que le service filtrerait ensuite —
+ * Les coder en dur laisserait cocher un temps fermé, que le service filtrerait ensuite :
  * une case qui ne produit rien, sans que rien ne l'explique. */
 async function loadTemps(): Promise<SetupChoice[]> {
   try {

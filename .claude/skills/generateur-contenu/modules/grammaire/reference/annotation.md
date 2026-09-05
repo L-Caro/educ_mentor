@@ -22,7 +22,7 @@ couvre les cinq catégories sans avoir à les nommer à l'enfant.
 **`l’` reste un déterminant** même s'il ne dit plus le genre. C'est le piège explicite de la
 fiche, il faut donc des phrases qui le contiennent.
 
-**`du` préposition est à éviter** — « près **du** feu » contracte `de` + `le`. Le partitif de
+**`du` préposition est à éviter** : « près **du** feu » contracte `de` + `le`. Le partitif de
 « vend du pain » est accepté parce qu'il ne contracte rien de perceptible pour un CE1.
 
 ## Mots invariables
@@ -45,7 +45,7 @@ Le test de la fiche est **le retrait** : on l'enlève, la phrase tient. `un gran
 
 - devant : `le **petit** chat`
 - derrière : `une maison **bleue**`
-- les deux à la fois : `le **petit** chat **noir**` — deux adjectifs, un seul nom, un seul
+- les deux à la fois : `le **petit** chat **noir**`, deux adjectifs, un seul nom, un seul
   groupe nominal
 
 Un adjectif appartient au groupe nominal de son nom. Il ne sort jamais du `gn`.
@@ -69,7 +69,7 @@ chat »). Il en faut, mais uniquement au niveau `complexe`.
 
 ## Le complément
 
-Circonstanciel **seulement** — où, quand, comment. Trois formes :
+Circonstanciel **seulement** : où, quand, comment. Trois formes :
 
 ```ts
 complement(inv('sur'), gn(d('le'), nc('tapis', '.')))    // préposition + groupe nominal
@@ -96,7 +96,7 @@ nature et de groupe nominal.
 Ces deux fonctions n'existent pas avant le CE2 et le CM1. Une phrase du socle qui en
 porterait une serait servie à un CE1, la phrase étant ouverte et la notion fermée.
 
-**Le complément d'objet** — ce sur quoi porte l'action. Il suit le verbe, sans préposition
+**Le complément d'objet** : ce sur quoi porte l'action. Il suit le verbe, sans préposition
 pour un COD, avec `à` ou `de` pour un COI.
 
 ```ts
@@ -106,7 +106,7 @@ gnSujet(np('Léa')), v('mange'), objet(gn(d('une'), nc('pomme', '.')))
 Avant le CE2, le même groupe reste un `gn(...)` nu, sans fonction. Ce n'est pas un oubli :
 la notion n'est pas enseignée, et lui donner une fonction reviendrait à l'enseigner.
 
-**L'attribut du sujet** — ce que le sujet EST. Il suit un verbe d'état : être, sembler,
+**L'attribut du sujet**, ce que le sujet EST. Il suit un verbe d'état : être, sembler,
 devenir, paraître, rester, demeurer.
 
 ```ts
@@ -124,10 +124,10 @@ Un attribut ne va **jamais** dans un `gn` : ce n'est pas un groupe nominal, c'es
 dit du sujet. Un adjectif attribut n'appartient donc à aucun groupe nominal, contrairement
 à l'adjectif épithète (« le chat noir ») qui est dans celui de son nom.
 
-Les verbes d'état sont aussi la seule raison d'écrire « être » suivi d'un adjectif — ce
+Les verbes d'état sont aussi la seule raison d'écrire « être » suivi d'un adjectif : ce
 que le socle CE1 s'interdit explicitement, faute de pouvoir annoter l'attribut.
 
-## Mots ambigus — le cœur du module
+## Mots ambigus : le cœur du module
 
 Ces mots n'ont pas de nature hors phrase. Ils justifient à eux seuls qu'on ne demande
 jamais « quelle est la nature de *ferme* ? ». En mettre, et les annoter selon le sens
@@ -144,9 +144,9 @@ employé.
 
 Autres ambiguïtés utiles, autrement placées :
 
-- `la` — déterminant (`la table`) ou pronom (`il la voit`). **Éviter le pronom
+- `la` : déterminant (`la table`) ou pronom (`il la voit`). **Éviter le pronom
   complément** : ce n'est pas un pronom sujet, il n'a pas de case dans ce module.
-- `est` — verbe. Éviter les phrases où il introduit un attribut (cf. SKILL.md).
+- `est` : verbe. Éviter les phrases où il introduit un attribut (cf. SKILL.md).
 
 ## Noms propres
 
@@ -154,7 +154,7 @@ Un nom propre forme un groupe nominal **à lui seul**, sans déterminant :
 `gnSujet(np('Maëve'))`. C'est le piège de la fiche du groupe nominal.
 
 Prénoms utilisés dans le corpus : `Maëve`, `Léa`, `Papa`, `Médor`. Réutiliser les mêmes
-plutôt que d'en inventer — l'enfant reconnaît ses repères, et la question porte sur la
+plutôt que d'en inventer : l'enfant reconnaît ses repères, et la question porte sur la
 grammaire, pas sur qui est ce nouveau personnage.
 
 ## Apostrophe : `’` et non `'`

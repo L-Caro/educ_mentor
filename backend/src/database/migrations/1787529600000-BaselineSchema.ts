@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 /**
- * Migration de référence (baseline) — fige le schéma tel qu'il existait le 2026-08-24,
+ * Migration de référence (baseline) : fige le schéma tel qu'il existait le 2026-08-24,
  * date à laquelle le projet est passé de `synchronize: true` à des migrations versionnées.
  *
  * Pourquoi `IF NOT EXISTS` : cette migration doit être jouable sur DEUX états de départ.

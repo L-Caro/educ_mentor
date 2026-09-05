@@ -3,7 +3,7 @@
  *
  * Les deux sont le MÊME jeu : aligner N pions sur une grille, à tour de rôle. Seuls
  * changent les dimensions, la longueur de l'alignement, et la façon dont un coup se pose
- * — n'importe où pour le morpion, dans la colonne qui tombe pour le Puissance 4.
+ * - n'importe où pour le morpion, dans la colonne qui tombe pour le Puissance 4.
  *
  * Ce fichier est partagé et non dupliqué, alors que la règle du projet est de ne
  * factoriser qu'à partir de trois usages. L'exception est assumée : ce n'est pas une
@@ -15,7 +15,7 @@
  * des jetons qui tombent, et forcer un composant commun coûterait plus qu'il ne rend.
  *
  * Ce fichier vit dans `utils/` et non dans `modules/` : là-bas, un dossier EST un module,
- * avec son descripteur et son entrée au catalogue — c'est une convention sur laquelle
+ * avec son descripteur et son entrée au catalogue : c'est une convention sur laquelle
  * `modules-registry.test.ts` s'appuie. Y déposer une bibliothèque cassait le test.
  */
 
@@ -227,7 +227,7 @@ function negamax(
 
 /** Le coup que joue l'adversaire.
  *
- * `profondeur` 0 rend un coup au hasard — c'est le niveau facile, et il doit être
+ * `profondeur` 0 rend un coup au hasard : c'est le niveau facile, et il doit être
  * réellement battable. `rand` est injecté pour que les tests soient déterministes. */
 export function meilleurCoup(
   p: Plateau,

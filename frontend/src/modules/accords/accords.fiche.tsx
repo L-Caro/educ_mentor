@@ -13,7 +13,7 @@ import type { AccordsQuestion, NotionKey } from './accords.type';
  * voit**. C'est pour ça que c'est difficile, et pour ça que chaque fiche le montre marque
  * par marque au lieu de l'énoncer.
  *
- * La fonction est pure — clause du contrat de `spec.fiche`.
+ * La fonction est pure : clause du contrat de `spec.fiche`.
  */
 
 interface Lecon {

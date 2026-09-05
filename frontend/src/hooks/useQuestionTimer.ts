@@ -9,7 +9,7 @@ interface UseQuestionTimerResult {
 }
 
 /**
- * Timer fluide ancré sur Date.now() — 100ms d'intervalle évite la dérive d'un
+ * Timer fluide ancré sur Date.now() : 100ms d'intervalle évite la dérive d'un
  * timer secondaire et permet une transition CSS smooth (0.08s).
  * Le callback onTimeout est toujours appelé dans sa version la plus récente.
  */

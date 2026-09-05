@@ -5,18 +5,18 @@ import type { GrammaireQuestion, NotionKey } from './grammaire.type';
 /**
  * L'explication proposée après une erreur.
  *
- * Le contenu vient des fiches déjà écrites et validées dans `cours/francais/` —
+ * Le contenu vient des fiches déjà écrites et validées dans `cours/francais/` :
  * `nature-des-mots.tsx` et `fonction-des-mots.tsx`. Ce n'est pas de la duplication par
  * paresse : la fiche du cours est du JSX rangé dans un arbre de notions, la fiche de jeu
  * est une fonction pure de la question. Ce qui doit rester commun, c'est le TEXTE que
- * l'enfant lit — elle ne doit pas rencontrer deux explications différentes du verbe selon
+ * l'enfant lit : elle ne doit pas rencontrer deux explications différentes du verbe selon
  * qu'elle joue ou qu'elle révise.
  *
  * Le principe de ces fiches, à ne pas défaire : chacune donne un TEST, pas une définition.
  * « Le verbe sert à décrire une action » ne permet de reconnaître aucun verbe ; « le mot
  * qui change quand je change le moment » le permet.
  *
- * La fonction est pure — c'est la clause du contrat de `spec.fiche`, qui permettra au mode
+ * La fonction est pure : c'est la clause du contrat de `spec.fiche`, qui permettra au mode
  * « école » d'engendrer sa bibliothèque en appelant les mêmes fonctions.
  */
 
@@ -129,7 +129,7 @@ const LECONS: Record<NotionKey, Lecon> = {
   },
   complement_objet: {
     titre: "Le complément d'objet",
-    idee: "Le complément d'objet dit sur QUOI porte l'action : on mange quelque chose, on regarde quelqu'un. Il se trouve en posant la question « qui ? » ou « quoi ? » juste après le verbe — et c'est ce test, pas la place dans la phrase, qui le désigne.",
+    idee: "Le complément d'objet dit sur QUOI porte l'action : on mange quelque chose, on regarde quelqu'un. Il se trouve en posant la question « qui ? » ou « quoi ? » juste après le verbe, et c'est ce test, pas la place dans la phrase, qui le désigne.",
     regle: [
       'Je trouve le verbe.',
       'Je demande : le sujet + le verbe + quoi ? ou qui ?',
@@ -140,7 +140,7 @@ const LECONS: Record<NotionKey, Lecon> = {
   },
   attribut: {
     titre: 'L’attribut du sujet',
-    idee: "L'attribut du sujet dit ce que le sujet EST, et non ce qu'il fait. Il arrive après un verbe d'état — être, sembler, devenir, paraître, rester — et il s'accorde avec le sujet, ce qu'aucun complément d'objet ne fait jamais.",
+    idee: "L'attribut du sujet dit ce que le sujet EST, et non ce qu'il fait. Il arrive après un verbe d'état, être, sembler, devenir, paraître, rester, et il s'accorde avec le sujet, ce qu'aucun complément d'objet ne fait jamais.",
     regle: [
       "Je cherche un verbe d'état : être, sembler, devenir, rester.",
       'Ce qui suit dit comment est le sujet.',

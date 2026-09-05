@@ -27,7 +27,7 @@ const OPTIONS: SetupOption[] = [
 
 const subOption = OPTIONS[1];
 
-describe('pré-jeu — cascade thème → sous-catégorie', () => {
+describe('pré-jeu : cascade thème → sous-catégorie', () => {
   it('ne montre que les sous-catégories du thème sélectionné', () => {
     expect(visibleChoices(subOption, { category: 'animaux' }).map((c) => c.value)).toEqual([
       'animaux-de-la-ferme',

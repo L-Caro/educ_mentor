@@ -1,6 +1,6 @@
 /** Génération pure des questions d'accord : aucune dépendance à NestJS ni à la base.
  *
- * Le type d'exercice et la notion coïncident — un exercice par fiche — donc `QuestionType`
+ * Le type d'exercice et la notion coïncident, un exercice par fiche, donc `QuestionType`
  * n'est qu'un alias de `NotionKey`. C'est plus simple que le module grammaire, où quatre
  * types se partagent dix notions.
  *
@@ -73,7 +73,7 @@ export type Rand = (min: number, max: number) => number;
  *
  * `qcmChoiceCount` de `common/difficulty.ts` n'est pas utilisé : son `hard` vaut 0, au sens
  * « saisie libre ». Ici certains exercices sont déjà en saisie libre par nature (écrire un
- * pluriel), et d'autres n'ont de sens qu'en QCM — choisir entre les quatre formes d'un
+ * pluriel), et d'autres n'ont de sens qu'en QCM : choisir entre les quatre formes d'un
  * adjectif ; les faire taper évaluerait la copie, pas l'accord. */
 function nbChoix(difficulty: Difficulty): number {
   return difficulty === 'easy' ? 2 : 4;
@@ -93,7 +93,7 @@ function nbAdjectifs(difficulty: Difficulty): number {
 }
 
 /** Les noms jouables : ceux dont la famille de pluriel est ouverte, puis, en `easy`,
- * uniquement les pluriels en -s — la règle générale, sans exception.
+ * uniquement les pluriels en -s : la règle générale, sans exception.
  *
  * La porte des familles vient AVANT la difficulté : un pluriel en -aux non ouvert ne doit
  * apparaître à aucune difficulté, pas même en « difficile ». */
@@ -115,7 +115,7 @@ function adjectifsOuverts(familles: FamilleKey[]): AdjectifMeta[] {
   );
 }
 
-/** Les verbes dont l'accord est audible sont les plus FACILES — « est / sont » s'entend,
+/** Les verbes dont l'accord est audible sont les plus FACILES : « est / sont » s'entend,
  * « joue / jouent » non. La fiche le dit : « il dort et ils dorment se prononcent presque
  * pareil, mais ne s'écrivent pas pareil ». La difficulté suit donc l'oreille, à l'envers
  * de l'intuition « irrégulier = difficile ». */
@@ -154,9 +154,9 @@ function majuscule(texte: string): string {
  * un devant et un derrière.
  *
  * Trois absurdités écartées d'un coup, toutes déjà produites par une version naïve :
- *   « les chapeaux sucrés »      — adjectif incompatible avec la catégorie du nom
- *   « le chapeau vert rouge »    — deux adjectifs de la même famille
- *   « le chapeau vert rapide »   — deux adjectifs derrière, qui s'empilent mal
+ *   « les chapeaux sucrés »      : adjectif incompatible avec la catégorie du nom
+ *   « le chapeau vert rouge »    : deux adjectifs de la même famille
+ *   « le chapeau vert rapide »   : deux adjectifs derrière, qui s'empilent mal
  *
  * La forme visée est celle de la fiche : « le petit chat noir ». */
 function choisirAdjectifs(
@@ -193,7 +193,7 @@ function choisirAdjectifs(
  *
  * `candidats` est une liste ORDONNÉE par valeur pédagogique, et les premiers sont retenus :
  * tirer au hasard dans le lot cassait la question à deux choix. « La fille ⬚ un gâteau
- * (faire) » proposait `faire / fait` — un QCM qui n'oppose plus le singulier au pluriel
+ * (faire) » proposait `faire / fait` : un QCM qui n'oppose plus le singulier au pluriel
  * n'interroge plus l'accord, il interroge la conjugaison. Seul l'ordre d'AFFICHAGE est
  * mélangé, pour que la bonne réponse ne soit pas toujours à la même place.
  *
@@ -340,7 +340,7 @@ function genererAccordAdjectif(
     apres: adj.place === 'avant' ? ` ${noyau}` : '',
     indice: adj.ms,
     // Distracteurs par valeur décroissante : d'abord la forme qui ne diffère que par le
-    // NOMBRE (même genre) — c'est la marque qu'on travaille — puis celle qui ne diffère
+    // NOMBRE (même genre), c'est la marque qu'on travaille, puis celle qui ne diffère
     // que par le genre, puis la dernière.
     choices: construireChoix(
       bonne,
@@ -540,13 +540,13 @@ export function generateQuestions(
 
 /** Ce module n'enlève PAS les accents, contrairement à `geometrie.game.tsx` qui accepte
  * « decagone ». Là-bas le module évalue la géométrie et l'orthographe est hors sujet ; ici
- * l'orthographe EST la réponse — « des gateaux » sans circonflexe est une faute, et la
+ * l'orthographe EST la réponse : « des gateaux » sans circonflexe est une faute, et la
  * passer enseignerait l'inverse de la leçon.
  *
  * Ce qui est toléré en revanche, parce que sans rapport avec l'accord :
- *   — la casse, l'énoncé s'affichant en minuscules ;
- *   — les espaces en trop, y compris au milieu ;
- *   — la forme de l'apostrophe : un clavier donne `'`, l'énoncé affiche `’`. */
+ *   - la casse, l'énoncé s'affichant en minuscules ;
+ *   - les espaces en trop, y compris au milieu ;
+ *   - la forme de l'apostrophe : un clavier donne `'`, l'énoncé affiche `’`. */
 export function normaliseReponse(saisie: string): string {
   return saisie
     .trim()

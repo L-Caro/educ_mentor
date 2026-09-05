@@ -72,7 +72,7 @@ export class SettingsService implements OnModuleInit {
   }
 
   private async seed() {
-    // PIN hash — seulement si absent
+    // PIN hash : seulement si absent
     const pinExists = await this.repo.findOneBy({ key: 'admin_pin_hash' });
     if (!pinExists) {
       const defaultPin = this.configService.get<string>('defaultPin') ?? '1234';
@@ -96,7 +96,7 @@ export class SettingsService implements OnModuleInit {
 
   /**
    * Réglages exposés à l'API. `admin_pin_hash` en était : n'importe quel appareil invité
-   * pouvait le lire, puis casser hors ligne un code à 4 chiffres — puis changer le PIN.
+   * pouvait le lire, puis casser hors ligne un code à 4 chiffres, puis changer le PIN.
    *
    * Le filtre est structurel plutôt qu'une liste nominative : tout réglage dont la clé
    * contient `hash`, `secret` ou `token` reste privé. Un futur secret nommé selon cette
@@ -107,7 +107,7 @@ export class SettingsService implements OnModuleInit {
     return all.filter((setting) => !isPrivateKey(setting.key));
   }
 
-  /** Tous les réglages, secrets compris. Usage interne uniquement — jamais exposé par un contrôleur. */
+  /** Tous les réglages, secrets compris. Usage interne uniquement : jamais exposé par un contrôleur. */
   async getAll(): Promise<Setting[]> {
     return this.repo.find();
   }

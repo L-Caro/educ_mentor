@@ -1,6 +1,6 @@
 @use 'src/assets/styles/_abstracts/variables' as v;
 
-// ─── Fiche de leçon — page de cahier Séyès ────────────────────────────────────
+// ─── Fiche de leçon : page de cahier Séyès ────────────────────────────────────
 //
 // La réglure impose une grille de ligne de base : l'interligne de CHAQUE bloc de texte
 // vaut un multiple exact de --fiche-line, et le trait tombe sur la ligne de base plutôt
@@ -127,7 +127,7 @@
 
 	// Pas de hauteur minimale : un exemple TEXTE (extrait, tableau) a déjà son interligne
 	// calé sur la grille, et un plancher pour images y laisserait un grand vide.
-	// Les images, elles, prennent une hauteur multiple du pas — sinon le bloc qui suit
+	// Les images, elles, prennent une hauteur multiple du pas, sinon le bloc qui suit
 	// retombe entre deux lignes de la réglure.
 	img,
 	svg {

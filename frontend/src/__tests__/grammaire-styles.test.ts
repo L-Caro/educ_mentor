@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest';
 
 /**
  * Trois invariants de la phrase touchable, vérifiés sur la feuille de style, parce que
- * leur seul symptôme est visuel — invisible au typage, au lint et aux tests de logique.
+ * leur seul symptôme est visuel : invisible au typage, au lint et aux tests de logique.
  *
  * Le plus important est la distinction à trois états après la réponse. Le moteur ne
  * connaît que juste/faux, mais l'enfant a besoin de savoir LAQUELLE des deux erreurs elle
@@ -59,7 +59,7 @@ describe('phrase touchable', () => {
 
   it('donne aux mots une cible tactile utilisable au doigt', () => {
     // Sans hauteur minimale, « Le » fait une cible de deux caractères de large sur une
-    // ligne de texte — impossible à viser sur un téléphone.
+    // ligne de texte : impossible à viser sur un téléphone.
     expect(bloc('.PhraseCliquable', '&__mot')).toMatch(
       /min-height:\s*2\.75rem/,
     );

@@ -39,7 +39,7 @@ export interface CompteSessionResult {
 
 /** Ce que la difficulté règle : la LONGUEUR DE LA CHAÎNE.
  *
- * Pas la taille des nombres — 100 s'atteint d'un coup d'œil avec 25 × 4, alors que 37
+ * Pas la taille des nombres : 100 s'atteint d'un coup d'œil avec 25 × 4, alors que 37
  * peut demander trois opérations. Les bornes de cible ne sont là que pour écarter les
  * tirages sans intérêt : une cible à 4, on ne la cherche pas, on la voit.
  *
@@ -48,7 +48,7 @@ export interface CompteSessionResult {
  * pratiquer aucun calcul.
  *
  * D'où le plancher très bas en facile. Il était à 10, et cela rendait trois
- * configurations INJOUABLES — sans l'addition, deux petites plaques soustraites ne
+ * configurations INJOUABLES, sans l'addition, deux petites plaques soustraites ne
  * dépassent jamais 8, et le pré-jeu servait alors « Aucun compte à chercher ». Avec la
  * soustraction seule, les cibles SONT petites : c'est la vérité de ce réglage, pas un
  * défaut à corriger en rouvrant les grandes plaques.
@@ -131,7 +131,7 @@ export class CompteService {
     const count = isUnlimited ? 10 : Math.min(perSession, 10);
 
     // Le pré-jeu propose, l'administration dispose : une opération cochée mais non
-    // ouverte ne doit rien produire. Le pré-jeu ne montre déjà que les actives — ce
+    // ouverte ne doit rien produire. Le pré-jeu ne montre déjà que les actives : ce
     // filtre est la ceinture.
     const actives = await this.getActiveOperations();
     const demandees = (dto.operations ?? [])

@@ -4,7 +4,7 @@
  *
  * Le module travaillait en `POSITION_VALUE[p]` (1, 10, 100…) et en nombres entiers. Les
  * décimaux n'y entrent pas : représenter 3,45 en flottant fait échouer les comparaisons
- * sur des arrondis, et la comparaison des décimaux EST la notion — un enfant qui croit
+ * sur des arrondis, et la comparaison des décimaux EST la notion : un enfant qui croit
  * que 3,45 > 3,5 parce que 45 > 5 fait l'erreur classique du CM1.
  *
  * Chaque position porte donc un EXPOSANT relatif à l'unité : centaine = 2, dixième = −1.
@@ -203,7 +203,7 @@ export function chiffreA(
 /** Le nombre tel qu'il s'écrit, virgule française comprise.
  *
  * L'entier ne devient un décimal qu'ICI : `formater(345, -2)` rend « 3,45 ». Les zéros de
- * tête de la partie décimale comptent — 305 centièmes s'écrit « 3,05 » et non « 3,5 ». */
+ * tête de la partie décimale comptent : 305 centièmes s'écrit « 3,05 » et non « 3,5 ». */
 export function formater(valeur: number, minExposant: number): string {
   if (minExposant >= 0) return String(valeur * 10 ** minExposant);
 

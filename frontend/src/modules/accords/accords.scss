@@ -37,7 +37,7 @@
   }
 
   // Les espaces de `avant` et `apres` font partie de l'énoncé : « Les filles ⬚ dans le
-  // jardin. » Sans `pre-wrap`, HTML les replie et le trou se colle au mot voisin —
+  // jardin. » Sans `pre-wrap`, HTML les replie et le trou se colle au mot voisin :
   // « ⬚pomme » au lieu de « ⬚ pomme ».
   &__segment {
     white-space: pre-wrap;

@@ -61,7 +61,7 @@ export class GrammaireService {
    *
    * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
    * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
-   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * fantôme d'une question dans « séances récentes » : la liste que lit l'adulte pour
    * savoir ce qui a été travaillé.
    *
    * La description de la séance sort d'ici elle aussi : elle se compose des mêmes
@@ -192,7 +192,7 @@ export class GrammaireService {
     await this.sessionRepo.save(session);
   }
 
-  // ─── Admin — progression ──────────────────────────────────────────────────
+  // ─── Admin : progression ──────────────────────────────────────────────────
 
   getProgression(): Promise<GrammaireProgression[]> {
     return this.progressionRepo.find({ order: { skill_key: 'ASC' } });
@@ -203,7 +203,7 @@ export class GrammaireService {
     await this.sessionRepo.clear();
   }
 
-  // ─── Admin — notions actives ──────────────────────────────────────────────
+  // ─── Admin : notions actives ──────────────────────────────────────────────
 
   getNotions() {
     return NOTIONS;
@@ -229,7 +229,7 @@ export class GrammaireService {
     return valid;
   }
 
-  // ─── Admin — classes de phrases ───────────────────────────────────────────
+  // ─── Admin : classes de phrases ───────────────────────────────────────────
 
   /** Les cinq classes, avec le nombre de phrases que le corpus porte pour chacune.
    * Ouvrir une classe vide donnerait un exercice muet : le compte le dit d'avance. */
@@ -265,7 +265,7 @@ export class GrammaireService {
   // ─── Utils ────────────────────────────────────────────────────────────────
 
   // `this: void` : passée telle quelle en callback à `generateQuestions`, comme dans
-  // `geometrie.service.ts` — sans l'annotation, un `this` désynchronisé serait un piège.
+  // `geometrie.service.ts`, sans l'annotation, un `this` désynchronisé serait un piège.
   private rand(this: void, min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }

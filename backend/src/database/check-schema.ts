@@ -2,7 +2,7 @@
  * Compare le schéma réel d'une base au schéma que TypeORM produirait depuis les entités.
  *
  * Vit dans `src/` et non dans `scripts/` pour une raison précise : `tsconfig.build.json`
- * exclut `scripts/`, et le Dockerfile élague les devDependencies — donc `ts-node`. Placé
+ * exclut `scripts/`, et le Dockerfile élague les devDependencies, donc `ts-node`. Placé
  * ailleurs, ce script était inexécutable sur l'image de production, c'est-à-dire sur la
  * seule base dont la dérive compte vraiment.
  *
@@ -18,7 +18,7 @@
  * Sur un serveur, dans le conteneur (JavaScript compilé, pas de ts-node nécessaire) :
  *   docker compose exec backend node dist/database/check-schema.js
  *
- * Sortie : code 0 si le schéma correspond, 1 sinon — utilisable dans un script de déploiement.
+ * Sortie : code 0 si le schéma correspond, 1 sinon, utilisable dans un script de déploiement.
  * Le script ne fait que LIRE la base ; il crée sa base témoin en zone temporaire.
  */
 import { DataSource } from 'typeorm';

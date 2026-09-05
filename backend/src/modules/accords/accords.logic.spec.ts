@@ -19,7 +19,7 @@ import {
  * **Un QCM qui n'interroge plus l'accord.** À deux choix, si le distracteur retenu est
  * l'infinitif plutôt que la forme opposée, « La fille ⬚ un gâteau (faire) » propose
  * `faire / fait` : la question devient de la conjugaison. C'est arrivé, et rien ne le
- * signalait — la réponse restait juste.
+ * signalait : la réponse restait juste.
  *
  * **Une réponse correcte refusée.** L'énoncé et la réponse attendue doivent sortir de la
  * même fonction. Un « des gâteaux » construit à la main d'un côté et par règle de l'autre
@@ -33,7 +33,7 @@ const TOUTES = NOTION_KEYS;
 
 /** Le nom du corpus présent dans un énoncé, repéré par JETON et non par sous-chaîne.
  * `'les gâteaux'.includes('eau')` est vrai, et faisait désigner « eau » là où il y avait
- * « gâteau » — le test échouait sur une incompatibilité qui n'existait pas. */
+ * « gâteau » : le test échouait sur une incompatibilité qui n'existait pas. */
 function nomDeLenonce(...morceaux: string[]) {
   const jetons = morceaux
     .join(' ')
@@ -46,7 +46,7 @@ function nomDeLenonce(...morceaux: string[]) {
   );
 }
 
-describe('generateQuestion — genre_nom', () => {
+describe('generateQuestion : genre_nom', () => {
   it('interroge toujours avec un déterminant indéfini, qui révèle le genre', () => {
     for (let n = 0; n < 60; n++) {
       const q = generateQuestion('genre_nom', 'medium', TOUTES, randReel)!;
@@ -62,7 +62,7 @@ describe('generateQuestion — genre_nom', () => {
   });
 });
 
-describe('generateQuestion — nombre_nom', () => {
+describe('generateQuestion : nombre_nom', () => {
   it('demande une saisie, dans les deux sens, et attend la forme du corpus', () => {
     for (let n = 0; n < 80; n++) {
       const q = generateQuestion('nombre_nom', 'medium', TOUTES, randReel)!;
@@ -99,7 +99,7 @@ describe('generateQuestion — nombre_nom', () => {
   });
 });
 
-describe('generateQuestion — accord_adjectif', () => {
+describe('generateQuestion : accord_adjectif', () => {
   it('propose toujours la bonne forme, sans doublon', () => {
     for (let n = 0; n < 100; n++) {
       const q = generateQuestion(
@@ -146,7 +146,7 @@ describe('generateQuestion — accord_adjectif', () => {
   });
 });
 
-describe('generateQuestion — accord_gn', () => {
+describe('generateQuestion : accord_gn', () => {
   it('donne un départ et attend le groupe entier accordé', () => {
     for (let n = 0; n < 80; n++) {
       const q = generateQuestion('accord_gn', 'medium', TOUTES, randReel)!;
@@ -169,7 +169,7 @@ describe('generateQuestion — accord_gn', () => {
     }
   });
 
-  it('ne met jamais deux adjectifs de la même famille — « le chapeau vert rouge »', () => {
+  it('ne met jamais deux adjectifs de la même famille : « le chapeau vert rouge »', () => {
     for (let n = 0; n < 200; n++) {
       const q = generateQuestion('accord_gn', 'hard', TOUTES, randReel)!;
       const familles = ADJECTIFS.filter((adj) =>
@@ -190,7 +190,7 @@ describe('generateQuestion — accord_gn', () => {
   });
 });
 
-describe('generateQuestion — accord_sujet_verbe', () => {
+describe('generateQuestion : accord_sujet_verbe', () => {
   it('oppose toujours le singulier et le pluriel du même verbe', () => {
     // Le cœur de la notion. À deux choix, l'infinitif ne doit JAMAIS remplacer la forme
     // opposée : la question deviendrait de la conjugaison.
@@ -253,7 +253,7 @@ describe('generateQuestion — accord_sujet_verbe', () => {
 
   it('garde les verbes audibles pour le facile et les homophones pour le difficile', () => {
     // La fiche : « il dort et ils dorment se prononcent presque pareil ». C'est ça qui est
-    // difficile, pas l'irrégularité — « est / sont » s'entend.
+    // difficile, pas l'irrégularité : « est / sont » s'entend.
     for (let n = 0; n < 60; n++) {
       const facile = generateQuestion(
         'accord_sujet_verbe',
@@ -314,7 +314,7 @@ describe('generateQuestions', () => {
 });
 
 describe('validation de la saisie', () => {
-  it("n'enlève JAMAIS les accents — l'orthographe est la réponse", () => {
+  it("n'enlève JAMAIS les accents : l'orthographe est la réponse", () => {
     // `geometrie` accepte « decagone » parce qu'il évalue la géométrie. Ici, accepter
     // « des gateaux » enseignerait l'inverse de la leçon.
     expect(reponseCorrecte('des gâteaux', 'des gateaux')).toBe(false);

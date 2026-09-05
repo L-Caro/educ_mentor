@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * Tables du module grammaire : les séances jouées et la progression par notion.
  *
- * Le corpus de phrases annotées n'est PAS en base — c'est du code
+ * Le corpus de phrases annotées n'est PAS en base : c'est du code
  * (`grammaire.corpus.ts`), pour la même raison que le catalogue de formes de la
  * géométrie : une phrase annotée mot par mot n'est pas du contenu qu'on édite, et une
  * annotation fausse enseignerait du faux français.

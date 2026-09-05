@@ -59,7 +59,7 @@ export class AccordsService {
    *
    * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
    * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
-   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * fantôme d'une question dans « séances récentes » : la liste que lit l'adulte pour
    * savoir ce qui a été travaillé.
    *
    * La description de la séance sort d'ici elle aussi : elle se compose des mêmes
@@ -129,7 +129,7 @@ export class AccordsService {
   }
 
   /** Un message qui dit quoi faire. Ici le type d'exercice EST la notion, donc ce qui
-   * bloque se nomme sans détour — contrairement au module grammaire, où il faut remonter
+   * bloque se nomme sans détour : contrairement au module grammaire, où il faut remonter
    * du type d'exercice aux notions qu'il suppose. */
   private messageAucuneQuestion(
     types: QuestionType[],
@@ -188,7 +188,7 @@ export class AccordsService {
     await this.sessionRepo.save(session);
   }
 
-  // ─── Admin — progression ──────────────────────────────────────────────────
+  // ─── Admin : progression ──────────────────────────────────────────────────
 
   getProgression(): Promise<AccordsProgression[]> {
     return this.progressionRepo.find({ order: { skill_key: 'ASC' } });
@@ -199,7 +199,7 @@ export class AccordsService {
     await this.sessionRepo.clear();
   }
 
-  // ─── Admin — notions actives ──────────────────────────────────────────────
+  // ─── Admin : notions actives ──────────────────────────────────────────────
 
   getNotions() {
     return NOTIONS;
@@ -225,10 +225,10 @@ export class AccordsService {
     return valid;
   }
 
-  // ─── Admin — familles morphologiques ──────────────────────────────────────
+  // ─── Admin : familles morphologiques ──────────────────────────────────────
 
   /** Le catalogue COMPLET, du CE1 au CM2, ouvertes comme fermées. L'administration doit
-   * voir les fermées — sinon il n'y a rien à ouvrir. */
+   * voir les fermées, sinon il n'y a rien à ouvrir. */
   getFamilles() {
     return FAMILLES;
   }
@@ -256,7 +256,7 @@ export class AccordsService {
   // ─── Utils ────────────────────────────────────────────────────────────────
 
   // `this: void` : passée telle quelle en callback à `generateQuestions`, comme dans
-  // `geometrie.service.ts` — sans l'annotation, un `this` désynchronisé serait un piège.
+  // `geometrie.service.ts`, sans l'annotation, un `this` désynchronisé serait un piège.
   private rand(this: void, min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }

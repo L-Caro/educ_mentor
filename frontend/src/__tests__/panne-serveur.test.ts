@@ -8,12 +8,12 @@ import { describe, expect, it } from 'vitest';
  * Incident réel : le backend local avait planté au démarrage. Le conteneur affichait
  * « Up », le port était publié, et l'interface s'est dégradée en SILENCE :
  *
- *   — l'accueil de Maëve affichait « Aucun module activé pour l'instant », un message
+ *   - l'accueil de Maëve affichait « Aucun module activé pour l'instant », un message
  *     qui l'accuse d'avoir une application vide et envoie son parent régler des
  *     activations déjà bonnes ;
- *   — le tableau de bord montrait dix-huit cartes aux ids bruts, sans icône ni
+ *   - le tableau de bord montrait dix-huit cartes aux ids bruts, sans icône ni
  *     interrupteur, parce que tout cela vient du catalogue ;
- *   — chaque carte annonçait « Aucune session jouée », le `.catch(() => [])` de la
+ *   - chaque carte annonçait « Aucune session jouée », le `.catch(() => [])` de la
  *     progression transformant une erreur réseau en absence de données.
  *
  * Trois symptômes, une cause, et aucun des trois ne la nommait. Ces tests tiennent la

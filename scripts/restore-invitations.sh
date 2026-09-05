@@ -18,4 +18,4 @@ fi
 
 sqlite3 "$DB_PATH" "DELETE FROM invitations;"
 sqlite3 "$DB_PATH" < "$BACKUP_PATH"
-echo "Restore OK — invitations restaurées depuis $BACKUP_PATH"
+echo "Restore OK : invitations restaurées depuis $BACKUP_PATH"

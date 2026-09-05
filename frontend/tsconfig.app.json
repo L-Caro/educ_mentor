@@ -28,7 +28,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
 
-    /* Path configuration (paths résolus relativement à ce tsconfig — pas besoin de baseUrl en moduleResolution bundler) */
+    /* Path configuration (paths résolus relativement à ce tsconfig : pas besoin de baseUrl en moduleResolution bundler) */
     "paths": {
       "src/*": ["./src/*"]
     },

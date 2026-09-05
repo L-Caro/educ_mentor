@@ -33,7 +33,7 @@ const question = (over: Partial<GeometrieQuestion> = {}): GeometrieQuestion => (
   ...over,
 });
 
-describe('fiche de géométrie — forme seule', () => {
+describe('fiche de géométrie : forme seule', () => {
   it('porte le nom de la forme en titre', () => {
     expect(geometrieFiche(question()).titre).toBe('carré');
   });
@@ -58,7 +58,7 @@ describe('fiche de géométrie — forme seule', () => {
   });
 });
 
-describe('fiche de géométrie — paire (proprietes)', () => {
+describe('fiche de géométrie : paire (proprietes)', () => {
   const q = question({
     type: 'proprietes',
     skill_key: 'carre_losange',

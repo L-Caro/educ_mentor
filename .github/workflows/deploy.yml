@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  # Barrière de qualité — s'exécute AVANT toute construction d'image.
+  # Barrière de qualité : s'exécute AVANT toute construction d'image.
   # Sans elle, chaque push déployait en production sans qu'aucun lint, typage ni test
   # n'ait été exécuté : le pipeline ne faisait qu'accélérer la mise en ligne de code cassé.
   checks:
@@ -42,7 +42,7 @@ jobs:
         run: npm test
 
       # Démarrage complet sur une base vierge : couvre le câblage des modules, l'application
-      # de la migration de référence et les seeds — soit le scénario « déploiement neuf ».
+      # de la migration de référence et les seeds : soit le scénario « déploiement neuf ».
       - name: Test end-to-end
         if: matrix.package == 'backend'
         run: npm run test:e2e

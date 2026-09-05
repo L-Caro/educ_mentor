@@ -33,7 +33,7 @@
 
     // Quelques tracés du catalogue (rectangle, cercle) portent une annotation texte
     // pensée pour la fiche de cours (« la longueur », « le centre »), stylée par
-    // `etapes.scss` — un fichier propre au dossier `cours/`, jamais importé ici. Sans sa
+    // `etapes.scss` : un fichier propre au dossier `cours/`, jamais importé ici. Sans sa
     // règle de taille, ce texte s'affichait à la taille par défaut du navigateur, énorme
     // et hors-sujet pendant une question. Le jeu n'en a pas besoin : on le masque.
     .Forme__note {

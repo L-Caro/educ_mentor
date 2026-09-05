@@ -18,7 +18,7 @@
 import type { Niveau } from '../../common/niveau';
 import type { Fonction, Nature } from './grammaire.notions';
 
-/** La complexité de la PHRASE — à ne pas confondre avec la classe scolaire, qui est le
+/** La complexité de la PHRASE : à ne pas confondre avec la classe scolaire, qui est le
  * champ `niveau`. Une phrase de CM1 peut être syntaxiquement simple, et une phrase de CE1
  * complexe. */
 export type Difficulte = 'simple' | 'moyen' | 'complexe';
@@ -34,7 +34,7 @@ export interface MotAnnote {
   /** Le mot tel qu'écrit, majuscule comprise. */
   mot: string;
   nature: Nature;
-  /** Sa fonction dans CETTE phrase — c'est tout l'objet de la notion. */
+  /** Sa fonction dans CETTE phrase : c'est tout l'objet de la notion. */
   fonction: Fonction | null;
   /** Index du groupe nominal auquel il appartient, `null` s'il n'en fait pas partie. */
   gn: number | null;
@@ -91,7 +91,7 @@ const d = motDe('determinant');
 const adj = motDe('adjectif');
 /** Pronom personnel sujet. */
 const pron = motDe('pronom_sujet');
-/** Mot invariable — adverbe ou préposition, comme dans la fiche du cours. */
+/** Mot invariable : adverbe ou préposition, comme dans la fiche du cours. */
 const inv = motDe('invariable');
 
 /** Un groupe nominal : le nom et tout ce qui l'accompagne. */
@@ -113,7 +113,7 @@ const complement = (...blocs: Bloc[]): Groupe => ({
   blocs,
 });
 
-/** Le complément d'OBJET — ce sur quoi porte l'action. Il n'était pas annoté tant que le
+/** Le complément d'OBJET : ce sur quoi porte l'action. Il n'était pas annoté tant que le
  * corpus s'arrêtait au CE1, où il n'est pas enseigné : « une pomme » dans « Maëve mange
  * une pomme » restait un groupe nominal sans fonction. Il s'apprend au CE2. */
 const objet = (...blocs: Bloc[]): Groupe => ({
@@ -122,7 +122,7 @@ const objet = (...blocs: Bloc[]): Groupe => ({
   blocs,
 });
 
-/** L'attribut du sujet — ce que le sujet EST, après être, sembler, devenir. Il s'accorde
+/** L'attribut du sujet : ce que le sujet EST, après être, sembler, devenir. Il s'accorde
  * avec le sujet, ce qui le distingue du complément d'objet, qui lui ne s'accorde pas. CM1. */
 const attribut = (...blocs: Bloc[]): Groupe => ({
   sorte: 'fonction',
@@ -135,7 +135,7 @@ const gnSujet = (...blocs: Bloc[]): Groupe => sujet(gn(...blocs));
 
 /** Aplatit l'arbre en liste de mots : les index de groupe nominal sont attribués dans
  * l'ordre d'apparition, la fonction descend du groupe vers ses mots. L'élision se déduit
- * du mot précédent — en français, un mot qui suit une apostrophe est toujours collé. */
+ * du mot précédent : en français, un mot qui suit une apostrophe est toujours collé. */
 function aplatir(blocs: Bloc[]): MotAnnote[] {
   const mots: MotAnnote[] = [];
   let prochainGn = 0;
@@ -194,7 +194,7 @@ function phrase(
 //              le sujet et le groupe nominal sans rien d'autre autour.
 // `moyen`    : un adjectif, un complément, un mot invariable.
 // `complexe` : groupe nominal étendu, sujet inversé, sujet coordonné, et des mots
-//              ambigus hors contexte — ferme, porte, gare, cuisine — qui sont
+//              ambigus hors contexte, ferme, porte, gare, cuisine, qui sont
 //              précisément la raison pour laquelle on ne demande jamais la nature
 //              d'un mot isolé.
 //
@@ -598,7 +598,7 @@ export const CORPUS: PhraseAnnotee[] = [
   ]),
 ];
 
-/** La phrase reconstituée, telle qu'elle s'affiche — sert aux tests et aux messages. */
+/** La phrase reconstituée, telle qu'elle s'affiche : sert aux tests et aux messages. */
 export function texteDe(phraseAnnotee: PhraseAnnotee): string {
   return phraseAnnotee.mots
     .map((mot, index) => {

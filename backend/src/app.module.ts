@@ -1,4 +1,4 @@
-/** Racine de l'application NestJS. Ce fichier importe tous les modules fonctionnels — c'est l'équivalent
+/** Racine de l'application NestJS. Ce fichier importe tous les modules fonctionnels : c'est l'équivalent
  * d'un registre central. Pour ajouter un module, on l'importe ici. ServeStaticModule gère deux chemins
  * statiques : /media/ pour les images et / pour le build React (SPA fallback). */
 import { Module } from '@nestjs/common';

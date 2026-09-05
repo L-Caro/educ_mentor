@@ -29,7 +29,7 @@ export const morpionModule: ModuleManifest = {
       ],
     },
     // Le module déclare SA clé `difficulty`, et c'est ce qui compte : sans elle, le
-    // pré-jeu injecte la sienne — « 2 choix / 4 choix / Saisie libre » — qui ne veut rien
+    // pré-jeu injecte la sienne, « 2 choix / 4 choix / Saisie libre », qui ne veut rien
     // dire sur un plateau. Le jeu posait alors deux fois la même question, une fois sous
     // son nom et une fois sous celui du moteur.
     //
@@ -43,7 +43,7 @@ export const morpionModule: ModuleManifest = {
       choices: [
         { value: 'easy', icon: '🙂', label: 'Facile', description: 'Il joue au hasard' },
         { value: 'medium', icon: '🤔', label: 'Moyen', description: 'Il gagne et il bloque' },
-        // Annoncé franchement : le morpion parfaitement joué est un match nul — les DEUX
+        // Annoncé franchement : le morpion parfaitement joué est un match nul, les DEUX
         // règles, la variante à trois pions l'est aussi (résolue dans `troisPions.ts`).
         // Déguiser « imbattable » en « fort » ferait chercher longtemps une faille.
         { value: 'hard', icon: '🤖', label: 'Difficile', description: 'Il ne perd jamais' },

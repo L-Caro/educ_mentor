@@ -33,7 +33,7 @@ const CE1_ACTIVE = [
   'cone',
 ].map(shape);
 
-describe('generateQuestion — nom_figure / nom_solide', () => {
+describe('generateQuestion : nom_figure / nom_solide', () => {
   it('interroge une forme active et propose son nom parmi les choix', () => {
     for (let n = 0; n < 40; n++) {
       const q = generateQuestion('nom_figure', CE1_ACTIVE, 4, randReel)!;
@@ -71,7 +71,7 @@ describe('generateQuestion — nom_figure / nom_solide', () => {
   });
 });
 
-describe('generateQuestion — cotes_sommets', () => {
+describe('generateQuestion : cotes_sommets', () => {
   it('interroge côtés ou sommets pour une figure plane, jamais un nombre négatif', () => {
     for (let n = 0; n < 60; n++) {
       const q = generateQuestion('cotes_sommets', CE1_ACTIVE, 4, randReel)!;
@@ -95,7 +95,7 @@ describe('generateQuestion — cotes_sommets', () => {
   });
 });
 
-describe('generateQuestion — angle_droit', () => {
+describe('generateQuestion : angle_droit', () => {
   it('exclut le cercle (angle droit non pertinent)', () => {
     for (let n = 0; n < 40; n++) {
       const q = generateQuestion('angle_droit', CE1_ACTIVE, 2, randReel)!;
@@ -126,7 +126,7 @@ describe('generateQuestion — angle_droit', () => {
   });
 });
 
-describe('generateQuestion — proprietes', () => {
+describe('generateQuestion : proprietes', () => {
   it('carré vs losange se départagent sur l’angle droit', () => {
     const pool = [shape('carre'), shape('losange')];
     const q = generateQuestion('proprietes', pool, 2, randReel);

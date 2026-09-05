@@ -3,7 +3,7 @@
  *
  * Ce fichier n'est PAS utilisé par l'application : au démarrage, Nest configure sa connexion
  * dans `database.module.ts` et exécute les migrations lui-même (`migrationsRun: true`).
- * La CLI ne sait pas lire la config NestJS, d'où ce doublon — les deux doivent rester cohérents.
+ * La CLI ne sait pas lire la config NestJS, d'où ce doublon : les deux doivent rester cohérents.
  *
  * Usage (depuis backend/) :
  *   npm run migration:generate -- src/database/migrations/NomDeLaMigration

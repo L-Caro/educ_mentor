@@ -1,5 +1,5 @@
 /** Logique métier de l'auth. verifyPin compare le PIN saisi (bcrypt.compare) avec le hash stocké en BDD.
- * Si ADMIN_PIN_ENABLED=false (.env), on court-circuite la vérification — utile en dev pour ne pas taper le PIN.
+ * Si ADMIN_PIN_ENABLED=false (.env), on court-circuite la vérification : utile en dev pour ne pas taper le PIN.
  * On retourne toujours un JWT signé : c'est ce token que le frontend stocke et renvoie dans chaque requête admin. */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

@@ -14,7 +14,7 @@ export async function writeReport(destination: URL, data: ReportData): Promise<v
   const { stats } = data;
   const lines: string[] = [];
 
-  lines.push('# Extraction kids-flashcards.com — rapport', '');
+  lines.push('# Extraction kids-flashcards.com : rapport', '');
   lines.push(`Généré le ${new Date().toISOString().slice(0, 10)}.`, '');
 
   lines.push('## Totaux', '');
@@ -61,7 +61,7 @@ export async function writeReport(destination: URL, data: ReportData): Promise<v
     for (const set of theme.sets) themeBySetSlug.set(set.slug, theme.name);
   }
 
-  lines.push('## Traductions qui écrasent `dictionary.json` — à valider en priorité', '');
+  lines.push('## Traductions qui écrasent `dictionary.json` : à valider en priorité', '');
   lines.push('Un override remplace volontairement la traduction du dictionnaire existant.', '');
   const overriding = data.uniqueWords.filter((word) => word.overriddenFromDictionary !== null);
   if (overriding.length === 0) {
@@ -77,7 +77,7 @@ export async function writeReport(destination: URL, data: ReportData): Promise<v
     lines.push('');
   }
 
-  lines.push('## Traductions inventées (source `override`) — à relire', '');
+  lines.push('## Traductions inventées (source `override`) : à relire', '');
   lines.push('Traductions que je propose faute de correspondance dans `dictionary.json`. Groupées par thème.', '');
   const overrides = data.uniqueWords.filter(
     (word) => word.frSource === 'override' && word.overriddenFromDictionary === null,

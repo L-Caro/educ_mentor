@@ -166,7 +166,7 @@ describe('CompteService', () => {
     it('sait tirer un compte pour CHAQUE réglage possible', async () => {
       // Le plancher de cible en facile était à 10, et trois configurations n'engendraient
       // alors RIEN : sans l'addition, deux petites plaques soustraites ne dépassent
-      // jamais 8. Le pré-jeu répondait « Aucun compte à chercher » — un cul-de-sac
+      // jamais 8. Le pré-jeu répondait « Aucun compte à chercher » : un cul-de-sac
       // atteignable en deux touches, et qui accusait l'enfant d'un mauvais choix.
       //
       // Ce test parcourt les quinze combinaisons d'opérations et les trois difficultés :

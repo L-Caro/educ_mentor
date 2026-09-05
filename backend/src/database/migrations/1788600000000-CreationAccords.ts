@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 /**
  * Tables du module accords : les séances jouées et la progression par notion.
  *
- * Le corpus morphologique n'est PAS en base — c'est du code (`accords.corpus.ts`). Ici
+ * Le corpus morphologique n'est PAS en base : c'est du code (`accords.corpus.ts`). Ici
  * plus qu'ailleurs : la réponse attendue de l'enfant EST une orthographe, donc une forme
  * fausse saisie dans un textarea d'import deviendrait la bonne réponse.
  *

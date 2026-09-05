@@ -23,7 +23,7 @@ interface GameInputProps {
  * Champ de saisie libre partagé : états visuels correct/wrong, validation au Enter,
  * focus auto à chaque nouvelle question. Le module garde le contrôle de `value`.
  *
- * variant='time' : deux inputs [HH]:[MM] — value attendue en "HH:MM", auto-avance vers MM.
+ * variant='time' : deux inputs [HH]:[MM], value attendue en "HH:MM", auto-avance vers MM.
  */
 export default function GameInput({
   value,

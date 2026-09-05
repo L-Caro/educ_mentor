@@ -1,4 +1,4 @@
-# Vocabulaire de notions — source unique
+# Vocabulaire de notions : source unique
 
 Ces libellés sont la seule valeur autorisée dans le champ `notions` d'un item de dictée.
 Le filtre « notion » du pré-jeu se construit en dédupliquant ces chaînes sur les items
@@ -6,7 +6,7 @@ actifs : un libellé approximatif (`accents` au lieu de `accents : é è ê`) cr
 catégorie fantôme dans le menu. **Copier-coller, ne pas paraphraser.**
 
 Si une notion CE1 manque vraiment, l'ajouter ici dans le même style (`famille : détail`),
-la documenter d'une ligne, puis l'utiliser — jamais l'inverse.
+la documenter d'une ligne, puis l'utiliser : jamais l'inverse.
 
 ## Sons
 

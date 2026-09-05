@@ -3,7 +3,7 @@
  * Le jeu télévisé donne les quatre d'emblée. Ici, non : une enfant qui n'a pas vu la
  * division ne doit pas la trouver dans la liste des touches. Les quatre sont donc
  * PRÉSENTES MAIS certaines FERMÉES, comme les figures de la géométrie ou les temps de la
- * conjugaison — on ouvre depuis Administration → Le compte est bon.
+ * conjugaison : on ouvre depuis Administration → Le compte est bon.
  *
  * La clé est le signe lui-même. C'est aussi ce que manipule le générateur : une table de
  * correspondance `plus → '+'` n'ajouterait qu'un endroit où se tromper.

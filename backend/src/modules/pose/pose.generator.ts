@@ -32,7 +32,7 @@ export interface Retenues {
 
 /** Un produit partiel de la multiplication posée : la valeur, et de combien de rangs elle
  * se décale vers la gauche. 247 × 36 en donne deux : 1482 sans décalage, 741 décalé d'un
- * rang — c'est le décalage qui fait toute la difficulté de l'opération. */
+ * rang : c'est le décalage qui fait toute la difficulté de l'opération. */
 export interface ProduitPartiel {
   valeur: number;
   decalage: number;
@@ -60,7 +60,7 @@ export interface PoseQuestion {
   answer_length: number;
   /** Y a-t-il au moins une retenue ? Sert à l'explication de la fiche. */
   has_carry: boolean;
-  /** Les produits partiels — multiplication seulement, vide ailleurs. */
+  /** Les produits partiels : multiplication seulement, vide ailleurs. */
   partiels: ProduitPartiel[];
 }
 
@@ -108,7 +108,7 @@ interface Options {
 
 /**
  * Tire une opération respectant les contraintes. Renvoie `null` si elle est impossible à
- * satisfaire — par exemple une soustraction à un chiffre sans retenue existe, mais une
+ * satisfaire : par exemple une soustraction à un chiffre sans retenue existe, mais une
  * addition à un chiffre AVEC retenue impose des tirages contraints : plutôt que de boucler
  * indéfiniment, on abandonne et l'appelant retire un autre type.
  */

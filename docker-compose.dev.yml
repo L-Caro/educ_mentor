@@ -7,10 +7,10 @@ services:
     command: sh -c "npm install && npm run start:dev"
     volumes:
       - ./backend:/app
-      - backend_modules:/app/node_modules   # volume isolé — évite les conflits avec les node_modules du host
+      - backend_modules:/app/node_modules   # volume isolé : évite les conflits avec les node_modules du host
       # Monté à /data et NON à /app/data : imbriqué sous le bind ./backend:/app, il se faisait
       # écraser par celui-ci (Docker applique les montages dans l'ordre, et /app arrivait après
-      # /app/data). Le conteneur créait alors une base vierge dans backend/data/ sur l'hôte —
+      # /app/data). Le conteneur créait alors une base vierge dans backend/data/ sur l'hôte :
       # modules inactifs, aucun mot, aucun texte, sans le moindre message d'erreur.
       - ./data:/data
     ports:

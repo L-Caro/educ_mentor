@@ -123,7 +123,7 @@ export class PenduService implements OnModuleInit {
     await this.sessionRepo.save(session);
   }
 
-  // ─── Admin — mots ─────────────────────────────────────────────────────────
+  // ─── Admin : mots ─────────────────────────────────────────────────────────
 
   async findWords(search?: string): Promise<PenduWord[]> {
     const qb = this.wordRepo.createQueryBuilder('w').orderBy('w.word', 'ASC');
@@ -165,7 +165,7 @@ export class PenduService implements OnModuleInit {
     await this.wordRepo.delete(id);
   }
 
-  // ─── Admin — progression ──────────────────────────────────────────────────
+  // ─── Admin : progression ──────────────────────────────────────────────────
 
   async getProgression(): Promise<ProgressionStat[]> {
     const sessions = await this.sessionRepo.find({

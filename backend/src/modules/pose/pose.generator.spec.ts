@@ -9,7 +9,7 @@ import {
 /**
  * La difficulté d'une opération posée se joue entièrement ici : le nombre de chiffres et
  * la présence de retenues. Une soustraction qui passerait sous zéro, ou une « addition
- * avec retenue » qui n'en a pas, ne se verraient qu'en jouant — et fausseraient la
+ * avec retenue » qui n'en a pas, ne se verraient qu'en jouant, et fausseraient la
  * progression, puisque la clé de compétence dérive de ces mêmes contraintes.
  */
 
@@ -270,7 +270,7 @@ describe('produits partiels', () => {
   });
 });
 
-describe('generatePose — multiplication', () => {
+describe('generatePose : multiplication', () => {
   it('rend une opération juste, avec ses produits partiels', () => {
     for (let n = 0; n < 100; n++) {
       const q = generatePose('multiplication', {

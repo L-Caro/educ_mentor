@@ -16,7 +16,7 @@ import type { Request } from 'express';
  *
  * Ce qu'il couvre réellement : quelqu'un à qui une invitation a été envoyée pourrait
  * scripter les 10 000 combinaisons en quelques secondes, et l'accès administrateur permet
- * de réinitialiser la progression — la seule donnée irremplaçable du projet. C'est ce
+ * de réinitialiser la progression : la seule donnée irremplaçable du projet. C'est ce
  * scénario-là, et lui seul, qui justifie la limite.
  *
  * Le seuil est donc généreux : un parent qui se trompe sur un téléphone ne doit jamais
@@ -27,7 +27,7 @@ import type { Request } from 'express';
  * l'accès du parent en épuisant volontairement les essais.
  *
  * En mémoire et non `@nestjs/throttler` : l'application tourne en instance unique. Un
- * compteur en mémoire suffit, ne dépend de rien, et se réinitialise au redémarrage — ce
+ * compteur en mémoire suffit, ne dépend de rien, et se réinitialise au redémarrage : ce
  * qui est acceptable ici. Ce choix serait faux derrière plusieurs répliques.
  */
 
@@ -88,7 +88,7 @@ export class PinAttemptGuard implements CanActivate {
     }
   }
 
-  /** Réinitialise le compteur d'une IP — appelé après une saisie correcte. */
+  /** Réinitialise le compteur d'une IP : appelé après une saisie correcte. */
   clear(ip: string | undefined): void {
     this.attempts.delete(ip ?? 'inconnu');
   }

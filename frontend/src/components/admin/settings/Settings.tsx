@@ -29,7 +29,7 @@ export default function Settings() {
     parseInt(localStorage.getItem(DURATION_KEY) ?? '0', 10)
   );
 
-  // Dérivés du cache settings — pas de miroir d'état local (cf. « you might not need an effect »)
+  // Dérivés du cache settings : pas de miroir d'état local (cf. « you might not need an effect »)
   const questionCount = parseInt(settings?.questions_per_session ?? '10', 10);
   /** Le péage des jeux : combien de questions avant d'ouvrir un plateau. `0` l'éteint. */
   const peage = parseInt(settings?.jeux_peage_questions ?? '0', 10) || 0;
@@ -133,7 +133,7 @@ export default function Settings() {
           <p className="Settings__hint">
             Avant d&rsquo;ouvrir un jeu (morpion, Puissance 4, Snake), répondre à
             quelques questions tirées des modules de calcul, tables, conjugaison,
-            grammaire et accords — seulement ceux qui sont activés.
+            grammaire et accords : seulement ceux qui sont activés.
           </p>
           <p className="Settings__hint">
             Une mauvaise réponse ne fait pas recommencer : la bonne s&rsquo;affiche, et on

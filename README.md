@@ -1,8 +1,8 @@
 # ÉducMentor
 
 Application d'entraînement scolaire pour un usage familial : une collection de petits jeux
-(« tuiles ») par matière — tables de multiplication, conjugaison, monnaie, lecture de l'heure,
-géographie, compréhension de texte… — avec suivi de progression et espace d'administration.
+(« tuiles ») par matière : tables de multiplication, conjugaison, monnaie, lecture de l'heure,
+géographie, compréhension de texte…, avec suivi de progression et espace d'administration.
 
 Déployée sur `educmentor.lionelcaro.fr`, derrière un système d'invitation par appareil.
 
@@ -43,8 +43,8 @@ data/        base, images, corpus de travail   monté en volume, jamais versionn
 scripts/     outils ponctuels (sauvegarde, préparation de corpus)
 ```
 
-- `frontend/CLAUDE.md` — architecture front en détail : moteur de jeu, manifeste, flux de données.
-- `CHANTIERS.md` — état des travaux en cours et décisions prises.
+- `frontend/CLAUDE.md`, architecture front en détail : moteur de jeu, manifeste, flux de données.
+- `CHANTIERS.md` : état des travaux en cours et décisions prises.
 
 ### Ajouter un module de jeu
 
@@ -59,7 +59,7 @@ sont d'accord.
 
 ## Base de données
 
-Le schéma n'évolue **que** par migration versionnée — `synchronize` est désactivé par défaut,
+Le schéma n'évolue **que** par migration versionnée : `synchronize` est désactivé par défaut,
 parce qu'il pouvait supprimer une colonne et ses données sur une simple modification d'entité.
 
 ```bash
@@ -74,7 +74,7 @@ En local sur une base jetable, `DB_SYNCHRONIZE=true` restaure l'ancien comportem
 
 ### Sauvegarde
 
-`data/educmentor.db` contient la progression — la seule donnée irremplaçable du projet.
+`data/educmentor.db` contient la progression : la seule donnée irremplaçable du projet.
 
 ```bash
 ./scripts/backup-db.sh              # → data/backups/educmentor-<horodatage>.db.gz
@@ -95,12 +95,12 @@ Le déploiement n'a lieu que si lint, typage et tests passent des deux côtés.
 
 Le backend refuse de démarrer en production si `JWT_SECRET` est absent, égal au défaut du
 dépôt ou plus court que 23 caractères, si `DB_SYNCHRONIZE=true`, ou si `ADMIN_PIN_ENABLED=false`
-— cette dernière variable, malgré son nom, court-circuite `AccessGuard` et rend toute l'API
+cette dernière variable, malgré son nom, court-circuite `AccessGuard` et rend toute l'API
 accessible sans invitation. Le code PIN lui-même n'entre pas dans ces contrôles : c'est un
 contrôle parental (empêcher l'enfant d'ouvrir les réglages), pas une frontière de sécurité.
 
 **Avant le premier déploiement suivant le passage aux migrations**, vérifier que le schéma de
-production correspond aux entités — il a vécu sous `synchronize: true` et a pu dériver :
+production correspond aux entités : il a vécu sous `synchronize: true` et a pu dériver :
 
 ```bash
 # depuis le serveur, dans le conteneur (le script est compilé dans l'image)

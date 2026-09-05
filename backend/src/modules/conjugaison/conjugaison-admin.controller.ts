@@ -16,7 +16,7 @@ export class ConjugaisonAdminController {
   constructor(private readonly conjugaisonService: ConjugaisonService) {}
 
   /** Le catalogue COMPLET : tous les temps du CP au CM2, avec leur classe. L'admin doit
-   * voir les fermés — sinon il n'y a rien à ouvrir. */
+   * voir les fermés, sinon il n'y a rien à ouvrir. */
   @Get('temps-catalogue')
   getTenses() {
     return this.conjugaisonService.getTenses();

@@ -62,6 +62,6 @@ if (import.meta.main) {
   const cards = await scrapeSet(testSet);
   console.log(`${cards.length} cartes (${cards.filter((card) => card.isTitleCard).length} carte-titre)`);
   for (const card of cards) {
-    console.log(`  ${card.isTitleCard ? '[titre] ' : ''}${card.en} — ${card.imageUrl}`);
+    console.log(`  ${card.isTitleCard ? '[titre] ' : ''}${card.en}, ${card.imageUrl}`);
   }
 }

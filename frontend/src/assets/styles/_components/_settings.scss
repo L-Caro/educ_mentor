@@ -186,7 +186,7 @@
 		padding-top: v.$space-7;
 	}
 
-	// ─── Admin link — outline → filled au hover pour contraste garanti ─────
+	// ─── Admin link : outline → filled au hover pour contraste garanti ─────
 	&__adminLink {
 		width: 90%;
 		display: flex;
@@ -209,7 +209,7 @@
 	}
 }
 
-// ─── InvitationsAdmin — intégré dans l'accordéon Settings ────────────────────
+// ─── InvitationsAdmin : intégré dans l'accordéon Settings ────────────────────
 .InvitationsAdmin {
 	display: flex;
 	flex-direction: column;

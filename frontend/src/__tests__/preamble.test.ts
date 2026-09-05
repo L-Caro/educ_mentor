@@ -8,7 +8,7 @@ import { lectureGameSpec } from 'src/modules/lecture/lecture.game';
  *
  * Le moteur affiche l'écran de préambule tant que `preamble(session)` ne renvoie pas `null`.
  * Ce contrat est donc ce qui décide qu'une partie de lecture commence par le texte ou
- * directement par la première question — un `null` de trop et l'enfant ne voit jamais le
+ * directement par la première question : un `null` de trop et l'enfant ne voit jamais le
  * texte qu'il est censé mémoriser.
  */
 

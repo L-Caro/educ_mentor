@@ -56,7 +56,7 @@ function parseHtml(source) {
     const tag = rawTag.toLowerCase();
 
     if (closing) {
-      // Remonte jusqu'à la balise ouvrante correspondante — tolère les balises non fermées
+      // Remonte jusqu'à la balise ouvrante correspondante : tolère les balises non fermées
       for (let i = stack.length - 1; i > 0; i--) {
         if (stack[i].tag === tag) {
           stack.length = i;
@@ -424,7 +424,7 @@ async function loadMedia() {
   try {
     return JSON.parse(await readFile(MEDIA_MANIFEST, 'utf-8')).images ?? {};
   } catch {
-    console.warn('⚠  Miroir d\'images absent — les blocs image n\'auront pas de fichier local.');
+    console.warn('⚠  Miroir d\'images absent : les blocs image n\'auront pas de fichier local.');
     console.warn('   Lancer : node scripts/mirror-lecons-images.mjs\n');
     return {};
   }

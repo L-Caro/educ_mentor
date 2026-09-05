@@ -83,7 +83,7 @@ describe('la résolution exacte', () => {
   it('répond pour le joueur qu’on lui NOMME, pas pour celui que l’alternance suggère', () => {
     // La fonction déduisait le joueur au trait du nombre de pions posés et ignorait son
     // argument : elle répondait pour l'autre, sans le dire. En jeu l'alternance est
-    // stricte, donc rien ne se voyait — un test l'a même « validée » par hasard.
+    // stricte, donc rien ne se voyait : un test l'a même « validée » par hasard.
     const cases = grille('xx. oo. ...');
     expect(valeur(cases, 1)).toBe(1); // joueur 1 pose en 2 et gagne
     expect(valeur(cases, 2)).toBe(1); // joueur 2 pose en 5 et gagne aussi
@@ -130,7 +130,7 @@ describe('l’adversaire', () => {
     expect(aligne(appliquer(cases, coup, 2), 2)).toBe(true);
   });
 
-  it('en DIFFICILE, ne perd JAMAIS — vérifié sur 200 parties contre un joueur au hasard', () => {
+  it('en DIFFICILE, ne perd JAMAIS : vérifié sur 200 parties contre un joueur au hasard', () => {
     // La promesse du pré-jeu, jouée pour de vrai plutôt que lue dans la table.
     let defaites = 0;
     for (let partie = 0; partie < 200; partie++) {

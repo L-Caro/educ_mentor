@@ -12,7 +12,7 @@ export interface PeageQuestion {
 export const peageApi = sharedApi.injectEndpoints({
   endpoints: (builder) => ({
     /** L'état du péage : combien de questions, et lesquels des cinq modules peuvent en
-     * fournir. Interrogé avant d'en demander une — sinon il faudrait demander une
+     * fournir. Interrogé avant d'en demander une, sinon il faudrait demander une
      * question pour découvrir qu'il n'y en a pas. */
     getPeage: builder.query<{ questions: number; modules: string[] }, void>({
       query: () => '/peage',

@@ -4,7 +4,7 @@
  * nombre), comment l'adjectif recopie ces marques, puis les deux accords qu'on demande
  * vraiment à l'école. Une notion ne vient jamais avant celles dont elle a besoin.
  *
- * Ici la notion et le type d'exercice COÏNCIDENT — un exercice par notion — contrairement
+ * Ici la notion et le type d'exercice COÏNCIDENT, un exercice par notion, contrairement
  * au module grammaire où quatre types d'exercice se partagent dix notions. C'est ce qui
  * permet de n'avoir qu'une seule énumération.
  */

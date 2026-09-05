@@ -23,8 +23,8 @@ import {
  * plus élevé des deux modules de français, parce que la réponse EST une orthographe.
  *
  * Deux familles de tests :
- *   — la forme des entrées (pas de doublon, quatre formes cohérentes) ;
- *   — le RESPECT DU PÉRIMÈTRE des fiches : rien dans le corpus ne doit sortir de ce que
+ *   - la forme des entrées (pas de doublon, quatre formes cohérentes) ;
+ *   - le RESPECT DU PÉRIMÈTRE des fiches : rien dans le corpus ne doit sortir de ce que
  *     `cours/francais/accords.tsx` explique. Un enfant qui rate une question doit pouvoir
  *     trouver la réponse dans la fiche.
  */
@@ -50,7 +50,7 @@ describe('noms', () => {
   it('range chaque nom dans une famille de pluriel déclarée', () => {
     // Le corpus va jusqu'au CM2 : il contient les pluriels en -aux et en -oux. Ce qui
     // doit rester vrai n'est plus « rien hors du CE1 », c'est « rien hors des familles
-    // déclarées » — un pluriel fantaisiste tomberait dans `pluriel_s` par défaut et
+    // déclarées » : un pluriel fantaisiste tomberait dans `pluriel_s` par défaut et
     // deviendrait jouable sans avoir jamais été décidé.
     const mauvais = NOMS.filter((nom) => {
       switch (familleDuNom(nom)) {
@@ -117,7 +117,7 @@ describe('noms', () => {
   });
 
   it('donne au moins un adjectif compatible à chaque nom', () => {
-    // Sans ça, `accord_adjectif` ne pourrait jamais interroger ce nom — silencieusement.
+    // Sans ça, `accord_adjectif` ne pourrait jamais interroger ce nom : silencieusement.
     const orphelins = NOMS.filter(
       (nom) => adjectifsCompatibles(nom).length === 0,
     ).map((nom) => nom.key);
@@ -150,7 +150,7 @@ describe('adjectifs', () => {
       if (familles.includes('feminin_double'))
         return adj.fs !== `${adj.ms}${adj.ms.slice(-1)}e`;
       // Irrégulier : rien à vérifier par règle, c'est justement sa définition. On exige
-      // seulement qu'il diffère du masculin — sinon il serait « identique ».
+      // seulement qu'il diffère du masculin, sinon il serait « identique ».
       return adj.fs === adj.ms;
     }).map((adj) => adj.key);
     expect(mauvais).toEqual([]);
@@ -158,7 +158,7 @@ describe('adjectifs', () => {
 
   it('forme toujours le féminin pluriel en +s sur le féminin singulier', () => {
     // Aucune exception en français : « belle → belles », « grosse → grosses ». Le
-    // masculin pluriel, lui, peut être invariable — c'est sa propre famille.
+    // masculin pluriel, lui, peut être invariable : c'est sa propre famille.
     const mauvais = ADJECTIFS.filter((adj) => adj.fp !== `${adj.fs}s`).map(
       (adj) => adj.key,
     );
@@ -261,7 +261,7 @@ describe('determinant', () => {
     expect(determinant('feminin', 'singulier', 'indefini', false)).toBe('une');
   });
 
-  it('cache le genre dès qu’il y a élision — le piège de la fiche', () => {
+  it('cache le genre dès qu’il y a élision : le piège de la fiche', () => {
     expect(determinant('masculin', 'singulier', 'defini', true)).toBe('l’');
     expect(determinant('feminin', 'singulier', 'defini', true)).toBe('l’');
   });

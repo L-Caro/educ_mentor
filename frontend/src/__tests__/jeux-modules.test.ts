@@ -6,7 +6,7 @@ import { MODULES } from 'src/modules.manifest';
 /**
  * Le morpion et le Puissance 4 sont des jeux « hors moule » : ils ne passent pas par
  * `<GameEngine>`, ils n'ont pas de backend, pas de progression, pas de migration. Ce qui
- * doit être tenu est donc surtout leur bon rangement — et deux choix de conception qu'un
+ * doit être tenu est donc surtout leur bon rangement, et deux choix de conception qu'un
  * relecteur pressé défera.
  */
 
@@ -46,7 +46,7 @@ describe('rangement', () => {
 
   it('les exclut du tirage « Au hasard » par leur catégorie', () => {
     // Rien de spécial à faire : `HORS_HASARD` écarte la catégorie `jeux`, donc les deux
-    // nouveaux en héritent. Ce test le verrouille — les y laisser entrer ferait du
+    // nouveaux en héritent. Ce test le verrouille : les y laisser entrer ferait du
     // bouton « je ne sais pas quoi faire » une façon de ne pas travailler.
     const accueil = readFileSync(
       join(__dirname, '../components/layout/HomeLayout.tsx'),
@@ -86,7 +86,7 @@ describe('choix de conception à ne pas défaire', () => {
   it('se garde du double coup', () => {
     // Un clic pendant que l'ordinateur réfléchit, ou deux clics plus rapides qu'un rendu,
     // ne doivent pas écraser le plateau. La garde doit vivre DANS la mise à jour, contre
-    // l'état réellement courant — la lire depuis le rendu, c'est la lire périmée.
+    // l'état réellement courant : la lire depuis le rendu, c'est la lire périmée.
     expect(P4).toMatch(/precedent\.cases\[cellule\] !== 0/);
 
     // Le morpion va plus loin depuis la règle à trois pions : le tour changeait hors de
@@ -99,15 +99,15 @@ describe('choix de conception à ne pas défaire', () => {
 
   it('promet l’imbattabilité pour le morpion et pas pour le Puissance 4', () => {
     // Le morpion est explorable en entier (profondeur 9) : il ne perd jamais, et c'est
-    // annoncé. Le Puissance 4 ne l'est pas — le promettre serait faux.
+    // annoncé. Le Puissance 4 ne l'est pas : le promettre serait faux.
     //
     // On lit les DESCRIPTIONS du manifeste, pas le texte du fichier : une première
     // version cherchait « ne perd jamais » dans la source et butait sur le commentaire
     // qui explique justement son absence. Un test qui lit du code attrape aussi ce qu'on
     // écrit à son sujet.
     //
-    // L'option se cherche par sa CLÉ et non à l'index 0 : ajouter une question devant —
-    // ce qu'a fait la règle à trois pions — faisait échouer ce test sans que rien de ce
+    // L'option se cherche par sa CLÉ et non à l'index 0 : ajouter une question devant :
+    // ce qu'a fait la règle à trois pions : faisait échouer ce test sans que rien de ce
     // qu'il garde n'ait bougé.
     const description = (id: string, valeur: string) =>
       MODULES.find((m) => m.id === id)
@@ -120,8 +120,8 @@ describe('choix de conception à ne pas défaire', () => {
   });
 
   it('ne pose la question du niveau QU’UNE FOIS', () => {
-    // Le pré-jeu injecte sa propre option `difficulty` — « 2 choix / 4 choix / Saisie
-    // libre » — à tout module qui n'en déclare pas une. Les deux jeux affichaient donc
+    // Le pré-jeu injecte sa propre option `difficulty` : « 2 choix / 4 choix / Saisie
+    // libre » : à tout module qui n'en déclare pas une. Les deux jeux affichaient donc
     // « Contre qui ? » ET « Quel niveau ? », la seconde ne voulant rien dire sur un
     // plateau. Déclarer la clé `difficulty` est ce qui écarte l'injection : c'est la
     // seule chose que ce test garde.
@@ -150,7 +150,7 @@ describe('choix de conception à ne pas défaire', () => {
   it('donne une fin à la règle à trois pions, qui ne peut pas se remplir', () => {
     // La grille garde toujours trois cases libres : sans règle de répétition, deux
     // joueurs qui ne trouvent rien se déplaceraient sans fin. La résolution exacte montre
-    // que 400 positions sont nulles PAR BOUCLE — ce n'est pas un cas d'école.
+    // que 400 positions sont nulles PAR BOUCLE : ce n'est pas un cas d'école.
     expect(MORPION).toMatch(/REPETITIONS_NULLES/);
     expect(MORPION).toMatch(/tourne en rond/);
   });

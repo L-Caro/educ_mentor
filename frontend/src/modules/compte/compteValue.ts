@@ -8,12 +8,12 @@ import type { CompteQuestion, Etape, Operation } from './compte.type';
  * Le serveur a la même fonction, et ce n'est pas une duplication par négligence : les
  * deux ne disent pas la même chose.
  *
- *   — côté serveur, `appliquer` décide ce que le GÉNÉRATEUR s'autorise à écrire dans une
+ *   - côté serveur, `appliquer` décide ce que le GÉNÉRATEUR s'autorise à écrire dans une
  *     solution de référence. Il y refuse « × 1 » et « ÷ 1 » : l'opération est légale mais
  *     ne change rien, et une étape morte dans un chemin donné en exemple est absurde.
- *   — ici, elle décide ce que L'ENFANT peut poser. « 7 × 1 » est permis. Griser la touche
+ *   - ici, elle décide ce que L'ENFANT peut poser. « 7 × 1 » est permis. Griser la touche
  *     parce qu'un coup est inutile lui apprendrait que l'application a un avis, pas que
- *     le coup est inutile — elle le découvre en le jouant.
+ *     le coup est inutile : elle le découvre en le jouant.
  *
  * Ce qui est refusé des deux côtés l'est parce que le jeu ne sait pas le représenter :
  * les négatifs et les divisions inexactes n'ont pas de plaque.
@@ -52,7 +52,7 @@ export interface Plaque {
 
 /** L'état du plateau : les plaques non consommées, puis les résultats obtenus.
  *
- * Quand plusieurs plaques portent le même nombre, on consomme la première rencontrée —
+ * Quand plusieurs plaques portent le même nombre, on consomme la première rencontrée :
  * comme `rejouer`. Elles sont interchangeables : ce qui compte est qu'un même exemplaire
  * ne serve pas deux fois. */
 export function disponibles(plaques: number[], etapes: Etape[]): Plaque[] {
@@ -71,7 +71,7 @@ export function disponibles(plaques: number[], etapes: Etape[]): Plaque[] {
 }
 
 /** Rejoue une suite d'étapes et rend le nombre atteint, ou `null` si elle est
- * injouable — une plaque employée deux fois, une division inexacte.
+ * injouable : une plaque employée deux fois, une division inexacte.
  *
  * On ne se contente pas de lire le dernier `resultat` : la chaîne arrive du navigateur,
  * et la relire est le seul moyen de savoir qu'elle tient debout. */
@@ -142,7 +142,7 @@ export function atteint(question: CompteQuestion, brut: string): number | null {
   return rejouer(question.plaques, decode(brut));
 }
 
-/** L'écart à la cible — ce que la correction annonce quand ce n'est pas tombé juste. */
+/** L'écart à la cible : ce que la correction annonce quand ce n'est pas tombé juste. */
 export function ecart(question: CompteQuestion, brut: string): number | null {
   const resultat = atteint(question, brut);
   return resultat === null ? null : Math.abs(resultat - question.cible);

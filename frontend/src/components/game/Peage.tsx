@@ -16,11 +16,11 @@ import './peage.scss';
  * ── Il ne se referme JAMAIS ──────────────────────────────────────────────────────────
  *
  * Une mauvaise réponse ne fait pas recommencer. On montre la bonne, et on passe à la
- * suivante ; après le nombre de questions réglé, elle joue — juste ou faux. C'est un
+ * suivante ; après le nombre de questions réglé, elle joue : juste ou faux. C'est un
  * choix, et il mérite d'être dit : interdire de jouer jusqu'à ce que ce soit correct
  * transformerait un péage en punition, et une enfant coincée devant un jeu qu'elle ne
  * peut pas lancer irait chercher un adulte, pas la bonne réponse. Ce qui s'apprend ici,
- * c'est la correction qu'on lui montre — pas la porte fermée.
+ * c'est la correction qu'on lui montre : pas la porte fermée.
  *
  * Tout ce qui peut mal tourner laisse passer : réglage à zéro, serveur muet, aucun module
  * capable de poser une question. Un péage en panne devant un morpion serait une panne
@@ -115,7 +115,7 @@ export default function Peage({
 
         <div className="Peage__choix">
           {question.choix.map((choix) => {
-            // Après la réponse, la bonne se montre TOUJOURS — c'est elle qu'on est venu
+            // Après la réponse, la bonne se montre TOUJOURS : c'est elle qu'on est venu
             // apprendre, pas le fait d'avoir eu tort.
             const etat = !repondu
               ? ''

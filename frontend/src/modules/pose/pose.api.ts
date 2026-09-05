@@ -3,7 +3,7 @@ import type { PoseSessionResponse } from './pose.type';
 
 export const poseApi = sharedApi.injectEndpoints({
   endpoints: (builder) => ({
-    /** Les opérations ACTIVES — pré-jeu. */
+    /** Les opérations ACTIVES : pré-jeu. */
     getPoseOperations: builder.query<
       { key: string; label: string; exemple: string; niveau: string }[],
       void
@@ -12,7 +12,7 @@ export const poseApi = sharedApi.injectEndpoints({
       providesTags: ['PoseActiveOperations'],
     }),
 
-    /** Le catalogue COMPLET, fermées comprises — administration. */
+    /** Le catalogue COMPLET, fermées comprises : administration. */
     getPoseCatalogue: builder.query<
       {
         key: string;

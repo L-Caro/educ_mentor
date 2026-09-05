@@ -14,7 +14,7 @@ import {
  * Ce qu'il faut tenir, et qui ne se voit pas en jouant : **tout tirage doit être
  * solvable**. Tirer six plaques et une cible au hasard donne le plus souvent un compte
  * impossible, et un enfant qui cherche vingt minutes une solution qui n'existe pas
- * n'apprend pas à chercher — il apprend que le jeu triche.
+ * n'apprend pas à chercher : il apprend que le jeu triche.
  *
  * D'où la construction à l'envers, et d'où ces tests : ils rejouent la solution de
  * référence sur les plaques et vérifient qu'elle mène bien à la cible. Vérifier par
@@ -142,7 +142,7 @@ describe('genererCompte', () => {
     //     3 + 54   = 57     ← ne sert à rien
     //     100 + 25 = 125    ← la cible, atteinte sans les deux premières
     //
-    // Le tirage restait solvable — les tests passaient — mais la solution de référence
+    // Le tirage restait solvable, les tests passaient, mais la solution de référence
     // était inutilisable comme aide. Chaque étape après la première doit consommer le
     // résultat de la précédente.
     for (let n = 0; n < 200; n++) {
@@ -234,7 +234,7 @@ describe('genererCompte', () => {
 
   it('abandonne proprement quand les contraintes sont inatteignables', () => {
     // Une cible à cinq chiffres avec l'addition seule et de petites plaques : impossible.
-    // Mieux vaut `null` — l'appelant retire — qu'une boucle sans fin.
+    // Mieux vaut `null`, l'appelant retire, qu'une boucle sans fin.
     expect(
       genererCompte(
         options({

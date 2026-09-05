@@ -28,7 +28,7 @@ import type {
 } from './dto/geometrie.dto';
 
 /** La question telle qu'envoyée au front : les propriétés complètes des formes en jeu
- * sont attachées ici, pas dans `geometrie.logic.ts` — la génération reste pure et légère,
+ * sont attachées ici, pas dans `geometrie.logic.ts` : la génération reste pure et légère,
  * et le front construit sa fiche d'erreur sans dupliquer le catalogue de métadonnées. */
 export interface GeometrieSessionQuestion extends GeometrieQuestion {
   shape_meta: ShapeMeta;
@@ -159,7 +159,7 @@ export class GeometrieService {
     await this.sessionRepo.save(session);
   }
 
-  // ─── Admin — progression ──────────────────────────────────────────────────
+  // ─── Admin : progression ──────────────────────────────────────────────────
 
   getProgression(): Promise<GeometrieProgression[]> {
     return this.progressionRepo.find({ order: { skill_key: 'ASC' } });
@@ -170,7 +170,7 @@ export class GeometrieService {
     await this.sessionRepo.clear();
   }
 
-  // ─── Admin — figures actives ──────────────────────────────────────────────
+  // ─── Admin : figures actives ──────────────────────────────────────────────
 
   getShapes() {
     return SHAPES;
@@ -199,7 +199,7 @@ export class GeometrieService {
   // ─── Utils ────────────────────────────────────────────────────────────────
 
   // `this: void` : cette méthode n'utilise jamais `this`, elle est passée telle quelle en
-  // callback à `generateQuestions` — sans l'annotation, un `this` désynchronisé y serait
+  // callback à `generateQuestions`, sans l'annotation, un `this` désynchronisé y serait
   // un piège classique.
   private rand(this: void, min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
