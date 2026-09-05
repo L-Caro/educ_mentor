@@ -33,6 +33,8 @@ export default function Settings() {
   const questionCount = parseInt(settings?.questions_per_session ?? '10', 10);
   /** Le péage des jeux : combien de questions avant d'ouvrir un plateau. `0` l'éteint. */
   const peage = parseInt(settings?.jeux_peage_questions ?? '0', 10) || 0;
+  /** Une partie sur combien est barrée. `1` = toutes. */
+  const peageFrequence = parseInt(settings?.jeux_peage_frequence ?? '1', 10) || 1;
   const savedTimer = parseInt(settings?.question_timer_seconds ?? '0', 10);
   const timerEnabled = savedTimer > 0;
   const timerSeconds = timerEnabled ? savedTimer : 30;
@@ -167,6 +169,34 @@ export default function Settings() {
               </label>
             ))}
           </div>
+
+          {peage > 0 && (
+            <>
+              <p className="Settings__hint">
+                À quelle fréquence ? Le péage se pose à la première partie, puis laisse
+                passer les suivantes jusqu&rsquo;à la prochaine échéance. Le compte est
+                gardé par appareil.
+              </p>
+              <div className="Settings__radios">
+                {[1, 2, 3, 5, 10].map((n) => (
+                  <label key={n} className="Settings__radio">
+                    <input
+                      type="radio"
+                      name="peage-frequence"
+                      checked={peageFrequence === n}
+                      onChange={() =>
+                        updateSetting({
+                          key: 'jeux_peage_frequence',
+                          value: String(n),
+                        })
+                      }
+                    />
+                    {n === 1 ? 'Chaque partie' : `1 partie sur ${n}`}
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="Settings__section">

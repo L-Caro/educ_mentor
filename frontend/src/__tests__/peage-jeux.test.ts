@@ -1,7 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { lireNombre } from 'src/components/game/peageReglage';
+import {
+  lireFrequence,
+  lireNombre,
+  lireRestantes,
+  ecrireRestantes,
+  MAXIMUM_FREQUENCE,
+} from 'src/components/game/peageReglage';
 
 const PEAGE = readFileSync(
   join(__dirname, '../components/game/Peage.tsx'),
@@ -36,6 +42,47 @@ describe('le réglage', () => {
     // introuvable.
     expect(SETTINGS).toMatch(/jeux_peage_questions/);
     expect(SETTINGS).toMatch(/Péage des jeux/);
+  });
+});
+
+describe('une partie sur X', () => {
+  it('vaut « chaque partie » par défaut, et pour toute valeur qui ne veut rien dire', () => {
+    for (const brut of [undefined, '', '0', '-4', 'souvent', '1']) {
+      expect({ brut, f: lireFrequence(brut) }).toEqual({ brut, f: 1 });
+    }
+  });
+
+  it('borne la fréquence : au-delà, l’enfant aurait oublié qu’un péage existe', () => {
+    expect(lireFrequence('3')).toBe(3);
+    expect(lireFrequence('99')).toBe(MAXIMUM_FREQUENCE);
+  });
+
+  it('rabote le compteur quand la fréquence BAISSE', () => {
+    // Passer de 5 à 2 dans l'administration ne doit pas laisser courir les trois parties
+    // libres déjà comptées : le réglage s'applique tout de suite.
+    ecrireRestantes(4);
+    expect(lireRestantes(2)).toBe(1);
+    expect(lireRestantes(1)).toBe(0);
+  });
+
+  it('compte les parties libres, jamais en dessous de zéro', () => {
+    ecrireRestantes(-3);
+    expect(lireRestantes(5)).toBe(0);
+  });
+
+  it('fait payer d’ABORD, puis laisse jouer', () => {
+    // Payer d'abord et jouer ensuite se comprend. L'inverse, laisser jouer deux fois puis
+    // barrer la troisième sans prévenir, ressemblerait à un caprice de l'application.
+    // C'est la règle que suit le composant : `restantes > 0` laisse passer, sinon on
+    // barre et on recharge le compteur à `frequence - 1`.
+    expect(PEAGE).toMatch(/ecrireRestantes\(frequence - 1\)/);
+    expect(PEAGE).toMatch(/restantes > 0/);
+  });
+
+  it('ne décide QU’UNE FOIS par ouverture', () => {
+    // Sans ce garde-fou, un simple re-rendu, ou un réglage changé dans un autre onglet,
+    // pourrait faire apparaître un péage au milieu d'une partie déjà commencée.
+    expect(PEAGE).toMatch(/decide\.current/);
   });
 });
 
@@ -76,7 +123,10 @@ describe('choix de conception à ne pas défaire', () => {
   it('laisse passer dès que quelque chose ne va pas', () => {
     // Réglage à zéro, serveur muet, aucun module capable de poser une question : un
     // péage en panne devant un morpion serait une panne absurde.
-    expect(PEAGE).toMatch(/isError \|\| total === 0 \|\| enPanne/);
+    // La décision de barrer se prend d'abord, et tombe à « non » sur la moindre panne ;
+    // le rendu laisse passer tout ce qui n'est pas explicitement barré.
+    expect(PEAGE).toMatch(/if \(isError \|\| total === 0\)/);
+    expect(PEAGE).toMatch(/if \(!barre \|\| enPanne \|\| posees >= total\) return/);
   });
 
   it('garde une sortie ouverte', () => {
