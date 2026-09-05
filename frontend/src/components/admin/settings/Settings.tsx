@@ -138,10 +138,10 @@ export default function Settings() {
             grammaire et accords : seulement ceux qui sont activés.
           </p>
           <p className="Settings__hint">
-            Une mauvaise réponse ne fait pas recommencer : la bonne s&rsquo;affiche, et on
-            passe à la suivante. Un jeu qu&rsquo;on ne peut pas lancer ferait chercher un
-            adulte, pas la bonne réponse. Rien n&rsquo;est enregistré dans les séances ni
-            dans la progression.
+            Il faut répondre JUSTE. Une erreur affiche la bonne réponse et repose une
+            autre question, sans faire avancer le compte. Rien n&rsquo;enferme pour
+            autant : elle peut renoncer au jeu et revenir en arrière. Rien n&rsquo;est
+            enregistré dans les séances ni dans la progression.
           </p>
           <div className="Settings__radios">
             <label className="Settings__radio">
