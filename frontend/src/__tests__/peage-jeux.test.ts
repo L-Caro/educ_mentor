@@ -75,8 +75,8 @@ describe('une partie sur X', () => {
     // barrer la troisième sans prévenir, ressemblerait à un caprice de l'application.
     // C'est la règle que suit le composant : `restantes > 0` laisse passer, sinon on
     // barre et on recharge le compteur à `frequence - 1`.
-    expect(PEAGE).toMatch(/ecrireRestantes\(frequence - 1\)/);
     expect(PEAGE).toMatch(/restantes > 0/);
+    expect(PEAGE).toMatch(/ecrireRestantes\(restantes - 1\)/);
   });
 
   it('ne décide QU’UNE FOIS par ouverture', () => {
@@ -104,15 +104,27 @@ describe('où le péage s’applique', () => {
 });
 
 describe('choix de conception à ne pas défaire', () => {
-  it('ne se referme JAMAIS sur une mauvaise réponse', () => {
-    // Interdire de jouer jusqu'à ce que ce soit correct transformerait un péage en
-    // punition, et une enfant coincée devant un jeu qu'elle ne peut pas lancer irait
-    // chercher un adulte, pas la bonne réponse. Ce qui s'apprend, c'est la correction
-    // qu'on lui montre.
+  it('n’avance que sur une réponse JUSTE', () => {
+    // La première version laissait passer après N questions posées, justes ou fausses.
+    // C'était naïf : une enfant comprend très vite qu'un bouton au hasard ouvre la même
+    // porte, et le péage devient un clic de plus avant de jouer. Il ne demande plus rien,
+    // donc il n'enseigne plus rien.
+    expect(PEAGE).toMatch(/const acquises = juste \? reussies \+ 1 : reussies;/);
+    expect(PEAGE).toMatch(/reussies >= total\) return/);
+  });
+
+  it('ne donne le crédit de parties libres qu’au péage FRANCHI', () => {
+    // Il s'écrivait à l'affichage du péage, pas à sa réussite : entrer, faire demi-tour,
+    // revenir, et la partie était gratuite. Une porte dérobée grande comme une maison.
     //
-    // Concrètement : `continuer` avance le compteur sans regarder si c'était juste.
-    expect(PEAGE).toMatch(/const faites = posees \+ 1;/);
-    expect(PEAGE).not.toMatch(/juste \?[^]{0,80}setPosees/);
+    // `ecrireRestantes(frequence - 1)` ne doit apparaître que dans `continuer`, jamais
+    // dans l'effet qui décide de barrer.
+    const decision = PEAGE.slice(
+      PEAGE.indexOf('decide.current = true'),
+      PEAGE.indexOf('// La première question'),
+    );
+    expect(decision).not.toMatch(/ecrireRestantes\(frequence - 1\)/);
+    expect(PEAGE).toMatch(/function continuer\(\)[^]*ecrireRestantes\(frequence - 1\)/);
   });
 
   it('montre TOUJOURS la bonne réponse, juste ou faux', () => {
@@ -126,7 +138,7 @@ describe('choix de conception à ne pas défaire', () => {
     // La décision de barrer se prend d'abord, et tombe à « non » sur la moindre panne ;
     // le rendu laisse passer tout ce qui n'est pas explicitement barré.
     expect(PEAGE).toMatch(/if \(isError \|\| total === 0\)/);
-    expect(PEAGE).toMatch(/if \(!barre \|\| enPanne \|\| posees >= total\) return/);
+    expect(PEAGE).toMatch(/if \(!barre \|\| enPanne \|\| reussies >= total\) return/);
   });
 
   it('garde une sortie ouverte', () => {

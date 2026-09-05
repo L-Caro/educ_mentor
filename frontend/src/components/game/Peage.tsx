@@ -18,14 +18,18 @@ import './peage.scss';
 /**
  * Le péage : quelques questions avant d'ouvrir un plateau.
  *
- * ── Il ne se referme JAMAIS ──────────────────────────────────────────────────────────
+ * ── Il faut RÉPONDRE JUSTE ───────────────────────────────────────────────────────────
  *
- * Une mauvaise réponse ne fait pas recommencer. On montre la bonne, et on passe à la
- * suivante ; après le nombre de questions réglé, elle joue : juste ou faux. C'est un
- * choix, et il mérite d'être dit : interdire de jouer jusqu'à ce que ce soit correct
- * transformerait un péage en punition, et une enfant coincée devant un jeu qu'elle ne
- * peut pas lancer irait chercher un adulte, pas la bonne réponse. Ce qui s'apprend ici,
- * c'est la correction qu'on lui montre : pas la porte fermée.
+ * Une mauvaise réponse ne compte pas : on montre la bonne, et on repose une AUTRE
+ * question. Il en faut `total` de justes pour passer.
+ *
+ * La première version laissait passer après `total` questions posées, justes ou fausses,
+ * au motif qu'une porte fermée serait une punition. C'était naïf : une enfant comprend
+ * très vite qu'un bouton au hasard ouvre la même porte, et le péage devient alors un
+ * clic de plus avant de jouer. Il ne demandait plus rien, donc il n'enseignait plus rien.
+ *
+ * Reste que rien ne l'enferme : « Revenir en arrière » est toujours là. Elle peut
+ * renoncer au jeu ; elle ne peut pas l'obtenir sans répondre.
  *
  * Tout ce qui peut mal tourner laisse passer : réglage à zéro, serveur muet, aucun module
  * capable de poser une question. Un péage en panne devant un morpion serait une panne
@@ -59,7 +63,8 @@ export default function Peage({
   const [barre, setBarre] = useState<boolean | null>(null);
   const decide = useRef(false);
 
-  const [posees, setPosees] = useState(0);
+  /** Les réponses JUSTES. Une erreur ne fait pas avancer ce compteur. */
+  const [reussies, setReussies] = useState(0);
   const [question, setQuestion] = useState<PeageQuestion | null>(null);
   const [donnee, setDonnee] = useState<string | null>(null);
   const [enPanne, setEnPanne] = useState(false);
@@ -97,17 +102,18 @@ export default function Peage({
       setBarre(false);
       return;
     }
-    // On paie maintenant, et les `frequence - 1` parties suivantes sont libres.
-    ecrireRestantes(frequence - 1);
+    // On barre, et on n'écrit RIEN : le crédit de parties libres ne se gagne qu'en
+    // franchissant le péage, jamais en le voyant. L'écrire ici ouvrait une porte dérobée
+    // grande comme une maison : entrer, faire demi-tour, revenir, et jouer gratuitement.
     setBarre(true);
   }, [isLoading, isError, total, frequence]);
 
   // La première question. Les suivantes sont demandées par « Continuer ».
   useEffect(() => {
-    if (barre && posees === 0 && question === null && !enPanne) {
+    if (barre && reussies === 0 && question === null && !enPanne) {
       void suivante();
     }
-  }, [barre, posees, question, enPanne, suivante]);
+  }, [barre, reussies, question, enPanne, suivante]);
 
   // Réglage éteint, serveur muet, partie non barrée, ou rien à demander : on joue.
   if (isLoading || barre === null) {
@@ -117,7 +123,7 @@ export default function Peage({
       </div>
     );
   }
-  if (!barre || enPanne || posees >= total) return <>{children}</>;
+  if (!barre || enPanne || reussies >= total) return <>{children}</>;
 
   if (chargement || !question) {
     return (
@@ -136,9 +142,16 @@ export default function Peage({
   }
 
   function continuer() {
-    const faites = posees + 1;
-    setPosees(faites);
-    if (faites < total) void suivante();
+    // Seule une réponse juste avance. Une erreur repose une autre question, indéfiniment.
+    const acquises = juste ? reussies + 1 : reussies;
+    setReussies(acquises);
+    if (acquises < total) {
+      void suivante();
+      return;
+    }
+    // Péage franchi : les `frequence - 1` parties suivantes sont libres. C'est ICI que le
+    // crédit s'écrit, et nulle part ailleurs.
+    ecrireRestantes(frequence - 1);
   }
 
   return (
@@ -146,7 +159,7 @@ export default function Peage({
       <div className="Peage__carte">
         <p className="Peage__entete">
           <span className="Peage__compte">
-            Question {posees + 1} / {total}
+            {reussies} / {total} trouvée{total > 1 ? 's' : ''}
           </span>
           <span className="Peage__module">{question.module_nom}</span>
         </p>
@@ -187,10 +200,10 @@ export default function Peage({
             >
               {juste
                 ? 'Bien joué !'
-                : `C'était « ${question.reponse} ».`}
+                : `C'était « ${question.reponse} ». Celle-ci ne compte pas.`}
             </p>
             <Button variant="primary" onClick={continuer}>
-              {posees + 1 < total ? 'Question suivante' : 'Jouer'}
+              {juste && reussies + 1 >= total ? 'Jouer' : 'Question suivante'}
             </Button>
           </>
         )}
