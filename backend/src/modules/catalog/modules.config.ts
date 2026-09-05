@@ -158,4 +158,22 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 18,
   },
+  {
+    id: 'morpion',
+    name: 'Morpion',
+    description:
+      'Aligner trois signes avant l’adversaire, ou à deux sur le même écran',
+    icon: '✕',
+    is_active: false,
+    display_order: 19,
+  },
+  {
+    id: 'puissance4',
+    name: 'Puissance 4',
+    description:
+      'Aligner quatre jetons — les pions tombent, la colonne décide',
+    icon: '🔴',
+    is_active: false,
+    display_order: 20,
+  },
 ];

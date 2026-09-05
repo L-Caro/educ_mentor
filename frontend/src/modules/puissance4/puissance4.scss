@@ -1,0 +1,85 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.Puissance4Game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-6;
+  padding: $space-6 0;
+
+  &__message {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: var(--color-base-content);
+    min-height: 1.6em;
+    text-align: center;
+  }
+
+  // Sept colonnes cliquables plutôt que quarante-deux cases : c'est la gravité qui décide
+  // où le jeton tombe, et une cible d'une colonne entière est bien plus facile à viser au
+  // doigt qu'une case.
+  &__plateau {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: $space-1;
+    padding: $space-2;
+    border-radius: $border-radius-2;
+    background: color-mix(in srgb, var(--color-primary) 18%, var(--color-base-200));
+    width: min(94vw, 26rem);
+  }
+
+  &__colonne {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+
+    &:disabled { cursor: default; }
+
+    &:hover:not(:disabled) .Puissance4Game__case {
+      // Survoler la colonne l'éclaire en entier : on voit où on joue avant de cliquer.
+      outline: 2px solid color-mix(in srgb, var(--color-primary) 45%, transparent);
+      outline-offset: -2px;
+    }
+  }
+
+  &__case {
+    display: block;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--color-base-100);
+
+    &--j1 { background: var(--color-primary); }
+    &--j2 { background: var(--color-warning); }
+
+    &--gagnante {
+      box-shadow: 0 0 0 3px var(--color-success);
+    }
+
+    // La chute : le jeton arrive par le haut. Sans elle, il apparaît d'un coup et le jeu
+    // perd ce qui fait tout le plaisir du Puissance 4.
+    &--tombe {
+      animation: puissance4-chute 0.28s ease-out;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+  }
+}
+
+@keyframes puissance4-chute {
+  from { transform: translateY(-320%); }
+  to   { transform: translateY(0); }
+}
+
+// Un enfant qui préfère moins de mouvement, ou un appareil réglé ainsi : le jeu reste
+// jouable, seul l'effet disparaît.
+@media (prefers-reduced-motion: reduce) {
+  .Puissance4Game__case--tombe { animation: none; }
+}
