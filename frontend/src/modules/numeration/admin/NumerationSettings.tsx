@@ -1,15 +1,7 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi';
 import Spinner from 'src/components/common/Spinner';
 import type { PositionKey } from '../numeration.type';
-
-const POSITIONS: { key: PositionKey; label: string }[] = [
-  { key: 'u',  label: 'Unités (1–9)' },
-  { key: 'd',  label: 'Dizaines (10–99)' },
-  { key: 'c',  label: 'Centaines (100–999)' },
-  { key: 'm',  label: 'Milliers (1 000–9 999)' },
-  { key: 'dm', label: 'Diz. de milliers (10 000–99 999)' },
-  { key: 'cm', label: 'Cent. de milliers (100 000–999 999)' },
-];
+import { useGetNumerationPositionsQuery } from '../numeration.api';
 
 const ALL_STEPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 50, 100, 200, 500, 1000];
 
@@ -25,9 +17,11 @@ function parseSteps(raw: string | undefined): number[] {
 
 export default function NumerationSettings() {
   const { data: settings = {}, isLoading } = useGetSettingsQuery();
+  const { data: POSITIONS = [], isLoading: loadingPositions } =
+    useGetNumerationPositionsQuery();
   const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
-  if (isLoading) return <Spinner size="sm" />;
+  if (isLoading || loadingPositions) return <Spinner size="sm" />;
 
   const activePositions = parsePositions(settings.numeration_active_positions);
   const activeSteps     = parseSteps(settings.numeration_active_steps);
@@ -62,17 +56,23 @@ export default function NumerationSettings() {
         <div className="AdminCard GameSettings__card">
           <p className="GameSettings__cardTitle">Positions actives</p>
           <p className="GameSettings__hint" style={{ marginBottom: '1rem' }}>
-            Détermine la plage de nombres pour tous les types de questions.
+            Détermine la plage de nombres pour tous les types de questions. Les
+            positions vont des millièmes aux centaines de millions ; la classe
+            indiquée dit quand les ouvrir. Ouvrir une décimale fait apparaître la
+            virgule partout — comparaisons, décompositions et valeur positionnelle.
           </p>
           <div className="GameSettings__denominations">
-            {POSITIONS.map(({ key, label }) => (
+            {POSITIONS.map(({ key, label, niveau }) => (
               <button
                 key={key}
                 type="button"
-                className={`GameSettings__denomination${activePositions.includes(key) ? ' GameSettings__denomination--active' : ''}`}
-                onClick={() => togglePosition(key)}
+                className={`GameSettings__denomination${activePositions.includes(key as PositionKey) ? ' GameSettings__denomination--active' : ''}`}
+                onClick={() => togglePosition(key as PositionKey)}
               >
                 {label}
+                <span className="NumerationSettings__niveau">
+                  {niveau.toUpperCase()}
+                </span>
               </button>
             ))}
           </div>
@@ -81,7 +81,8 @@ export default function NumerationSettings() {
         <div className="AdminCard GameSettings__card">
           <p className="GameSettings__cardTitle">Pas des suites numériques</p>
           <p className="GameSettings__hint" style={{ marginBottom: '1rem' }}>
-            Le moteur pioche un pas aléatoire parmi ceux activés.
+            Le moteur pioche un pas aléatoire parmi ceux activés. Le pas s&rsquo;entend
+            en unités affichées : « de 2 en 2 » compte 2, pas deux centièmes.
           </p>
           <div className="GameSettings__denominations">
             {ALL_STEPS.map((step) => (

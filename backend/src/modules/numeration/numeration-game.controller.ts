@@ -20,6 +20,15 @@ export class NumerationGameController {
     return this.service.resetProgression();
   }
 
+  /** Le catalogue des positions, des millièmes aux centaines de millions, avec la classe
+   * de chacune. Servi ici et non en admin protégé : le pré-jeu n'en a pas besoin, mais
+   * l'écran de réglages du module le lit sans jeton d'administration, comme les autres
+   * catalogues du projet. */
+  @Get('positions')
+  getPositions() {
+    return this.service.getPositions();
+  }
+
   @Post('session')
   startSession(@Body() dto: StartNumerationSessionDto) {
     return this.service.createSession(dto);

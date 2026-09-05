@@ -9,6 +9,7 @@ import { AppModule } from './../src/app.module';
 import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.service';
 import { AccordsService } from './../src/modules/accords/accords.service';
 import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
+import { NumerationService } from './../src/modules/numeration/numeration.service';
 import { NOMS } from './../src/modules/accords/accords.corpus';
 import { familleDuNom } from './../src/modules/accords/accords.familles';
 
@@ -525,5 +526,50 @@ describe("Démarrage de l'application (e2e)", () => {
     }
 
     await service.setActiveClassKeys(['cp', 'ce1']);
+  });
+
+  // ─── Numération : millions et décimaux ──────────────────────────────────────
+
+  it('sert le catalogue des positions, des millièmes aux centaines de millions', async () => {
+    const positions = (
+      await request(server()).get('/api/numeration/positions').expect(200)
+    ).body as { key: string; exposant: number; niveau: string }[];
+    expect(positions.map((p) => p.key)).toContain('millieme');
+    expect(positions.map((p) => p.key)).toContain('cmi');
+    expect(Math.min(...positions.map((p) => p.exposant))).toBe(-3);
+    expect(Math.max(...positions.map((p) => p.exposant))).toBe(8);
+  });
+
+  it('reste entier tant qu’aucune décimale n’est ouverte', async () => {
+    const session = (
+      await request(server())
+        .post('/api/numeration/session')
+        .send({ question_types: ['comparaison'] })
+        .expect(201)
+    ).body as { questions: { display: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.display).not.toContain(',');
+    }
+  });
+
+  it('fait apparaître la virgule une fois les centièmes ouverts', async () => {
+    const service = app.get(NumerationService);
+    await service.setActivePositions(['centieme', 'dixieme', 'u', 'd']);
+
+    const session = (
+      await request(server())
+        .post('/api/numeration/session')
+        .send({ question_types: ['comparaison'] })
+        .expect(201)
+    ).body as { questions: { display: string; answer: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      // Deux décimales exactement, virgule française, jamais de point.
+      expect(question.display).toMatch(/^\d+,\d{2} {2}□ {2}\d+,\d{2}$/);
+      expect(['<', '>', '=']).toContain(question.answer);
+    }
+
+    await service.setActivePositions(['u', 'd']);
   });
 });
