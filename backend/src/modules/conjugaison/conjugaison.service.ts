@@ -119,9 +119,21 @@ export class ConjugaisonService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(
-    dto: StartConjugaisonSessionDto,
-  ): Promise<ConjugaisonSessionResult> {
+  /** Construire les questions, et RIEN d'autre : aucune écriture en base.
+   *
+   * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
+   * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
+   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * savoir ce qui a été travaillé.
+   *
+   * La description de la séance sort d'ici elle aussi : elle se compose des mêmes
+   * variables que les questions, et la recalculer dans `startSession` aurait été un
+   * deuxième endroit à tenir d'accord avec le premier.
+   */
+  async construireQuestions(dto: StartConjugaisonSessionDto): Promise<{
+    resultat: Omit<ConjugaisonSessionResult, 'session_id'>;
+    seance: Partial<ConjugaisonSession>;
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
@@ -168,22 +180,31 @@ export class ConjugaisonService {
       choicesCount,
     );
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      tenses: tenses.join(','),
-      verb_groups: groups.join(','),
-      direction,
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
+      seance: {
+        difficulty,
+        tenses: tenses.join(','),
+        verb_groups: groups.join(','),
+        direction,
+        timer_seconds: timerSeconds,
+      },
+    };
+  }
+
+  async startSession(
+    dto: StartConjugaisonSessionDto,
+  ): Promise<ConjugaisonSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(

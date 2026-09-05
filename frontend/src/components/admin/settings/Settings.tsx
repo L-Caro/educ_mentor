@@ -31,6 +31,8 @@ export default function Settings() {
 
   // Dérivés du cache settings — pas de miroir d'état local (cf. « you might not need an effect »)
   const questionCount = parseInt(settings?.questions_per_session ?? '10', 10);
+  /** Le péage des jeux : combien de questions avant d'ouvrir un plateau. `0` l'éteint. */
+  const peage = parseInt(settings?.jeux_peage_questions ?? '0', 10) || 0;
   const savedTimer = parseInt(settings?.question_timer_seconds ?? '0', 10);
   const timerEnabled = savedTimer > 0;
   const timerSeconds = timerEnabled ? savedTimer : 30;
@@ -123,6 +125,47 @@ export default function Settings() {
               />
               Illimité
             </label>
+          </div>
+        </div>
+
+        <div className="Settings__section">
+          <p className="Settings__cardTitle">🎟 Péage des jeux</p>
+          <p className="Settings__hint">
+            Avant d&rsquo;ouvrir un jeu (morpion, Puissance 4, Snake), répondre à
+            quelques questions tirées des modules de calcul, tables, conjugaison,
+            grammaire et accords — seulement ceux qui sont activés.
+          </p>
+          <p className="Settings__hint">
+            Une mauvaise réponse ne fait pas recommencer : la bonne s&rsquo;affiche, et on
+            passe à la suivante. Un jeu qu&rsquo;on ne peut pas lancer ferait chercher un
+            adulte, pas la bonne réponse. Rien n&rsquo;est enregistré dans les séances ni
+            dans la progression.
+          </p>
+          <div className="Settings__radios">
+            <label className="Settings__radio">
+              <input
+                type="radio"
+                name="peage-questions"
+                checked={peage === 0}
+                onChange={() =>
+                  updateSetting({ key: 'jeux_peage_questions', value: '0' })
+                }
+              />
+              Aucun
+            </label>
+            {[1, 2, 3, 5].map((n) => (
+              <label key={n} className="Settings__radio">
+                <input
+                  type="radio"
+                  name="peage-questions"
+                  checked={peage === n}
+                  onChange={() =>
+                    updateSetting({ key: 'jeux_peage_questions', value: String(n) })
+                  }
+                />
+                {n} question{n > 1 ? 's' : ''}
+              </label>
+            ))}
           </div>
         </div>
 

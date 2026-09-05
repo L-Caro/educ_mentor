@@ -14,5 +14,8 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   controllers: [CalculGameController, CalculAdminController],
   providers: [CalculService],
+  // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
+  // enregistrer — voir `PeageService`.
+  exports: [CalculService],
 })
 export class CalculModule {}

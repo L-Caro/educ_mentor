@@ -13,6 +13,8 @@ import { NumerationService } from './../src/modules/numeration/numeration.servic
 import { CalculService } from './../src/modules/calcul/calcul.service';
 import { PoseService } from './../src/modules/pose/pose.service';
 import { CompteService } from './../src/modules/compte/compte.service';
+import { CatalogService } from './../src/modules/catalog/catalog.service';
+import { MODULES_DE_PEAGE } from './../src/modules/peage/peage.types';
 import { rejouer, type Etape } from './../src/modules/compte/compte.generator';
 import { NOMS } from './../src/modules/accords/accords.corpus';
 import { familleDuNom } from './../src/modules/accords/accords.familles';
@@ -809,5 +811,66 @@ describe("Démarrage de l'application (e2e)", () => {
     }
 
     await service.setActiveOperations(['+', '-']);
+  });
+
+  // ─── Le péage des jeux ──────────────────────────────────────────────────────
+
+  it('ne pose aucune question tant qu’aucun module n’est activé', async () => {
+    // Les modules arrivent dormants. Le péage ne doit pas les réveiller par la bande :
+    // poser une question de conjugaison alors que le module est éteint contournerait le
+    // seul réglage qui décide de ce que l'enfant voit.
+    const etat = (await request(server()).get('/api/peage').expect(200))
+      .body as { questions: number; modules: string[] };
+    expect(etat.questions).toBe(0);
+    expect(etat.modules).toEqual([]);
+
+    const { question } = (
+      await request(server()).get('/api/peage/question').expect(200)
+    ).body as { question: unknown };
+    expect(question).toBeNull();
+  });
+
+  it('pose une question COMPLÈTE une fois les modules activés', async () => {
+    // Le test qui compte : il traverse les vrais adaptateurs des cinq modules, pas des
+    // doublures. Une question mal formée — sans bonne réponse dans ses propositions, ou
+    // sans propositions du tout — bloquerait l'enfant à la porte d'un jeu.
+    const catalog = app.get(CatalogService);
+    for (const { id } of MODULES_DE_PEAGE) {
+      await catalog.update(id, { is_active: true });
+    }
+
+    const vus = new Set<string>();
+    for (let essai = 0; essai < 40; essai++) {
+      const { question } = (
+        await request(server()).get('/api/peage/question').expect(200)
+      ).body as {
+        question: {
+          module_id: string;
+          module_nom: string;
+          consigne: string;
+          enonce: string;
+          choix: string[];
+          reponse: string;
+        } | null;
+      };
+      expect(question).not.toBeNull();
+      vus.add(question!.module_id);
+
+      expect(question!.consigne.length).toBeGreaterThan(0);
+      expect(question!.enonce.length).toBeGreaterThan(0);
+      // Un péage se franchit d'une touche : il faut de quoi toucher, et la bonne réponse
+      // doit être parmi les propositions.
+      expect(question!.choix.length).toBeGreaterThanOrEqual(2);
+      expect(question!.choix).toContain(question!.reponse);
+      expect(new Set(question!.choix).size).toBe(question!.choix.length);
+    }
+
+    // Sur quarante tirages, le hasard doit avoir visité plusieurs modules — sinon c'est
+    // qu'un seul répond, et les quatre autres sont muets sans qu'on le sache.
+    expect(vus.size).toBeGreaterThan(1);
+
+    for (const { id } of MODULES_DE_PEAGE) {
+      await catalog.update(id, { is_active: false });
+    }
   });
 });

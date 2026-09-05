@@ -15,6 +15,9 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule,
   ],
   providers: [TablesService],
+  // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
+  // enregistrer — voir `PeageService`.
+  exports: [TablesService],
   controllers: [TablesGameController, TablesAdminController],
 })
 export class TablesModule {}
