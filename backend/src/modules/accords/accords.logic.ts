@@ -12,6 +12,13 @@
 
 import type { Difficulty } from '../../common/difficulty';
 import {
+  DEFAULT_ACTIVE_FAMILLES,
+  familleDuNom,
+  famillesDeLAdjectif,
+  type FamilleKey,
+} from './accords.familles';
+import {
+  ADJECTIFS,
   NOMS,
   VERBES,
   adjectifsCompatibles,
@@ -85,11 +92,27 @@ function nbAdjectifs(difficulty: Difficulty): number {
   }
 }
 
-/** En `easy`, uniquement les pluriels en -s : la règle générale, sans exception. */
-function poolNoms(difficulty: Difficulty): NomMeta[] {
+/** Les noms jouables : ceux dont la famille de pluriel est ouverte, puis, en `easy`,
+ * uniquement les pluriels en -s — la règle générale, sans exception.
+ *
+ * La porte des familles vient AVANT la difficulté : un pluriel en -aux non ouvert ne doit
+ * apparaître à aucune difficulté, pas même en « difficile ». */
+function poolNoms(difficulty: Difficulty, familles: FamilleKey[]): NomMeta[] {
+  const ouverts = NOMS.filter((nomMeta) =>
+    familles.includes(familleDuNom(nomMeta)),
+  );
   return difficulty === 'easy'
-    ? NOMS.filter((nomMeta) => !plurielIrregulier(nomMeta))
-    : NOMS;
+    ? ouverts.filter((nomMeta) => !plurielIrregulier(nomMeta))
+    : ouverts;
+}
+
+/** Les adjectifs jouables : ceux dont TOUTES les familles sont ouvertes. « gros » demande
+ * la consonne doublée (CE2) et le pluriel invariable (CM1) ; le servir avec une seule des
+ * deux ouvertes enseignerait l'autre au passage. */
+function adjectifsOuverts(familles: FamilleKey[]): AdjectifMeta[] {
+  return ADJECTIFS.filter((adj) =>
+    famillesDeLAdjectif(adj).every((f) => familles.includes(f)),
+  );
 }
 
 /** Les verbes dont l'accord est audible sont les plus FACILES — « est / sont » s'entend,
@@ -139,10 +162,13 @@ function majuscule(texte: string): string {
 function choisirAdjectifs(
   nomMeta: NomMeta,
   combien: number,
+  adjectifsAutorises: AdjectifMeta[],
   rand: Rand,
 ): AdjectifMeta[] {
   if (combien <= 0) return [];
-  const compatibles = adjectifsCompatibles(nomMeta);
+  const compatibles = adjectifsCompatibles(nomMeta).filter((adj) =>
+    adjectifsAutorises.includes(adj),
+  );
   if (compatibles.length === 0) return [];
 
   if (combien === 1) {
@@ -274,11 +300,17 @@ function distracteursAdjectif(
 function genererAccordAdjectif(
   noms: NomMeta[],
   nbChoixVoulu: number,
+  adjectifsAutorises: AdjectifMeta[],
   rand: Rand,
 ): AccordsQuestion | null {
   const nomMeta = pick(noms, rand);
   if (!nomMeta) return null;
-  const adj = pick(adjectifsCompatibles(nomMeta), rand);
+  const adj = pick(
+    adjectifsCompatibles(nomMeta).filter((candidat) =>
+      adjectifsAutorises.includes(candidat),
+    ),
+    rand,
+  );
   if (!adj) return null;
 
   const nombre: Nombre = rand(0, 1) === 0 ? 'singulier' : 'pluriel';
@@ -325,12 +357,18 @@ function genererAccordAdjectif(
 function genererAccordGn(
   noms: NomMeta[],
   combienAdjectifs: number,
+  adjectifsAutorises: AdjectifMeta[],
   rand: Rand,
 ): AccordsQuestion | null {
   const nomMeta = pick(noms, rand);
   if (!nomMeta) return null;
 
-  const adjectifs = choisirAdjectifs(nomMeta, combienAdjectifs, rand);
+  const adjectifs = choisirAdjectifs(
+    nomMeta,
+    combienAdjectifs,
+    adjectifsAutorises,
+    rand,
+  );
   const versLePluriel = rand(0, 1) === 0;
   const source: Nombre = versLePluriel ? 'singulier' : 'pluriel';
   const cible: Nombre = versLePluriel ? 'pluriel' : 'singulier';
@@ -437,10 +475,12 @@ export function generateQuestion(
   difficulty: Difficulty,
   notionsActives: NotionKey[],
   rand: Rand,
+  famillesActives: FamilleKey[] = DEFAULT_ACTIVE_FAMILLES,
 ): AccordsQuestion | null {
   if (!notionsActives.includes(type)) return null;
 
-  const noms = poolNoms(difficulty);
+  const noms = poolNoms(difficulty, famillesActives);
+  const adjectifs = adjectifsOuverts(famillesActives);
 
   switch (type) {
     case 'genre_nom':
@@ -448,9 +488,9 @@ export function generateQuestion(
     case 'nombre_nom':
       return genererNombreNom(noms, rand);
     case 'accord_adjectif':
-      return genererAccordAdjectif(noms, nbChoix(difficulty), rand);
+      return genererAccordAdjectif(noms, nbChoix(difficulty), adjectifs, rand);
     case 'accord_gn':
-      return genererAccordGn(noms, nbAdjectifs(difficulty), rand);
+      return genererAccordGn(noms, nbAdjectifs(difficulty), adjectifs, rand);
     case 'accord_sujet_verbe':
       return genererAccordSujetVerbe(
         noms,
@@ -467,6 +507,7 @@ export function generateQuestions(
   difficulty: Difficulty,
   notionsActives: NotionKey[],
   rand: Rand,
+  famillesActives: FamilleKey[] = DEFAULT_ACTIVE_FAMILLES,
 ): AccordsQuestion[] {
   const questions: AccordsQuestion[] = [];
   const used = new Set<string>();
@@ -480,7 +521,13 @@ export function generateQuestions(
     attempts++;
     const type = pick(types, rand);
     if (!type) break;
-    const question = generateQuestion(type, difficulty, notionsActives, rand);
+    const question = generateQuestion(
+      type,
+      difficulty,
+      notionsActives,
+      rand,
+      famillesActives,
+    );
     if (!question || used.has(question.item_key)) continue;
     used.add(question.item_key);
     questions.push(question);

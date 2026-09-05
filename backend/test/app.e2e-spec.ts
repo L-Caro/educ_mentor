@@ -7,6 +7,7 @@ import * as request from 'supertest';
 import type { Server } from 'node:http';
 import { AppModule } from './../src/app.module';
 import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.service';
+import { AccordsService } from './../src/modules/accords/accords.service';
 
 interface CatalogModule {
   id: string;
@@ -364,6 +365,13 @@ describe("Démarrage de l'application (e2e)", () => {
       // Le QCM oppose toujours deux formes du même verbe : c'est toute la notion.
       expect(question.choices.length).toBeGreaterThanOrEqual(2);
     }
+
+    // Remettre le socle : ce réglage est global, le laisser modifié ferait échouer les
+    // tests suivants pour une raison qui n'a rien à voir avec ce qu'ils vérifient.
+    await request(server())
+      .patch('/api/accords/notions-actives')
+      .send({ keys: ['genre_nom', 'nombre_nom', 'accord_adjectif'] })
+      .expect(200);
   });
 
   // ─── Conjugaison : les temps des grandes classes ────────────────────────────
@@ -412,5 +420,48 @@ describe("Démarrage de l'application (e2e)", () => {
       expect(question.conjugated).toContain(' ');
       expect(question.conjugated).not.toMatch(/^(je|j\')/);
     }
+  });
+
+  // ─── Accords : les familles des grandes classes ─────────────────────────────
+
+  it('ne sert pas un pluriel en -aux tant que la famille est fermée', async () => {
+    await app
+      .get(AccordsService)
+      .setActiveNotionKeys(['genre_nom', 'nombre_nom', 'accord_adjectif']);
+
+    const session = (
+      await request(server())
+        .post('/api/accords/session')
+        .send({ question_types: ['nombre_nom'], difficulty: 'hard' })
+        .expect(201)
+    ).body as { questions: { answer: string }[] };
+    for (const question of session.questions) {
+      expect(question.answer).not.toMatch(/aux$/);
+    }
+  });
+
+  it('sert le pluriel en -aux une fois la famille ouverte', async () => {
+    const service = app.get(AccordsService);
+    await service.setActiveNotionKeys([
+      'genre_nom',
+      'nombre_nom',
+      'accord_adjectif',
+    ]);
+    const socle = await service.getActiveFamilleKeys();
+    await service.setActiveFamilleKeys([...socle, 'pluriel_aux']);
+
+    const vus = new Set<string>();
+    for (let essai = 0; essai < 6; essai++) {
+      const session = (
+        await request(server())
+          .post('/api/accords/session')
+          .send({ question_types: ['nombre_nom'], difficulty: 'hard' })
+          .expect(201)
+      ).body as { questions: { answer: string }[] };
+      for (const question of session.questions) vus.add(question.answer);
+    }
+    expect([...vus].some((forme) => /aux$/.test(forme))).toBe(true);
+
+    await service.setActiveFamilleKeys(socle);
   });
 });

@@ -6,23 +6,20 @@
  * est plus grand encore, parce que la réponse attendue EST une orthographe : « des chevals »
  * saisi dans un textarea deviendrait la bonne réponse.
  *
- * ── Une règle de sélection, non négociable ────────────────────────────────────────────
+ * ── Le corpus va jusqu'au CM2, la porte décide ────────────────────────────────────────
  *
- * Le module n'interroge QUE la morphologie que les fiches de `cours/francais/accords.tsx`
- * expliquent. Ce qu'elles ne disent pas est absent du corpus, même quand c'est courant :
+ * Il contient toutes les familles morphologiques du CE1 au CM2 : les pluriels en -aux et
+ * en -oux, les féminins irréguliers, les adjectifs invariables au masculin pluriel. Rien
+ * n'est écarté sous prétexte que la fiche du CE1 s'arrête avant.
  *
- *   — pas de pluriel en -al → -aux (cheval, journal) : la fiche du nombre énumère +s,
- *     -eau/-au/-eu → x, et -s/-x/-z invariables. Elle s'arrête là.
- *   — pas de pluriel en -ou → -oux (genou, chou) : même raison.
- *   — pas d'adjectif à féminin irrégulier (beau/belle, blanc/blanche, long/longue,
- *     gentil/gentille) : la fiche annonce « en général on ajoute un e », et ces formes ne
- *     s'en déduisent pas.
- *   — pas d'adjectif en -s ou -x (gris, doux, vieux, gros) : leur masculin pluriel est
- *     invariable, exception que la fiche de l'adjectif ne mentionne pas.
+ * Ce qui est JOUABLE est décidé ailleurs : `accords.familles.ts` déclare chaque famille
+ * avec la classe où elle s'apprend, et l'administration ouvre celles qui ont été vues —
+ * comme les figures de la géométrie. Une famille fermée n'apparaît jamais dans une
+ * question, ni comme distracteur.
  *
- * Le module teste donc un SOUS-ENSEMBLE de ce que la fiche explique, jamais un
- * sur-ensemble. Un enfant qui rate une question doit pouvoir trouver la réponse dans la
- * fiche ; l'inverse est une question piégée.
+ * La famille d'un mot est DÉRIVÉE de ses formes, jamais annotée ici : « cheval / chevaux »
+ * est un pluriel en -aux parce qu'il se termine par -aux. Une annotation de plus serait
+ * une occasion de plus de se tromper.
  */
 
 export type Genre = 'masculin' | 'feminin';
@@ -190,6 +187,18 @@ export const NOMS: NomMeta[] = [
   nom('feu', 'feu', 'feux', 'masculin', 'nature'),
   nom('cheveu', 'cheveu', 'cheveux', 'masculin', 'corps'),
 
+  // pluriel en -aux : noms en -al (CE2)
+  nom('cheval', 'cheval', 'chevaux', 'masculin', 'animal'),
+  nom('animal', 'animal', 'animaux', 'masculin', 'animal'),
+  nom('journal', 'journal', 'journaux', 'masculin', 'objet'),
+  nom('hopital', 'hôpital', 'hôpitaux', 'masculin', 'lieu', { elision: true }),
+
+  // pluriel en -oux : les sept noms en -ou qui font exception (CM1)
+  nom('genou', 'genou', 'genoux', 'masculin', 'corps'),
+  nom('chou', 'chou', 'choux', 'masculin', 'aliment'),
+  nom('hibou', 'hibou', 'hiboux', 'masculin', 'animal', { elision: false }),
+  nom('bijou', 'bijou', 'bijoux', 'masculin', 'objet'),
+
   // invariables : noms en -s, -x, -z
   nom('souris', 'souris', 'souris', 'feminin', 'animal'),
   nom('bras', 'bras', 'bras', 'masculin', 'corps'),
@@ -347,6 +356,75 @@ export const ADJECTIFS: AdjectifMeta[] = [
     ['rapide', 'rapide', 'rapides', 'rapides'],
     'apres',
     'vitesse',
+    ANIME,
+  ),
+
+  // ── Consonne doublée au féminin (CE2) ─────────────────────────────────────
+  adjectif('gros', ['gros', 'grosse', 'gros', 'grosses'], 'avant', 'taille', [
+    ...CHOSES,
+    'personne',
+    'animal',
+  ]),
+  adjectif('bon', ['bon', 'bonne', 'bons', 'bonnes'], 'avant', 'gout', [
+    'aliment',
+  ]),
+  adjectif(
+    'gentil',
+    ['gentil', 'gentille', 'gentils', 'gentilles'],
+    'apres',
+    'caractere',
+    ANIME,
+  ),
+
+  // ── Féminin irrégulier (CM1) ──────────────────────────────────────────────
+  adjectif('beau', ['beau', 'belle', 'beaux', 'belles'], 'avant', 'aspect', [
+    ...CHOSES,
+    'personne',
+    'animal',
+  ]),
+  adjectif(
+    'nouveau',
+    ['nouveau', 'nouvelle', 'nouveaux', 'nouvelles'],
+    'avant',
+    'age',
+    CHOSES,
+  ),
+  adjectif('vieux', ['vieux', 'vieille', 'vieux', 'vieilles'], 'avant', 'age', [
+    ...ANIME,
+    'objet',
+    'lieu',
+  ]),
+  adjectif(
+    'blanc',
+    ['blanc', 'blanche', 'blancs', 'blanches'],
+    'apres',
+    'couleur',
+    CHOSES,
+  ),
+  adjectif('long', ['long', 'longue', 'longs', 'longues'], 'apres', 'taille', [
+    'objet',
+    'nature',
+    'abstrait',
+  ]),
+  adjectif('doux', ['doux', 'douce', 'doux', 'douces'], 'apres', 'etat', [
+    ...ANIME,
+    'objet',
+    'aliment',
+  ]),
+
+  // ── Masculin pluriel invariable : adjectifs en -s, -x (CM1) ───────────────
+  adjectif(
+    'gris',
+    ['gris', 'grise', 'gris', 'grises'],
+    'apres',
+    'couleur',
+    CHOSES,
+  ),
+  adjectif(
+    'heureux',
+    ['heureux', 'heureuse', 'heureux', 'heureuses'],
+    'apres',
+    'caractere',
     ANIME,
   ),
 ];
