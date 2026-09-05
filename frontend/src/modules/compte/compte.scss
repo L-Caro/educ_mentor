@@ -1,0 +1,174 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Le plateau du compte est bon ─────────────────────────────────────────────
+// Des plaques qu'on touche, pas un champ qu'on remplit : le geste du jeu est de prendre
+// deux nombres et d'en faire un troisième. Les plaques sont donc larges et espacées —
+// visées au doigt sur une tablette, et souvent deux fois de suite.
+
+.ComptePlateau {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: v.$space-5;
+	width: 100%;
+	font-variant-numeric: tabular-nums;
+}
+
+.ComptePlateau__cible {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: v.$space-1;
+	margin: 0;
+}
+
+.ComptePlateau__cibleLabel {
+	font-size: v.$font-size-sm;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	opacity: 0.7;
+}
+
+.ComptePlateau__cibleValeur {
+	font-size: v.$font-size-3xl;
+	font-weight: 800;
+	line-height: 1;
+	color: var(--color-primary);
+}
+
+.ComptePlateau__plaques {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: v.$space-4;
+	max-width: 100%;
+}
+
+.ComptePlateau__plaque {
+	min-width: 5.5rem;
+	padding: v.$space-4 v.$space-5;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$radius-md;
+	background: var(--color-base-100);
+	color: var(--color-base-content);
+	font-family: v.$font-family;
+	font-size: v.$font-size-xl;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: var(--shadow-sm);
+	transition: transform 0.12s ease, border-color 0.12s ease;
+
+	&:disabled {
+		cursor: default;
+		opacity: 0.6;
+		box-shadow: none;
+	}
+
+	&:not(:disabled):hover {
+		transform: translateY(-2px);
+	}
+}
+
+// La plaque choisie doit se voir sans la couleur seule : un liseré épais et un léger
+// soulèvement, pour que le choix reste lisible en cas de daltonisme.
+.ComptePlateau__plaque--choisie {
+	border-color: var(--color-primary);
+	border-width: 3px;
+	transform: translateY(-3px);
+}
+
+// Une plaque FABRIQUÉE par l'enfant, distinguée de celles qui ont été distribuées : après
+// trois étapes, savoir d'où vient un nombre est ce qui rend le plateau relisible.
+.ComptePlateau__plaque--obtenue {
+	background: var(--color-base-300);
+	border-style: dashed;
+}
+
+.ComptePlateau__operations {
+	display: flex;
+	justify-content: center;
+	gap: v.$space-4;
+}
+
+.ComptePlateau__operation {
+	width: 4.4rem;
+	height: 4.4rem;
+	border: 2px solid var(--color-base-300);
+	border-radius: v.$radius-pill;
+	background: var(--color-base-200);
+	color: var(--color-base-content);
+	font-family: v.$font-family;
+	font-size: v.$font-size-xl;
+	font-weight: 700;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+		opacity: 0.45;
+	}
+}
+
+.ComptePlateau__operation--choisie {
+	background: var(--color-primary);
+	border-color: var(--color-primary);
+	color: var(--color-primary-content);
+}
+
+// La consigne dit à chaque instant ce qu'on attend d'elle, et pourquoi un coup a été
+// refusé. `role="status"` : le texte change sans que rien ne bouge à l'écran, une
+// synthèse vocale doit donc l'annoncer.
+.ComptePlateau__consigne {
+	margin: 0;
+	min-height: 2.4rem;
+	text-align: center;
+	font-size: v.$font-size-base;
+	color: var(--color-base-content);
+	opacity: 0.85;
+}
+
+.ComptePlateau__etapes {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: v.$space-2;
+	align-items: center;
+}
+
+.ComptePlateau__etape {
+	font-size: v.$font-size-md;
+	font-weight: 600;
+}
+
+.ComptePlateau__reprises {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: v.$space-4;
+}
+
+// Reprendre doit être facile : chercher un compte, c'est se tromper de chemin. Mais ces
+// boutons ne doivent pas rivaliser avec « Valider » — d'où le fond transparent.
+.ComptePlateau__reprise {
+	padding: v.$space-3 v.$space-5;
+	border: 1px solid var(--color-base-300);
+	border-radius: v.$radius-pill;
+	background: transparent;
+	color: var(--color-base-content);
+	font-family: v.$font-family;
+	font-size: v.$font-size-sm;
+	cursor: pointer;
+
+	&:disabled {
+		cursor: default;
+		opacity: 0.45;
+	}
+}
+
+// ─── Fiche ────────────────────────────────────────────────────────────────────
+
+.CompteFiche__ligne {
+	margin: 0 0 v.$space-3;
+	font-size: v.$font-size-base;
+}

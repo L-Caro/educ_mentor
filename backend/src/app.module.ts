@@ -24,6 +24,7 @@ import { NumerationModule } from './modules/numeration/numeration.module';
 import { MemoryModule } from './modules/memory/memory.module';
 import { PenduModule } from './modules/pendu/pendu.module';
 import { PoseModule } from './modules/pose/pose.module';
+import { CompteModule } from './modules/compte/compte.module';
 import { DicteeModule } from './modules/dictee/dictee.module';
 import { AccordsModule } from './modules/accords/accords.module';
 import { GrammaireModule } from './modules/grammaire/grammaire.module';
@@ -72,6 +73,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     MemoryModule,
     PenduModule,
     PoseModule,
+    CompteModule,
     DicteeModule,
     GeometrieModule,
     GrammaireModule,
