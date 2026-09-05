@@ -231,3 +231,15 @@
 .PoseFigure__row--result {
 	box-shadow: inset 0 2px 0 var(--fiche-ink);
 }
+
+// ── Multiplication posée ──────────────────────────────────────────────────────
+//
+// Une rangée par produit partiel. Le décalage se VOIT : les colonnes que le produit
+// n'occupe pas restent vides, sans case. C'est ce décalage qu'on apprend, l'escamoter
+// reviendrait à retirer la difficulté de l'exercice.
+.PoseGrid__row--partiel {
+  .PoseGrid__cell--partiel {
+    // Un cran plus discret que le résultat : ce sont des étapes, pas la réponse.
+    opacity: 0.92;
+  }
+}

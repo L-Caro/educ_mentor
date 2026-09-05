@@ -31,6 +31,7 @@ function figure(over: Partial<PoseQuestion> & Pick<PoseQuestion, 'operands' | 'a
     has_carry: true,
     carry_display: 'filled',
     method: 'compensation',
+    partiels: [],
     retenues: { haut: [], bas: [] },
     ...over,
   };

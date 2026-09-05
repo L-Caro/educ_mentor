@@ -2,7 +2,7 @@ import type { PoseQuestion } from './pose.type';
 import { colonnesBarrees } from './poseValue';
 import './pose.scss';
 
-const SIGNE = { addition: '+', soustraction: '−' } as const;
+const SIGNE = { addition: '+', soustraction: '−', multiplication: '×' } as const;
 
 /**
  * L'opération posée, en lecture seule, telle qu'elle s'écrit : colonnes alignées, retenues

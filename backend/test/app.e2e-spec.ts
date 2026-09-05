@@ -11,6 +11,7 @@ import { AccordsService } from './../src/modules/accords/accords.service';
 import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
 import { NumerationService } from './../src/modules/numeration/numeration.service';
 import { CalculService } from './../src/modules/calcul/calcul.service';
+import { PoseService } from './../src/modules/pose/pose.service';
 import { NOMS } from './../src/modules/accords/accords.corpus';
 import { familleDuNom } from './../src/modules/accords/accords.familles';
 
@@ -660,5 +661,76 @@ describe("Démarrage de l'application (e2e)", () => {
       expect(Number(m[2]) - Number(m[1])).toBe(question.answer);
       expect(question.answer).toBeGreaterThan(0);
     }
+  });
+
+  // ─── Calcul posé : la multiplication ────────────────────────────────────────
+
+  it('n’ouvre que l’addition et la soustraction à l’installation', async () => {
+    const operations = (
+      await request(server()).get('/api/pose/operations').expect(200)
+    ).body as { key: string }[];
+    expect(operations.map((o) => o.key).sort()).toEqual([
+      'addition',
+      'soustraction',
+    ]);
+  });
+
+  it('refuse une multiplication posée tant qu’elle est fermée', async () => {
+    const session = (
+      await request(server())
+        .post('/api/pose/session')
+        .send({ operations: ['multiplication'] })
+        .expect(201)
+    ).body as { questions: { operation: string }[] };
+    for (const question of session.questions) {
+      expect(question.operation).not.toBe('multiplication');
+    }
+  });
+
+  it('sert des multiplications posées justes une fois ouvertes', async () => {
+    const service = app.get(PoseService);
+    await service.setActiveOperations(['multiplication']);
+
+    const session = (
+      await request(server())
+        .post('/api/pose/session')
+        .send({ operations: ['multiplication'] })
+        .expect(201)
+    ).body as {
+      questions: {
+        operation: string;
+        operands: number[];
+        answer: number;
+        columns: number;
+        partiels: { valeur: number; decalage: number }[];
+        retenues: { haut: (number | null)[]; bas: (number | null)[] };
+      }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      expect(question.operation).toBe('multiplication');
+      expect(question.answer).toBe(question.operands[0] * question.operands[1]);
+
+      // Les produits partiels, remis à leur décalage, doivent redonner le résultat.
+      const somme = question.partiels.reduce(
+        (total, p) => total + p.valeur * 10 ** p.decalage,
+        0,
+      );
+      expect(somme).toBe(question.answer);
+
+      // La grille doit être assez large pour le résultat ET pour le produit le plus décalé.
+      const largeurMax = Math.max(
+        String(question.answer).length,
+        ...question.partiels.map((p) => String(p.valeur).length + p.decalage),
+      );
+      expect(question.columns).toBeGreaterThanOrEqual(largeurMax);
+
+      // Aucune rangée de retenue en multiplication.
+      expect(question.retenues.haut.every((v) => v === null)).toBe(true);
+      expect(question.retenues.bas.every((v) => v === null)).toBe(true);
+    }
+
+    await service.setActiveOperations(['addition', 'soustraction']);
   });
 });

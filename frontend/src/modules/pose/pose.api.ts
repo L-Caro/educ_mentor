@@ -3,6 +3,43 @@ import type { PoseSessionResponse } from './pose.type';
 
 export const poseApi = sharedApi.injectEndpoints({
   endpoints: (builder) => ({
+    /** Les opérations ACTIVES — pré-jeu. */
+    getPoseOperations: builder.query<
+      { key: string; label: string; exemple: string; niveau: string }[],
+      void
+    >({
+      query: () => '/pose/operations',
+      providesTags: ['PoseActiveOperations'],
+    }),
+
+    /** Le catalogue COMPLET, fermées comprises — administration. */
+    getPoseCatalogue: builder.query<
+      {
+        key: string;
+        label: string;
+        exemple: string;
+        niveau: string;
+        defaultActive: boolean;
+      }[],
+      void
+    >({
+      query: () => '/pose/operations-catalogue',
+    }),
+
+    getPoseActiveOperations: builder.query<string[], void>({
+      query: () => '/pose/operations-actives',
+      providesTags: ['PoseActiveOperations'],
+    }),
+
+    updatePoseActiveOperations: builder.mutation<string[], string[]>({
+      query: (keys) => ({
+        url: '/pose/operations-actives',
+        method: 'PATCH',
+        body: { keys },
+      }),
+      invalidatesTags: ['PoseActiveOperations'],
+    }),
+
     startPoseSession: builder.mutation<
       PoseSessionResponse,
       { difficulty?: string; operations?: string[] }
@@ -46,6 +83,10 @@ export const poseApi = sharedApi.injectEndpoints({
 });
 
 export const {
+  useGetPoseOperationsQuery,
+  useGetPoseCatalogueQuery,
+  useGetPoseActiveOperationsQuery,
+  useUpdatePoseActiveOperationsMutation,
   useGetPoseProgressionQuery,
   useResetPoseProgressionMutation,
 } = poseApi;

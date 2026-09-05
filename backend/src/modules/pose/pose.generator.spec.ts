@@ -2,6 +2,7 @@ import {
   computeRetenues,
   generatePose,
   hasCarry,
+  produitsPartiels,
   type PoseOperation,
 } from './pose.generator';
 
@@ -227,5 +228,95 @@ describe('computeRetenues', () => {
       expect(comp.bas.some((x) => x !== null)).toBe(true);
       expect(cass.bas.every((x) => x === null)).toBe(true);
     }
+  });
+});
+
+// ─── Multiplication posée ───────────────────────────────────────────────────
+
+describe('produits partiels', () => {
+  it('donne un produit par chiffre du multiplicateur, décalé de son rang', () => {
+    // 247 × 36 : 247×6 = 1482 sans décalage, 247×3 = 741 décalé d'un rang.
+    expect(produitsPartiels(247, 36)).toEqual([
+      { valeur: 1482, decalage: 0 },
+      { valeur: 741, decalage: 1 },
+    ]);
+  });
+
+  it("n'en donne qu'un pour un multiplicateur à un chiffre", () => {
+    // La grille n'affiche alors aucune ligne intermédiaire : le produit EST le résultat.
+    expect(produitsPartiels(47, 6)).toEqual([{ valeur: 282, decalage: 0 }]);
+  });
+
+  it('écarte un produit nul, sauf s’il est le seul', () => {
+    // 47 × 30 : le chiffre des unités donne 0, une ligne de zéros n'apprend rien.
+    expect(produitsPartiels(47, 30)).toEqual([{ valeur: 141, decalage: 1 }]);
+    // Mais 47 × 0 doit rester jouable plutôt que de rendre une liste vide.
+    expect(produitsPartiels(47, 0)).toEqual([{ valeur: 0, decalage: 0 }]);
+  });
+
+  it('somme les produits décalés au résultat', () => {
+    for (const [a, b] of [
+      [247, 36],
+      [8, 7],
+      [125, 48],
+      [903, 27],
+    ] as const) {
+      const total = produitsPartiels(a, b).reduce(
+        (somme, p) => somme + p.valeur * 10 ** p.decalage,
+        0,
+      );
+      expect({ a, b, total }).toEqual({ a, b, total: a * b });
+    }
+  });
+});
+
+describe('generatePose — multiplication', () => {
+  it('rend une opération juste, avec ses produits partiels', () => {
+    for (let n = 0; n < 100; n++) {
+      const q = generatePose('multiplication', {
+        digits: 3,
+        carry: 'any',
+        rand: randReel,
+      })!;
+      expect(q).not.toBeNull();
+      expect(q.operation).toBe('multiplication');
+      expect(q.answer).toBe(q.operands[0] * q.operands[1]);
+      expect(q.answer_length).toBe(String(q.answer).length);
+      expect(q.partiels.length).toBeGreaterThan(0);
+
+      const somme = q.partiels.reduce(
+        (total, p) => total + p.valeur * 10 ** p.decalage,
+        0,
+      );
+      expect(somme).toBe(q.answer);
+    }
+  });
+
+  it('garde le multiplicateur court, pour que la grille reste jouable', () => {
+    // Un multiplicateur aussi long que le multiplicande donnerait dix colonnes, injouables
+    // sur un téléphone et hors programme.
+    for (let n = 0; n < 100; n++) {
+      const q = generatePose('multiplication', {
+        digits: 3,
+        carry: 'any',
+        rand: randReel,
+      })!;
+      expect(String(q.operands[1]).length).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('détecte la retenue sur un produit chiffre × chiffre', () => {
+    expect(hasCarry('multiplication', 12, 3)).toBe(false); // 1×3, 2×3 : rien ne dépasse 9
+    expect(hasCarry('multiplication', 47, 6)).toBe(true); // 7×6 = 42
+    expect(hasCarry('multiplication', 21, 4)).toBe(false);
+  });
+
+  it("n'affiche aucune rangée de retenue", () => {
+    // À l'école elles s'écrivent petit et s'effacent d'une ligne à l'autre ; une rangée par
+    // produit partiel rendrait la grille illisible. Ce qui est demandé, ce sont les
+    // produits partiels eux-mêmes.
+    const marques = computeRetenues('multiplication', 247, 36, 'compensation');
+    expect(marques.haut.every((v) => v === null)).toBe(true);
+    expect(marques.bas.every((v) => v === null)).toBe(true);
   });
 });
