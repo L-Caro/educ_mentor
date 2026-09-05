@@ -111,12 +111,30 @@ describe('choix de conception à ne pas défaire', () => {
     // qu'il garde n'ait bougé.
     const description = (id: string, valeur: string) =>
       MODULES.find((m) => m.id === id)
-        ?.setupOptions?.find((o) => o.key === 'adversaire')
+        ?.setupOptions?.find((o) => o.key === 'difficulty')
         ?.choices?.find((c) => c.value === valeur)?.description ?? '';
 
-    expect(description('morpion', 'difficile')).toMatch(/ne perd jamais/);
-    expect(description('puissance4', 'difficile')).not.toMatch(/ne perd jamais/);
-    expect(MORPION).toMatch(/difficile: 9/);
+    expect(description('morpion', 'hard')).toMatch(/ne perd jamais/);
+    expect(description('puissance4', 'hard')).not.toMatch(/ne perd jamais/);
+    expect(MORPION).toMatch(/hard: 9/);
+  });
+
+  it('ne pose la question du niveau QU’UNE FOIS', () => {
+    // Le pré-jeu injecte sa propre option `difficulty` — « 2 choix / 4 choix / Saisie
+    // libre » — à tout module qui n'en déclare pas une. Les deux jeux affichaient donc
+    // « Contre qui ? » ET « Quel niveau ? », la seconde ne voulant rien dire sur un
+    // plateau. Déclarer la clé `difficulty` est ce qui écarte l'injection : c'est la
+    // seule chose que ce test garde.
+    for (const id of ['morpion', 'puissance4']) {
+      const options = MODULES.find((m) => m.id === id)?.setupOptions ?? [];
+      const cles = options.map((o) => o.key);
+      expect({ id, difficulty: cles.includes('difficulty') }).toEqual({
+        id,
+        difficulty: true,
+      });
+      // Et plus de question « contre qui » : ce n'était pas un niveau.
+      expect(cles).not.toContain('adversaire');
+    }
   });
 
   it('propose la règle à trois pions, et la décrit sans jargon', () => {
@@ -137,9 +155,13 @@ describe('choix de conception à ne pas défaire', () => {
     expect(MORPION).toMatch(/tourne en rond/);
   });
 
-  it('propose de jouer à deux sur le même écran', () => {
+  it('propose de jouer à deux DEPUIS le plateau, pas depuis le pré-jeu', () => {
+    // « À deux » n'est pas un niveau de difficulté, et l'enterrer dans cette liste
+    // obligeait à ressortir du jeu pour passer la main. Le basculement ne remet pas la
+    // partie à zéro : il change seulement qui tient les pions de l'ordinateur.
     for (const source of [MORPION, P4]) {
-      expect(source).toMatch(/mode !== 'deux'/);
+      expect(source).toMatch(/setContreOrdinateur/);
+      expect(source).toMatch(/Jouer à deux/);
     }
   });
 

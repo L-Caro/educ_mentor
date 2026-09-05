@@ -35,9 +35,9 @@ const MODULE_ID = 'morpion';
  * La règle à trois pions ne passe pas par ici : elle ne se cherche pas en profondeur,
  * elle se RÉSOUT (voir `troisPions.ts`). */
 const PROFONDEUR: Record<string, number> = {
-  facile: 0,
-  moyen: 2,
-  difficile: 9,
+  easy: 0,
+  medium: 2,
+  hard: 9,
 };
 
 const SIGNE: Record<Joueur, string> = { 1: '✕', 2: '◯' };
@@ -81,9 +81,19 @@ const NEUVE: Partie = {
 export default function MorpionGame() {
   const navigate = useNavigate();
   const setup = useAppSelector(selectModuleSetup(MODULE_ID)) ?? {};
-  const mode = (setup.adversaire as string) || 'moyen';
+  const mode = (setup.difficulty as string) || 'medium';
   const troisPions = setup.variante === 'trois';
-  const contreOrdinateur = mode !== 'deux';
+
+  /** Contre la machine, ou à deux sur le même écran.
+   *
+   * C'était un choix de pré-jeu, rangé parmi les niveaux de difficulté — alors que ce
+   * n'en est pas un, et que le pré-jeu posait déjà la question du niveau juste à côté.
+   * C'est maintenant un bouton SUR le plateau : passer la main à quelqu'un ne demande
+   * plus de ressortir du jeu.
+   *
+   * Le basculement ne remet pas la partie à zéro. Il change seulement qui tient les ronds
+   * — et c'est justement l'usage : « viens, prends ma place ». */
+  const [contreOrdinateur, setContreOrdinateur] = useState(true);
 
   const [partie, setPartie] = useState<Partie>(NEUVE);
   /** Le pion pris en main, en phase de déplacement. */
@@ -270,6 +280,13 @@ export default function MorpionGame() {
       <div className="MorpionGame__actions">
         <Button variant="primary" onClick={rejouer}>
           {fini ? 'Rejouer' : 'Recommencer'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setContreOrdinateur((precedent) => !precedent)}
+        >
+          {contreOrdinateur ? '👥 Jouer à deux' : '🤖 Jouer contre lui'}
         </Button>
         <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
           Accueil

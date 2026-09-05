@@ -41,7 +41,10 @@ export type Coup =
   | { type: 'pose'; vers: number }
   | { type: 'deplacement'; depuis: number; vers: number };
 
-export type Niveau = 'facile' | 'moyen' | 'difficile';
+/** Les valeurs du moteur, et non un vocabulaire à nous : le pré-jeu commun parle en
+ * `easy | medium | hard`, et traduire entre les deux n'ajouterait qu'un endroit où se
+ * tromper. */
+export type Niveau = 'easy' | 'medium' | 'hard';
 
 export type Rand = (max: number) => number;
 
@@ -315,8 +318,8 @@ export function meilleurCoup(
 ): Coup | null {
   const coups = coupsPossibles(cases, joueur);
   if (coups.length === 0) return null;
-  if (niveau === 'facile') return coups[rand(coups.length)];
-  if (niveau === 'moyen') return coupMoyen(cases, joueur, rand);
+  if (niveau === 'easy') return coups[rand(coups.length)];
+  if (niveau === 'medium') return coupMoyen(cases, joueur, rand);
 
   let meilleurs: Coup[] = [];
   let meilleure = -Infinity;

@@ -28,18 +28,25 @@ export const morpionModule: ModuleManifest = {
         },
       ],
     },
+    // Le module déclare SA clé `difficulty`, et c'est ce qui compte : sans elle, le
+    // pré-jeu injecte la sienne — « 2 choix / 4 choix / Saisie libre » — qui ne veut rien
+    // dire sur un plateau. Le jeu posait alors deux fois la même question, une fois sous
+    // son nom et une fois sous celui du moteur.
+    //
+    // « À deux » n'est plus ici : c'est un bouton sur le plateau. Ce n'est pas un niveau
+    // de difficulté, et l'enterrer dans cette liste obligeait à ressortir du jeu pour
+    // passer la main à quelqu'un.
     {
-      key: 'adversaire',
+      key: 'difficulty',
       type: 'single',
-      label: 'Contre qui ?',
+      label: 'Quel niveau ?',
       choices: [
-        { value: 'facile', icon: '🙂', label: 'Facile', description: 'Il joue au hasard' },
-        { value: 'moyen', icon: '🤔', label: 'Moyen', description: 'Il gagne et il bloque' },
+        { value: 'easy', icon: '🙂', label: 'Facile', description: 'Il joue au hasard' },
+        { value: 'medium', icon: '🤔', label: 'Moyen', description: 'Il gagne et il bloque' },
         // Annoncé franchement : le morpion parfaitement joué est un match nul — les DEUX
         // règles, la variante à trois pions l'est aussi (résolue dans `troisPions.ts`).
         // Déguiser « imbattable » en « fort » ferait chercher longtemps une faille.
-        { value: 'difficile', icon: '🤖', label: 'Difficile', description: 'Il ne perd jamais' },
-        { value: 'deux', icon: '👥', label: 'À deux', description: 'Sur le même écran' },
+        { value: 'hard', icon: '🤖', label: 'Difficile', description: 'Il ne perd jamais' },
       ],
     },
   ],

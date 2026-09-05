@@ -105,13 +105,13 @@ describe('l’adversaire', () => {
     // Il doit être battable : c'est tout ce qu'on lui demande.
     const cases = grille('xx. ... o..');
     const coups = coupsPossibles(cases, 2);
-    const joue = meilleurCoup(cases, 2, 'facile', () => coups.length - 1);
+    const joue = meilleurCoup(cases, 2, 'easy', () => coups.length - 1);
     expect(joue).toEqual(coups[coups.length - 1]);
   });
 
   it('en MOYEN, gagne quand il peut', () => {
     const cases = grille('x.x oo. ...');
-    const coup = meilleurCoup(cases, 2, 'moyen', sansHasard)!;
+    const coup = meilleurCoup(cases, 2, 'medium', sansHasard)!;
     expect(aligne(appliquer(cases, coup, 2), 2)).toBe(true);
   });
 
@@ -120,13 +120,13 @@ describe('l’adversaire', () => {
     // Deux pions à lui, un seul à l'ordinateur : c'est bien à l'ordinateur de jouer, et
     // il n'a aucun alignement à saisir. Il ne lui reste qu'à barrer la case 2.
     const cases = grille('xx. o.. ...');
-    const coup = meilleurCoup(cases, 2, 'moyen', sansHasard)!;
+    const coup = meilleurCoup(cases, 2, 'medium', sansHasard)!;
     expect(coup).toEqual({ type: 'pose', vers: 2 });
   });
 
   it('en DIFFICILE, gagne immédiatement plutôt que de tourner autour', () => {
     const cases = grille('x.x oo. ...');
-    const coup = meilleurCoup(cases, 2, 'difficile', sansHasard)!;
+    const coup = meilleurCoup(cases, 2, 'hard', sansHasard)!;
     expect(aligne(appliquer(cases, coup, 2), 2)).toBe(true);
   });
 
@@ -140,8 +140,8 @@ describe('l’adversaire', () => {
       while (coups < 60) {
         const coup =
           tour === 1
-            ? meilleurCoup(cases, 1, 'facile')
-            : meilleurCoup(cases, 2, 'difficile');
+            ? meilleurCoup(cases, 1, 'easy')
+            : meilleurCoup(cases, 2, 'hard');
         if (!coup) break;
         cases = appliquer(cases, coup, tour);
         if (aligne(cases, tour)) {
