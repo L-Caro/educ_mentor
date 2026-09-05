@@ -155,12 +155,15 @@
 }
 
 // ─── Entrée depuis l'accueil ──────────────────────────────────────────────────
-
+//
+// Vit désormais dans la rangée `HomeLayout__actions`, à côté de « Au hasard ». C'est ce
+// conteneur qui porte l'espacement : la marge basse d'époque, quand ce lien était seul,
+// le désalignait verticalement de son voisin.
 .HomeLayout__cours {
 	display: inline-flex;
 	align-items: center;
 	gap: v.$space-3;
-	margin-bottom: v.$space-5;
+	min-height: 2.75rem; // même cible tactile que le bouton voisin
 	padding: v.$space-3 v.$space-5;
 	border: 2px solid var(--color-base-300);
 	border-radius: v.$border-radius-2;
