@@ -79,7 +79,12 @@ function ecrireDernierHasard(id: string): void {
 // ─── Composant ────────────────────────────────────────────────────────────────
 
 export default function HomeLayout() {
-  const { data: modules = [], isLoading: loading } = useGetModulesQuery({ onlyActive: true });
+  const {
+    data: modules = [],
+    isLoading: loading,
+    isError,
+    refetch,
+  } = useGetModulesQuery({ onlyActive: true });
   const navigate = useNavigate();
   const [repliees, setRepliees] = useState<Set<ModuleCategory>>(lireRepliees);
 
@@ -148,6 +153,35 @@ export default function HomeLayout() {
       <div className="HomeLayout">
         <div className="HomeLayout__loading">
           <Spinner />
+        </div>
+      </div>
+    );
+  }
+
+  // « Serveur injoignable » et « rien d'activé » se ressemblaient à l'écran : les deux
+  // rendaient « Aucun module activé pour l'instant ». Un backend mort affichait donc à
+  // Maëve un message qui l'accusait, elle, d'avoir une application vide — et qui envoyait
+  // son parent régler des activations déjà bonnes. Ce sont deux causes opposées, elles
+  // demandent deux messages.
+  if (isError) {
+    return (
+      <div className="HomeLayout">
+        <div className="HomeLayout__panne" role="alert">
+          <p className="HomeLayout__panneTitre">
+            <span aria-hidden="true">🔌</span> L&apos;application n&apos;arrive pas à
+            joindre le serveur.
+          </p>
+          <p className="HomeLayout__panneTexte">
+            Ce n&apos;est pas de ta faute, et rien n&apos;est perdu. Préviens un adulte,
+            ou réessaie dans un instant.
+          </p>
+          <button
+            type="button"
+            className="HomeLayout__panneBtn"
+            onClick={() => void refetch()}
+          >
+            Réessayer
+          </button>
         </div>
       </div>
     );

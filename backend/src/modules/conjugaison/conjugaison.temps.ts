@@ -301,9 +301,48 @@ function mapPronoms(f: (pronom: Pronom) => string): Formes {
 export function conjugaisonsCompletes(
   verbe: VerbData,
   auxiliaires: Record<'avoir' | 'être', VerbData>,
+  infinitif = verbe.participe,
 ): Record<Tense, Formes> {
+  // Échouer BRUYAMMENT et en nommant le coupable. Cette fonction tourne une fois au
+  // démarrage, sur les cinquante verbes : une donnée manquante y tue l'application
+  // entière, et sans ce garde-fou elle le fait par un « Cannot read properties of
+  // undefined (reading 'conjugaisons') » au fond d'un `.map`, qui ne dit ni quel verbe
+  // ni quel champ. C'est arrivé, et ç'a transformé dix secondes de diagnostic en dix
+  // minutes.
+  //
+  // Planter au démarrage est le bon comportement : le corpus est du code, une entrée
+  // fautive est une erreur de programmation que les tests attrapent, et une conjugaison
+  // fausse ne doit jamais atteindre l'enfant. Mieux vaut un backend qui refuse de
+  // démarrer qu'un backend qui enseigne du faux.
   const aux = auxiliaires[verbe.auxiliaire];
+  if (!aux?.conjugaisons?.['présent'] || !aux.conjugaisons['imparfait']) {
+    throw new Error(
+      `Conjugaison de « ${infinitif} » : auxiliaire « ${String(verbe.auxiliaire)} » ` +
+        `introuvable ou incomplet. Attendu « avoir » ou « être », et les deux doivent ` +
+        `porter leur présent et leur imparfait dans conjugaisons.json.`,
+    );
+  }
+  if (!verbe.participe) {
+    throw new Error(
+      `Conjugaison de « ${infinitif} » : participe passé manquant dans conjugaisons.json.`,
+    );
+  }
+  if (!verbe.passeSimple?.radical || !verbe.passeSimple?.famille) {
+    throw new Error(
+      `Conjugaison de « ${infinitif} » : radical ou famille de passé simple manquants ` +
+        `dans conjugaisons.json.`,
+    );
+  }
+
   const simples = verbe.conjugaisons;
+  for (const temps of ['présent', 'imparfait', 'futur'] as const) {
+    if (!simples?.[temps]) {
+      throw new Error(
+        `Conjugaison de « ${infinitif} » : le temps « ${temps} » manque dans ` +
+          `conjugaisons.json — les quatre autres s'en dérivent.`,
+      );
+    }
+  }
 
   return {
     présent: simples['présent'],

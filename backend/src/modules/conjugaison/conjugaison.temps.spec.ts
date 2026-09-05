@@ -254,3 +254,57 @@ describe('couverture du corpus', () => {
     expect(rangs).toEqual([...rangs].sort((a, b) => a - b));
   });
 });
+
+// ─── Échouer bruyamment ─────────────────────────────────────────────────────
+
+describe('données incomplètes', () => {
+  /**
+   * Ces quatre tests couvrent un incident réel : un verbe sans auxiliaire a tué le
+   * backend au démarrage par un « Cannot read properties of undefined (reading
+   * 'conjugaisons') » au fond d'un `.map`, sans dire ni quel verbe ni quel champ.
+   *
+   * Planter au démarrage reste le bon comportement — une conjugaison fausse ne doit
+   * jamais atteindre l'enfant — mais le message doit nommer le coupable.
+   */
+
+  const AUX = { avoir: VERBES['avoir'], être: VERBES['être'] };
+  const sain = () => JSON.parse(JSON.stringify(VERBES['chanter'])) as VerbData;
+
+  it('nomme le verbe et l’auxiliaire quand l’auxiliaire ne résout pas', () => {
+    const casse = { ...sain(), auxiliaire: 'avoirr' as never };
+    expect(() => conjugaisonsCompletes(casse, AUX, 'chanter')).toThrow(
+      /chanter.*avoirr/s,
+    );
+  });
+
+  it('nomme le verbe quand le participe manque', () => {
+    const casse = { ...sain(), participe: '' };
+    expect(() => conjugaisonsCompletes(casse, AUX, 'chanter')).toThrow(
+      /chanter.*participe/s,
+    );
+  });
+
+  it('nomme le verbe quand le passé simple est incomplet', () => {
+    const casse = {
+      ...sain(),
+      passeSimple: { radical: '', famille: 'a' as const },
+    };
+    expect(() => conjugaisonsCompletes(casse, AUX, 'chanter')).toThrow(
+      /chanter.*passé simple/s,
+    );
+  });
+
+  it('nomme le temps simple manquant, dont les autres se dérivent', () => {
+    const casse = sain();
+    delete (casse.conjugaisons as Record<string, unknown>)['futur'];
+    expect(() => conjugaisonsCompletes(casse, AUX, 'chanter')).toThrow(
+      /chanter.*futur/s,
+    );
+  });
+
+  it('accepte le corpus réel, les cinquante verbes', () => {
+    for (const [infinitif, verbe] of Object.entries(VERBES)) {
+      expect(() => conjugaisonsCompletes(verbe, AUX, infinitif)).not.toThrow();
+    }
+  });
+});

@@ -73,7 +73,10 @@ export class ConjugaisonService {
     this.verbs = Object.fromEntries(
       Object.entries(brut).map(([infinitif, verbe]) => [
         infinitif,
-        { ...verbe, conjugaisons: conjugaisonsCompletes(verbe, auxiliaires) },
+        {
+          ...verbe,
+          conjugaisons: conjugaisonsCompletes(verbe, auxiliaires, infinitif),
+        },
       ]),
     );
   }

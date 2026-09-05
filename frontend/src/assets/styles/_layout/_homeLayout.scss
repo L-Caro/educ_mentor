@@ -23,6 +23,52 @@
 		margin: v.$space-8 0;
 	}
 
+	// Serveur injoignable. Le message s'adresse à une enfant de sept ans : il dit que ce
+	// n'est pas sa faute, que rien n'est perdu, et il offre un bouton plutôt que de la
+	// laisser devant un écran mort. Le ton est délibérément different de `__empty`, qui
+	// veut dire tout autre chose — « rien n'est activé » est un état normal.
+	&__panne {
+		border-radius: v.$border-radius;
+		background: var(--color-base-100);
+		border: 2px solid var(--color-warning, var(--color-base-300));
+		box-shadow: var(--shadow-md);
+		color: var(--color-base-content);
+		padding: v.$space-8;
+		text-align: center;
+		margin: v.$space-8 auto;
+		max-width: 32rem;
+	}
+
+	&__panneTitre {
+		font-size: v.$font-size-lg;
+		font-weight: 700;
+		margin: 0 0 v.$space-3;
+	}
+
+	&__panneTexte {
+		margin: 0 0 v.$space-6;
+		opacity: 0.85;
+	}
+
+	&__panneBtn {
+		display: inline-flex;
+		align-items: center;
+		padding: v.$space-4 v.$space-7;
+		border-radius: v.$radius-pill;
+		border: 2px solid var(--color-primary);
+		background: var(--color-primary);
+		color: var(--color-primary-content);
+		font-family: inherit;
+		font-size: v.$font-size-md;
+		font-weight: 700;
+		min-height: 2.75rem;
+		cursor: pointer;
+
+		&:hover {
+			filter: brightness(1.06);
+		}
+	}
+
 	&__timerRow {
 		display: flex;
 		justify-content: flex-end;
