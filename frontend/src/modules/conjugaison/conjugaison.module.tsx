@@ -1,18 +1,36 @@
+import store from 'src/store';
 import { conjugaisonApi } from './conjugaison.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
-import type { SetupOption } from 'src/types/game.types.ts';
+import type { SetupChoice, SetupOption } from 'src/types/game.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
+
+/** Les temps viennent du SERVEUR : ce sont ceux ouverts dans Administration → Conjugaison.
+ * Les coder en dur laisserait cocher un temps fermé, que le service filtrerait ensuite —
+ * une case qui ne produit rien, sans que rien ne l'explique. */
+async function loadTemps(): Promise<SetupChoice[]> {
+  try {
+    const temps = await store
+      .dispatch(conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined))
+      .unwrap();
+    return temps.map((t) => ({
+      value: t.key,
+      label: t.label,
+      description: t.exemple,
+    }));
+  } catch {
+    // Repli sûr : le présent est actif à l'installation.
+    return [{ value: 'présent', label: 'Présent', description: 'je mange' }];
+  }
+}
 
 const CONJUGAISON_SETUP_OPTIONS: SetupOption[] = [
   {
     key: 'tenses',
     type: 'multi',
     label: 'Temps',
-    choices: [
-      { value: 'présent',   label: 'Présent',      description: 'Je mange' },
-      { value: 'imparfait', label: 'Imparfait',    description: 'Je mangeais' },
-      { value: 'futur',     label: 'Futur simple', description: 'Je mangerai' },
-    ],
+    loader: loadTemps,
+    emptyMessage:
+      'Aucun temps actif. Ouvre-les dans Administration → Conjugaison.',
   },
   {
     key: 'verbGroups',

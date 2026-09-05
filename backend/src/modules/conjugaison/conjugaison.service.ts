@@ -14,21 +14,15 @@ import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 import { randomUUID } from 'node:crypto';
 
-type Pronom =
-  | 'je'
-  | 'tu'
-  | 'il'
-  | 'elle'
-  | 'on'
-  | 'nous'
-  | 'vous'
-  | 'ils'
-  | 'elles';
-
-interface VerbData {
-  groupe: string;
-  conjugaisons: Record<string, Record<Pronom, string>>;
-}
+import {
+  DEFAULT_ACTIVE_TENSES,
+  TENSES,
+  conjugaisonsCompletes,
+  isTense,
+  type Pronom,
+  type Tense,
+  type VerbData,
+} from './conjugaison.temps';
 
 export interface ConjugaisonQuestion {
   infinitif: string;
@@ -51,7 +45,8 @@ export interface ConjugaisonSessionResult {
   is_unlimited: boolean;
 }
 
-const VALID_TENSES = ['présent', 'imparfait', 'futur'] as const;
+const SETTING_ACTIVE_TENSES = 'conjugaison_temps_actifs';
+
 const VALID_GROUPS = ['auxiliaire', '1', '2', '3'] as const;
 
 @Injectable()
@@ -66,10 +61,57 @@ export class ConjugaisonService {
     private readonly settingsService: SettingsService,
   ) {
     const jsonPath = path.join(__dirname, 'data', 'conjugaisons.json');
-    this.verbs = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as Record<
+    const brut = JSON.parse(fs.readFileSync(jsonPath, 'utf-8')) as Record<
       string,
       VerbData
     >;
+
+    // Le fichier ne porte que les trois temps simples. Les quatre autres sont dérivés ICI,
+    // une fois au démarrage : `conjugaisonsCompletes` est pure, et tout le reste du service
+    // continue de lire `verbe.conjugaisons[temps]` sans savoir lesquels ont été saisis.
+    const auxiliaires = { avoir: brut['avoir'], être: brut['être'] };
+    this.verbs = Object.fromEntries(
+      Object.entries(brut).map(([infinitif, verbe]) => [
+        infinitif,
+        { ...verbe, conjugaisons: conjugaisonsCompletes(verbe, auxiliaires) },
+      ]),
+    );
+  }
+
+  // ─── Temps actifs ─────────────────────────────────────────────────────────
+
+  /** Le catalogue complet : tous les temps du CP au CM2, ouverts comme fermés.
+   * L'administration doit voir les fermés — sinon il n'y a rien à ouvrir. */
+  getTenses() {
+    return TENSES;
+  }
+
+  async getActiveTenseKeys(): Promise<Tense[]> {
+    const raw = await this.settingsService.get(SETTING_ACTIVE_TENSES);
+    try {
+      const parsed = JSON.parse(raw ?? '[]') as unknown;
+      const valid = Array.isArray(parsed) ? parsed.filter(isTense) : [];
+      return valid.length > 0 ? valid : DEFAULT_ACTIVE_TENSES;
+    } catch {
+      return DEFAULT_ACTIVE_TENSES;
+    }
+  }
+
+  async setActiveTenseKeys(keys: string[]): Promise<Tense[]> {
+    const valid = keys.filter(isTense);
+    await this.settingsService.set(
+      SETTING_ACTIVE_TENSES,
+      JSON.stringify(valid),
+    );
+    return valid;
+  }
+
+  /** Les temps actifs, avec leur libellé et un exemple. Servi au PRÉ-JEU : l'enfant ne
+   * doit voir que ce qu'elle peut réellement jouer. Les coder en dur côté front laisserait
+   * cocher un temps fermé, que le service filtrerait ensuite — une case sans effet. */
+  async getTempsOuverts() {
+    const actifs = await this.getActiveTenseKeys();
+    return TENSES.filter((temps) => actifs.includes(temps.key));
   }
 
   // ─── Session ──────────────────────────────────────────────────────────────
@@ -89,7 +131,10 @@ export class ConjugaisonService {
       10,
     );
 
-    const tenses = this.normalizeTenses(dto.tenses);
+    const actifs = await this.getActiveTenseKeys();
+    const tenses = this.normalizeTenses(dto.tenses).filter((t) =>
+      actifs.includes(t as Tense),
+    );
     const groups = this.normalizeGroups(dto.verb_groups);
     const direction = dto.question_direction ?? 'forward'; // 'random' résolu par question dans generateQuestions
 
@@ -352,7 +397,7 @@ export class ConjugaisonService {
 
   private normalizeTenses(raw?: string[]): string[] {
     if (!raw?.length) return ['présent'];
-    return raw.filter((t) => (VALID_TENSES as readonly string[]).includes(t));
+    return raw.filter(isTense);
   }
 
   private normalizeGroups(raw?: string[]): string[] {

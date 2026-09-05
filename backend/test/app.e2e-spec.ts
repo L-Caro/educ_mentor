@@ -6,6 +6,7 @@ import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import type { Server } from 'node:http';
 import { AppModule } from './../src/app.module';
+import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.service';
 
 interface CatalogModule {
   id: string;
@@ -362,6 +363,54 @@ describe("Démarrage de l'application (e2e)", () => {
       expect(question.skill_key).toBe('accord_sujet_verbe');
       // Le QCM oppose toujours deux formes du même verbe : c'est toute la notion.
       expect(question.choices.length).toBeGreaterThanOrEqual(2);
+    }
+  });
+
+  // ─── Conjugaison : les temps des grandes classes ────────────────────────────
+
+  it('n’ouvre que les trois temps simples à l’installation', async () => {
+    const temps = (
+      await request(server()).get('/api/conjugaison/temps').expect(200)
+    ).body as { key: string; niveau: string }[];
+    expect(temps.map((t) => t.key)).toEqual(['présent', 'imparfait', 'futur']);
+  });
+
+  it('refuse de jouer un temps fermé, même demandé explicitement', async () => {
+    // Le passé composé EXISTE dans le catalogue, mais il n'est pas ouvert : le service
+    // ne doit pas le servir sous prétexte qu'il a été demandé.
+    const session = (
+      await request(server())
+        .post('/api/conjugaison/session')
+        .send({ tenses: ['passé composé'], verb_groups: ['1'] })
+        .expect(201)
+    ).body as { questions: { tense: string }[] };
+    for (const question of session.questions) {
+      expect(question.tense).not.toBe('passé composé');
+    }
+  });
+
+  it('sert le passé composé une fois le temps ouvert en administration', async () => {
+    await app
+      .get(ConjugaisonService)
+      .setActiveTenseKeys(['présent', 'passé composé']);
+
+    const temps = (
+      await request(server()).get('/api/conjugaison/temps').expect(200)
+    ).body as { key: string }[];
+    expect(temps.map((t) => t.key)).toContain('passé composé');
+
+    const session = (
+      await request(server())
+        .post('/api/conjugaison/session')
+        .send({ tenses: ['passé composé'], verb_groups: ['1'] })
+        .expect(201)
+    ).body as { questions: { tense: string; conjugated: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.tense).toBe('passé composé');
+      // Auxiliaire + participe, et jamais le pronom : l'élision est faite à l'affichage.
+      expect(question.conjugated).toContain(' ');
+      expect(question.conjugated).not.toMatch(/^(je|j\')/);
     }
   });
 });

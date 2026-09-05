@@ -2,405 +2,2201 @@
   "avoir": {
     "groupe": "auxiliaire",
     "conjugaisons": {
-      "présent":   { "je": "ai",     "tu": "as",     "il": "a",      "elle": "a",      "on": "a",      "nous": "avons",    "vous": "avez",    "ils": "ont",      "elles": "ont"      },
-      "imparfait": { "je": "avais",  "tu": "avais",  "il": "avait",  "elle": "avait",  "on": "avait",  "nous": "avions",   "vous": "aviez",   "ils": "avaient",  "elles": "avaient"  },
-      "futur":     { "je": "aurai",  "tu": "auras",  "il": "aura",   "elle": "aura",   "on": "aura",   "nous": "aurons",   "vous": "aurez",   "ils": "auront",   "elles": "auront"   }
+      "présent": {
+        "je": "ai",
+        "tu": "as",
+        "il": "a",
+        "elle": "a",
+        "on": "a",
+        "nous": "avons",
+        "vous": "avez",
+        "ils": "ont",
+        "elles": "ont"
+      },
+      "imparfait": {
+        "je": "avais",
+        "tu": "avais",
+        "il": "avait",
+        "elle": "avait",
+        "on": "avait",
+        "nous": "avions",
+        "vous": "aviez",
+        "ils": "avaient",
+        "elles": "avaient"
+      },
+      "futur": {
+        "je": "aurai",
+        "tu": "auras",
+        "il": "aura",
+        "elle": "aura",
+        "on": "aura",
+        "nous": "aurons",
+        "vous": "aurez",
+        "ils": "auront",
+        "elles": "auront"
+      }
+    },
+    "participe": "eu",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "e",
+      "famille": "u"
     }
   },
   "être": {
     "groupe": "auxiliaire",
     "conjugaisons": {
-      "présent":   { "je": "suis",   "tu": "es",     "il": "est",    "elle": "est",    "on": "est",    "nous": "sommes",   "vous": "êtes",    "ils": "sont",     "elles": "sont"     },
-      "imparfait": { "je": "étais",  "tu": "étais",  "il": "était",  "elle": "était",  "on": "était",  "nous": "étions",   "vous": "étiez",   "ils": "étaient",  "elles": "étaient"  },
-      "futur":     { "je": "serai",  "tu": "seras",  "il": "sera",   "elle": "sera",   "on": "sera",   "nous": "serons",   "vous": "serez",   "ils": "seront",   "elles": "seront"   }
+      "présent": {
+        "je": "suis",
+        "tu": "es",
+        "il": "est",
+        "elle": "est",
+        "on": "est",
+        "nous": "sommes",
+        "vous": "êtes",
+        "ils": "sont",
+        "elles": "sont"
+      },
+      "imparfait": {
+        "je": "étais",
+        "tu": "étais",
+        "il": "était",
+        "elle": "était",
+        "on": "était",
+        "nous": "étions",
+        "vous": "étiez",
+        "ils": "étaient",
+        "elles": "étaient"
+      },
+      "futur": {
+        "je": "serai",
+        "tu": "seras",
+        "il": "sera",
+        "elle": "sera",
+        "on": "sera",
+        "nous": "serons",
+        "vous": "serez",
+        "ils": "seront",
+        "elles": "seront"
+      }
+    },
+    "participe": "été",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "f",
+      "famille": "u"
     }
   },
-
   "aimer": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "aime",       "tu": "aimes",      "il": "aime",       "elle": "aime",       "on": "aime",       "nous": "aimons",      "vous": "aimez",      "ils": "aiment",      "elles": "aiment"      },
-      "imparfait": { "je": "aimais",     "tu": "aimais",     "il": "aimait",     "elle": "aimait",     "on": "aimait",     "nous": "aimions",     "vous": "aimiez",     "ils": "aimaient",    "elles": "aimaient"    },
-      "futur":     { "je": "aimerai",    "tu": "aimeras",    "il": "aimera",     "elle": "aimera",     "on": "aimera",     "nous": "aimerons",    "vous": "aimerez",    "ils": "aimeront",    "elles": "aimeront"    }
+      "présent": {
+        "je": "aime",
+        "tu": "aimes",
+        "il": "aime",
+        "elle": "aime",
+        "on": "aime",
+        "nous": "aimons",
+        "vous": "aimez",
+        "ils": "aiment",
+        "elles": "aiment"
+      },
+      "imparfait": {
+        "je": "aimais",
+        "tu": "aimais",
+        "il": "aimait",
+        "elle": "aimait",
+        "on": "aimait",
+        "nous": "aimions",
+        "vous": "aimiez",
+        "ils": "aimaient",
+        "elles": "aimaient"
+      },
+      "futur": {
+        "je": "aimerai",
+        "tu": "aimeras",
+        "il": "aimera",
+        "elle": "aimera",
+        "on": "aimera",
+        "nous": "aimerons",
+        "vous": "aimerez",
+        "ils": "aimeront",
+        "elles": "aimeront"
+      }
+    },
+    "participe": "aimé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "aim",
+      "famille": "a"
     }
   },
   "parler": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "parle",      "tu": "parles",     "il": "parle",      "elle": "parle",      "on": "parle",      "nous": "parlons",     "vous": "parlez",     "ils": "parlent",     "elles": "parlent"     },
-      "imparfait": { "je": "parlais",    "tu": "parlais",    "il": "parlait",    "elle": "parlait",    "on": "parlait",    "nous": "parlions",    "vous": "parliez",    "ils": "parlaient",   "elles": "parlaient"   },
-      "futur":     { "je": "parlerai",   "tu": "parleras",   "il": "parlera",    "elle": "parlera",    "on": "parlera",    "nous": "parlerons",   "vous": "parlerez",   "ils": "parleront",   "elles": "parleront"   }
+      "présent": {
+        "je": "parle",
+        "tu": "parles",
+        "il": "parle",
+        "elle": "parle",
+        "on": "parle",
+        "nous": "parlons",
+        "vous": "parlez",
+        "ils": "parlent",
+        "elles": "parlent"
+      },
+      "imparfait": {
+        "je": "parlais",
+        "tu": "parlais",
+        "il": "parlait",
+        "elle": "parlait",
+        "on": "parlait",
+        "nous": "parlions",
+        "vous": "parliez",
+        "ils": "parlaient",
+        "elles": "parlaient"
+      },
+      "futur": {
+        "je": "parlerai",
+        "tu": "parleras",
+        "il": "parlera",
+        "elle": "parlera",
+        "on": "parlera",
+        "nous": "parlerons",
+        "vous": "parlerez",
+        "ils": "parleront",
+        "elles": "parleront"
+      }
+    },
+    "participe": "parlé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "parl",
+      "famille": "a"
     }
   },
   "chanter": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "chante",     "tu": "chantes",    "il": "chante",     "elle": "chante",     "on": "chante",     "nous": "chantons",    "vous": "chantez",    "ils": "chantent",    "elles": "chantent"    },
-      "imparfait": { "je": "chantais",   "tu": "chantais",   "il": "chantait",   "elle": "chantait",   "on": "chantait",   "nous": "chantions",   "vous": "chantiez",   "ils": "chantaient",  "elles": "chantaient"  },
-      "futur":     { "je": "chanterai",  "tu": "chanteras",  "il": "chantera",   "elle": "chantera",   "on": "chantera",   "nous": "chanterons",  "vous": "chanterez",  "ils": "chanteront",  "elles": "chanteront"  }
+      "présent": {
+        "je": "chante",
+        "tu": "chantes",
+        "il": "chante",
+        "elle": "chante",
+        "on": "chante",
+        "nous": "chantons",
+        "vous": "chantez",
+        "ils": "chantent",
+        "elles": "chantent"
+      },
+      "imparfait": {
+        "je": "chantais",
+        "tu": "chantais",
+        "il": "chantait",
+        "elle": "chantait",
+        "on": "chantait",
+        "nous": "chantions",
+        "vous": "chantiez",
+        "ils": "chantaient",
+        "elles": "chantaient"
+      },
+      "futur": {
+        "je": "chanterai",
+        "tu": "chanteras",
+        "il": "chantera",
+        "elle": "chantera",
+        "on": "chantera",
+        "nous": "chanterons",
+        "vous": "chanterez",
+        "ils": "chanteront",
+        "elles": "chanteront"
+      }
+    },
+    "participe": "chanté",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "chant",
+      "famille": "a"
     }
   },
   "jouer": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "joue",       "tu": "joues",      "il": "joue",       "elle": "joue",       "on": "joue",       "nous": "jouons",      "vous": "jouez",      "ils": "jouent",      "elles": "jouent"      },
-      "imparfait": { "je": "jouais",     "tu": "jouais",     "il": "jouait",     "elle": "jouait",     "on": "jouait",     "nous": "jouions",     "vous": "jouiez",     "ils": "jouaient",    "elles": "jouaient"    },
-      "futur":     { "je": "jouerai",    "tu": "joueras",    "il": "jouera",     "elle": "jouera",     "on": "jouera",     "nous": "jouerons",    "vous": "jouerez",    "ils": "joueront",    "elles": "joueront"    }
+      "présent": {
+        "je": "joue",
+        "tu": "joues",
+        "il": "joue",
+        "elle": "joue",
+        "on": "joue",
+        "nous": "jouons",
+        "vous": "jouez",
+        "ils": "jouent",
+        "elles": "jouent"
+      },
+      "imparfait": {
+        "je": "jouais",
+        "tu": "jouais",
+        "il": "jouait",
+        "elle": "jouait",
+        "on": "jouait",
+        "nous": "jouions",
+        "vous": "jouiez",
+        "ils": "jouaient",
+        "elles": "jouaient"
+      },
+      "futur": {
+        "je": "jouerai",
+        "tu": "joueras",
+        "il": "jouera",
+        "elle": "jouera",
+        "on": "jouera",
+        "nous": "jouerons",
+        "vous": "jouerez",
+        "ils": "joueront",
+        "elles": "joueront"
+      }
+    },
+    "participe": "joué",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "jou",
+      "famille": "a"
     }
   },
   "regarder": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "regarde",    "tu": "regardes",   "il": "regarde",    "elle": "regarde",    "on": "regarde",    "nous": "regardons",   "vous": "regardez",   "ils": "regardent",   "elles": "regardent"   },
-      "imparfait": { "je": "regardais",  "tu": "regardais",  "il": "regardait",  "elle": "regardait",  "on": "regardait",  "nous": "regardions",  "vous": "regardiez",  "ils": "regardaient", "elles": "regardaient" },
-      "futur":     { "je": "regarderai", "tu": "regarderas", "il": "regardera",  "elle": "regardera",  "on": "regardera",  "nous": "regarderons", "vous": "regarderez", "ils": "regarderont", "elles": "regarderont" }
+      "présent": {
+        "je": "regarde",
+        "tu": "regardes",
+        "il": "regarde",
+        "elle": "regarde",
+        "on": "regarde",
+        "nous": "regardons",
+        "vous": "regardez",
+        "ils": "regardent",
+        "elles": "regardent"
+      },
+      "imparfait": {
+        "je": "regardais",
+        "tu": "regardais",
+        "il": "regardait",
+        "elle": "regardait",
+        "on": "regardait",
+        "nous": "regardions",
+        "vous": "regardiez",
+        "ils": "regardaient",
+        "elles": "regardaient"
+      },
+      "futur": {
+        "je": "regarderai",
+        "tu": "regarderas",
+        "il": "regardera",
+        "elle": "regardera",
+        "on": "regardera",
+        "nous": "regarderons",
+        "vous": "regarderez",
+        "ils": "regarderont",
+        "elles": "regarderont"
+      }
+    },
+    "participe": "regardé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "regard",
+      "famille": "a"
     }
   },
   "écouter": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "écoute",     "tu": "écoutes",    "il": "écoute",     "elle": "écoute",     "on": "écoute",     "nous": "écoutons",    "vous": "écoutez",    "ils": "écoutent",    "elles": "écoutent"    },
-      "imparfait": { "je": "écoutais",   "tu": "écoutais",   "il": "écoutait",   "elle": "écoutait",   "on": "écoutait",   "nous": "écoutions",   "vous": "écoutiez",   "ils": "écoutaient",  "elles": "écoutaient"  },
-      "futur":     { "je": "écouterai",  "tu": "écouteras",  "il": "écoutera",   "elle": "écoutera",   "on": "écoutera",   "nous": "écouterons",  "vous": "écouterez",  "ils": "écouteront",  "elles": "écouteront"  }
+      "présent": {
+        "je": "écoute",
+        "tu": "écoutes",
+        "il": "écoute",
+        "elle": "écoute",
+        "on": "écoute",
+        "nous": "écoutons",
+        "vous": "écoutez",
+        "ils": "écoutent",
+        "elles": "écoutent"
+      },
+      "imparfait": {
+        "je": "écoutais",
+        "tu": "écoutais",
+        "il": "écoutait",
+        "elle": "écoutait",
+        "on": "écoutait",
+        "nous": "écoutions",
+        "vous": "écoutiez",
+        "ils": "écoutaient",
+        "elles": "écoutaient"
+      },
+      "futur": {
+        "je": "écouterai",
+        "tu": "écouteras",
+        "il": "écoutera",
+        "elle": "écoutera",
+        "on": "écoutera",
+        "nous": "écouterons",
+        "vous": "écouterez",
+        "ils": "écouteront",
+        "elles": "écouteront"
+      }
+    },
+    "participe": "écouté",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "écout",
+      "famille": "a"
     }
   },
   "marcher": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "marche",     "tu": "marches",    "il": "marche",     "elle": "marche",     "on": "marche",     "nous": "marchons",    "vous": "marchez",    "ils": "marchent",    "elles": "marchent"    },
-      "imparfait": { "je": "marchais",   "tu": "marchais",   "il": "marchait",   "elle": "marchait",   "on": "marchait",   "nous": "marchions",   "vous": "marchiez",   "ils": "marchaient",  "elles": "marchaient"  },
-      "futur":     { "je": "marcherai",  "tu": "marcheras",  "il": "marchera",   "elle": "marchera",   "on": "marchera",   "nous": "marcherons",  "vous": "marcherez",  "ils": "marcheront",  "elles": "marcheront"  }
+      "présent": {
+        "je": "marche",
+        "tu": "marches",
+        "il": "marche",
+        "elle": "marche",
+        "on": "marche",
+        "nous": "marchons",
+        "vous": "marchez",
+        "ils": "marchent",
+        "elles": "marchent"
+      },
+      "imparfait": {
+        "je": "marchais",
+        "tu": "marchais",
+        "il": "marchait",
+        "elle": "marchait",
+        "on": "marchait",
+        "nous": "marchions",
+        "vous": "marchiez",
+        "ils": "marchaient",
+        "elles": "marchaient"
+      },
+      "futur": {
+        "je": "marcherai",
+        "tu": "marcheras",
+        "il": "marchera",
+        "elle": "marchera",
+        "on": "marchera",
+        "nous": "marcherons",
+        "vous": "marcherez",
+        "ils": "marcheront",
+        "elles": "marcheront"
+      }
+    },
+    "participe": "marché",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "march",
+      "famille": "a"
     }
   },
   "trouver": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "trouve",     "tu": "trouves",    "il": "trouve",     "elle": "trouve",     "on": "trouve",     "nous": "trouvons",    "vous": "trouvez",    "ils": "trouvent",    "elles": "trouvent"    },
-      "imparfait": { "je": "trouvais",   "tu": "trouvais",   "il": "trouvait",   "elle": "trouvait",   "on": "trouvait",   "nous": "trouvions",   "vous": "trouviez",   "ils": "trouvaient",  "elles": "trouvaient"  },
-      "futur":     { "je": "trouverai",  "tu": "trouveras",  "il": "trouvera",   "elle": "trouvera",   "on": "trouvera",   "nous": "trouverons",  "vous": "trouverez",  "ils": "trouveront",  "elles": "trouveront"  }
+      "présent": {
+        "je": "trouve",
+        "tu": "trouves",
+        "il": "trouve",
+        "elle": "trouve",
+        "on": "trouve",
+        "nous": "trouvons",
+        "vous": "trouvez",
+        "ils": "trouvent",
+        "elles": "trouvent"
+      },
+      "imparfait": {
+        "je": "trouvais",
+        "tu": "trouvais",
+        "il": "trouvait",
+        "elle": "trouvait",
+        "on": "trouvait",
+        "nous": "trouvions",
+        "vous": "trouviez",
+        "ils": "trouvaient",
+        "elles": "trouvaient"
+      },
+      "futur": {
+        "je": "trouverai",
+        "tu": "trouveras",
+        "il": "trouvera",
+        "elle": "trouvera",
+        "on": "trouvera",
+        "nous": "trouverons",
+        "vous": "trouverez",
+        "ils": "trouveront",
+        "elles": "trouveront"
+      }
+    },
+    "participe": "trouvé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "trouv",
+      "famille": "a"
     }
   },
   "donner": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "donne",      "tu": "donnes",     "il": "donne",      "elle": "donne",      "on": "donne",      "nous": "donnons",     "vous": "donnez",     "ils": "donnent",     "elles": "donnent"     },
-      "imparfait": { "je": "donnais",    "tu": "donnais",    "il": "donnait",    "elle": "donnait",    "on": "donnait",    "nous": "donnions",    "vous": "donniez",    "ils": "donnaient",   "elles": "donnaient"   },
-      "futur":     { "je": "donnerai",   "tu": "donneras",   "il": "donnera",    "elle": "donnera",    "on": "donnera",    "nous": "donnerons",   "vous": "donnerez",   "ils": "donneront",   "elles": "donneront"   }
+      "présent": {
+        "je": "donne",
+        "tu": "donnes",
+        "il": "donne",
+        "elle": "donne",
+        "on": "donne",
+        "nous": "donnons",
+        "vous": "donnez",
+        "ils": "donnent",
+        "elles": "donnent"
+      },
+      "imparfait": {
+        "je": "donnais",
+        "tu": "donnais",
+        "il": "donnait",
+        "elle": "donnait",
+        "on": "donnait",
+        "nous": "donnions",
+        "vous": "donniez",
+        "ils": "donnaient",
+        "elles": "donnaient"
+      },
+      "futur": {
+        "je": "donnerai",
+        "tu": "donneras",
+        "il": "donnera",
+        "elle": "donnera",
+        "on": "donnera",
+        "nous": "donnerons",
+        "vous": "donnerez",
+        "ils": "donneront",
+        "elles": "donneront"
+      }
+    },
+    "participe": "donné",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "donn",
+      "famille": "a"
     }
   },
   "penser": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "pense",      "tu": "penses",     "il": "pense",      "elle": "pense",      "on": "pense",      "nous": "pensons",     "vous": "pensez",     "ils": "pensent",     "elles": "pensent"     },
-      "imparfait": { "je": "pensais",    "tu": "pensais",    "il": "pensait",    "elle": "pensait",    "on": "pensait",    "nous": "pensions",    "vous": "pensiez",    "ils": "pensaient",   "elles": "pensaient"   },
-      "futur":     { "je": "penserai",   "tu": "penseras",   "il": "pensera",    "elle": "pensera",    "on": "pensera",    "nous": "penserons",   "vous": "penserez",   "ils": "penseront",   "elles": "penseront"   }
+      "présent": {
+        "je": "pense",
+        "tu": "penses",
+        "il": "pense",
+        "elle": "pense",
+        "on": "pense",
+        "nous": "pensons",
+        "vous": "pensez",
+        "ils": "pensent",
+        "elles": "pensent"
+      },
+      "imparfait": {
+        "je": "pensais",
+        "tu": "pensais",
+        "il": "pensait",
+        "elle": "pensait",
+        "on": "pensait",
+        "nous": "pensions",
+        "vous": "pensiez",
+        "ils": "pensaient",
+        "elles": "pensaient"
+      },
+      "futur": {
+        "je": "penserai",
+        "tu": "penseras",
+        "il": "pensera",
+        "elle": "pensera",
+        "on": "pensera",
+        "nous": "penserons",
+        "vous": "penserez",
+        "ils": "penseront",
+        "elles": "penseront"
+      }
+    },
+    "participe": "pensé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "pens",
+      "famille": "a"
     }
   },
   "travailler": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "travaille",      "tu": "travailles",     "il": "travaille",      "elle": "travaille",      "on": "travaille",      "nous": "travaillons",     "vous": "travaillez",     "ils": "travaillent",     "elles": "travaillent"     },
-      "imparfait": { "je": "travaillais",    "tu": "travaillais",    "il": "travaillait",    "elle": "travaillait",    "on": "travaillait",    "nous": "travaillions",    "vous": "travailliez",    "ils": "travaillaient",   "elles": "travaillaient"   },
-      "futur":     { "je": "travaillerai",   "tu": "travailleras",   "il": "travaillera",    "elle": "travaillera",    "on": "travaillera",    "nous": "travaillerons",   "vous": "travaillerez",   "ils": "travailleront",   "elles": "travailleront"   }
+      "présent": {
+        "je": "travaille",
+        "tu": "travailles",
+        "il": "travaille",
+        "elle": "travaille",
+        "on": "travaille",
+        "nous": "travaillons",
+        "vous": "travaillez",
+        "ils": "travaillent",
+        "elles": "travaillent"
+      },
+      "imparfait": {
+        "je": "travaillais",
+        "tu": "travaillais",
+        "il": "travaillait",
+        "elle": "travaillait",
+        "on": "travaillait",
+        "nous": "travaillions",
+        "vous": "travailliez",
+        "ils": "travaillaient",
+        "elles": "travaillaient"
+      },
+      "futur": {
+        "je": "travaillerai",
+        "tu": "travailleras",
+        "il": "travaillera",
+        "elle": "travaillera",
+        "on": "travaillera",
+        "nous": "travaillerons",
+        "vous": "travaillerez",
+        "ils": "travailleront",
+        "elles": "travailleront"
+      }
+    },
+    "participe": "travaillé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "travaill",
+      "famille": "a"
     }
   },
   "habiter": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "habite",     "tu": "habites",    "il": "habite",     "elle": "habite",     "on": "habite",     "nous": "habitons",    "vous": "habitez",    "ils": "habitent",    "elles": "habitent"    },
-      "imparfait": { "je": "habitais",   "tu": "habitais",   "il": "habitait",   "elle": "habitait",   "on": "habitait",   "nous": "habitions",   "vous": "habitiez",   "ils": "habitaient",  "elles": "habitaient"  },
-      "futur":     { "je": "habiterai",  "tu": "habiteras",  "il": "habitera",   "elle": "habitera",   "on": "habitera",   "nous": "habiterons",  "vous": "habiterez",  "ils": "habiteront",  "elles": "habiteront"  }
+      "présent": {
+        "je": "habite",
+        "tu": "habites",
+        "il": "habite",
+        "elle": "habite",
+        "on": "habite",
+        "nous": "habitons",
+        "vous": "habitez",
+        "ils": "habitent",
+        "elles": "habitent"
+      },
+      "imparfait": {
+        "je": "habitais",
+        "tu": "habitais",
+        "il": "habitait",
+        "elle": "habitait",
+        "on": "habitait",
+        "nous": "habitions",
+        "vous": "habitiez",
+        "ils": "habitaient",
+        "elles": "habitaient"
+      },
+      "futur": {
+        "je": "habiterai",
+        "tu": "habiteras",
+        "il": "habitera",
+        "elle": "habitera",
+        "on": "habitera",
+        "nous": "habiterons",
+        "vous": "habiterez",
+        "ils": "habiteront",
+        "elles": "habiteront"
+      }
+    },
+    "participe": "habité",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "habit",
+      "famille": "a"
     }
   },
   "arriver": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "arrive",       "tu": "arrives",      "il": "arrive",       "elle": "arrive",       "on": "arrive",       "nous": "arrivons",      "vous": "arrivez",      "ils": "arrivent",      "elles": "arrivent"      },
-      "imparfait": { "je": "arrivais",     "tu": "arrivais",     "il": "arrivait",     "elle": "arrivait",     "on": "arrivait",     "nous": "arrivions",     "vous": "arriviez",     "ils": "arrivaient",    "elles": "arrivaient"    },
-      "futur":     { "je": "arriverai",    "tu": "arriveras",    "il": "arrivera",     "elle": "arrivera",     "on": "arrivera",     "nous": "arriverons",    "vous": "arriverez",    "ils": "arriveront",    "elles": "arriveront"    }
+      "présent": {
+        "je": "arrive",
+        "tu": "arrives",
+        "il": "arrive",
+        "elle": "arrive",
+        "on": "arrive",
+        "nous": "arrivons",
+        "vous": "arrivez",
+        "ils": "arrivent",
+        "elles": "arrivent"
+      },
+      "imparfait": {
+        "je": "arrivais",
+        "tu": "arrivais",
+        "il": "arrivait",
+        "elle": "arrivait",
+        "on": "arrivait",
+        "nous": "arrivions",
+        "vous": "arriviez",
+        "ils": "arrivaient",
+        "elles": "arrivaient"
+      },
+      "futur": {
+        "je": "arriverai",
+        "tu": "arriveras",
+        "il": "arrivera",
+        "elle": "arrivera",
+        "on": "arrivera",
+        "nous": "arriverons",
+        "vous": "arriverez",
+        "ils": "arriveront",
+        "elles": "arriveront"
+      }
+    },
+    "participe": "arrivé",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "arriv",
+      "famille": "a"
     }
   },
   "tomber": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "tombe",      "tu": "tombes",     "il": "tombe",      "elle": "tombe",      "on": "tombe",      "nous": "tombons",     "vous": "tombez",     "ils": "tombent",     "elles": "tombent"     },
-      "imparfait": { "je": "tombais",    "tu": "tombais",    "il": "tombait",    "elle": "tombait",    "on": "tombait",    "nous": "tombions",    "vous": "tombiez",    "ils": "tombaient",   "elles": "tombaient"   },
-      "futur":     { "je": "tomberai",   "tu": "tomberas",   "il": "tombera",    "elle": "tombera",    "on": "tombera",    "nous": "tomberons",   "vous": "tomberez",   "ils": "tomberont",   "elles": "tomberont"   }
+      "présent": {
+        "je": "tombe",
+        "tu": "tombes",
+        "il": "tombe",
+        "elle": "tombe",
+        "on": "tombe",
+        "nous": "tombons",
+        "vous": "tombez",
+        "ils": "tombent",
+        "elles": "tombent"
+      },
+      "imparfait": {
+        "je": "tombais",
+        "tu": "tombais",
+        "il": "tombait",
+        "elle": "tombait",
+        "on": "tombait",
+        "nous": "tombions",
+        "vous": "tombiez",
+        "ils": "tombaient",
+        "elles": "tombaient"
+      },
+      "futur": {
+        "je": "tomberai",
+        "tu": "tomberas",
+        "il": "tombera",
+        "elle": "tombera",
+        "on": "tombera",
+        "nous": "tomberons",
+        "vous": "tomberez",
+        "ils": "tomberont",
+        "elles": "tomberont"
+      }
+    },
+    "participe": "tombé",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "tomb",
+      "famille": "a"
     }
   },
   "rester": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "reste",      "tu": "restes",     "il": "reste",      "elle": "reste",      "on": "reste",      "nous": "restons",     "vous": "restez",     "ils": "restent",     "elles": "restent"     },
-      "imparfait": { "je": "restais",    "tu": "restais",    "il": "restait",    "elle": "restait",    "on": "restait",    "nous": "restions",    "vous": "restiez",    "ils": "restaient",   "elles": "restaient"   },
-      "futur":     { "je": "resterai",   "tu": "resteras",   "il": "restera",    "elle": "restera",    "on": "restera",    "nous": "resterons",   "vous": "resterez",   "ils": "resteront",   "elles": "resteront"   }
+      "présent": {
+        "je": "reste",
+        "tu": "restes",
+        "il": "reste",
+        "elle": "reste",
+        "on": "reste",
+        "nous": "restons",
+        "vous": "restez",
+        "ils": "restent",
+        "elles": "restent"
+      },
+      "imparfait": {
+        "je": "restais",
+        "tu": "restais",
+        "il": "restait",
+        "elle": "restait",
+        "on": "restait",
+        "nous": "restions",
+        "vous": "restiez",
+        "ils": "restaient",
+        "elles": "restaient"
+      },
+      "futur": {
+        "je": "resterai",
+        "tu": "resteras",
+        "il": "restera",
+        "elle": "restera",
+        "on": "restera",
+        "nous": "resterons",
+        "vous": "resterez",
+        "ils": "resteront",
+        "elles": "resteront"
+      }
+    },
+    "participe": "resté",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "rest",
+      "famille": "a"
     }
   },
   "passer": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "passe",      "tu": "passes",     "il": "passe",      "elle": "passe",      "on": "passe",      "nous": "passons",     "vous": "passez",     "ils": "passent",     "elles": "passent"     },
-      "imparfait": { "je": "passais",    "tu": "passais",    "il": "passait",    "elle": "passait",    "on": "passait",    "nous": "passions",    "vous": "passiez",    "ils": "passaient",   "elles": "passaient"   },
-      "futur":     { "je": "passerai",   "tu": "passeras",   "il": "passera",    "elle": "passera",    "on": "passera",    "nous": "passerons",   "vous": "passerez",   "ils": "passeront",   "elles": "passeront"   }
+      "présent": {
+        "je": "passe",
+        "tu": "passes",
+        "il": "passe",
+        "elle": "passe",
+        "on": "passe",
+        "nous": "passons",
+        "vous": "passez",
+        "ils": "passent",
+        "elles": "passent"
+      },
+      "imparfait": {
+        "je": "passais",
+        "tu": "passais",
+        "il": "passait",
+        "elle": "passait",
+        "on": "passait",
+        "nous": "passions",
+        "vous": "passiez",
+        "ils": "passaient",
+        "elles": "passaient"
+      },
+      "futur": {
+        "je": "passerai",
+        "tu": "passeras",
+        "il": "passera",
+        "elle": "passera",
+        "on": "passera",
+        "nous": "passerons",
+        "vous": "passerez",
+        "ils": "passeront",
+        "elles": "passeront"
+      }
+    },
+    "participe": "passé",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "pass",
+      "famille": "a"
     }
   },
   "chercher": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "cherche",    "tu": "cherches",   "il": "cherche",    "elle": "cherche",    "on": "cherche",    "nous": "cherchons",   "vous": "cherchez",   "ils": "cherchent",   "elles": "cherchent"   },
-      "imparfait": { "je": "cherchais",  "tu": "cherchais",  "il": "cherchait",  "elle": "cherchait",  "on": "cherchait",  "nous": "cherchions",  "vous": "cherchiez",  "ils": "cherchaient", "elles": "cherchaient" },
-      "futur":     { "je": "chercherai", "tu": "chercheras", "il": "cherchera",  "elle": "cherchera",  "on": "cherchera",  "nous": "chercherons", "vous": "chercherez", "ils": "chercheront", "elles": "chercheront" }
+      "présent": {
+        "je": "cherche",
+        "tu": "cherches",
+        "il": "cherche",
+        "elle": "cherche",
+        "on": "cherche",
+        "nous": "cherchons",
+        "vous": "cherchez",
+        "ils": "cherchent",
+        "elles": "cherchent"
+      },
+      "imparfait": {
+        "je": "cherchais",
+        "tu": "cherchais",
+        "il": "cherchait",
+        "elle": "cherchait",
+        "on": "cherchait",
+        "nous": "cherchions",
+        "vous": "cherchiez",
+        "ils": "cherchaient",
+        "elles": "cherchaient"
+      },
+      "futur": {
+        "je": "chercherai",
+        "tu": "chercheras",
+        "il": "cherchera",
+        "elle": "cherchera",
+        "on": "cherchera",
+        "nous": "chercherons",
+        "vous": "chercherez",
+        "ils": "chercheront",
+        "elles": "chercheront"
+      }
+    },
+    "participe": "cherché",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "cherch",
+      "famille": "a"
     }
   },
   "porter": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "porte",      "tu": "portes",     "il": "porte",      "elle": "porte",      "on": "porte",      "nous": "portons",     "vous": "portez",     "ils": "portent",     "elles": "portent"     },
-      "imparfait": { "je": "portais",    "tu": "portais",    "il": "portait",    "elle": "portait",    "on": "portait",    "nous": "portions",    "vous": "portiez",    "ils": "portaient",   "elles": "portaient"   },
-      "futur":     { "je": "porterai",   "tu": "porteras",   "il": "portera",    "elle": "portera",    "on": "portera",    "nous": "porterons",   "vous": "porterez",   "ils": "porteront",   "elles": "porteront"   }
+      "présent": {
+        "je": "porte",
+        "tu": "portes",
+        "il": "porte",
+        "elle": "porte",
+        "on": "porte",
+        "nous": "portons",
+        "vous": "portez",
+        "ils": "portent",
+        "elles": "portent"
+      },
+      "imparfait": {
+        "je": "portais",
+        "tu": "portais",
+        "il": "portait",
+        "elle": "portait",
+        "on": "portait",
+        "nous": "portions",
+        "vous": "portiez",
+        "ils": "portaient",
+        "elles": "portaient"
+      },
+      "futur": {
+        "je": "porterai",
+        "tu": "porteras",
+        "il": "portera",
+        "elle": "portera",
+        "on": "portera",
+        "nous": "porterons",
+        "vous": "porterez",
+        "ils": "porteront",
+        "elles": "porteront"
+      }
+    },
+    "participe": "porté",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "port",
+      "famille": "a"
     }
   },
   "dessiner": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "dessine",     "tu": "dessines",    "il": "dessine",     "elle": "dessine",     "on": "dessine",     "nous": "dessinons",    "vous": "dessinez",    "ils": "dessinent",    "elles": "dessinent"    },
-      "imparfait": { "je": "dessinais",   "tu": "dessinais",   "il": "dessinait",   "elle": "dessinait",   "on": "dessinait",   "nous": "dessinions",   "vous": "dessiniez",   "ils": "dessinaient",  "elles": "dessinaient"  },
-      "futur":     { "je": "dessinerai",  "tu": "dessineras",  "il": "dessinera",   "elle": "dessinera",   "on": "dessinera",   "nous": "dessinerons",  "vous": "dessinerez",  "ils": "dessineront",  "elles": "dessineront"  }
+      "présent": {
+        "je": "dessine",
+        "tu": "dessines",
+        "il": "dessine",
+        "elle": "dessine",
+        "on": "dessine",
+        "nous": "dessinons",
+        "vous": "dessinez",
+        "ils": "dessinent",
+        "elles": "dessinent"
+      },
+      "imparfait": {
+        "je": "dessinais",
+        "tu": "dessinais",
+        "il": "dessinait",
+        "elle": "dessinait",
+        "on": "dessinait",
+        "nous": "dessinions",
+        "vous": "dessiniez",
+        "ils": "dessinaient",
+        "elles": "dessinaient"
+      },
+      "futur": {
+        "je": "dessinerai",
+        "tu": "dessineras",
+        "il": "dessinera",
+        "elle": "dessinera",
+        "on": "dessinera",
+        "nous": "dessinerons",
+        "vous": "dessinerez",
+        "ils": "dessineront",
+        "elles": "dessineront"
+      }
+    },
+    "participe": "dessiné",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "dessin",
+      "famille": "a"
     }
   },
   "danser": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "danse",      "tu": "danses",     "il": "danse",      "elle": "danse",      "on": "danse",      "nous": "dansons",     "vous": "dansez",     "ils": "dansent",     "elles": "dansent"     },
-      "imparfait": { "je": "dansais",    "tu": "dansais",    "il": "dansait",    "elle": "dansait",    "on": "dansait",    "nous": "dansions",    "vous": "dansiez",    "ils": "dansaient",   "elles": "dansaient"   },
-      "futur":     { "je": "danserai",   "tu": "danseras",   "il": "dansera",    "elle": "dansera",    "on": "dansera",    "nous": "danserons",   "vous": "danserez",   "ils": "danseront",   "elles": "danseront"   }
+      "présent": {
+        "je": "danse",
+        "tu": "danses",
+        "il": "danse",
+        "elle": "danse",
+        "on": "danse",
+        "nous": "dansons",
+        "vous": "dansez",
+        "ils": "dansent",
+        "elles": "dansent"
+      },
+      "imparfait": {
+        "je": "dansais",
+        "tu": "dansais",
+        "il": "dansait",
+        "elle": "dansait",
+        "on": "dansait",
+        "nous": "dansions",
+        "vous": "dansiez",
+        "ils": "dansaient",
+        "elles": "dansaient"
+      },
+      "futur": {
+        "je": "danserai",
+        "tu": "danseras",
+        "il": "dansera",
+        "elle": "dansera",
+        "on": "dansera",
+        "nous": "danserons",
+        "vous": "danserez",
+        "ils": "danseront",
+        "elles": "danseront"
+      }
+    },
+    "participe": "dansé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "dans",
+      "famille": "a"
     }
   },
-
   "manger": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "mange",       "tu": "manges",      "il": "mange",       "elle": "mange",       "on": "mange",       "nous": "mangeons",     "vous": "mangez",      "ils": "mangent",      "elles": "mangent"      },
-      "imparfait": { "je": "mangeais",    "tu": "mangeais",    "il": "mangeait",    "elle": "mangeait",    "on": "mangeait",    "nous": "mangions",     "vous": "mangiez",     "ils": "mangeaient",   "elles": "mangeaient"   },
-      "futur":     { "je": "mangerai",    "tu": "mangeras",    "il": "mangera",     "elle": "mangera",     "on": "mangera",     "nous": "mangerons",    "vous": "mangerez",    "ils": "mangeront",    "elles": "mangeront"    }
+      "présent": {
+        "je": "mange",
+        "tu": "manges",
+        "il": "mange",
+        "elle": "mange",
+        "on": "mange",
+        "nous": "mangeons",
+        "vous": "mangez",
+        "ils": "mangent",
+        "elles": "mangent"
+      },
+      "imparfait": {
+        "je": "mangeais",
+        "tu": "mangeais",
+        "il": "mangeait",
+        "elle": "mangeait",
+        "on": "mangeait",
+        "nous": "mangions",
+        "vous": "mangiez",
+        "ils": "mangeaient",
+        "elles": "mangeaient"
+      },
+      "futur": {
+        "je": "mangerai",
+        "tu": "mangeras",
+        "il": "mangera",
+        "elle": "mangera",
+        "on": "mangera",
+        "nous": "mangerons",
+        "vous": "mangerez",
+        "ils": "mangeront",
+        "elles": "mangeront"
+      }
+    },
+    "participe": "mangé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "mang",
+      "famille": "a"
     }
   },
   "commencer": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "commence",      "tu": "commences",     "il": "commence",      "elle": "commence",      "on": "commence",      "nous": "commençons",     "vous": "commencez",     "ils": "commencent",     "elles": "commencent"     },
-      "imparfait": { "je": "commençais",    "tu": "commençais",    "il": "commençait",    "elle": "commençait",    "on": "commençait",    "nous": "commencions",    "vous": "commenciez",    "ils": "commençaient",   "elles": "commençaient"   },
-      "futur":     { "je": "commencerai",   "tu": "commenceras",   "il": "commencera",    "elle": "commencera",    "on": "commencera",    "nous": "commencerons",   "vous": "commencerez",   "ils": "commenceront",   "elles": "commenceront"   }
+      "présent": {
+        "je": "commence",
+        "tu": "commences",
+        "il": "commence",
+        "elle": "commence",
+        "on": "commence",
+        "nous": "commençons",
+        "vous": "commencez",
+        "ils": "commencent",
+        "elles": "commencent"
+      },
+      "imparfait": {
+        "je": "commençais",
+        "tu": "commençais",
+        "il": "commençait",
+        "elle": "commençait",
+        "on": "commençait",
+        "nous": "commencions",
+        "vous": "commenciez",
+        "ils": "commençaient",
+        "elles": "commençaient"
+      },
+      "futur": {
+        "je": "commencerai",
+        "tu": "commenceras",
+        "il": "commencera",
+        "elle": "commencera",
+        "on": "commencera",
+        "nous": "commencerons",
+        "vous": "commencerez",
+        "ils": "commenceront",
+        "elles": "commenceront"
+      }
+    },
+    "participe": "commencé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "commenc",
+      "famille": "a"
     }
   },
   "appeler": {
     "groupe": "1",
     "conjugaisons": {
-      "présent":   { "je": "appelle",     "tu": "appelles",    "il": "appelle",     "elle": "appelle",     "on": "appelle",     "nous": "appelons",     "vous": "appelez",     "ils": "appellent",    "elles": "appellent"    },
-      "imparfait": { "je": "appelais",    "tu": "appelais",    "il": "appelait",    "elle": "appelait",    "on": "appelait",    "nous": "appelions",    "vous": "appeliez",    "ils": "appelaient",   "elles": "appelaient"   },
-      "futur":     { "je": "appellerai",  "tu": "appelleras",  "il": "appellera",   "elle": "appellera",   "on": "appellera",   "nous": "appellerons",  "vous": "appellerez",  "ils": "appelleront",  "elles": "appelleront"  }
+      "présent": {
+        "je": "appelle",
+        "tu": "appelles",
+        "il": "appelle",
+        "elle": "appelle",
+        "on": "appelle",
+        "nous": "appelons",
+        "vous": "appelez",
+        "ils": "appellent",
+        "elles": "appellent"
+      },
+      "imparfait": {
+        "je": "appelais",
+        "tu": "appelais",
+        "il": "appelait",
+        "elle": "appelait",
+        "on": "appelait",
+        "nous": "appelions",
+        "vous": "appeliez",
+        "ils": "appelaient",
+        "elles": "appelaient"
+      },
+      "futur": {
+        "je": "appellerai",
+        "tu": "appelleras",
+        "il": "appellera",
+        "elle": "appellera",
+        "on": "appellera",
+        "nous": "appellerons",
+        "vous": "appellerez",
+        "ils": "appelleront",
+        "elles": "appelleront"
+      }
+    },
+    "participe": "appelé",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "appel",
+      "famille": "a"
     }
   },
-
   "finir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "finis",        "tu": "finis",        "il": "finit",        "elle": "finit",        "on": "finit",        "nous": "finissons",     "vous": "finissez",     "ils": "finissent",     "elles": "finissent"     },
-      "imparfait": { "je": "finissais",    "tu": "finissais",    "il": "finissait",    "elle": "finissait",    "on": "finissait",    "nous": "finissions",    "vous": "finissiez",    "ils": "finissaient",   "elles": "finissaient"   },
-      "futur":     { "je": "finirai",      "tu": "finiras",      "il": "finira",       "elle": "finira",       "on": "finira",       "nous": "finirons",      "vous": "finirez",      "ils": "finiront",      "elles": "finiront"      }
+      "présent": {
+        "je": "finis",
+        "tu": "finis",
+        "il": "finit",
+        "elle": "finit",
+        "on": "finit",
+        "nous": "finissons",
+        "vous": "finissez",
+        "ils": "finissent",
+        "elles": "finissent"
+      },
+      "imparfait": {
+        "je": "finissais",
+        "tu": "finissais",
+        "il": "finissait",
+        "elle": "finissait",
+        "on": "finissait",
+        "nous": "finissions",
+        "vous": "finissiez",
+        "ils": "finissaient",
+        "elles": "finissaient"
+      },
+      "futur": {
+        "je": "finirai",
+        "tu": "finiras",
+        "il": "finira",
+        "elle": "finira",
+        "on": "finira",
+        "nous": "finirons",
+        "vous": "finirez",
+        "ils": "finiront",
+        "elles": "finiront"
+      }
+    },
+    "participe": "fini",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "fin",
+      "famille": "i"
     }
   },
   "choisir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "choisis",      "tu": "choisis",      "il": "choisit",      "elle": "choisit",      "on": "choisit",      "nous": "choisissons",   "vous": "choisissez",   "ils": "choisissent",   "elles": "choisissent"   },
-      "imparfait": { "je": "choisissais",  "tu": "choisissais",  "il": "choisissait",  "elle": "choisissait",  "on": "choisissait",  "nous": "choisissions",  "vous": "choisissiez",  "ils": "choisissaient", "elles": "choisissaient" },
-      "futur":     { "je": "choisirai",    "tu": "choisiras",    "il": "choisira",     "elle": "choisira",     "on": "choisira",     "nous": "choisirons",    "vous": "choisirez",    "ils": "choisiront",    "elles": "choisiront"    }
+      "présent": {
+        "je": "choisis",
+        "tu": "choisis",
+        "il": "choisit",
+        "elle": "choisit",
+        "on": "choisit",
+        "nous": "choisissons",
+        "vous": "choisissez",
+        "ils": "choisissent",
+        "elles": "choisissent"
+      },
+      "imparfait": {
+        "je": "choisissais",
+        "tu": "choisissais",
+        "il": "choisissait",
+        "elle": "choisissait",
+        "on": "choisissait",
+        "nous": "choisissions",
+        "vous": "choisissiez",
+        "ils": "choisissaient",
+        "elles": "choisissaient"
+      },
+      "futur": {
+        "je": "choisirai",
+        "tu": "choisiras",
+        "il": "choisira",
+        "elle": "choisira",
+        "on": "choisira",
+        "nous": "choisirons",
+        "vous": "choisirez",
+        "ils": "choisiront",
+        "elles": "choisiront"
+      }
+    },
+    "participe": "choisi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "chois",
+      "famille": "i"
     }
   },
   "grandir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "grandis",      "tu": "grandis",      "il": "grandit",      "elle": "grandit",      "on": "grandit",      "nous": "grandissons",   "vous": "grandissez",   "ils": "grandissent",   "elles": "grandissent"   },
-      "imparfait": { "je": "grandissais",  "tu": "grandissais",  "il": "grandissait",  "elle": "grandissait",  "on": "grandissait",  "nous": "grandissions",  "vous": "grandissiez",  "ils": "grandissaient", "elles": "grandissaient" },
-      "futur":     { "je": "grandirai",    "tu": "grandiras",    "il": "grandira",     "elle": "grandira",     "on": "grandira",     "nous": "grandirons",    "vous": "grandirez",    "ils": "grandiront",    "elles": "grandiront"    }
+      "présent": {
+        "je": "grandis",
+        "tu": "grandis",
+        "il": "grandit",
+        "elle": "grandit",
+        "on": "grandit",
+        "nous": "grandissons",
+        "vous": "grandissez",
+        "ils": "grandissent",
+        "elles": "grandissent"
+      },
+      "imparfait": {
+        "je": "grandissais",
+        "tu": "grandissais",
+        "il": "grandissait",
+        "elle": "grandissait",
+        "on": "grandissait",
+        "nous": "grandissions",
+        "vous": "grandissiez",
+        "ils": "grandissaient",
+        "elles": "grandissaient"
+      },
+      "futur": {
+        "je": "grandirai",
+        "tu": "grandiras",
+        "il": "grandira",
+        "elle": "grandira",
+        "on": "grandira",
+        "nous": "grandirons",
+        "vous": "grandirez",
+        "ils": "grandiront",
+        "elles": "grandiront"
+      }
+    },
+    "participe": "grandi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "grand",
+      "famille": "i"
     }
   },
   "rougir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "rougis",       "tu": "rougis",       "il": "rougit",       "elle": "rougit",       "on": "rougit",       "nous": "rougissons",    "vous": "rougissez",    "ils": "rougissent",    "elles": "rougissent"    },
-      "imparfait": { "je": "rougissais",   "tu": "rougissais",   "il": "rougissait",   "elle": "rougissait",   "on": "rougissait",   "nous": "rougissions",   "vous": "rougissiez",   "ils": "rougissaient",  "elles": "rougissaient"  },
-      "futur":     { "je": "rougirai",     "tu": "rougiras",     "il": "rougira",      "elle": "rougira",      "on": "rougira",      "nous": "rougirons",     "vous": "rougirez",     "ils": "rougiront",     "elles": "rougiront"     }
+      "présent": {
+        "je": "rougis",
+        "tu": "rougis",
+        "il": "rougit",
+        "elle": "rougit",
+        "on": "rougit",
+        "nous": "rougissons",
+        "vous": "rougissez",
+        "ils": "rougissent",
+        "elles": "rougissent"
+      },
+      "imparfait": {
+        "je": "rougissais",
+        "tu": "rougissais",
+        "il": "rougissait",
+        "elle": "rougissait",
+        "on": "rougissait",
+        "nous": "rougissions",
+        "vous": "rougissiez",
+        "ils": "rougissaient",
+        "elles": "rougissaient"
+      },
+      "futur": {
+        "je": "rougirai",
+        "tu": "rougiras",
+        "il": "rougira",
+        "elle": "rougira",
+        "on": "rougira",
+        "nous": "rougirons",
+        "vous": "rougirez",
+        "ils": "rougiront",
+        "elles": "rougiront"
+      }
+    },
+    "participe": "rougi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "roug",
+      "famille": "i"
     }
   },
   "réussir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "réussis",      "tu": "réussis",      "il": "réussit",      "elle": "réussit",      "on": "réussit",      "nous": "réussissons",   "vous": "réussissez",   "ils": "réussissent",   "elles": "réussissent"   },
-      "imparfait": { "je": "réussissais",  "tu": "réussissais",  "il": "réussissait",  "elle": "réussissait",  "on": "réussissait",  "nous": "réussissions",  "vous": "réussissiez",  "ils": "réussissaient", "elles": "réussissaient" },
-      "futur":     { "je": "réussirai",    "tu": "réussiras",    "il": "réussira",     "elle": "réussira",     "on": "réussira",     "nous": "réussirons",    "vous": "réussirez",    "ils": "réussiront",    "elles": "réussiront"    }
+      "présent": {
+        "je": "réussis",
+        "tu": "réussis",
+        "il": "réussit",
+        "elle": "réussit",
+        "on": "réussit",
+        "nous": "réussissons",
+        "vous": "réussissez",
+        "ils": "réussissent",
+        "elles": "réussissent"
+      },
+      "imparfait": {
+        "je": "réussissais",
+        "tu": "réussissais",
+        "il": "réussissait",
+        "elle": "réussissait",
+        "on": "réussissait",
+        "nous": "réussissions",
+        "vous": "réussissiez",
+        "ils": "réussissaient",
+        "elles": "réussissaient"
+      },
+      "futur": {
+        "je": "réussirai",
+        "tu": "réussiras",
+        "il": "réussira",
+        "elle": "réussira",
+        "on": "réussira",
+        "nous": "réussirons",
+        "vous": "réussirez",
+        "ils": "réussiront",
+        "elles": "réussiront"
+      }
+    },
+    "participe": "réussi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "réuss",
+      "famille": "i"
     }
   },
   "obéir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "obéis",        "tu": "obéis",        "il": "obéit",        "elle": "obéit",        "on": "obéit",        "nous": "obéissons",     "vous": "obéissez",     "ils": "obéissent",     "elles": "obéissent"     },
-      "imparfait": { "je": "obéissais",    "tu": "obéissais",    "il": "obéissait",    "elle": "obéissait",    "on": "obéissait",    "nous": "obéissions",    "vous": "obéissiez",    "ils": "obéissaient",   "elles": "obéissaient"   },
-      "futur":     { "je": "obéirai",      "tu": "obéiras",      "il": "obéira",       "elle": "obéira",       "on": "obéira",       "nous": "obéirons",      "vous": "obéirez",      "ils": "obéiront",      "elles": "obéiront"      }
+      "présent": {
+        "je": "obéis",
+        "tu": "obéis",
+        "il": "obéit",
+        "elle": "obéit",
+        "on": "obéit",
+        "nous": "obéissons",
+        "vous": "obéissez",
+        "ils": "obéissent",
+        "elles": "obéissent"
+      },
+      "imparfait": {
+        "je": "obéissais",
+        "tu": "obéissais",
+        "il": "obéissait",
+        "elle": "obéissait",
+        "on": "obéissait",
+        "nous": "obéissions",
+        "vous": "obéissiez",
+        "ils": "obéissaient",
+        "elles": "obéissaient"
+      },
+      "futur": {
+        "je": "obéirai",
+        "tu": "obéiras",
+        "il": "obéira",
+        "elle": "obéira",
+        "on": "obéira",
+        "nous": "obéirons",
+        "vous": "obéirez",
+        "ils": "obéiront",
+        "elles": "obéiront"
+      }
+    },
+    "participe": "obéi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "obé",
+      "famille": "i"
     }
   },
   "remplir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "remplis",      "tu": "remplis",      "il": "remplit",      "elle": "remplit",      "on": "remplit",      "nous": "remplissons",   "vous": "remplissez",   "ils": "remplissent",   "elles": "remplissent"   },
-      "imparfait": { "je": "remplissais",  "tu": "remplissais",  "il": "remplissait",  "elle": "remplissait",  "on": "remplissait",  "nous": "remplissions",  "vous": "remplissiez",  "ils": "remplissaient", "elles": "remplissaient" },
-      "futur":     { "je": "remplirai",    "tu": "rempliras",    "il": "remplira",     "elle": "remplira",     "on": "remplira",     "nous": "remplirons",    "vous": "remplirez",    "ils": "rempliront",    "elles": "rempliront"    }
+      "présent": {
+        "je": "remplis",
+        "tu": "remplis",
+        "il": "remplit",
+        "elle": "remplit",
+        "on": "remplit",
+        "nous": "remplissons",
+        "vous": "remplissez",
+        "ils": "remplissent",
+        "elles": "remplissent"
+      },
+      "imparfait": {
+        "je": "remplissais",
+        "tu": "remplissais",
+        "il": "remplissait",
+        "elle": "remplissait",
+        "on": "remplissait",
+        "nous": "remplissions",
+        "vous": "remplissiez",
+        "ils": "remplissaient",
+        "elles": "remplissaient"
+      },
+      "futur": {
+        "je": "remplirai",
+        "tu": "rempliras",
+        "il": "remplira",
+        "elle": "remplira",
+        "on": "remplira",
+        "nous": "remplirons",
+        "vous": "remplirez",
+        "ils": "rempliront",
+        "elles": "rempliront"
+      }
+    },
+    "participe": "rempli",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "rempl",
+      "famille": "i"
     }
   },
   "bâtir": {
     "groupe": "2",
     "conjugaisons": {
-      "présent":   { "je": "bâtis",        "tu": "bâtis",        "il": "bâtit",        "elle": "bâtit",        "on": "bâtit",        "nous": "bâtissons",     "vous": "bâtissez",     "ils": "bâtissent",     "elles": "bâtissent"     },
-      "imparfait": { "je": "bâtissais",    "tu": "bâtissais",    "il": "bâtissait",    "elle": "bâtissait",    "on": "bâtissait",    "nous": "bâtissions",    "vous": "bâtissiez",    "ils": "bâtissaient",   "elles": "bâtissaient"   },
-      "futur":     { "je": "bâtirai",      "tu": "bâtiras",      "il": "bâtira",       "elle": "bâtira",       "on": "bâtira",       "nous": "bâtirons",      "vous": "bâtirez",      "ils": "bâtiront",      "elles": "bâtiront"      }
+      "présent": {
+        "je": "bâtis",
+        "tu": "bâtis",
+        "il": "bâtit",
+        "elle": "bâtit",
+        "on": "bâtit",
+        "nous": "bâtissons",
+        "vous": "bâtissez",
+        "ils": "bâtissent",
+        "elles": "bâtissent"
+      },
+      "imparfait": {
+        "je": "bâtissais",
+        "tu": "bâtissais",
+        "il": "bâtissait",
+        "elle": "bâtissait",
+        "on": "bâtissait",
+        "nous": "bâtissions",
+        "vous": "bâtissiez",
+        "ils": "bâtissaient",
+        "elles": "bâtissaient"
+      },
+      "futur": {
+        "je": "bâtirai",
+        "tu": "bâtiras",
+        "il": "bâtira",
+        "elle": "bâtira",
+        "on": "bâtira",
+        "nous": "bâtirons",
+        "vous": "bâtirez",
+        "ils": "bâtiront",
+        "elles": "bâtiront"
+      }
+    },
+    "participe": "bâti",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "bât",
+      "famille": "i"
     }
   },
-
   "aller": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "vais",     "tu": "vas",      "il": "va",       "elle": "va",       "on": "va",       "nous": "allons",    "vous": "allez",    "ils": "vont",      "elles": "vont"      },
-      "imparfait": { "je": "allais",   "tu": "allais",   "il": "allait",   "elle": "allait",   "on": "allait",   "nous": "allions",   "vous": "alliez",   "ils": "allaient",  "elles": "allaient"  },
-      "futur":     { "je": "irai",     "tu": "iras",     "il": "ira",      "elle": "ira",      "on": "ira",      "nous": "irons",     "vous": "irez",     "ils": "iront",     "elles": "iront"     }
+      "présent": {
+        "je": "vais",
+        "tu": "vas",
+        "il": "va",
+        "elle": "va",
+        "on": "va",
+        "nous": "allons",
+        "vous": "allez",
+        "ils": "vont",
+        "elles": "vont"
+      },
+      "imparfait": {
+        "je": "allais",
+        "tu": "allais",
+        "il": "allait",
+        "elle": "allait",
+        "on": "allait",
+        "nous": "allions",
+        "vous": "alliez",
+        "ils": "allaient",
+        "elles": "allaient"
+      },
+      "futur": {
+        "je": "irai",
+        "tu": "iras",
+        "il": "ira",
+        "elle": "ira",
+        "on": "ira",
+        "nous": "irons",
+        "vous": "irez",
+        "ils": "iront",
+        "elles": "iront"
+      }
+    },
+    "participe": "allé",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "all",
+      "famille": "a"
     }
   },
   "venir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "viens",      "tu": "viens",      "il": "vient",      "elle": "vient",      "on": "vient",      "nous": "venons",     "vous": "venez",     "ils": "viennent",    "elles": "viennent"    },
-      "imparfait": { "je": "venais",     "tu": "venais",     "il": "venait",     "elle": "venait",     "on": "venait",     "nous": "venions",    "vous": "veniez",    "ils": "venaient",    "elles": "venaient"    },
-      "futur":     { "je": "viendrai",   "tu": "viendras",   "il": "viendra",    "elle": "viendra",    "on": "viendra",    "nous": "viendrons",  "vous": "viendrez",  "ils": "viendront",   "elles": "viendront"   }
+      "présent": {
+        "je": "viens",
+        "tu": "viens",
+        "il": "vient",
+        "elle": "vient",
+        "on": "vient",
+        "nous": "venons",
+        "vous": "venez",
+        "ils": "viennent",
+        "elles": "viennent"
+      },
+      "imparfait": {
+        "je": "venais",
+        "tu": "venais",
+        "il": "venait",
+        "elle": "venait",
+        "on": "venait",
+        "nous": "venions",
+        "vous": "veniez",
+        "ils": "venaient",
+        "elles": "venaient"
+      },
+      "futur": {
+        "je": "viendrai",
+        "tu": "viendras",
+        "il": "viendra",
+        "elle": "viendra",
+        "on": "viendra",
+        "nous": "viendrons",
+        "vous": "viendrez",
+        "ils": "viendront",
+        "elles": "viendront"
+      }
+    },
+    "participe": "venu",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "v",
+      "famille": "in"
     }
   },
   "faire": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "fais",     "tu": "fais",     "il": "fait",     "elle": "fait",     "on": "fait",     "nous": "faisons",   "vous": "faites",   "ils": "font",      "elles": "font"      },
-      "imparfait": { "je": "faisais",  "tu": "faisais",  "il": "faisait",  "elle": "faisait",  "on": "faisait",  "nous": "faisions",  "vous": "faisiez",  "ils": "faisaient", "elles": "faisaient" },
-      "futur":     { "je": "ferai",    "tu": "feras",    "il": "fera",     "elle": "fera",     "on": "fera",     "nous": "ferons",    "vous": "ferez",    "ils": "feront",    "elles": "feront"    }
+      "présent": {
+        "je": "fais",
+        "tu": "fais",
+        "il": "fait",
+        "elle": "fait",
+        "on": "fait",
+        "nous": "faisons",
+        "vous": "faites",
+        "ils": "font",
+        "elles": "font"
+      },
+      "imparfait": {
+        "je": "faisais",
+        "tu": "faisais",
+        "il": "faisait",
+        "elle": "faisait",
+        "on": "faisait",
+        "nous": "faisions",
+        "vous": "faisiez",
+        "ils": "faisaient",
+        "elles": "faisaient"
+      },
+      "futur": {
+        "je": "ferai",
+        "tu": "feras",
+        "il": "fera",
+        "elle": "fera",
+        "on": "fera",
+        "nous": "ferons",
+        "vous": "ferez",
+        "ils": "feront",
+        "elles": "feront"
+      }
+    },
+    "participe": "fait",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "f",
+      "famille": "i"
     }
   },
   "dire": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "dis",      "tu": "dis",      "il": "dit",      "elle": "dit",      "on": "dit",      "nous": "disons",    "vous": "dites",    "ils": "disent",    "elles": "disent"    },
-      "imparfait": { "je": "disais",   "tu": "disais",   "il": "disait",   "elle": "disait",   "on": "disait",   "nous": "disions",   "vous": "disiez",   "ils": "disaient",  "elles": "disaient"  },
-      "futur":     { "je": "dirai",    "tu": "diras",    "il": "dira",     "elle": "dira",     "on": "dira",     "nous": "dirons",    "vous": "direz",    "ils": "diront",    "elles": "diront"    }
+      "présent": {
+        "je": "dis",
+        "tu": "dis",
+        "il": "dit",
+        "elle": "dit",
+        "on": "dit",
+        "nous": "disons",
+        "vous": "dites",
+        "ils": "disent",
+        "elles": "disent"
+      },
+      "imparfait": {
+        "je": "disais",
+        "tu": "disais",
+        "il": "disait",
+        "elle": "disait",
+        "on": "disait",
+        "nous": "disions",
+        "vous": "disiez",
+        "ils": "disaient",
+        "elles": "disaient"
+      },
+      "futur": {
+        "je": "dirai",
+        "tu": "diras",
+        "il": "dira",
+        "elle": "dira",
+        "on": "dira",
+        "nous": "dirons",
+        "vous": "direz",
+        "ils": "diront",
+        "elles": "diront"
+      }
+    },
+    "participe": "dit",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "d",
+      "famille": "i"
     }
   },
   "voir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "vois",     "tu": "vois",     "il": "voit",     "elle": "voit",     "on": "voit",     "nous": "voyons",    "vous": "voyez",    "ils": "voient",    "elles": "voient"    },
-      "imparfait": { "je": "voyais",   "tu": "voyais",   "il": "voyait",   "elle": "voyait",   "on": "voyait",   "nous": "voyions",   "vous": "voyiez",   "ils": "voyaient",  "elles": "voyaient"  },
-      "futur":     { "je": "verrai",   "tu": "verras",   "il": "verra",    "elle": "verra",    "on": "verra",    "nous": "verrons",   "vous": "verrez",   "ils": "verront",   "elles": "verront"   }
+      "présent": {
+        "je": "vois",
+        "tu": "vois",
+        "il": "voit",
+        "elle": "voit",
+        "on": "voit",
+        "nous": "voyons",
+        "vous": "voyez",
+        "ils": "voient",
+        "elles": "voient"
+      },
+      "imparfait": {
+        "je": "voyais",
+        "tu": "voyais",
+        "il": "voyait",
+        "elle": "voyait",
+        "on": "voyait",
+        "nous": "voyions",
+        "vous": "voyiez",
+        "ils": "voyaient",
+        "elles": "voyaient"
+      },
+      "futur": {
+        "je": "verrai",
+        "tu": "verras",
+        "il": "verra",
+        "elle": "verra",
+        "on": "verra",
+        "nous": "verrons",
+        "vous": "verrez",
+        "ils": "verront",
+        "elles": "verront"
+      }
+    },
+    "participe": "vu",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "v",
+      "famille": "i"
     }
   },
   "savoir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "sais",     "tu": "sais",     "il": "sait",     "elle": "sait",     "on": "sait",     "nous": "savons",    "vous": "savez",    "ils": "savent",    "elles": "savent"    },
-      "imparfait": { "je": "savais",   "tu": "savais",   "il": "savait",   "elle": "savait",   "on": "savait",   "nous": "savions",   "vous": "saviez",   "ils": "savaient",  "elles": "savaient"  },
-      "futur":     { "je": "saurai",   "tu": "sauras",   "il": "saura",    "elle": "saura",    "on": "saura",    "nous": "saurons",   "vous": "saurez",   "ils": "sauront",   "elles": "sauront"   }
+      "présent": {
+        "je": "sais",
+        "tu": "sais",
+        "il": "sait",
+        "elle": "sait",
+        "on": "sait",
+        "nous": "savons",
+        "vous": "savez",
+        "ils": "savent",
+        "elles": "savent"
+      },
+      "imparfait": {
+        "je": "savais",
+        "tu": "savais",
+        "il": "savait",
+        "elle": "savait",
+        "on": "savait",
+        "nous": "savions",
+        "vous": "saviez",
+        "ils": "savaient",
+        "elles": "savaient"
+      },
+      "futur": {
+        "je": "saurai",
+        "tu": "sauras",
+        "il": "saura",
+        "elle": "saura",
+        "on": "saura",
+        "nous": "saurons",
+        "vous": "saurez",
+        "ils": "sauront",
+        "elles": "sauront"
+      }
+    },
+    "participe": "su",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "s",
+      "famille": "u"
     }
   },
   "vouloir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "veux",      "tu": "veux",      "il": "veut",      "elle": "veut",      "on": "veut",      "nous": "voulons",    "vous": "voulez",    "ils": "veulent",    "elles": "veulent"    },
-      "imparfait": { "je": "voulais",   "tu": "voulais",   "il": "voulait",   "elle": "voulait",   "on": "voulait",   "nous": "voulions",   "vous": "vouliez",   "ils": "voulaient",  "elles": "voulaient"  },
-      "futur":     { "je": "voudrai",   "tu": "voudras",   "il": "voudra",    "elle": "voudra",    "on": "voudra",    "nous": "voudrons",   "vous": "voudrez",   "ils": "voudront",   "elles": "voudront"   }
+      "présent": {
+        "je": "veux",
+        "tu": "veux",
+        "il": "veut",
+        "elle": "veut",
+        "on": "veut",
+        "nous": "voulons",
+        "vous": "voulez",
+        "ils": "veulent",
+        "elles": "veulent"
+      },
+      "imparfait": {
+        "je": "voulais",
+        "tu": "voulais",
+        "il": "voulait",
+        "elle": "voulait",
+        "on": "voulait",
+        "nous": "voulions",
+        "vous": "vouliez",
+        "ils": "voulaient",
+        "elles": "voulaient"
+      },
+      "futur": {
+        "je": "voudrai",
+        "tu": "voudras",
+        "il": "voudra",
+        "elle": "voudra",
+        "on": "voudra",
+        "nous": "voudrons",
+        "vous": "voudrez",
+        "ils": "voudront",
+        "elles": "voudront"
+      }
+    },
+    "participe": "voulu",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "voul",
+      "famille": "u"
     }
   },
   "pouvoir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "peux",      "tu": "peux",      "il": "peut",      "elle": "peut",      "on": "peut",      "nous": "pouvons",    "vous": "pouvez",    "ils": "peuvent",    "elles": "peuvent"    },
-      "imparfait": { "je": "pouvais",   "tu": "pouvais",   "il": "pouvait",   "elle": "pouvait",   "on": "pouvait",   "nous": "pouvions",   "vous": "pouviez",   "ils": "pouvaient",  "elles": "pouvaient"  },
-      "futur":     { "je": "pourrai",   "tu": "pourras",   "il": "pourra",    "elle": "pourra",    "on": "pourra",    "nous": "pourrons",   "vous": "pourrez",   "ils": "pourront",   "elles": "pourront"   }
+      "présent": {
+        "je": "peux",
+        "tu": "peux",
+        "il": "peut",
+        "elle": "peut",
+        "on": "peut",
+        "nous": "pouvons",
+        "vous": "pouvez",
+        "ils": "peuvent",
+        "elles": "peuvent"
+      },
+      "imparfait": {
+        "je": "pouvais",
+        "tu": "pouvais",
+        "il": "pouvait",
+        "elle": "pouvait",
+        "on": "pouvait",
+        "nous": "pouvions",
+        "vous": "pouviez",
+        "ils": "pouvaient",
+        "elles": "pouvaient"
+      },
+      "futur": {
+        "je": "pourrai",
+        "tu": "pourras",
+        "il": "pourra",
+        "elle": "pourra",
+        "on": "pourra",
+        "nous": "pourrons",
+        "vous": "pourrez",
+        "ils": "pourront",
+        "elles": "pourront"
+      }
+    },
+    "participe": "pu",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "p",
+      "famille": "u"
     }
   },
   "devoir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "dois",      "tu": "dois",      "il": "doit",      "elle": "doit",      "on": "doit",      "nous": "devons",     "vous": "devez",     "ils": "doivent",    "elles": "doivent"    },
-      "imparfait": { "je": "devais",    "tu": "devais",    "il": "devait",    "elle": "devait",    "on": "devait",    "nous": "devions",    "vous": "deviez",    "ils": "devaient",   "elles": "devaient"   },
-      "futur":     { "je": "devrai",    "tu": "devras",    "il": "devra",     "elle": "devra",     "on": "devra",     "nous": "devrons",    "vous": "devrez",    "ils": "devront",    "elles": "devront"    }
+      "présent": {
+        "je": "dois",
+        "tu": "dois",
+        "il": "doit",
+        "elle": "doit",
+        "on": "doit",
+        "nous": "devons",
+        "vous": "devez",
+        "ils": "doivent",
+        "elles": "doivent"
+      },
+      "imparfait": {
+        "je": "devais",
+        "tu": "devais",
+        "il": "devait",
+        "elle": "devait",
+        "on": "devait",
+        "nous": "devions",
+        "vous": "deviez",
+        "ils": "devaient",
+        "elles": "devaient"
+      },
+      "futur": {
+        "je": "devrai",
+        "tu": "devras",
+        "il": "devra",
+        "elle": "devra",
+        "on": "devra",
+        "nous": "devrons",
+        "vous": "devrez",
+        "ils": "devront",
+        "elles": "devront"
+      }
+    },
+    "participe": "dû",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "d",
+      "famille": "u"
     }
   },
   "prendre": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "prends",     "tu": "prends",     "il": "prend",      "elle": "prend",      "on": "prend",      "nous": "prenons",    "vous": "prenez",    "ils": "prennent",   "elles": "prennent"   },
-      "imparfait": { "je": "prenais",    "tu": "prenais",    "il": "prenait",    "elle": "prenait",    "on": "prenait",    "nous": "prenions",   "vous": "preniez",   "ils": "prenaient",  "elles": "prenaient"  },
-      "futur":     { "je": "prendrai",   "tu": "prendras",   "il": "prendra",    "elle": "prendra",    "on": "prendra",    "nous": "prendrons",  "vous": "prendrez",  "ils": "prendront",  "elles": "prendront"  }
+      "présent": {
+        "je": "prends",
+        "tu": "prends",
+        "il": "prend",
+        "elle": "prend",
+        "on": "prend",
+        "nous": "prenons",
+        "vous": "prenez",
+        "ils": "prennent",
+        "elles": "prennent"
+      },
+      "imparfait": {
+        "je": "prenais",
+        "tu": "prenais",
+        "il": "prenait",
+        "elle": "prenait",
+        "on": "prenait",
+        "nous": "prenions",
+        "vous": "preniez",
+        "ils": "prenaient",
+        "elles": "prenaient"
+      },
+      "futur": {
+        "je": "prendrai",
+        "tu": "prendras",
+        "il": "prendra",
+        "elle": "prendra",
+        "on": "prendra",
+        "nous": "prendrons",
+        "vous": "prendrez",
+        "ils": "prendront",
+        "elles": "prendront"
+      }
+    },
+    "participe": "pris",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "pr",
+      "famille": "i"
     }
   },
   "mettre": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "mets",      "tu": "mets",      "il": "met",       "elle": "met",       "on": "met",       "nous": "mettons",    "vous": "mettez",    "ils": "mettent",    "elles": "mettent"    },
-      "imparfait": { "je": "mettais",   "tu": "mettais",   "il": "mettait",   "elle": "mettait",   "on": "mettait",   "nous": "mettions",   "vous": "mettiez",   "ils": "mettaient",  "elles": "mettaient"  },
-      "futur":     { "je": "mettrai",   "tu": "mettras",   "il": "mettra",    "elle": "mettra",    "on": "mettra",    "nous": "mettrons",   "vous": "mettrez",   "ils": "mettront",   "elles": "mettront"   }
+      "présent": {
+        "je": "mets",
+        "tu": "mets",
+        "il": "met",
+        "elle": "met",
+        "on": "met",
+        "nous": "mettons",
+        "vous": "mettez",
+        "ils": "mettent",
+        "elles": "mettent"
+      },
+      "imparfait": {
+        "je": "mettais",
+        "tu": "mettais",
+        "il": "mettait",
+        "elle": "mettait",
+        "on": "mettait",
+        "nous": "mettions",
+        "vous": "mettiez",
+        "ils": "mettaient",
+        "elles": "mettaient"
+      },
+      "futur": {
+        "je": "mettrai",
+        "tu": "mettras",
+        "il": "mettra",
+        "elle": "mettra",
+        "on": "mettra",
+        "nous": "mettrons",
+        "vous": "mettrez",
+        "ils": "mettront",
+        "elles": "mettront"
+      }
+    },
+    "participe": "mis",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "m",
+      "famille": "i"
     }
   },
   "partir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "pars",      "tu": "pars",      "il": "part",      "elle": "part",      "on": "part",      "nous": "partons",    "vous": "partez",    "ils": "partent",    "elles": "partent"    },
-      "imparfait": { "je": "partais",   "tu": "partais",   "il": "partait",   "elle": "partait",   "on": "partait",   "nous": "partions",   "vous": "partiez",   "ils": "partaient",  "elles": "partaient"  },
-      "futur":     { "je": "partirai",  "tu": "partiras",  "il": "partira",   "elle": "partira",   "on": "partira",   "nous": "partirons",  "vous": "partirez",  "ils": "partiront",  "elles": "partiront"  }
+      "présent": {
+        "je": "pars",
+        "tu": "pars",
+        "il": "part",
+        "elle": "part",
+        "on": "part",
+        "nous": "partons",
+        "vous": "partez",
+        "ils": "partent",
+        "elles": "partent"
+      },
+      "imparfait": {
+        "je": "partais",
+        "tu": "partais",
+        "il": "partait",
+        "elle": "partait",
+        "on": "partait",
+        "nous": "partions",
+        "vous": "partiez",
+        "ils": "partaient",
+        "elles": "partaient"
+      },
+      "futur": {
+        "je": "partirai",
+        "tu": "partiras",
+        "il": "partira",
+        "elle": "partira",
+        "on": "partira",
+        "nous": "partirons",
+        "vous": "partirez",
+        "ils": "partiront",
+        "elles": "partiront"
+      }
+    },
+    "participe": "parti",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "part",
+      "famille": "i"
     }
   },
   "sortir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "sors",      "tu": "sors",      "il": "sort",      "elle": "sort",      "on": "sort",      "nous": "sortons",    "vous": "sortez",    "ils": "sortent",    "elles": "sortent"    },
-      "imparfait": { "je": "sortais",   "tu": "sortais",   "il": "sortait",   "elle": "sortait",   "on": "sortait",   "nous": "sortions",   "vous": "sortiez",   "ils": "sortaient",  "elles": "sortaient"  },
-      "futur":     { "je": "sortirai",  "tu": "sortiras",  "il": "sortira",   "elle": "sortira",   "on": "sortira",   "nous": "sortirons",  "vous": "sortirez",  "ils": "sortiront",  "elles": "sortiront"  }
+      "présent": {
+        "je": "sors",
+        "tu": "sors",
+        "il": "sort",
+        "elle": "sort",
+        "on": "sort",
+        "nous": "sortons",
+        "vous": "sortez",
+        "ils": "sortent",
+        "elles": "sortent"
+      },
+      "imparfait": {
+        "je": "sortais",
+        "tu": "sortais",
+        "il": "sortait",
+        "elle": "sortait",
+        "on": "sortait",
+        "nous": "sortions",
+        "vous": "sortiez",
+        "ils": "sortaient",
+        "elles": "sortaient"
+      },
+      "futur": {
+        "je": "sortirai",
+        "tu": "sortiras",
+        "il": "sortira",
+        "elle": "sortira",
+        "on": "sortira",
+        "nous": "sortirons",
+        "vous": "sortirez",
+        "ils": "sortiront",
+        "elles": "sortiront"
+      }
+    },
+    "participe": "sorti",
+    "auxiliaire": "être",
+    "passeSimple": {
+      "radical": "sort",
+      "famille": "i"
     }
   },
   "dormir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "dors",      "tu": "dors",      "il": "dort",      "elle": "dort",      "on": "dort",      "nous": "dormons",    "vous": "dormez",    "ils": "dorment",    "elles": "dorment"    },
-      "imparfait": { "je": "dormais",   "tu": "dormais",   "il": "dormait",   "elle": "dormait",   "on": "dormait",   "nous": "dormions",   "vous": "dormiez",   "ils": "dormaient",  "elles": "dormaient"  },
-      "futur":     { "je": "dormirai",  "tu": "dormiras",  "il": "dormira",   "elle": "dormira",   "on": "dormira",   "nous": "dormirons",  "vous": "dormirez",  "ils": "dormiront",  "elles": "dormiront"  }
+      "présent": {
+        "je": "dors",
+        "tu": "dors",
+        "il": "dort",
+        "elle": "dort",
+        "on": "dort",
+        "nous": "dormons",
+        "vous": "dormez",
+        "ils": "dorment",
+        "elles": "dorment"
+      },
+      "imparfait": {
+        "je": "dormais",
+        "tu": "dormais",
+        "il": "dormait",
+        "elle": "dormait",
+        "on": "dormait",
+        "nous": "dormions",
+        "vous": "dormiez",
+        "ils": "dormaient",
+        "elles": "dormaient"
+      },
+      "futur": {
+        "je": "dormirai",
+        "tu": "dormiras",
+        "il": "dormira",
+        "elle": "dormira",
+        "on": "dormira",
+        "nous": "dormirons",
+        "vous": "dormirez",
+        "ils": "dormiront",
+        "elles": "dormiront"
+      }
+    },
+    "participe": "dormi",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "dorm",
+      "famille": "i"
     }
   },
   "lire": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "lis",       "tu": "lis",       "il": "lit",       "elle": "lit",       "on": "lit",       "nous": "lisons",     "vous": "lisez",     "ils": "lisent",     "elles": "lisent"     },
-      "imparfait": { "je": "lisais",    "tu": "lisais",    "il": "lisait",    "elle": "lisait",    "on": "lisait",    "nous": "lisions",    "vous": "lisiez",    "ils": "lisaient",   "elles": "lisaient"   },
-      "futur":     { "je": "lirai",     "tu": "liras",     "il": "lira",      "elle": "lira",      "on": "lira",      "nous": "lirons",     "vous": "lirez",     "ils": "liront",     "elles": "liront"     }
+      "présent": {
+        "je": "lis",
+        "tu": "lis",
+        "il": "lit",
+        "elle": "lit",
+        "on": "lit",
+        "nous": "lisons",
+        "vous": "lisez",
+        "ils": "lisent",
+        "elles": "lisent"
+      },
+      "imparfait": {
+        "je": "lisais",
+        "tu": "lisais",
+        "il": "lisait",
+        "elle": "lisait",
+        "on": "lisait",
+        "nous": "lisions",
+        "vous": "lisiez",
+        "ils": "lisaient",
+        "elles": "lisaient"
+      },
+      "futur": {
+        "je": "lirai",
+        "tu": "liras",
+        "il": "lira",
+        "elle": "lira",
+        "on": "lira",
+        "nous": "lirons",
+        "vous": "lirez",
+        "ils": "liront",
+        "elles": "liront"
+      }
+    },
+    "participe": "lu",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "l",
+      "famille": "u"
     }
   },
   "écrire": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "écris",     "tu": "écris",     "il": "écrit",     "elle": "écrit",     "on": "écrit",     "nous": "écrivons",   "vous": "écrivez",   "ils": "écrivent",   "elles": "écrivent"   },
-      "imparfait": { "je": "écrivais",  "tu": "écrivais",  "il": "écrivait",  "elle": "écrivait",  "on": "écrivait",  "nous": "écrivions",  "vous": "écriviez",  "ils": "écrivaient", "elles": "écrivaient" },
-      "futur":     { "je": "écrirai",   "tu": "écriras",   "il": "écrira",    "elle": "écrira",    "on": "écrira",    "nous": "écrirons",   "vous": "écrirez",   "ils": "écriront",   "elles": "écriront"   }
+      "présent": {
+        "je": "écris",
+        "tu": "écris",
+        "il": "écrit",
+        "elle": "écrit",
+        "on": "écrit",
+        "nous": "écrivons",
+        "vous": "écrivez",
+        "ils": "écrivent",
+        "elles": "écrivent"
+      },
+      "imparfait": {
+        "je": "écrivais",
+        "tu": "écrivais",
+        "il": "écrivait",
+        "elle": "écrivait",
+        "on": "écrivait",
+        "nous": "écrivions",
+        "vous": "écriviez",
+        "ils": "écrivaient",
+        "elles": "écrivaient"
+      },
+      "futur": {
+        "je": "écrirai",
+        "tu": "écriras",
+        "il": "écrira",
+        "elle": "écrira",
+        "on": "écrira",
+        "nous": "écrirons",
+        "vous": "écrirez",
+        "ils": "écriront",
+        "elles": "écriront"
+      }
+    },
+    "participe": "écrit",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "écriv",
+      "famille": "i"
     }
   },
   "courir": {
     "groupe": "3",
     "conjugaisons": {
-      "présent":   { "je": "cours",     "tu": "cours",     "il": "court",     "elle": "court",     "on": "court",     "nous": "courons",    "vous": "courez",    "ils": "courent",    "elles": "courent"    },
-      "imparfait": { "je": "courais",   "tu": "courais",   "il": "courait",   "elle": "courait",   "on": "courait",   "nous": "courions",   "vous": "couriez",   "ils": "couraient",  "elles": "couraient"  },
-      "futur":     { "je": "courrai",   "tu": "courras",   "il": "courra",    "elle": "courra",    "on": "courra",    "nous": "courrons",   "vous": "courrez",   "ils": "courront",   "elles": "courront"   }
+      "présent": {
+        "je": "cours",
+        "tu": "cours",
+        "il": "court",
+        "elle": "court",
+        "on": "court",
+        "nous": "courons",
+        "vous": "courez",
+        "ils": "courent",
+        "elles": "courent"
+      },
+      "imparfait": {
+        "je": "courais",
+        "tu": "courais",
+        "il": "courait",
+        "elle": "courait",
+        "on": "courait",
+        "nous": "courions",
+        "vous": "couriez",
+        "ils": "couraient",
+        "elles": "couraient"
+      },
+      "futur": {
+        "je": "courrai",
+        "tu": "courras",
+        "il": "courra",
+        "elle": "courra",
+        "on": "courra",
+        "nous": "courrons",
+        "vous": "courrez",
+        "ils": "courront",
+        "elles": "courront"
+      }
+    },
+    "participe": "couru",
+    "auxiliaire": "avoir",
+    "passeSimple": {
+      "radical": "cour",
+      "famille": "u"
     }
   }
 }
