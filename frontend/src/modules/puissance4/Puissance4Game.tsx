@@ -27,9 +27,9 @@ const LIGNES = 6;
  * heures de calcul et une base d'ouvertures. `difficile` reste donc battable, et c'est
  * tant mieux : contrairement au morpion, on ne promet pas qu'il ne perd jamais. */
 const PROFONDEUR: Record<string, number> = {
-  facile: 0,
-  moyen: 2,
-  difficile: 5,
+  easy: 0,
+  medium: 2,
+  hard: 5,
 };
 
 const DELAI_MS = 500;
@@ -37,8 +37,15 @@ const DELAI_MS = 500;
 export default function Puissance4Game() {
   const navigate = useNavigate();
   const setup = useAppSelector(selectModuleSetup(MODULE_ID)) ?? {};
-  const mode = (setup.adversaire as string) || 'moyen';
-  const contreOrdinateur = mode !== 'deux';
+  const mode = (setup.difficulty as string) || 'medium';
+
+  /** Contre la machine, ou à deux sur le même écran.
+   *
+   * C'était un choix de pré-jeu rangé parmi les niveaux de difficulté — alors que ce n'en
+   * est pas un, et que le moteur injectait DÉJÀ sa propre question de niveau juste à
+   * côté. C'est maintenant un bouton sur le plateau, et le basculement ne remet pas la
+   * partie à zéro : il change seulement qui tient les jetons jaunes. */
+  const [contreOrdinateur, setContreOrdinateur] = useState(true);
 
   const [plateau, setPlateau] = useState<Plateau>(() =>
     creer(COLONNES, LIGNES, 4, true),
@@ -149,6 +156,13 @@ export default function Puissance4Game() {
       <div className="Puissance4Game__actions">
         <Button variant="primary" onClick={rejouer}>
           {fini ? 'Rejouer' : 'Recommencer'}
+        </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setContreOrdinateur((precedent) => !precedent)}
+        >
+          {contreOrdinateur ? '👥 Jouer à deux' : '🤖 Jouer contre lui'}
         </Button>
         <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
           Accueil
