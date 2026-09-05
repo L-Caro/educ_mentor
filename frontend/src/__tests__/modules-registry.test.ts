@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
  *
  * La grille d'accueil est construite depuis le catalogue BACKEND, pas depuis le manifeste
  * frontend. Un module absent du catalogue n'apparaît donc jamais, sans le moindre message
- * d'erreur — c'est ce qui est arrivé à `snake`, invisible sur l'accueil pendant des semaines
+ * d'erreur : c'est ce qui est arrivé à `snake`, invisible sur l'accueil pendant des semaines
  * alors que sa route et son écran d'administration existaient.
  *
  * Les fichiers sont lus sur disque plutôt qu'importés : les deux paquets ont des
@@ -24,7 +24,7 @@ const MANIFEST_PATH = join(FRONT_SRC, 'modules.manifest.tsx');
 const CATALOG_PATH = join(FRONT_SRC, '../../backend/src/modules/catalog/modules.config.ts');
 
 /** Modules présents sur disque : nom de dossier + identifiant déclaré.
- * Les deux diffèrent parfois — le dossier `calcul` déclare l'identifiant `calcul-mental`. */
+ * Les deux diffèrent parfois : le dossier `calcul` déclare l'identifiant `calcul-mental`. */
 function moduleFolders(): string[] {
   return readdirSync(MODULES_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
@@ -34,7 +34,7 @@ function moduleFolders(): string[] {
 /** Les dossiers de `modules/` qui n'ont pas de descripteur.
  *
  * Sous `modules/`, un dossier EST un module. Y déposer une bibliothèque partagée faisait
- * échouer les trois tests suivants sur un `ENOENT` brut, qui ne disait pas la règle — le
+ * échouer les trois tests suivants sur un `ENOENT` brut, qui ne disait pas la règle : le
  * temps perdu à le comprendre est allé à la trace d'appel au lieu du diagnostic. Une
  * bibliothèque va dans `utils/`. */
 function foldersSansDescripteur(): string[] {

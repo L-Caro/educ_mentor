@@ -80,7 +80,7 @@ export interface GameModuleSpec<TSession, TQuestion> {
     /**
      * Porte de sortie pour une saisie que `<GameInput>` ne sait pas rendre : le module
      * fournit son propre composant, qui reçoit la valeur et la remonte comme une chaîne.
-     * Même principe que `map.getComponent` — le moteur garde le squelette, le module
+     * Même principe que `map.getComponent` : le moteur garde le squelette, le module
      * fournit ce qui lui est propre. Une grille d'opération posée en est le premier cas.
      * DOIT être une référence stable (composant défini au niveau module) : une fonction
      * créée à chaque rendu serait un type de composant neuf, et React démonterait la
@@ -123,7 +123,7 @@ export interface GameModuleSpec<TSession, TQuestion> {
    * « école » d'engendrer la bibliothèque en appelant les mêmes fonctions sur des questions
    * types, sans rien réimplémenter.
    *
-   * Retourner `null` quand il n'y a rien à expliquer — le moteur n'affiche alors aucun
+   * Retourner `null` quand il n'y a rien à expliquer : le moteur n'affiche alors aucun
    * bouton et conserve son avance automatique. Un module qui ne déclare pas `fiche` est
    * strictement inchangé.
    */

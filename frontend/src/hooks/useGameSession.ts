@@ -59,7 +59,7 @@ export function useGameSession<TSession, TQuestion>({
   const answerStateRef = useRef<GameAnswerState>('idle');
   const correctCountRef = useRef(0);
   const resultsRef = useRef<GameResultEntry[]>([]);
-  // Ref sur le setTimeout d'avance automatique — permet son annulation depuis handleTerminate
+  // Ref sur le setTimeout d'avance automatique : permet son annulation depuis handleTerminate
   const pendingAdvanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => { sessionRef.current = session; }, [session]);
@@ -157,7 +157,7 @@ export function useGameSession<TSession, TQuestion>({
    * @param record - Fonction zéro-argument qui appelle l'API d'enregistrement.
    *                 N'est pas appelée si skipApiCalls est actif.
    * @param options.hold - Suspend l'avance automatique : la partie reste sur la correction
-   *   jusqu'à un appel à `advanceNow()`. Utilisé quand l'écran propose une explication —
+   *   jusqu'à un appel à `advanceNow()`. Utilisé quand l'écran propose une explication :
    *   1600 ms ne laissent pas le temps de repérer un bouton, encore moins de le toucher.
    */
   function submitAnswer(

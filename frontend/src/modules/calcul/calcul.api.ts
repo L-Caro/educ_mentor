@@ -5,7 +5,7 @@ import { baseApi } from 'src/store/api/baseApi.ts';
 /** Endpoints RTK Query propres au module Calcul Mental (co-localisés avec le module). */
 export const calculApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    /** Les types ACTIFS — pré-jeu. */
+    /** Les types ACTIFS : pré-jeu. */
     getCalculTypes: builder.query<
       { key: string; label: string; exemple: string; niveau: string }[],
       void
@@ -14,7 +14,7 @@ export const calculApi = baseApi.injectEndpoints({
       providesTags: ['CalculActiveTypes'],
     }),
 
-    /** Le catalogue COMPLET, fermés compris — administration. */
+    /** Le catalogue COMPLET, fermés compris : administration. */
     getCalculOperations: builder.query<
       {
         key: string;

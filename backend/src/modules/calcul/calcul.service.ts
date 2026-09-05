@@ -49,7 +49,7 @@ export class CalculService {
    *
    * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
    * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
-   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * fantôme d'une question dans « séances récentes » : la liste que lit l'adulte pour
    * savoir ce qui a été travaillé.
    */
   async construireQuestions(dto: StartCalculSessionDto): Promise<{
@@ -74,7 +74,7 @@ export class CalculService {
     );
 
     // Le pré-jeu propose, l'administration dispose : un type coché mais non ouvert ne
-    // doit rien produire. Le pré-jeu ne montre déjà que les types actifs — ce filtre est
+    // doit rien produire. Le pré-jeu ne montre déjà que les types actifs : ce filtre est
     // la ceinture, au cas où une requête arriverait d'ailleurs.
     const actifs = await this.getActiveOperationTypes();
     const requestedTypes = (dto.operation_types ?? [])

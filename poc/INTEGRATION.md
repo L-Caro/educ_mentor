@@ -13,8 +13,8 @@ npm run to-imagier    # → out/dictionnaire_thematique.json + out/imagier-image
 ```
 
 Relire avant d'importer :
-- `out/report.md` — traductions inventées, écarts
-- `out/imagier-collisions.md` — 28 concepts distincts perdus (2e sens ignoré à l'import)
+- `out/report.md` : traductions inventées, écarts
+- `out/imagier-collisions.md` : 28 concepts distincts perdus (2e sens ignoré à l'import)
 
 ## 1. Figer le contenu memory (AVANT tout wipe)
 

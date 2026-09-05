@@ -12,7 +12,7 @@ import type { GameModuleSpec } from 'src/types/game.types';
 import './grammaire.scss';
 
 /** `nature_mot` est un QCM ; les trois autres types sont de la sélection multiple sur la
- * phrase. Le moteur sait déjà faire les deux — `spec.map` avec `isMultiSelect` valide une
+ * phrase. Le moteur sait déjà faire les deux : `spec.map` avec `isMultiSelect` valide une
  * sélection de plusieurs clés, et c'est exactement ce que `france` utilise pour ses
  * régions. Un seul descripteur suffit donc, avec un aiguillage par type de question. */
 function estSelection(question: GrammaireQuestion): boolean {
@@ -116,7 +116,7 @@ export const grammaireGameSpec: GameModuleSpec<
 };
 
 /** Les mots effectivement touchés, recollés, pour la liste d'erreurs de fin de partie.
- * Sans ça, la ligne afficherait `["0","2"]` — des index bruts. */
+ * Sans ça, la ligne afficherait `["0","2"]` : des index bruts. */
 function motsDe(question: GrammaireQuestion, given: unknown): string | null {
   if (!Array.isArray(given) || given.length === 0) return null;
   return given

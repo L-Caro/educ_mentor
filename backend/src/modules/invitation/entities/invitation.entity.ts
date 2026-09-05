@@ -10,7 +10,7 @@ export class Invitation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  /** Token unique envoyé dans le lien d'invitation — à usage unique. */
+  /** Token unique envoyé dans le lien d'invitation : à usage unique. */
   @Column({ unique: true })
   token: string;
 

@@ -7,11 +7,11 @@ import { buildInitialValues } from 'src/components/game/setup/setupOptions';
 /**
  * Comme pour le module grammaire : le vocabulaire du module est décrit dans trois fichiers
  * qu'aucun outil ne relie. Une notion ajoutée côté backend sans son pendant frontend passe
- * le typage des deux côtés et casse à l'exécution sur `LECONS[question.skill_key]` — la
+ * le typage des deux côtés et casse à l'exécution sur `LECONS[question.skill_key]` : la
  * fiche vaut `undefined` et l'écran de correction plante.
  *
  * Ici notion et type d'exercice coïncident, donc les trois registres portent la MÊME liste
- * de clés — ce qui rend la vérification d'autant plus simple, et son absence d'autant plus
+ * de clés : ce qui rend la vérification d'autant plus simple, et son absence d'autant plus
  * bête.
  */
 
@@ -56,7 +56,7 @@ describe('registres du module accords', () => {
     }).toEqual({ absentesDuFrontend: [], absentesDuBackend: [] });
   });
 
-  it('donne une leçon à chaque notion — sinon la fiche vaut undefined à l’écran', () => {
+  it('donne une leçon à chaque notion, sinon la fiche vaut undefined à l’écran', () => {
     const sansLecon = notionsBackend().filter(
       (key) => !new RegExp(`^  ${key}: \\{$`, 'm').test(FICHE_FRONT),
     );

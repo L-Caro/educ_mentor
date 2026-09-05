@@ -59,7 +59,7 @@ export default function NumerationSettings() {
             Détermine la plage de nombres pour tous les types de questions. Les
             positions vont des millièmes aux centaines de millions ; la classe
             indiquée dit quand les ouvrir. Ouvrir une décimale fait apparaître la
-            virgule partout — comparaisons, décompositions et valeur positionnelle.
+            virgule partout : comparaisons, décompositions et valeur positionnelle.
           </p>
           <div className="GameSettings__denominations">
             {POSITIONS.map(({ key, label, niveau }) => (

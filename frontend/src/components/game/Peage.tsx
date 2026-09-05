@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGetSettingsQuery } from 'src/store/api/sharedApi.ts';
 import {
@@ -6,7 +6,12 @@ import {
   type PeageQuestion,
 } from 'src/store/api/peageApi.ts';
 import Button from 'src/components/common/Button';
-import { lireNombre } from './peageReglage';
+import {
+  ecrireRestantes,
+  lireFrequence,
+  lireNombre,
+  lireRestantes,
+} from './peageReglage';
 import Spinner from 'src/components/common/Spinner';
 import './peage.scss';
 
@@ -16,15 +21,25 @@ import './peage.scss';
  * ── Il ne se referme JAMAIS ──────────────────────────────────────────────────────────
  *
  * Une mauvaise réponse ne fait pas recommencer. On montre la bonne, et on passe à la
- * suivante ; après le nombre de questions réglé, elle joue — juste ou faux. C'est un
+ * suivante ; après le nombre de questions réglé, elle joue : juste ou faux. C'est un
  * choix, et il mérite d'être dit : interdire de jouer jusqu'à ce que ce soit correct
  * transformerait un péage en punition, et une enfant coincée devant un jeu qu'elle ne
  * peut pas lancer irait chercher un adulte, pas la bonne réponse. Ce qui s'apprend ici,
- * c'est la correction qu'on lui montre — pas la porte fermée.
+ * c'est la correction qu'on lui montre : pas la porte fermée.
  *
  * Tout ce qui peut mal tourner laisse passer : réglage à zéro, serveur muet, aucun module
  * capable de poser une question. Un péage en panne devant un morpion serait une panne
  * absurde.
+ *
+ * ── Une partie sur X, pas toutes ─────────────────────────────────────────────────────
+ *
+ * Le péage se pose à la première partie, puis laisse passer les suivantes jusqu'à la
+ * prochaine échéance. Payer d'abord et jouer ensuite se comprend ; l'inverse, laisser
+ * jouer deux fois puis barrer la troisième sans prévenir, ressemblerait à un caprice de
+ * l'application.
+ *
+ * La décision se prend UNE FOIS, à l'ouverture, et ne change plus : sans ça, un simple
+ * re-rendu pourrait faire apparaître un péage au milieu d'une partie déjà commencée.
  */
 export default function Peage({
   moduleId,
@@ -38,6 +53,11 @@ export default function Peage({
   const [demander] = useGetPeageQuestionMutation();
 
   const total = lireNombre(settings?.jeux_peage_questions);
+  const frequence = lireFrequence(settings?.jeux_peage_frequence);
+
+  /** `null` tant que les réglages chargent, puis figé pour toute la durée de l'écran. */
+  const [barre, setBarre] = useState<boolean | null>(null);
+  const decide = useRef(false);
 
   const [posees, setPosees] = useState(0);
   const [question, setQuestion] = useState<PeageQuestion | null>(null);
@@ -61,22 +81,43 @@ export default function Peage({
     }
   }, [demander]);
 
+  // Barrer cette partie, ou la laisser passer. Une seule fois : le garde-fou par `ref`
+  // sert autant au double montage du mode strict qu'à un changement de réglage en cours
+  // de partie.
+  useEffect(() => {
+    if (isLoading || decide.current) return;
+    decide.current = true;
+    if (isError || total === 0) {
+      setBarre(false);
+      return;
+    }
+    const restantes = lireRestantes(frequence);
+    if (restantes > 0) {
+      ecrireRestantes(restantes - 1);
+      setBarre(false);
+      return;
+    }
+    // On paie maintenant, et les `frequence - 1` parties suivantes sont libres.
+    ecrireRestantes(frequence - 1);
+    setBarre(true);
+  }, [isLoading, isError, total, frequence]);
+
   // La première question. Les suivantes sont demandées par « Continuer ».
   useEffect(() => {
-    if (total > 0 && posees === 0 && question === null && !enPanne) {
+    if (barre && posees === 0 && question === null && !enPanne) {
       void suivante();
     }
-  }, [total, posees, question, enPanne, suivante]);
+  }, [barre, posees, question, enPanne, suivante]);
 
-  // Réglage éteint, serveur muet, ou rien à demander : on joue.
-  if (isLoading) {
+  // Réglage éteint, serveur muet, partie non barrée, ou rien à demander : on joue.
+  if (isLoading || barre === null) {
     return (
       <div className="Peage">
         <Spinner />
       </div>
     );
   }
-  if (isError || total === 0 || enPanne || posees >= total) return <>{children}</>;
+  if (!barre || enPanne || posees >= total) return <>{children}</>;
 
   if (chargement || !question) {
     return (
@@ -115,7 +156,7 @@ export default function Peage({
 
         <div className="Peage__choix">
           {question.choix.map((choix) => {
-            // Après la réponse, la bonne se montre TOUJOURS — c'est elle qu'on est venu
+            // Après la réponse, la bonne se montre TOUJOURS : c'est elle qu'on est venu
             // apprendre, pas le fait d'avoir eu tort.
             const etat = !repondu
               ? ''

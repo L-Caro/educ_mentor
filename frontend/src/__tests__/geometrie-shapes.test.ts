@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
  *
  * Le back ignore tout du SVG et le front ignore tout des propriétés : rien ne les relie
  * à la compilation. Une forme ajoutée d'un seul côté produirait soit une question sans
- * dessin, soit un dessin jamais interrogé — dans les deux cas, silencieusement.
+ * dessin, soit un dessin jamais interrogé : dans les deux cas, silencieusement.
  *
  * Les fichiers sont lus sur disque plutôt qu'importés : les deux paquets ont des
  * configurations TypeScript distinctes, sans dépendance entre eux.
@@ -32,7 +32,7 @@ function frontendCatalogueKeys(): string[] {
   return [...source.matchAll(/^ {2}([a-zA-Z]+):/gm)].map((m) => m[1]).sort();
 }
 
-describe('catalogue de formes — cohérence back/front', () => {
+describe('catalogue de formes : cohérence back/front', () => {
   it('trouve bien les deux registres (garde-fou sur les expressions régulières)', () => {
     expect(backendShapeKeys().length).toBeGreaterThan(20);
     expect(frontendCatalogueKeys().length).toBeGreaterThan(20);

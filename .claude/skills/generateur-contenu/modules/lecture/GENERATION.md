@@ -1,10 +1,10 @@
-# Module Lecture — génération
+# Module Lecture : génération
 
 Génère le contenu du module de compréhension de lecture d'educ_mentor : un texte et des
 questions à choix multiples, au format JSON importable dans l'admin. Le module ne génère
 rien à l'exécution : tout le contenu est écrit ici, relu par Lionel, puis importé.
 
-## Étape 1 — Questionnaire interactif
+## Étape 1 : Questionnaire interactif
 
 Avant toute génération, pose ces questions à Lionel (une seule salve, pas une par une).
 Utilise l'outil de question fermé si disponible. Sinon, pose-les en Markdown avec des
@@ -28,7 +28,7 @@ options numérotées.
 | 7 | **Langue du module** | Français |
 | 8 | **Contraintes particulières** | Aucune (ex. : "éviter les mots difficiles", "inclure des chiffres") |
 
-## Étape 2 — Confirmation avant génération
+## Étape 2 : Confirmation avant génération
 
 Après le questionnaire, affiche un récapitulatif compact :
 
@@ -48,7 +48,7 @@ Langue     : Français
 
 Attends confirmation avant de passer à l'étape 3.
 
-## Étape 3 — Contraintes de génération à respecter
+## Étape 3 : Contraintes de génération à respecter
 
 Utilise les paramètres collectés pour produire le JSON. Règles à appliquer :
 
@@ -74,10 +74,10 @@ Utilise les paramètres collectés pour produire le JSON. Règles à appliquer :
 | CM1    | 9 ans |
 | CM2    | 10 ans |
 
-## Étape 4 — Génération directe dans le chat
+## Étape 4 : Génération directe dans le chat
 
 À partir des paramètres collectés, génère toi-même le JSON directement dans ta réponse.
-Pas d'appel API, pas de code à exécuter — tu es le modèle, tu produis le contenu.
+Pas d'appel API, pas de code à exécuter : tu es le modèle, tu produis le contenu.
 
 Respecte scrupuleusement la structure suivante, en substituant les valeurs collectées :
 
@@ -101,7 +101,7 @@ livre classique.
 
 **Ne génère que le bloc JSON**, dans un bloc que l'on peut copier, sans texte avant ni après.
 
-## Étape 5 — Post-génération
+## Étape 5 : Post-génération
 
 Après affichage du JSON, propose systématiquement :
 

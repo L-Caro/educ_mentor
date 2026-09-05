@@ -7,7 +7,7 @@ import {
 
 /**
  * Modèle de maîtrise partagé par les treize modules. Une erreur ici se traduit par une
- * progression fausse pour l'enfant — soit des notions déclarées acquises à tort, soit des
+ * progression fausse pour l'enfant : soit des notions déclarées acquises à tort, soit des
  * notions maîtrisées qui reviennent sans fin. Rien ne le signalerait.
  */
 
@@ -18,7 +18,7 @@ describe('masteryScore', () => {
 
   it('ne descend jamais sous zéro', () => {
     // Sans le plancher, une série d'échecs creuserait une dette que l'enfant devrait
-    // combler avant de voir sa progression bouger — démotivant et invisible.
+    // combler avant de voir sa progression bouger : démotivant et invisible.
     expect(masteryScore(1, 9)).toBe(0);
     expect(masteryScore(0, 0)).toBe(0);
   });

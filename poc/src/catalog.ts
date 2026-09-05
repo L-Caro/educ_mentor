@@ -56,7 +56,7 @@ if (import.meta.main) {
   const setCount = themes.reduce((total, theme) => total + theme.sets.length, 0);
   console.log(`${themes.length} thèmes, ${setCount} sets`);
   for (const theme of themes) {
-    console.log(`\n${theme.name} (${theme.slug}) — ${theme.announcedCount} cartes annoncées`);
+    console.log(`\n${theme.name} (${theme.slug}) : ${theme.announcedCount} cartes annoncées`);
     for (const set of theme.sets) {
       console.log(`  - ${set.name} [${set.slug}] : ${set.announcedCount}`);
     }

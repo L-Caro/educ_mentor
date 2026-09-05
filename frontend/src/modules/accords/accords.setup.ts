@@ -1,7 +1,7 @@
 import type { SetupOption } from 'src/types/game.types';
 
 /** Une seule option propre au module, comme en géométrie et en grammaire : l'étape
- * difficulté commune est conservée, et c'est elle qui porte la morphologie — pluriels
+ * difficulté commune est conservée, et c'est elle qui porte la morphologie : pluriels
  * réguliers seuls en facile, irréguliers et deux adjectifs en difficile.
  *
  * Les cinq choix sont les cinq fiches de `cours/francais/accords.tsx`, dans leur ordre,

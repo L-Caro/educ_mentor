@@ -1,5 +1,5 @@
 /** Guard qui protège les routes admin. canActivate est appelé avant chaque requête sur une route @UseGuards(JwtAuthGuard).
- * Si ADMIN_PIN_ENABLED=false, on laisse passer sans vérifier — mode dev.
+ * Si ADMIN_PIN_ENABLED=false, on laisse passer sans vérifier : mode dev.
  * Sinon, on délègue à AuthGuard('jwt') qui vérifie le token via JwtStrategy (voir jwt.strategy.ts). */
 import { ExecutionContext, Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';

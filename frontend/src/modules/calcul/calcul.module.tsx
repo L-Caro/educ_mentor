@@ -6,7 +6,7 @@ import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 
 /** Les types viennent du SERVEUR : ce sont ceux ouverts dans Administration → Calcul
  * mental. Les coder en dur laisserait un CE1 cocher « division », que le service
- * filtrerait ensuite — la partie servirait autre chose que ce qui a été coché. */
+ * filtrerait ensuite : la partie servirait autre chose que ce qui a été coché. */
 async function loadTypes(): Promise<SetupChoice[]> {
   try {
     const types = await store

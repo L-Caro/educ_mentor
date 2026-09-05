@@ -1,12 +1,12 @@
 /** Configure la connexion à SQLite via TypeORM.
  *
  * `synchronize` est **désactivé par défaut** : il alignait le schéma sur les entités à chaque
- * démarrage, ce qui peut supprimer une colonne — et ses données — sur une simple modification
+ * démarrage, ce qui peut supprimer une colonne, et ses données, sur une simple modification
  * d'entité. Le schéma n'évolue plus que par migration versionnée (`src/database/migrations/`),
  * appliquée automatiquement au boot via `migrationsRun`.
  *
  * Pour retrouver l'ancien confort en développement local : `DB_SYNCHRONIZE=true` dans le `.env`.
- * Le défaut reste sûr — un oubli de variable ne peut pas détruire de données.
+ * Le défaut reste sûr : un oubli de variable ne peut pas détruire de données.
  *
  * `autoLoadEntities: true` évite de lister chaque entité ici : TypeORM les découvre via les
  * `TypeOrmModule.forFeature([...])` de chaque module fonctionnel.
@@ -31,7 +31,7 @@ import * as fs from 'fs';
 
         // `DB_PATH` est relatif dans les .env du projet : il se résout sur le répertoire de
         // travail. Lancé depuis backend/ plutôt que depuis la racine, `./data/educmentor.db`
-        // désigne `backend/data/` — et l'application crée une base VIERGE sans rien signaler.
+        // désigne `backend/data/`, et l'application crée une base VIERGE sans rien signaler.
         // Symptôme : toute la progression semble avoir disparu. Cause : invisible.
         // D'où le chemin absolu journalisé à chaque démarrage, et l'avertissement ci-dessous.
         logger.log(`Base de données : ${database}`);

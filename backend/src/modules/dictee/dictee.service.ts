@@ -25,7 +25,7 @@ import type {
   UpdateDicteeItemDto,
 } from './dto/dictee.dto';
 
-/** Un mot vu 3 fois sans faute nette est considéré acquis — plus bas que le seuil des
+/** Un mot vu 3 fois sans faute nette est considéré acquis : plus bas que le seuil des
  * modules à répétition rapide : en dictée, un mot revient rarement. */
 const DICTEE_MASTERY_THRESHOLD = 3;
 
@@ -189,7 +189,7 @@ export class DicteeService {
     await this.statRepo.save(stat);
   }
 
-  // ─── Admin — progression ──────────────────────────────────────────────────
+  // ─── Admin : progression ──────────────────────────────────────────────────
 
   async getProgression(): Promise<ProgressionStat[]> {
     const stats = await this.statRepo.find();
@@ -226,7 +226,7 @@ export class DicteeService {
     });
   }
 
-  // ─── Admin — items ────────────────────────────────────────────────────────
+  // ─── Admin : items ────────────────────────────────────────────────────────
 
   findItems(filters: {
     niveau?: string;

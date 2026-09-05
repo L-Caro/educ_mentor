@@ -72,7 +72,7 @@
 			background: var(--color-base-200);
 		}
 
-		// Indicateur actif : fond très léger + bordure gauche — bon contraste dans les deux thèmes
+		// Indicateur actif : fond très léger + bordure gauche, bon contraste dans les deux thèmes
 		&--active {
 			background: color-mix(in srgb, var(--color-primary) 12%, var(--color-base-100));
 			color: var(--color-primary);

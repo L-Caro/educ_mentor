@@ -15,7 +15,7 @@ const SIGNES: Record<string, string> = {
 
 /** Les opérations viennent du SERVEUR : ce sont celles ouvertes dans Administration →
  * Calcul posé. Les coder en dur laisserait cocher la multiplication avant qu'elle ait été
- * vue en classe, et le service filtrerait ensuite la case — une partie qui sert autre
+ * vue en classe, et le service filtrerait ensuite la case : une partie qui sert autre
  * chose que ce qui a été demandé. */
 async function loadOperations(): Promise<SetupChoice[]> {
   try {

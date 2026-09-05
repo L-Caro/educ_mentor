@@ -1,4 +1,4 @@
-# POC — extraction des flashcards kids-flashcards.com
+# POC : extraction des flashcards kids-flashcards.com
 
 Récupère l'intégralité du catalogue anglais de [kids-flashcards.com](https://kids-flashcards.com/en/flashcards-in-english)
 (18 thèmes, 59 sets, ~1300 cartes) pour alimenter le module `imagier` d'ÉducMentor.
@@ -28,9 +28,9 @@ Scripts annexes : `npm run catalog` (liste thèmes/sets), `npm run set` (dump d'
 | | |
 |---|---|
 | `flashcards.json` | structure du site (`themes[].sets[].cards[]`) + liste à plat dédupliquée (`words[]`) |
-| `report.md` | écarts, traductions à relire, collisions de slug — **à lire avant intégration** |
+| `report.md` | écarts, traductions à relire, collisions de slug : **à lire avant intégration** |
 | `images/<mot-en>.webp` | image de la carte, rognée de 18 % en bas pour retirer le mot incrusté, largeur ≤ 640 px |
-| `dictionnaire_thematique.json` | `npm run to-imagier` — prêt pour l'admin « Import JSON » d'educ_mentor |
+| `dictionnaire_thematique.json` | `npm run to-imagier` : prêt pour l'admin « Import JSON » d'educ_mentor |
 | `imagier-images/<catégorie>/<mot-fr>.webp` | idem, images renommées en FR et rangées par catégorie (à copier dans `data/images/imagier/`) |
 | `imagier-collisions.md` | slugs FR en double : ceux qui perdent un sens (à trancher) vs les doublons inter-sets |
 

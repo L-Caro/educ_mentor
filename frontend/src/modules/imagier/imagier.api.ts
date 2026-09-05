@@ -45,7 +45,7 @@ export const imagierApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'imagier' }],
     }),
 
-    // ─── Admin — mots ───────────────────────────────────────────────────────────
+    // ─── Admin : mots ───────────────────────────────────────────────────────────
     getImagierWords: builder.query<
       ImagierWord[],
       { category?: string; is_active?: boolean; search?: string } | void
@@ -77,13 +77,13 @@ export const imagierApi = baseApi.injectEndpoints({
       invalidatesTags: ['ImagierWords'],
     }),
 
-    // ─── Admin — catégories ─────────────────────────────────────────────────────
+    // ─── Admin : catégories ─────────────────────────────────────────────────────
     normalizeImagierCategories: builder.mutation<{ updated: number }, void>({
       query: () => ({ url: '/imagier/normalize-categories', method: 'PATCH' }),
       invalidatesTags: ['ImagierCategories', 'ImagierWords'],
     }),
 
-    // ─── Admin — import JSON ────────────────────────────────────────────────────
+    // ─── Admin : import JSON ────────────────────────────────────────────────────
     importImagierJson: builder.mutation<
       { inserted: number; skipped: number; replaced: boolean; errors: string[] },
       { json: string; overwrite?: boolean; replace?: boolean; activate?: boolean }

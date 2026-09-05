@@ -1,4 +1,4 @@
-# Chantiers — ÉducMentor
+# Chantiers : ÉducMentor
 
 > **Document vivant.** C'est le point de reprise : où on en est, ce qui est décidé, ce qui reste ouvert.
 > Dernière mise à jour : **2026-09-04**.
@@ -7,9 +7,9 @@
 
 | Fichier | Rôle |
 |---|---|
-| `CHANTIERS.md` | **ce fichier** — l'état courant, à tenir à jour |
-| `AUDIT_FULLSTACK_2026-07-07.md` | archive — audit initial, instantané figé |
-| `AUDIT_2026-08-24_ET_ORIENTATION_COURS.md` | archive — audit delta + première réflexion Cours (⚠️ son plan d'implémentation est **caduc**, cf. chantier B) |
+| `CHANTIERS.md` | **ce fichier** : l'état courant, à tenir à jour |
+| `AUDIT_FULLSTACK_2026-07-07.md` | archive : audit initial, instantané figé |
+| `AUDIT_2026-08-24_ET_ORIENTATION_COURS.md` | archive : audit delta + première réflexion Cours (⚠️ son plan d'implémentation est **caduc**, cf. chantier B) |
 | `frontend/CLAUDE.md` | architecture front, à jour et fiable |
 
 Les deux audits sont des **instantanés datés** : on ne les modifie pas, on les lit pour le détail. Le statut courant vit ici.
@@ -27,19 +27,19 @@ Les deux audits sont des **instantanés datés** : on ne les modifie pas, on les
   six modules qui ont une règle à expliquer. Branche `fiches`, 10 commits, non poussée.
 
 **Reste :**
-- A5 — dépendances vulnérables, préexistantes, délibérément non traitées (voir plus bas)
+- A5 : dépendances vulnérables, préexistantes, délibérément non traitées (voir plus bas)
 - chantier B, suite : le mode « école » (bibliothèque de fiches), qui demande des entités
-  et une migration — contrairement à tout ce qui a été fait jusqu'ici
+  et une migration : contrairement à tout ce qui a été fait jusqu'ici
 
-**Ce qu'il faut retenir de la dérive de départ** — le travail sur le corpus avait été qualifié d'« actions sans regret », et la dette avait été repoussée de réponse en réponse. Elle est maintenant payée ; la règle qui l'a permis reste valable : nommer l'hypothèse non validée avant de coder, et exécuter le bloquant plutôt que le répéter.
+**Ce qu'il faut retenir de la dérive de départ**, le travail sur le corpus avait été qualifié d'« actions sans regret », et la dette avait été repoussée de réponse en réponse. Elle est maintenant payée ; la règle qui l'a permis reste valable : nommer l'hypothèse non validée avant de coder, et exécuter le bloquant plutôt que le répéter.
 
 **Le chantier B est désormais possible sans risque** : il ajoute des entités en base, le schéma n'évolue que par migration, et la sauvegarde existe.
 
 ---
 
-# Chantier A — Dette technique ✅ **terminé** (2026-08-24)
+# Chantier A : Dette technique ✅ **terminé** (2026-08-24)
 
-Branche `chantier-a-robustesse`, 11 commits, **non poussée** — le déploiement reste ta décision.
+Branche `chantier-a-robustesse`, 11 commits, **non poussée** : le déploiement reste ta décision.
 
 | | |
 |---|---|
@@ -50,7 +50,7 @@ Branche `chantier-a-robustesse`, 11 commits, **non poussée** — le déploiemen
 | A4 | `strict: true`, 29 tests, C1 · C2 · C3 · I6 |
 
 Les 8 étapes de la CI ont été simulées localement à chaque étape. Détail dans les messages
-de commit — ils portent le pourquoi de chaque correction.
+de commit : ils portent le pourquoi de chaque correction.
 
 ### Avant de fusionner et déployer
 
@@ -63,7 +63,7 @@ de commit — ils portent le pourquoi de chaque correction.
 2. **Sauvegarder avant le premier déploiement.** `./scripts/backup-db.sh`, puis planifier le cron.
 3. **Renseigner les variables de production.** L'application refuse de démarrer si
    `JWT_SECRET` est absent, égal au défaut du dépôt ou plus court que 23 caractères, si
-   `DB_SYNCHRONIZE=true`, ou si `ADMIN_PIN_ENABLED=false` — cette variable court-circuite
+   `DB_SYNCHRONIZE=true`, ou si `ADMIN_PIN_ENABLED=false` : cette variable court-circuite
    `AccessGuard`, donc le portail d'invitation, malgré ce que son nom suggère.
    Le code PIN n'entre pas dans ces contrôles : c'est un contrôle parental, pas une
    frontière de sécurité.
@@ -75,7 +75,7 @@ de commit — ils portent le pourquoi de chaque correction.
 
 ---
 
-# Chantier A5 — Dépendances vulnérables ⚠️ **nouveau, non traité**
+# Chantier A5 : Dépendances vulnérables ⚠️ **nouveau, non traité**
 
 `npm audit` sur le backend : **26 vulnérabilités, dont 11 hautes et 1 critique**. Toutes
 préexistantes, aucune introduite par le chantier A. Les plus notables :
@@ -88,7 +88,7 @@ préexistantes, aucune introduite par le chantier A. Les plus notables :
 | critique | `@xhmikosr/decompress` | chaîne de build uniquement |
 
 **Volontairement non traité** : corriger cela demande de monter des versions majeures de
-`@nestjs/*`, ce qui peut casser l'application — exactement ce qu'on cherchait à éviter.
+`@nestjs/*`, ce qui peut casser l'application : exactement ce qu'on cherchait à éviter.
 C'est un chantier à part entière, à mener avec le filet de tests désormais en place.
 
 Portée réelle : toutes ces routes sont derrière `AccessGuard`. L'attaquant plausible reste
@@ -96,12 +96,12 @@ Portée réelle : toutes ces routes sont derrière `AccessGuard`. L'attaquant pl
 
 ---
 
-# Chantier B — Cours
+# Chantier B : Cours
 
 ## B.1 · Ce qui est acquis
 
 ### Le corpus est prêt
-`data/lecons/` — 448 leçons Kartable, CE1→CM2. Gitignoré, jamais livré tel quel.
+`data/lecons/` : 448 leçons Kartable, CE1→CM2. Gitignoré, jamais livré tel quel.
 
 Deux scripts, idempotents, relançables :
 
@@ -110,21 +110,21 @@ node scripts/mirror-lecons-images.mjs   # 1 824 images → data/lecons_media/ (2
 node scripts/parse-lecons.mjs           # 448 HTML → data/corpus/{corpus.json,index.json}
 ```
 
-`corpus.json` — arbre de blocs typés, chaque bloc porte un **rôle** qui mappe sur un champ de fiche :
+`corpus.json` : arbre de blocs typés, chaque bloc porte un **rôle** qui mappe sur un champ de fiche :
 `rule` (1 160) · `example` (1 431) · `tip` (385) · `key` (108) · `warning` (54).
 
-`index.json` — le squelette : 4 niveaux, 6 matières, **355 notions**, dont **68 spiralaires** (le même titre
+`index.json`, le squelette : 4 niveaux, 6 matières, **355 notions**, dont **68 spiralaires** (le même titre
 revient sur 2 à 4 niveaux : « Le verbe » existe en CE1, CE2, CM1 et CM2). C'est la progression du programme,
 déjà encodée. Elle justifie une fiche **par niveau**, pas une fiche par notion.
 
-### Ce que le corpus donne — et ne donne pas
+### Ce que le corpus donne, et ne donne pas
 
 | | |
 |---|---|
 | ✅ la règle | présente dans 77 % des leçons |
 | ✅ l'exemple | 1 431 blocs, **illustrations de qualité**, réutilisables telles quelles |
-| ❌ l'idée clé | seulement **19 %** des leçons ont un résumé/mémo — à rédiger |
-| ❌ 46 leçons | quasi sans texte (vocabulaire Français/Anglais) — tout est dans l'image |
+| ❌ l'idée clé | seulement **19 %** des leçons ont un résumé/mémo : à rédiger |
+| ❌ 46 leçons | quasi sans texte (vocabulaire Français/Anglais) : tout est dans l'image |
 | ❌ 1 leçon | vide à la source (`CM1/Exercice Maths/Identifier la classe de chaque chiffre`) |
 
 ### Décisions prises
@@ -137,7 +137,7 @@ déjà encodée. Elle justifie une fiche **par niveau**, pas une fiche par notio
   Fix retenu : une **carte « papier »** en CSS (fond clair explicite dans les deux thèmes), pas de retouche d'image.
 - **Le texte livré à l'enfant est réécrit**, jamais copié. Le corpus est une source de travail.
 - **La progression par notion** : table `notion_progression` alimentée par la fiche elle-même
-  (option A), pas de `notionKey` à câbler dans les 13 modules (option B) — on y viendra si ça tient.
+  (option A), pas de `notionKey` à câbler dans les 13 modules (option B) : on y viendra si ça tient.
 
 ## B.2 · Ce qui a été validé, puis construit
 
@@ -325,7 +325,7 @@ pas un cadre vide à l'écran.
 
 ---
 
-# Chantier C — Le trou du français : `grammaire`
+# Chantier C, Le trou du français : `grammaire`
 
 Branche `module-grammaire`, worktree `../educ_mentor-grammaire` (l'arbre principal était
 occupé par `module-geometrie`).
@@ -333,8 +333,8 @@ occupé par `module-geometrie`).
 ## Pourquoi ce module et pas un autre
 
 Le découpage du français en §B.4 compte 7 grandes notions. Trois portaient « aucune »
-tuile — **La nature des mots** (6 concepts), **Les accords** (5), **La fonction des mots**
-(3) — et « La phrase » était rattachée à `lecture`, qui fait de la compréhension, pas de la
+tuile : **La nature des mots** (6 concepts), **Les accords** (5), **La fonction des mots**
+(3), et « La phrase » était rattachée à `lecture`, qui fait de la compréhension, pas de la
 ponctuation. Soit **17 notions sur 33 sans aucun entraînement** : aucun autre trou n'en
 approche. Et les fiches de cours étaient déjà écrites, donc la pédagogie était déjà faite.
 
@@ -348,7 +348,7 @@ seul module, c'est ce qui empêche de le finir.
 - **Le corpus est du CODE, pas de la base.** Même raison que `geometrie.shapes.ts` : une
   phrase annotée mot par mot n'est pas du contenu qu'un parent édite, et une annotation
   fausse enseigne du faux français. Conséquence assumée : pas de table de contenu, pas
-  d'import JSON, pas d'onglet « Contenu » — un textarea JSON était le seul endroit du
+  d'import JSON, pas d'onglet « Contenu » : un textarea JSON était le seul endroit du
   module capable d'injecter une annotation fausse. Étendre le corpus demande un déploiement,
   comme pour une figure ou une fiche.
 - **L'annotation passe par des constructeurs, pas par des objets littéraux.**
@@ -357,11 +357,11 @@ seul module, c'est ce qui empêche de le finir.
 - **Ce n'est PAS l'écran de correction de la dictée qui est réutilisé.** Celui-là est de
   l'auto-correction : l'enfant coche ses propres fautes, l'application ne connaît aucune
   vérité. Ici il y a une bonne réponse. Le vrai véhicule était `spec.map` +
-  `isMultiSelect`, déjà utilisé par les régions de `france` — timer, score, étoiles,
+  `isMultiSelect`, déjà utilisé par les régions de `france` : timer, score, étoiles,
   progression et fiche fournis par le moteur.
 - **Jamais la nature d'un mot hors phrase.** « Quelle est la nature de *ferme* ? » n'a pas
   de réponse. C'est aussi ce que dit la fiche du cours : un enfant de CE1 classe les mots
-  par ce qu'ils font dans la phrase. Le corpus contient exprès des ambiguïtés — *ferme*,
+  par ce qu'ils font dans la phrase. Le corpus contient exprès des ambiguïtés : *ferme*,
   *porte*, *gare*, *cuisine*.
 - **La difficulté porte la phrase, pas la forme de la réponse.** `qcmChoiceCount` de
   `common/difficulty.ts` renvoie 0 en `hard` au sens « saisie libre » : faire taper
@@ -385,7 +385,7 @@ seul module, c'est ce qui empêche de le finir.
 | exercices | `nature_mot` (QCM) · `trouver_mots` · `trouver_fonction` · `groupe_nominal` (sélection) |
 | pré-jeu | une option `questionTypes`, plus la difficulté commune |
 | admin | un onglet « Notions actives » + tableau « Notions à retravailler » |
-| progression | par notion, jamais par phrase — c'est le grain actionnable pour le parent |
+| progression | par notion, jamais par phrase : c'est le grain actionnable pour le parent |
 | fiche | le texte des fiches de `cours/francais/`, l'exemple étant la phrase ratée |
 | tests | 41 backend (dont 14 invariants de corpus), 29 frontend |
 
@@ -399,18 +399,18 @@ différentes du verbe selon qu'elle joue ou qu'elle révise.
 - **La phrase** (majuscule, point, types de phrase) reste le dernier trou du français :
   interaction de production, donc module distinct. Les accords sont faits, cf. chantier D.
 - Le corpus est du CE1. CE2→CM2 demanderont d'autres phrases et probablement d'autres
-  notions (COD/COI, attribut) — les constructeurs tiendront, l'énumération devra grandir.
+  notions (COD/COI, attribut) : les constructeurs tiendront, l'énumération devra grandir.
 
 ---
 
-# Chantier D — Les accords ✅
+# Chantier D : Les accords ✅
 
 Même branche `module-grammaire`, même worktree. Le module fait suite direct à `grammaire` :
 les fiches du cours le disent, « on ne peut pas accorder ce qu'on ne sait pas nommer ».
 
 ## Les cinq exercices sont les cinq fiches
 
-Ici la notion et le type d'exercice **coïncident**, un pour un — contrairement à
+Ici la notion et le type d'exercice **coïncident**, un pour un : contrairement à
 `grammaire` où quatre types d'exercice se partagent dix notions. Une seule énumération
 suffit donc, et le message d'erreur « active telle notion » se rédige sans détour.
 
@@ -428,7 +428,7 @@ suffit donc, et le message d'erreur « active telle notion » se rédige sans d�
   20 adjectifs (les quatre formes), 20 verbes (les deux personnes). Les déterminants et les
   groupes nominaux sont **dérivés** par `determinant()` et `groupeNominal()`. L'énoncé et la
   réponse attendue sortent donc de la MÊME fonction : une divergence entre les deux est
-  impossible par construction, et c'était le risque principal — un « des gâteaux » construit
+  impossible par construction, et c'était le risque principal : un « des gâteaux » construit
   à la main d'un côté et par règle de l'autre finit par diverger, et l'enfant a raison
   contre la machine.
 - **Le corpus ne dépasse jamais ce que la fiche explique.** Pas de -al → -aux (cheval), pas
@@ -438,7 +438,7 @@ suffit donc, et le message d'erreur « active telle notion » se rédige sans d�
   question doit pouvoir trouver la réponse dans la fiche.
 - **La validation n'enlève PAS les accents**, à l'inverse de `geometrie` qui accepte
   « decagone ». Là-bas l'orthographe est hors sujet ; ici elle EST la réponse. Sont tolérés
-  la casse, les espaces en trop et la forme de l'apostrophe — un clavier donne `'`, l'énoncé
+  la casse, les espaces en trop et la forme de l'apostrophe : un clavier donne `'`, l'énoncé
   affiche `’`. `normaliseReponse` est **dupliquée** côté front (la saisie est validée par
   `<GameEngine>`, et les deux paquets n'ont aucune dépendance) ; `accords-reponse.test.ts`
   compare les deux corps de fonction sur disque.
@@ -447,7 +447,7 @@ suffit donc, et le message d'erreur « active telle notion » se rédige sans d�
   « il dort et ils dorment se prononcent presque pareil, mais ne s'écrivent pas pareil ».
   Classer « irrégulier = difficile » aurait inversé la progression.
 - **Deux défauts trouvés en lisant la sortie réelle, pas les tests :**
-  1. *Le QCM à deux choix pouvait proposer l'infinitif* au lieu de la forme opposée —
+  1. *Le QCM à deux choix pouvait proposer l'infinitif* au lieu de la forme opposée :
      « La fille ⬚ un gâteau (faire) » offrait `faire / fait`. Une question qui n'oppose plus
      le singulier au pluriel n'interroge plus l'accord. Les distracteurs sont désormais
      **ordonnés par valeur pédagogique** et retenus dans l'ordre, jamais tirés au hasard.

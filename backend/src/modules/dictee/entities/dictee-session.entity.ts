@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-/** Une dictée jouée : les items servis, les options choisies, et — une fois corrigée —
+/** Une dictée jouée : les items servis, les options choisies, et, une fois corrigée :
  * les mots que l'enfant a ratés. Ces mots alimentent `dictee_word_stats`. */
 @Entity('dictee_sessions')
 export class DicteeSession {

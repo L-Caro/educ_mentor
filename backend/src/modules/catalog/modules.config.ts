@@ -1,7 +1,7 @@
 import type { AppModule } from './entities/module.entity';
 
 /** Liste des modules disponibles dans l'application.
- * C'est ici qu'on ajoute un nouveau module — les données sont insérées en BDD au démarrage si elles n'existent pas encore. */
+ * C'est ici qu'on ajoute un nouveau module : les données sont insérées en BDD au démarrage si elles n'existent pas encore. */
 export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'imagier',
@@ -22,7 +22,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'calcul-mental',
     name: 'Calcul Mental',
-    description: 'Opérations à trous — trouver le nombre manquant',
+    description: 'Opérations à trous : trouver le nombre manquant',
     icon: '🧮',
     is_active: false,
     display_order: 3,
@@ -57,7 +57,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'geo',
     name: 'Géographie',
-    description: 'Capitales, drapeaux, continents, océans — explorer le monde',
+    description: 'Capitales, drapeaux, continents, océans : explorer le monde',
     icon: '🌍',
     is_active: false,
     display_order: 7,
@@ -66,7 +66,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     id: 'france',
     name: 'France',
     description:
-      'Départements, régions, préfectures, fleuves, massifs — la géographie française',
+      'Départements, régions, préfectures, fleuves, massifs : la géographie française',
     icon: '🇫🇷',
     is_active: false,
     display_order: 8,
@@ -75,7 +75,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     id: 'snake',
     name: 'Snake',
     description:
-      'Le jeu du serpent — grandir en mangeant des fruits, sans se mordre',
+      'Le jeu du serpent : grandir en mangeant des fruits, sans se mordre',
     icon: '🐍',
     is_active: false,
     display_order: 9,
@@ -170,7 +170,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
   {
     id: 'puissance4',
     name: 'Puissance 4',
-    description: 'Aligner quatre jetons — les pions tombent, la colonne décide',
+    description: 'Aligner quatre jetons : les pions tombent, la colonne décide',
     icon: '🔴',
     is_active: false,
     display_order: 20,

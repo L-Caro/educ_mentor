@@ -25,8 +25,8 @@ const METHODES = [
 /** Les opérations ouvertes. La multiplication posée est là mais fermée : on l'ouvre quand
  * la classe l'a vue, comme les figures de la géométrie.
  *
- * La division posée n'y figure pas : sa potence est une autre géométrie — quotient
- * construit de gauche à droite, abaissements, reste — que la grille en colonnes ne sait
+ * La division posée n'y figure pas : sa potence est une autre géométrie, quotient
+ * construit de gauche à droite, abaissements, reste, que la grille en colonnes ne sait
  * pas rendre. La proposer sans savoir la jouer ouvrirait une case muette. */
 function OperationsActives() {
   const { data: catalogue = [], isLoading: loadingCatalogue } =
@@ -53,7 +53,7 @@ function OperationsActives() {
         {saving && <Spinner size="xs" />}
       </div>
       <p className="GameSettings__hint">
-        La classe indiquée dit quand ouvrir — rien n&rsquo;empêche d&rsquo;ouvrir plus
+        La classe indiquée dit quand ouvrir : rien n&rsquo;empêche d&rsquo;ouvrir plus
         tôt. La multiplication demande d&rsquo;écrire les produits partiels et leur
         décalage : c&rsquo;est là qu&rsquo;elle se joue.
       </p>

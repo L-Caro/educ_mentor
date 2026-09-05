@@ -13,7 +13,7 @@
  * n'est écarté sous prétexte que la fiche du CE1 s'arrête avant.
  *
  * Ce qui est JOUABLE est décidé ailleurs : `accords.familles.ts` déclare chaque famille
- * avec la classe où elle s'apprend, et l'administration ouvre celles qui ont été vues —
+ * avec la classe où elle s'apprend, et l'administration ouvre celles qui ont été vues :
  * comme les figures de la géométrie. Une famille fermée n'apparaît jamais dans une
  * question, ni comme distracteur.
  *
@@ -24,8 +24,8 @@
 
 export type Genre = 'masculin' | 'feminin';
 
-/** La catégorie sémantique d'un nom. Elle ne sert pas la grammaire — l'accord de
- * « chapeau » ne dépend pas de ce qu'est un chapeau — mais elle empêche le générateur de
+/** La catégorie sémantique d'un nom. Elle ne sert pas la grammaire : l'accord de
+ * « chapeau » ne dépend pas de ce qu'est un chapeau, mais elle empêche le générateur de
  * produire « les chapeaux sucrés » ou « les chiens dessinent ». Un énoncé absurde reste
  * grammaticalement valide et déplace l'attention de l'accord vers la phrase : l'enfant
  * s'arrête sur le nez content au lieu de compter les s. */
@@ -84,7 +84,7 @@ export interface VerbeMeta {
   s3: string;
   /** 3e personne du pluriel du présent. */
   p3: string;
-  /** La suite de la phrase après le verbe — portée par le verbe pour que la phrase soit
+  /** La suite de la phrase après le verbe : portée par le verbe pour que la phrase soit
    * toujours correcte : « les chats prennent dans le jardin » ne se dit pas. */
   suite: string;
   /** Les deux formes se PRONONCENT pareil. C'est là que l'accord est vraiment difficile,
@@ -210,7 +210,7 @@ export const NOMS: NomMeta[] = [
 // ─── Adjectifs ──────────────────────────────────────────────────────────────
 //
 // Tous réguliers : féminin en +e, pluriel en +s. Ceux qui finissent déjà par un e sont
-// invariables au féminin — c'est le piège explicite de la fiche (rouge, jaune, calme).
+// invariables au féminin : c'est le piège explicite de la fiche (rouge, jaune, calme).
 //
 // `sappliqueA` et `famille` ne servent pas l'accord : elles empêchent le générateur
 // d'écrire « les chapeaux sucrés » ou « le chapeau vert rouge ».

@@ -22,8 +22,8 @@ export class SettingsController {
 
   @Get()
   getAll() {
-    // Volontairement `getPublic` : cette route n'est pas protégée — le frontend enfant en a
-    // besoin — elle ne doit donc jamais renvoyer de secret.
+    // Volontairement `getPublic` : cette route n'est pas protégée, le frontend enfant en a
+    // besoin : elle ne doit donc jamais renvoyer de secret.
     return this.settingsService.getPublic();
   }
 

@@ -5,7 +5,7 @@ export type NotionKey =
   | 'accord_gn'
   | 'accord_sujet_verbe';
 
-/** Le type d'exercice et la notion coïncident dans ce module — un exercice par fiche. */
+/** Le type d'exercice et la notion coïncident dans ce module : un exercice par fiche. */
 export type AccordsQuestionType = NotionKey;
 
 export interface NotionMeta {

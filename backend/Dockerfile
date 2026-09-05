@@ -32,7 +32,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Créer les dossiers attendus par configuration.ts.
-# Ils seront montés en volume par docker-compose — le dossier doit exister avant le montage.
+# Ils seront montés en volume par docker-compose : le dossier doit exister avant le montage.
 RUN mkdir -p /app/data/images /app/static
 
 ENV NODE_ENV=production

@@ -41,7 +41,7 @@ const InvitationsAdmin = () => {
       <div className="Settings__section">
         <p className="Settings__cardTitle">Générer un lien</p>
         <p className="InvitationsAdmin__hint">
-          Un lien par appareil — usage unique. L'accès devient permanent après validation.
+          Un lien par appareil : usage unique. L'accès devient permanent après validation.
         </p>
         <form onSubmit={handleCreate} className="InvitationsAdmin__form">
           <input

@@ -7,7 +7,7 @@ import {
 } from 'src/modules/accords/accords.reponse';
 
 /**
- * `normaliseReponse` existe en DEUX exemplaires — un par paquet — parce que la validation
+ * `normaliseReponse` existe en DEUX exemplaires, un par paquet, parce que la validation
  * d'une saisie libre est faite côté client par `<GameEngine>` et que les deux paquets
  * n'ont aucune dépendance entre eux. Même situation que `dictee.tokens.ts`, qui reproduit
  * `dictee.logic.ts`.
@@ -51,7 +51,7 @@ describe('normalisation dupliquée', () => {
 });
 
 describe('validation d’une saisie', () => {
-  it("n'enlève JAMAIS les accents — l'orthographe EST la réponse", () => {
+  it("n'enlève JAMAIS les accents : l'orthographe EST la réponse", () => {
     // `geometrie.game.tsx` accepte « decagone » parce qu'il évalue la géométrie, pas
     // l'orthographe. Ici, accepter « des gateaux » enseignerait l'inverse de la leçon.
     expect(reponseCorrecte('des gâteaux', 'des gateaux')).toBe(false);

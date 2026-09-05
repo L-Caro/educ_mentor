@@ -42,7 +42,7 @@ export class MemoryCardSeedService implements OnModuleInit {
     const seedPath = path.join(this.seedDir, 'memory-card.seed.json');
     if (!fs.existsSync(seedPath)) {
       this.logger.warn(
-        `Seed introuvable (${seedPath}) — module Memory sans cartes.`,
+        `Seed introuvable (${seedPath}) : module Memory sans cartes.`,
       );
       return;
     }

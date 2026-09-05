@@ -2,7 +2,7 @@
 
 // ─── Le plateau du compte est bon ─────────────────────────────────────────────
 // Des plaques qu'on touche, pas un champ qu'on remplit : le geste du jeu est de prendre
-// deux nombres et d'en faire un troisième. Les plaques sont donc larges et espacées —
+// deux nombres et d'en faire un troisième. Les plaques sont donc larges et espacées :
 // visées au doigt sur une tablette, et souvent deux fois de suite.
 
 .ComptePlateau {
@@ -149,7 +149,7 @@
 }
 
 // Reprendre doit être facile : chercher un compte, c'est se tromper de chemin. Mais ces
-// boutons ne doivent pas rivaliser avec « Valider » — d'où le fond transparent.
+// boutons ne doivent pas rivaliser avec « Valider » : d'où le fond transparent.
 .ComptePlateau__reprise {
 	padding: v.$space-3 v.$space-5;
 	border: 1px solid var(--color-base-300);

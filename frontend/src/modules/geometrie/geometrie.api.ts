@@ -49,7 +49,7 @@ export const geometrieApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'geometrie' }],
     }),
 
-    // ─── Admin — figures actives ────────────────────────────────────────────────
+    // ─── Admin : figures actives ────────────────────────────────────────────────
     getGeometrieShapes: builder.query<ShapeMeta[], void>({
       query: () => '/geometrie/shapes',
     }),

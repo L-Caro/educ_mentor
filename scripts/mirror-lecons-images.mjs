@@ -60,7 +60,7 @@ async function listHtmlFiles(dir) {
 /**
  * Nom de fichier local : hash de l'URL complète.
  * On ne réutilise pas le basename d'origine parce que deux URLs peuvent le partager
- * en ne différant que par leur query (`?format=webp`, `?1597322999`) — la lisibilité
+ * en ne différant que par leur query (`?format=webp`, `?1597322999`) : la lisibilité
  * est assurée par le manifeste, pas par le nom de fichier.
  */
 function localName(url, contentType) {
@@ -79,7 +79,7 @@ function extFor(url, contentType) {
   }[(contentType ?? '').split(';')[0].trim()];
   if (fromType) return fromType;
 
-  // Repli sur l'extension du chemin — attention, elle ment quand il y a ?format=webp
+  // Repli sur l'extension du chemin : attention, elle ment quand il y a ?format=webp
   const pathExt = extname(new URL(url).pathname).toLowerCase();
   return pathExt || '.bin';
 }
@@ -130,7 +130,7 @@ async function fetchWithRetry(url) {
       };
     } catch (error) {
       lastError = error;
-      // Backoff exponentiel : 500ms, 1s, 2s — inutile de marteler un serveur qui tousse
+      // Backoff exponentiel : 500ms, 1s, 2s, inutile de marteler un serveur qui tousse
       if (attempt < MAX_RETRIES) {
         await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** (attempt - 1)));
       }

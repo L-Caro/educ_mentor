@@ -10,7 +10,7 @@ import { GrammaireModule } from '../grammaire/grammaire.module';
 import { AccordsModule } from '../accords/accords.module';
 
 /** Le péage n'a NI entité NI migration : il ne possède aucune donnée. Il emprunte les
- * questions des cinq modules et n'en garde rien — voir `PeageService`. */
+ * questions des cinq modules et n'en garde rien : voir `PeageService`. */
 @Module({
   imports: [
     SettingsModule,

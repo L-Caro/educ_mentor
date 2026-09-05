@@ -1,7 +1,7 @@
-# Fins de ligne — normalisation explicite.
+# Fins de ligne : normalisation explicite.
 #
 # Pourquoi : `core.autocrlf=true` est configuré sur le poste de développement (Windows/WSL).
-# Sans ce fichier, git convertit en CRLF à chaque checkout — y compris les scripts shell, qui
+# Sans ce fichier, git convertit en CRLF à chaque checkout : y compris les scripts shell, qui
 # deviennent alors inexécutables sous Linux (`bad interpreter: /usr/bin/env bash^M`) et partent
 # ainsi dans le contexte de build Docker.
 #
@@ -15,7 +15,7 @@
 Dockerfile      text eol=lf
 *.Dockerfile    text eol=lf
 
-# Binaires — aucune conversion.
+# Binaires : aucune conversion.
 *.png    binary
 *.jpg    binary
 *.jpeg   binary

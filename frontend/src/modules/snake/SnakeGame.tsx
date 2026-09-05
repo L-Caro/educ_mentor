@@ -60,7 +60,7 @@ export default function SnakeGame() {
     active: false,
   });
 
-  // Boucle principale — démarre dès que le container a des dimensions réelles.
+  // Boucle principale : démarre dès que le container a des dimensions réelles.
   // On utilise un ResizeObserver car sur mobile (iOS Safari), clientWidth/Height
   // valent 0 au moment du mount React : sans ça, isWall() détecte une collision
   // immédiate et le jeu se termine avant même d'avoir commencé.

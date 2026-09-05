@@ -1,4 +1,4 @@
-/** Service Worker minimal — requis par Chrome/Android pour proposer l'installation de la PWA.
+/** Service Worker minimal : requis par Chrome/Android pour proposer l'installation de la PWA.
  * Stratégie : réseau d'abord, cache en fallback pour les navigations (rechargement hors ligne). */
 
 const CACHE_NAME = 'educmentor-v1';
@@ -24,7 +24,7 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   // On ne gère que les navigations (GET sur des pages HTML).
-  // Les assets JS/CSS ont déjà des hash Vite — le cache HTTP suffit pour eux.
+  // Les assets JS/CSS ont déjà des hash Vite : le cache HTTP suffit pour eux.
   if (event.request.mode !== 'navigate') return;
 
   event.respondWith(

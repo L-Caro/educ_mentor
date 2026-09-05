@@ -5,8 +5,8 @@ export const puissance4Module: ModuleManifest = {
   id: 'puissance4',
   category: 'jeux',
   setupOptions: [
-    // Le module déclare SA clé `difficulty` : sans elle, le pré-jeu injecte la sienne —
-    // « 2 choix / 4 choix / Saisie libre » — qui ne veut rien dire sur un plateau, et le
+    // Le module déclare SA clé `difficulty` : sans elle, le pré-jeu injecte la sienne :
+    // « 2 choix / 4 choix / Saisie libre », qui ne veut rien dire sur un plateau, et le
     // jeu posait deux fois la même question.
     //
     // « À deux » n'est plus ici : c'est un bouton sur le plateau, où passer la main ne

@@ -1,4 +1,4 @@
-/** Mots pour le jeu du pendu — MAJUSCULES sans accents, 5 lettres minimum.
+/** Mots pour le jeu du pendu : MAJUSCULES sans accents, 5 lettres minimum.
  * Organisé par longueur exacte (5/6/7/8/9+) × difficulté (easy/normal/hard).
  * 20 mots par combinaison = 300 mots au total. */
 export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
@@ -6,7 +6,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   // 5 LETTRES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── 5 lettres — Easy ────────────────────────────────────────────────────
+  // ─── 5 lettres : Easy ────────────────────────────────────────────────────
   { word: 'AVION', difficulty: 'easy' },
   { word: 'LAPIN', difficulty: 'easy' },
   { word: 'FLEUR', difficulty: 'easy' },
@@ -28,7 +28,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'BLANC', difficulty: 'easy' },
   { word: 'TIGRE', difficulty: 'easy' },
 
-  // ─── 5 lettres — Normal ──────────────────────────────────────────────────
+  // ─── 5 lettres : Normal ──────────────────────────────────────────────────
   { word: 'PIANO', difficulty: 'normal' },
   { word: 'STYLO', difficulty: 'normal' },
   { word: 'COEUR', difficulty: 'normal' },
@@ -50,7 +50,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'BULLE', difficulty: 'normal' },
   { word: 'ROUTE', difficulty: 'normal' },
 
-  // ─── 5 lettres — Hard ────────────────────────────────────────────────────
+  // ─── 5 lettres : Hard ────────────────────────────────────────────────────
   { word: 'PINCE', difficulty: 'hard' },
   { word: 'COUDE', difficulty: 'hard' },
   { word: 'GENOU', difficulty: 'hard' },
@@ -76,7 +76,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   // 6 LETTRES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── 6 lettres — Easy ────────────────────────────────────────────────────
+  // ─── 6 lettres : Easy ────────────────────────────────────────────────────
   { word: 'MAISON', difficulty: 'easy' },
   { word: 'JARDIN', difficulty: 'easy' },
   { word: 'CHEVAL', difficulty: 'easy' },
@@ -98,7 +98,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'BALLON', difficulty: 'easy' },
   { word: 'LAVABO', difficulty: 'easy' },
 
-  // ─── 6 lettres — Normal ──────────────────────────────────────────────────
+  // ─── 6 lettres : Normal ──────────────────────────────────────────────────
   { word: 'REQUIN', difficulty: 'normal' },
   { word: 'RENARD', difficulty: 'normal' },
   { word: 'COCHON', difficulty: 'normal' },
@@ -120,7 +120,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'MARCHE', difficulty: 'normal' },
   { word: 'GATEAU', difficulty: 'normal' },
 
-  // ─── 6 lettres — Hard ────────────────────────────────────────────────────
+  // ─── 6 lettres : Hard ────────────────────────────────────────────────────
   { word: 'GRIFFE', difficulty: 'hard' },
   { word: 'BASSIN', difficulty: 'hard' },
   { word: 'SOUCHE', difficulty: 'hard' },
@@ -146,7 +146,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   // 7 LETTRES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── 7 lettres — Easy ────────────────────────────────────────────────────
+  // ─── 7 lettres : Easy ────────────────────────────────────────────────────
   { word: 'VOITURE', difficulty: 'easy' },
   { word: 'FAMILLE', difficulty: 'easy' },
   { word: 'CHAPEAU', difficulty: 'easy' },
@@ -168,7 +168,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'GARCONS', difficulty: 'easy' },
   { word: 'PISCINE', difficulty: 'easy' },
 
-  // ─── 7 lettres — Normal ──────────────────────────────────────────────────
+  // ─── 7 lettres : Normal ──────────────────────────────────────────────────
   { word: 'ABEILLE', difficulty: 'normal' },
   { word: 'SORCIER', difficulty: 'normal' },
   { word: 'VAMPIRE', difficulty: 'normal' },
@@ -190,7 +190,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'TAMBOUR', difficulty: 'normal' },
   { word: 'POIRIER', difficulty: 'normal' },
 
-  // ─── 7 lettres — Hard ────────────────────────────────────────────────────
+  // ─── 7 lettres : Hard ────────────────────────────────────────────────────
   { word: 'ECLIPSE', difficulty: 'hard' },
   { word: 'NAUTILE', difficulty: 'hard' },
   { word: 'CHARBON', difficulty: 'hard' },
@@ -216,7 +216,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   // 8 LETTRES
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── 8 lettres — Easy ────────────────────────────────────────────────────
+  // ─── 8 lettres : Easy ────────────────────────────────────────────────────
   { word: 'CARTABLE', difficulty: 'easy' },
   { word: 'CHOCOLAT', difficulty: 'easy' },
   { word: 'TOBOGGAN', difficulty: 'easy' },
@@ -238,7 +238,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'TARTINES', difficulty: 'easy' },
   { word: 'MACARONS', difficulty: 'easy' },
 
-  // ─── 8 lettres — Normal ──────────────────────────────────────────────────
+  // ─── 8 lettres : Normal ──────────────────────────────────────────────────
   { word: 'CHOUETTE', difficulty: 'normal' },
   { word: 'BOUSSOLE', difficulty: 'normal' },
   { word: 'TALISMAN', difficulty: 'normal' },
@@ -260,7 +260,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'PLANKTON', difficulty: 'normal' },
   { word: 'BANQUISE', difficulty: 'normal' },
 
-  // ─── 8 lettres — Hard ────────────────────────────────────────────────────
+  // ─── 8 lettres : Hard ────────────────────────────────────────────────────
   { word: 'MYSTIQUE', difficulty: 'hard' },
   { word: 'ALCHIMIE', difficulty: 'hard' },
   { word: 'VIPERINE', difficulty: 'hard' },
@@ -286,7 +286,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   // 9 LETTRES ET PLUS
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // ─── 9+ lettres — Easy ───────────────────────────────────────────────────
+  // ─── 9+ lettres : Easy ───────────────────────────────────────────────────
   { word: 'CROCODILE', difficulty: 'easy' },
   { word: 'DINOSAURE', difficulty: 'easy' },
   { word: 'BAIGNOIRE', difficulty: 'easy' },
@@ -303,7 +303,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'COUVERTURE', difficulty: 'easy' },
   { word: 'BOULANGER', difficulty: 'easy' },
 
-  // ─── 9+ lettres — Normal ─────────────────────────────────────────────────
+  // ─── 9+ lettres : Normal ─────────────────────────────────────────────────
   { word: 'RHINOCEROS', difficulty: 'normal' },
   { word: 'PERROQUET', difficulty: 'normal' },
   { word: 'COULEUVRE', difficulty: 'normal' },
@@ -318,7 +318,7 @@ export const PENDU_SEED_WORDS: { word: string; difficulty: string }[] = [
   { word: 'CLEMENTINE', difficulty: 'normal' },
   { word: 'TOURNIQUET', difficulty: 'normal' },
 
-  // ─── 9+ lettres — Hard ───────────────────────────────────────────────────
+  // ─── 9+ lettres : Hard ───────────────────────────────────────────────────
   { word: 'ASTRONOMIE', difficulty: 'hard' },
   { word: 'ARCHEOLOGIE', difficulty: 'hard' },
   { word: 'HYDROGENE', difficulty: 'hard' },

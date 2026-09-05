@@ -29,7 +29,7 @@ export const lectureApi = baseApi.injectEndpoints({
       invalidatesTags: ['LectureTexts', { type: 'Progression', id: 'lecture' }],
     }),
 
-    // ─── Admin — textes ─────────────────────────────────────────────────────
+    // ─── Admin : textes ─────────────────────────────────────────────────────
 
     getAdminTexts: builder.query<LectureAdminText[], void>({
       query: () => '/admin/lecture/texts',
@@ -51,7 +51,7 @@ export const lectureApi = baseApi.injectEndpoints({
       invalidatesTags: ['LectureAdminTexts', 'LectureTexts'],
     }),
 
-    // ─── Admin — questions ───────────────────────────────────────────────────
+    // ─── Admin : questions ───────────────────────────────────────────────────
 
     getAdminQuestions: builder.query<LectureAdminQuestion[], number>({
       query: (textId) => `/admin/lecture/texts/${textId}/questions`,
@@ -73,7 +73,7 @@ export const lectureApi = baseApi.injectEndpoints({
       invalidatesTags: (_r, _e, { textId }) => [{ type: 'LectureQuestions' as const, id: textId }, 'LectureAdminTexts'],
     }),
 
-    // ─── Admin — progression ─────────────────────────────────────────────────
+    // ─── Admin : progression ─────────────────────────────────────────────────
 
     getLectureProgression: builder.query<ProgressionStat[], void>({
       query: () => '/admin/lecture/progression',

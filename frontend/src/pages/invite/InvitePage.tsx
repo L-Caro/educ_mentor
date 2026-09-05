@@ -5,7 +5,7 @@ import Spinner from 'src/components/common/Spinner';
 type InviteStatus = 'loading' | 'redirecting' | 'invalid' | 'already_used' | 'error';
 
 /** Valide le token d'invitation, pose le cookie access_token via l'API,
- * puis redirige vers / — l'AccessGate laissera passer au prochain check. */
+ * puis redirige vers / : l'AccessGate laissera passer au prochain check. */
 const InvitePage = () => {
   const { token } = useParams<{ token: string }>();
   const [inviteStatus, setInviteStatus] = useState<InviteStatus>(() => (token ? 'loading' : 'invalid'));

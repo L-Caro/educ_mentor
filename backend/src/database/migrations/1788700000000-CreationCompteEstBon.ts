@@ -13,8 +13,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  *
  * Le nom haché de la contrainte UNIQUE n'est pas une coquetterie : c'est celui que
  * TypeORM dérive de l'entité, et `npm run db:check` compare les deux textes de création
- * littéralement. Un nom lisible écrit à la main — comme dans les migrations d'accords, de
- * géométrie et de grammaire — y apparaît pour toujours comme un « écart », alors que les
+ * littéralement. Un nom lisible écrit à la main, comme dans les migrations d'accords, de
+ * géométrie et de grammaire : y apparaît pour toujours comme un « écart », alors que les
  * colonnes et l'unicité sont identiques. Trois fausses alertes suffisent : celle-ci est
  * le quatrième cas, et le seul qu'on puisse encore éviter sans reconstruire une table.
  */

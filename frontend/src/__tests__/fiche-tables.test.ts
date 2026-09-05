@@ -4,7 +4,7 @@ import type { TablesQuestion } from 'src/modules/tables/tables.type';
 
 /**
  * Deuxième module à déclarer une fiche, et celui qui vérifie que le contrat se généralise :
- * contrairement à la conjugaison, tables n'a demandé AUCUNE modification du backend — tout
+ * contrairement à la conjugaison, tables n'a demandé AUCUNE modification du backend : tout
  * était déjà dans la question.
  */
 

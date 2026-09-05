@@ -27,7 +27,7 @@ interface Pays {
   capitale: string;
   continent: string;
   oceans: string[]; // vrais océans uniquement (Atlantique, Pacifique, Indien, Arctique, Antarctique)
-  mers: string[]; // mers et détroits (Méditerranée, Mer du Nord…) — réservé aux futurs types de questions
+  mers: string[]; // mers et détroits (Méditerranée, Mer du Nord…) : réservé aux futurs types de questions
   voisins: string[];
   langues: string[];
 }
@@ -36,7 +36,7 @@ interface Pays {
  * Carte d'identité du sujet d'une question, jointe pour la fiche de leçon.
  *
  * En géographie il n'y a pas de règle à énoncer : « pourquoi Lima ? » n'a pas de réponse.
- * Ce qui aide, c'est de voir la fiche complète du pays — capitale, continent, voisins,
+ * Ce qui aide, c'est de voir la fiche complète du pays : capitale, continent, voisins,
  * langues. Rater la capitale du Pérou, puis lire sa carte, prépare la question suivante
  * sur son continent.
  *

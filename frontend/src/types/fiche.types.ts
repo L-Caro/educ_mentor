@@ -4,10 +4,10 @@ import type { ReactNode } from 'react';
  * Le contenu d'une fiche de leçon, quelle que soit son origine.
  *
  * Deux sources la produiront, avec la même forme en sortie :
- *   - dérivée de la question elle-même (`spec.fiche`) — conjugaison, tables, calcul…
+ *   - dérivée de la question elle-même (`spec.fiche`) : conjugaison, tables, calcul…
  *     Là où le module possède déjà la donnée, la fiche ne coûte rien à produire et
  *     porte exactement sur ce que l'enfant vient de rater.
- *   - rédigée une fois et rangée en bibliothèque — géographie, histoire, sciences,
+ *   - rédigée une fois et rangée en bibliothèque : géographie, histoire, sciences,
  *     où le « pourquoi » ne se déduit d'aucune règle.
  *
  * Un seul type en sortie, donc un seul composant de rendu, et un futur mode « école »
@@ -23,6 +23,6 @@ export interface Fiche {
   regle?: string | string[];
   /** L'exemple. Le module rend ce qu'il veut : tableau, cadran, pièces, illustration. */
   exemple?: ReactNode;
-  /** L'erreur classique — souvent la raison pour laquelle l'enfant vient de se tromper. */
+  /** L'erreur classique : souvent la raison pour laquelle l'enfant vient de se tromper. */
   piege?: string;
 }

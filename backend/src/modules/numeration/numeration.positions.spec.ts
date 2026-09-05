@@ -14,7 +14,7 @@ import { NIVEAUX } from '../../common/niveau';
 /**
  * L'arithmétique des positions, et surtout celle des décimaux.
  *
- * Représenter 3,45 en flottant ferait échouer les comparaisons sur des arrondis — et la
+ * Représenter 3,45 en flottant ferait échouer les comparaisons sur des arrondis, et la
  * comparaison des décimaux EST la notion : un enfant de CM1 croit spontanément que
  * 3,45 > 3,5 parce que 45 > 5. Un module qui se tromperait lui-même là-dessus enseignerait
  * exactement l'erreur qu'il est censé corriger.
@@ -99,7 +99,7 @@ describe('affichage', () => {
   });
 
   it('garde les zéros de tête de la partie décimale', () => {
-    // 305 centièmes s'écrit 3,05 — pas 3,5. C'est exactement l'erreur à ne pas commettre.
+    // 305 centièmes s'écrit 3,05 : pas 3,5. C'est exactement l'erreur à ne pas commettre.
     expect(formater(305, -2)).toBe('3,05');
     expect(formater(5, -2)).toBe('0,05');
     expect(formater(1005, -3)).toBe('1,005');

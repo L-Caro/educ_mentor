@@ -3,7 +3,7 @@ import type { Case, Joueur } from 'src/utils/plateau';
 /**
  * Le morpion à TROIS PIONS.
  *
- * Chacun pose trois pions, puis les déplace — vers n'importe quelle case libre — jusqu'à
+ * Chacun pose trois pions, puis les déplace, vers n'importe quelle case libre, jusqu'à
  * ce que l'un aligne. C'est un autre jeu que le morpion classique, et un meilleur : la
  * grille ne se remplit jamais, donc la partie ne s'éteint pas en match nul au neuvième
  * coup. Il faut regarder ce que l'adversaire prépare, pas seulement remplir.
@@ -13,23 +13,23 @@ import type { Case, Joueur } from 'src/utils/plateau';
  * En phase de déplacement, chacun a neuf coups (trois pions × trois cases libres) et la
  * partie ne se termine pas d'elle-même : explorer neuf coups d'avance ferait 387 millions
  * de positions. Le minimax de `plateau.ts` devrait donc s'arrêter beaucoup plus tôt, et
- * un adversaire tronqué se ferait battre — alors que le pré-jeu promet « il ne perd
+ * un adversaire tronqué se ferait battre, alors que le pré-jeu promet « il ne perd
  * jamais » au niveau difficile.
  *
  * Mais le jeu est MINUSCULE : trois pions chacun sur neuf cases, c'est 2 744 positions de
  * déplacement. On les résout TOUTES, une fois, en quelques millisecondes. L'adversaire
- * difficile ne cherche alors plus rien — il lit la réponse.
+ * difficile ne cherche alors plus rien : il lit la réponse.
  *
  * ── Le jeu boucle, et il faut le dire ────────────────────────────────────────────────
  *
  * C'est un jeu BOUCLANT : depuis une position, on peut revenir à la même. Un minimax
- * ordinaire y tournerait sans fin. La résolution se fait donc par POINT FIXE — on marque
+ * ordinaire y tournerait sans fin. La résolution se fait donc par POINT FIXE : on marque
  * gagnantes les positions d'où l'on force une victoire, perdantes celles d'où tout mène à
  * une défaite, et on recommence jusqu'à ce que plus rien ne change. Ce qui reste n'est ni
  * l'un ni l'autre : ce sont les positions où la partie tourne en rond, et c'est la vraie
  * définition du match nul ici.
  *
- * La partie complète est nulle si les deux jouent parfaitement (vérifié par un test) —
+ * La partie complète est nulle si les deux jouent parfaitement (vérifié par un test) :
  * comme le morpion classique. Mais 400 positions de déplacement sont nulles PAR BOUCLE,
  * d'où la règle de répétition côté partie : sans elle, deux joueurs parfaits se
  * déplaceraient jusqu'à la fin des temps.
@@ -130,7 +130,7 @@ const NUL = 0;
 /** Valeur de chaque position de déplacement, DU POINT DE VUE DU JOUEUR AU TRAIT.
  *
  * Construite au premier usage seulement : une partie en facile ou en moyen n'en a pas
- * besoin, et le calcul — quelques millisecondes — n'a pas à peser au chargement du
+ * besoin, et le calcul, quelques millisecondes, n'a pas à peser au chargement du
  * module. */
 let table: Uint8Array | null = null;
 
@@ -153,7 +153,7 @@ function resoudre(): Uint8Array {
   }
 
   // Point fixe : on ne promeut que « inconnu → gagnant/perdant », jamais l'inverse. Ce
-  // qui reste inconnu à la fin est nul par boucle — c'est exactement ce qu'on veut.
+  // qui reste inconnu à la fin est nul par boucle : c'est exactement ce qu'on veut.
   let change = true;
   while (change) {
     change = false;
@@ -201,7 +201,7 @@ function resoudre(): Uint8Array {
   return valeurs;
 }
 
-/** +1 je gagne de force · 0 nulle · −1 je perds de force — pour le joueur au trait. */
+/** +1 je gagne de force · 0 nulle · −1 je perds de force, pour le joueur au trait. */
 function valeurDeplacement(un: number, deux: number, tour: 0 | 1): number {
   const v = resoudre()[cle(un, deux, tour)];
   return v === GAGNANT ? 1 : v === PERDANT ? -1 : 0;
@@ -215,7 +215,7 @@ const memoPose = new Map<number, number>();
  * `tour` est un PARAMÈTRE et non une déduction depuis le nombre de pions posés. C'était
  * une déduction, et elle rendait la fonction sourde au joueur qu'on lui nommait : elle
  * répondait pour l'autre sans le dire. En jeu l'alternance est stricte, donc l'erreur ne
- * se voyait pas — un test l'a même « validée » par hasard. Un paramètre coûte un entier
+ * se voyait pas : un test l'a même « validée » par hasard. Un paramètre coûte un entier
  * et supprime la classe entière de bêtise. */
 function valeurPose(
   un: number,
@@ -247,7 +247,7 @@ function valeurPose(
 /** La valeur d'une position, DU POINT DE VUE DU JOUEUR NOMMÉ, qu'on suppose au trait :
  * +1 il gagne de force, 0 nulle, −1 il perd de force.
  *
- * Une position déjà alignée n'a pas de valeur — la partie est finie, personne n'est au
+ * Une position déjà alignée n'a pas de valeur : la partie est finie, personne n'est au
  * trait. On rend alors ±1 selon qui a aligné, plutôt que d'explorer une suite qui
  * n'existe pas. Exposée pour les tests : c'est elle qui dit que la partie complète est
  * nulle. */
@@ -274,7 +274,7 @@ const gagne = (cases: Case[], joueur: Joueur): boolean => {
 
 /** Minimax à deux demi-coups, sans évaluation : ce qui donne exactement « il gagne s'il
  * peut, il bloque s'il doit ». C'est la définition du niveau moyen, et ça la rend
- * vérifiable — pas une profondeur choisie au jugé. */
+ * vérifiable : pas une profondeur choisie au jugé. */
 function coupMoyen(cases: Case[], joueur: Joueur, rand: Rand): Coup | null {
   const coups = coupsPossibles(cases, joueur);
   if (coups.length === 0) return null;
@@ -307,7 +307,7 @@ function coupMoyen(cases: Case[], joueur: Joueur, rand: Rand): Coup | null {
 
 /** Le coup de l'adversaire.
  *
- * En difficile, il joue la valeur exacte — et, à valeur égale, il PRÉFÈRE gagner vite :
+ * En difficile, il joue la valeur exacte, et, à valeur égale, il PRÉFÈRE gagner vite :
  * sans ce départage, un adversaire qui gagne de force peut tourner indéfiniment autour
  * de sa victoire, ce qui ressemble à un bug. */
 export function meilleurCoup(

@@ -1,5 +1,5 @@
 ---
-name: ÉducMentor — contexte projet
+name: ÉducMentor : contexte projet
 description: Application éducative locale pour la fille du dev (CE1). Stack, décisions, modules développés, principes réels.
 metadata:
   type: project
@@ -30,7 +30,7 @@ Application web éducative locale, développée par le père pour sa fille (CE1)
 
 **Modules développés (✅ complets, 3 au total) :**
 
-**Module 1 — Imagier Anglais** (`id: 'imagier'`)
+**Module 1 : Imagier Anglais** (`id: 'imagier'`)
 - Mots FR↔EN avec images, organisés par catégories
 - QCM 4 choix (level_1), 2 choix (level_2), saisie libre (level_3)
 - Direction configurable : FR→EN, EN→FR
@@ -39,13 +39,13 @@ Application web éducative locale, développée par le père pour sa fille (CE1)
 - Source de vérité : dictionary.json (5744 entrées) importable via l'admin
 - Images existantes dans generateur_carte/image anglais/ à migrer (Phase 6)
 
-**Module 2 — Tables de multiplication** (`id: 'tables'`)
+**Module 2 : Tables de multiplication** (`id: 'tables'`)
 - Backend : `backend/src/modules/tables/`
 - Frontend : `frontend/src/components/modules/tables/`
 - Vues child : TablesHome, TablesGame, TablesResult
 - Vues admin : TablesAdmin, TablesProgression, TablesSettings
 
-**Module 3 — Calcul Mental** (`id: 'calcul-mental'`)
+**Module 3 : Calcul Mental** (`id: 'calcul-mental'`)
 - Backend : `backend/src/modules/calcul/`
 - Frontend : `frontend/src/components/modules/calcul/`
 - Vues child : CalculHome, CalculGame, CalculResult

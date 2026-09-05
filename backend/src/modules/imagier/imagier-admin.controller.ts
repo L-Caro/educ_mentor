@@ -73,7 +73,7 @@ export class ImagierAdminController {
   }
 
   // ─── Catégories ────────────────────────────────────────────────────────────
-  // Note : la liste des catégories (GET) vit dans ImagierGameController, non protégée —
+  // Note : la liste des catégories (GET) vit dans ImagierGameController, non protégée :
   // elle est consommée par le pré-jeu Imagier ET Memory, pas seulement par l'admin.
 
   @Patch('normalize-categories')
@@ -111,7 +111,7 @@ export class ImagierAdminController {
     // `memoryStorage` plutôt que `diskStorage` : le fichier n'atteint le disque qu'après
     // validation, sous un nom choisi par le serveur, dans un dossier dérivé de la config.
     // L'ancienne version écrivait `file.originalname` tel quel dans un dossier temporaire
-    // en dur — un nom du type `../../evil.png` sortait de l'arborescence prévue.
+    // en dur : un nom du type `../../evil.png` sortait de l'arborescence prévue.
     FileInterceptor('file', {
       storage: memoryStorage(),
       limits: { fileSize: MAX_IMAGE_BYTES, files: 1 },

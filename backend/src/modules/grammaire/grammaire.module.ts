@@ -16,7 +16,7 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   providers: [GrammaireService],
   // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
-  // enregistrer — voir `PeageService`.
+  // enregistrer : voir `PeageService`.
   exports: [GrammaireService],
   controllers: [GrammaireGameController, GrammaireAdminController],
 })

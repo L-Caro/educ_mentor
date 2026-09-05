@@ -41,7 +41,7 @@ export default function CompteSettings() {
           {saving && <Spinner size="xs" />}
         </div>
         <p className="GameSettings__hint">
-          La classe indiquée dit quand ouvrir — rien n&rsquo;empêche d&rsquo;ouvrir plus
+          La classe indiquée dit quand ouvrir : rien n&rsquo;empêche d&rsquo;ouvrir plus
           tôt. Avec l&rsquo;addition seule, le jeu reste jouable : on cherche la cible en
           empilant les plaques.
         </p>

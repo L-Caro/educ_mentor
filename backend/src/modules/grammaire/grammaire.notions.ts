@@ -1,8 +1,8 @@
 /** Le vocabulaire grammatical du module, et lui seul.
  *
  * Deux dimensions que le CE1 apprend justement à ne pas confondre :
- *   la NATURE ne change jamais — « chat » est un nom dans toutes les phrases ;
- *   la FONCTION dépend de la phrase — le même groupe est sujet ici, complément là.
+ *   la NATURE ne change jamais : « chat » est un nom dans toutes les phrases ;
+ *   la FONCTION dépend de la phrase : le même groupe est sujet ici, complément là.
  *
  * Les libellés sont ceux des fiches de `cours/francais/` : l'enfant ne doit pas
  * rencontrer deux mots différents pour la même notion selon qu'elle joue ou qu'elle lit.
@@ -37,7 +37,7 @@ export interface NotionMeta {
   singulier: string;
   /** Consigne au pluriel : « Touche tous les verbes. » */
   pluriel: string;
-  /** Le socle du début de CE1 — le reste s'active au fil du programme. */
+  /** Le socle du début de CE1 : le reste s'active au fil du programme. */
   defaultActive: boolean;
 }
 
@@ -154,7 +154,7 @@ export const NOTIONS: NotionMeta[] = [
 
 const BY_KEY = new Map(NOTIONS.map((notion) => [notion.key, notion]));
 
-/** Les natures, dans l'ordre des fiches — c'est l'ordre du programme, pas l'alphabet. */
+/** Les natures, dans l'ordre des fiches : c'est l'ordre du programme, pas l'alphabet. */
 export const NATURES: Nature[] = NOTIONS.filter(
   (notion) => notion.categorie === 'nature',
 ).map((notion) => notion.key as Nature);

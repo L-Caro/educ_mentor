@@ -41,7 +41,7 @@ describe('qcmChoiceCount', () => {
 
   it('signale la saisie libre par zéro choix', () => {
     // Le moteur front dérive le mode de la présence de choix : 0 = saisie libre.
-    // Renvoyer 1 au lieu de 0 afficherait un QCM à réponse unique — toujours juste.
+    // Renvoyer 1 au lieu de 0 afficherait un QCM à réponse unique : toujours juste.
     expect(qcmChoiceCount('hard')).toBe(0);
   });
 

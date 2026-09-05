@@ -207,7 +207,7 @@ export class LectureService {
     await this.progressionRepo.save(prog);
   }
 
-  // ─── Admin — textes ────────────────────────────────────────────────────────
+  // ─── Admin : textes ────────────────────────────────────────────────────────
 
   async getAllTexts(): Promise<(LectureText & { question_count: number })[]> {
     const texts = await this.textsRepo.find({
@@ -235,7 +235,7 @@ export class LectureService {
     await this.textsRepo.delete(id);
   }
 
-  // ─── Admin — questions ─────────────────────────────────────────────────────
+  // ─── Admin : questions ─────────────────────────────────────────────────────
 
   async getQuestionsForText(textId: number): Promise<LectureQuestion[]> {
     return this.questionsRepo.find({
@@ -272,7 +272,7 @@ export class LectureService {
     await this.questionsRepo.delete(id);
   }
 
-  // ─── Admin — progression ───────────────────────────────────────────────────
+  // ─── Admin : progression ───────────────────────────────────────────────────
 
   async getProgression(): Promise<
     { is_mastered: boolean; correct_count: number; incorrect_count: number }[]

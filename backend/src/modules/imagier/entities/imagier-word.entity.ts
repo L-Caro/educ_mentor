@@ -21,7 +21,7 @@ export class ImagierWord {
   subcategory: string; // ex: 'mammiferes'
 
   @Column({ nullable: true })
-  image_filename: string; // ex: 'chat.webp' — null si pas d'image
+  image_filename: string; // ex: 'chat.webp' : null si pas d'image
 
   @Column({ default: false })
   is_active: boolean;

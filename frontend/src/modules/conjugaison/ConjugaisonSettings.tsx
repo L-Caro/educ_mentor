@@ -44,7 +44,7 @@ function TempsActifs() {
         {saving && <Spinner size="xs" />}
       </div>
       <p className="GameSettings__hint">
-        Les sept temps du CP au CM2 sont là. Ouvre-les au fil du programme — la classe
+        Les sept temps du CP au CM2 sont là. Ouvre-les au fil du programme : la classe
         indiquée dit quand, mais rien n&rsquo;empêche d&rsquo;ouvrir plus tôt.
       </p>
       <div className="GameSettings__denominations">

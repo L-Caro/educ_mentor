@@ -59,7 +59,7 @@ export const dicteeApi = baseApi.injectEndpoints({
       ],
     }),
 
-    // ─── Admin — items ────────────────────────────────────────────────────────
+    // ─── Admin : items ────────────────────────────────────────────────────────
     getDicteeItems: builder.query<
       DicteeItem[],
       { niveau?: string; is_active?: boolean } | void

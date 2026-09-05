@@ -43,7 +43,7 @@ describe('fiche de lecture', () => {
   it("existe dans les trois modes, pas seulement en facile", () => {
     // Le serveur ne joignait l'extrait qu'en mode facile, parce que c'est là que le jeu le
     // surligne pendant la question. En moyen et difficile la fiche n'avait donc rien à
-    // montrer — alors que c'est précisément là qu'elle sert. L'extrait est désormais
+    // montrer, alors que c'est précisément là qu'elle sert. L'extrait est désormais
     // toujours envoyé, et un drapeau distinct commande le surlignage en jeu.
     for (const highlight of [true, false]) {
       for (const showText of [true, false]) {

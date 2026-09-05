@@ -3,7 +3,7 @@ import { geoFiche } from 'src/modules/geo/geo.fiche';
 import type { GeoCarte, GeoQuestion } from 'src/modules/geo/geo.type';
 
 /**
- * Second genre de fiche : la carte de faits. En géographie il n'y a pas de règle —
+ * Second genre de fiche : la carte de faits. En géographie il n'y a pas de règle :
  * « pourquoi Lima ? » n'a pas de réponse. La fiche montre donc la carte d'identité du
  * sujet, assemblée par le serveur qui seul possède les 211 pays.
  */

@@ -29,7 +29,7 @@ const MODULE_ID = 'morpion';
  * battable.
  *
  * En `difficile`, le morpion est exploré ENTIÈREMENT : il ne perd jamais, au mieux on
- * fait match nul. C'est assumé et annoncé au pré-jeu — découvrir qu'un adversaire est
+ * fait match nul. C'est assumé et annoncé au pré-jeu : découvrir qu'un adversaire est
  * imbattable fait partie du jeu, à condition de ne pas le déguiser en « fort ».
  *
  * La règle à trois pions ne passe pas par ici : elle ne se cherche pas en profondeur,
@@ -43,14 +43,14 @@ const PROFONDEUR: Record<string, number> = {
 const SIGNE: Record<Joueur, string> = { 1: '✕', 2: '◯' };
 
 /** Le temps que l'ordinateur « réfléchit ». Jouer instantanément donne l'impression que
- * la machine ne joue pas mais réagit — et l'enfant n'a pas le temps de voir son coup. */
+ * la machine ne joue pas mais réagit, et l'enfant n'a pas le temps de voir son coup. */
 const DELAI_MS = 450;
 
 /** Combien de fois une même position peut revenir avant que la partie soit déclarée
  * nulle, en règle à trois pions.
  *
  * La grille ne se remplit jamais : sans cette règle, deux joueurs qui ne trouvent rien se
- * déplaceraient jusqu'à la fin des temps. Elle n'est pas de confort — la résolution
+ * déplaceraient jusqu'à la fin des temps. Elle n'est pas de confort : la résolution
  * exacte montre que 400 positions sont nulles PAR BOUCLE, c'est-à-dire que ni l'un ni
  * l'autre ne peut forcer quoi que ce soit. Trois, comme aux échecs. */
 const REPETITIONS_NULLES = 3;
@@ -63,7 +63,7 @@ const clePosition = (cases: Case[], tour: Joueur): string =>
  * Séparer plateau, tour et historique laissait une faille : la garde contre le double
  * coup vivait dans la mise à jour du plateau, mais le changement de tour se faisait à
  * côté, sans condition. Deux clics dans le même lot de rendu lisaient donc un tour périmé
- * et posaient deux pions d'affilée. Réunis, la garde vaut pour les trois — il n'y a plus
+ * et posaient deux pions d'affilée. Réunis, la garde vaut pour les trois : il n'y a plus
  * qu'un endroit où l'état change. */
 interface Partie {
   cases: Case[];
@@ -86,13 +86,13 @@ export default function MorpionGame() {
 
   /** Contre la machine, ou à deux sur le même écran.
    *
-   * C'était un choix de pré-jeu, rangé parmi les niveaux de difficulté — alors que ce
+   * C'était un choix de pré-jeu, rangé parmi les niveaux de difficulté, alors que ce
    * n'en est pas un, et que le pré-jeu posait déjà la question du niveau juste à côté.
    * C'est maintenant un bouton SUR le plateau : passer la main à quelqu'un ne demande
    * plus de ressortir du jeu.
    *
    * Le basculement ne remet pas la partie à zéro. Il change seulement qui tient les ronds
-   * — et c'est justement l'usage : « viens, prends ma place ». */
+   * - et c'est justement l'usage : « viens, prends ma place ». */
   const [contreOrdinateur, setContreOrdinateur] = useState(true);
 
   const [partie, setPartie] = useState<Partie>(NEUVE);
@@ -177,7 +177,7 @@ export default function MorpionGame() {
 
     // Phase de déplacement : on prend un pion, puis on le pose sur une case libre.
     if (cases[cellule] === tour) {
-      // Retaper le pion pris le relâche — le seul moyen de se raviser.
+      // Retaper le pion pris le relâche : le seul moyen de se raviser.
       setSelection((precedent) => (precedent === cellule ? null : cellule));
       return;
     }
@@ -211,7 +211,7 @@ export default function MorpionGame() {
         ? tour === 1
           ? consigne
           : 'Il réfléchit…'
-        : `Au tour de ${SIGNE[tour]} — ${consigne.toLowerCase()}`;
+        : `Au tour de ${SIGNE[tour]}, ${consigne.toLowerCase()}`;
 
   return (
     <div className="MorpionGame">
@@ -229,7 +229,7 @@ export default function MorpionGame() {
           //
           // Et rien ne l'est pendant que l'ordinateur réfléchit : sans ce garde-fou, ses
           // propres pions s'affichaient en boutons vivants pendant une demi-seconde. Le
-          // clic ne faisait rien — c'est bien le problème, le curseur promettait un coup.
+          // clic ne faisait rien : c'est bien le problème, le curseur promettait un coup.
           const sonTour = !contreOrdinateur || tour === 1;
           const actionnable =
             sonTour &&

@@ -64,7 +64,7 @@ export const accordsApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'accords' }],
     }),
 
-    // ─── Admin — familles morphologiques ─────────────────────────────────────
+    // ─── Admin : familles morphologiques ─────────────────────────────────────
     getAccordsFamilles: builder.query<
       {
         key: string;
@@ -93,7 +93,7 @@ export const accordsApi = baseApi.injectEndpoints({
       invalidatesTags: ['AccordsActiveFamilles'],
     }),
 
-    // ─── Admin — notions actives ──────────────────────────────────────────────
+    // ─── Admin : notions actives ──────────────────────────────────────────────
     getAccordsNotions: builder.query<NotionMeta[], void>({
       query: () => '/accords/notions',
     }),

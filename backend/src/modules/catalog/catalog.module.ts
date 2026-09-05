@@ -9,7 +9,7 @@ import { AuthModule } from '../auth/auth.module';
   imports: [TypeOrmModule.forFeature([ModuleEntity]), AuthModule],
   providers: [CatalogService],
   // Exporté pour le péage des jeux, qui emprunte les questions de ce module sans rien
-  // enregistrer — voir `PeageService`.
+  // enregistrer : voir `PeageService`.
   exports: [CatalogService],
   controllers: [CatalogController],
 })

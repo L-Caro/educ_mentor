@@ -5,7 +5,7 @@
  *
  * Tirer six plaques et une cible au hasard donne, la plupart du temps, un compte
  * IMPOSSIBLE. On peut s'en sortir en acceptant « le plus proche », mais un enfant qui
- * cherche vingt minutes une solution qui n'existe pas n'apprend rien — il apprend que le
+ * cherche vingt minutes une solution qui n'existe pas n'apprend rien : il apprend que le
  * jeu triche.
  *
  * On part donc d'une suite d'opérations valides tirée au sort, et la cible est ce qu'elle
@@ -44,7 +44,7 @@ export interface CompteQuestion {
   cible: number;
   /** Les six plaques, dans l'ordre où elles s'affichent. */
   plaques: number[];
-  /** Une solution — pas LA solution, il y en a souvent plusieurs. */
+  /** Une solution : pas LA solution, il y en a souvent plusieurs. */
   solution: Etape[];
 }
 
@@ -85,10 +85,10 @@ function melanger<T>(items: T[], rand: Rand): T[] {
 /** Le résultat d'une opération, ou `null` si elle n'a pas sa place dans le jeu.
  *
  * Trois refus, et chacun a sa raison :
- *   — une soustraction qui passe sous zéro ou tombe à zéro : hors du jeu, et une plaque
+ *   - une soustraction qui passe sous zéro ou tombe à zéro : hors du jeu, et une plaque
  *     à 0 ne sert plus à rien ensuite ;
- *   — une division inexacte : on ne joue qu'avec des entiers ;
- *   — une multiplication ou une division PAR 1 : elle est légale mais ne fait rien, et
+ *   - une division inexacte : on ne joue qu'avec des entiers ;
+ *   - une multiplication ou une division PAR 1 : elle est légale mais ne fait rien, et
  *     une étape qui ne change pas le nombre donne une solution de référence absurde
  *     (« 7 × 1 = 7 »). */
 export function appliquer(
@@ -112,7 +112,7 @@ export function appliquer(
 
 /** Rejoue une suite d'étapes sur un jeu de plaques et rend le nombre atteint.
  *
- * Sert à VÉRIFIER une solution — la sienne comme celle de référence — plutôt qu'à la
+ * Sert à VÉRIFIER une solution, la sienne comme celle de référence, plutôt qu'à la
  * croire. Rend `null` dès qu'une étape utilise un nombre indisponible ou une opération
  * refusée : c'est ce qui empêche de valider « 100 × 100 » quand il n'y a qu'un 100. */
 export function rejouer(
@@ -142,7 +142,7 @@ export function rejouer(
   };
 }
 
-/** Tire un compte solvable, ou `null` si les contraintes sont inatteignables — une cible
+/** Tire un compte solvable, ou `null` si les contraintes sont inatteignables : une cible
  * à quatre chiffres avec seulement l'addition et de petites plaques, par exemple. */
 export function genererCompte(options: Options): CompteQuestion | null {
   const { operations, etapes, grandesPlaques, cibleMin, cibleMax, rand } =
@@ -214,7 +214,7 @@ export function genererCompte(options: Options): CompteQuestion | null {
 
     // Vérification par relecture : la solution de référence doit réellement mener à la
     // cible depuis ces plaques. Se fier au calcul qui vient de la produire ne vérifie
-    // rien — c'est le même code.
+    // rien : c'est le même code.
     const controle = rejouer(plaques, chemin);
     if (!controle || controle.resultat !== cible) continue;
 

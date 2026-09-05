@@ -18,9 +18,9 @@ import {
  * interrogée, sur quelle phrase, et quels mots comptent comme la bonne réponse.
  *
  * Deux pannes silencieuses sont visées en particulier :
- *   — une question dont la réponse est vide (« touche les adjectifs » sur une phrase qui
+ *   - une question dont la réponse est vide (« touche les adjectifs » sur une phrase qui
  *     n'en a pas), qui rendrait la validation impossible ;
- *   — un distracteur pris dans une notion NON activée, qui divulgue par le QCM une
+ *   - un distracteur pris dans une notion NON activée, qui divulgue par le QCM une
  *     notion que l'enfant n'a pas encore vue en classe.
  */
 
@@ -52,7 +52,7 @@ describe('difficultesPour / nombreDeChoix', () => {
   });
 });
 
-describe('generateQuestion — nature_mot', () => {
+describe('generateQuestion : nature_mot', () => {
   it('souligne un mot de la phrase et propose sa nature parmi les choix', () => {
     for (let n = 0; n < 60; n++) {
       const q = generateQuestion('nature_mot', CORPUS, TOUTES, 4, randReel)!;
@@ -97,7 +97,7 @@ describe('generateQuestion — nature_mot', () => {
   });
 
   it('ne pose pas la question quand une seule nature est activée', () => {
-    // Un QCM à une proposition offre la réponse — et la question ne testerait rien :
+    // Un QCM à une proposition offre la réponse, et la question ne testerait rien :
     // classer un mot suppose d'avoir plus d'une case où le ranger.
     expect(
       generateQuestion('nature_mot', CORPUS, ['verbe'], 4, randReel),
@@ -110,7 +110,7 @@ describe('generateQuestion — nature_mot', () => {
   });
 });
 
-describe('generateQuestion — trouver_mots', () => {
+describe('generateQuestion : trouver_mots', () => {
   it('vise au moins un mot, et exactement ceux de la nature demandée', () => {
     for (let n = 0; n < 80; n++) {
       const q = generateQuestion('trouver_mots', CORPUS, TOUTES, 4, randReel)!;
@@ -139,7 +139,7 @@ describe('generateQuestion — trouver_mots', () => {
   });
 });
 
-describe('generateQuestion — trouver_fonction', () => {
+describe('generateQuestion : trouver_fonction', () => {
   it('vise un seul bloc de mots, contigu', () => {
     for (let n = 0; n < 80; n++) {
       const q = generateQuestion(
@@ -181,7 +181,7 @@ describe('generateQuestion — trouver_fonction', () => {
   });
 });
 
-describe('generateQuestion — groupe_nominal', () => {
+describe('generateQuestion : groupe_nominal', () => {
   it('vise un groupe contigu, et nomme son nom dans la consigne', () => {
     for (let n = 0; n < 80; n++) {
       const q = generateQuestion(

@@ -42,7 +42,7 @@
   }
 }
 
-// Carte des régions — paths de départements sans traits internes
+// Carte des régions : paths de départements sans traits internes
 .FranceRegionMap__path {
   fill: var(--color-base-content);
   stroke: none;
@@ -75,7 +75,7 @@
   }
 }
 
-// Carte ville — fond neutre, pas de clic dept
+// Carte ville : fond neutre, pas de clic dept
 .FranceCityMap {
   display: block;
   width: 100%;

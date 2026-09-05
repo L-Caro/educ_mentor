@@ -205,7 +205,7 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
             {cols.map((c) => {
               // À gauche du nombre comme à droite du décalage, aucune case : un trou
               // visuel vaut mieux qu'une case qui invite à écrire n'importe quoi, et le
-              // décalage doit se VOIR — c'est lui qu'on apprend.
+              // décalage doit se VOIR : c'est lui qu'on apprend.
               if (attendu[c] === '') {
                 return (
                   <span

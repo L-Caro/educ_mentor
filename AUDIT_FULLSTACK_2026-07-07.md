@@ -1,4 +1,4 @@
-# Audit full-stack — EducMentor
+# Audit full-stack : EducMentor
 
 > **Date :** 2026-07-07
 > **Périmètre :** frontend (React 19 / Vite), backend (NestJS / TypeORM / SQLite), couche data, Docker/déploiement.
@@ -6,7 +6,7 @@
 > (GameEngine, useGameSession, manifest, router, store, types) + 6 services de jeu backend lus en entier
 > (tables, imagier, geo, lecture, pendu, memory), le reste échantillonné. Vérifs exécutées : `tsc` backend (✅ vert),
 > lint frontend (❌ 13 erreurs + 1 warning au moment de l'audit).
-> **Aucun code n'a été modifié — c'est un état des lieux.** Ce fichier sert de checklist à suivre.
+> **Aucun code n'a été modifié : c'est un état des lieux.** Ce fichier sert de checklist à suivre.
 
 ---
 
@@ -31,28 +31,28 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 
 ### Légende
 
-- 🔴 **Critique** — sécurité / intégrité des données
-- 🟠 **Important** — ce qui sépare « ça marche » de « c'est pro » (tests, CI, strictness, outillage)
-- 🟡 **Moyen** — qualité et maintenabilité
-- ⚪ **Léger** — détails
+- 🔴 **Critique** : sécurité / intégrité des données
+- 🟠 **Important** : ce qui sépare « ça marche » de « c'est pro » (tests, CI, strictness, outillage)
+- 🟡 **Moyen** : qualité et maintenabilité
+- ⚪ **Léger** : détails
 
 ---
 
-## 🔴 Critique — sécurité & données
+## 🔴 Critique : sécurité & données
 
-- [ ] **C1 — `GET /api/settings` expose le hash du PIN admin à tout appareil invité.**
+- [ ] **C1 : `GET /api/settings` expose le hash du PIN admin à tout appareil invité.**
   📍 `backend/src/modules/settings/settings.controller.ts:22`
   Le `GET` n'a pas de `JwtAuthGuard` (seul le `PATCH` en a un) et `getAll()` renvoie *tous* les settings, dont `admin_pin_hash`.
   Chaîne : appareil invité → lit le hash → crack hors-ligne d'un PIN 4 chiffres → PIN admin → `change-pin`.
   **Fix :** filtrer les clés sensibles côté service (liste blanche des clés publiques), ou séparer route publique / route admin.
 
-- [ ] **C2 — Secrets par défaut dangereux, sans fail-fast au démarrage.**
+- [ ] **C2 : Secrets par défaut dangereux, sans fail-fast au démarrage.**
   📍 `backend/src/config/configuration.ts:4-5`
   `JWT_SECRET` retombe sur `'dev_secret_change_in_prod'` (chaîne **présente dans le git**) et `DEFAULT_PIN` sur `'1234'`.
   Un déploiement qui oublie ces variables démarre avec un secret JWT public → forge de token admin possible.
   **Fix :** refuser de booter en prod (`NODE_ENV=production`) si `JWT_SECRET` est absent ou égal au défaut.
 
-- [ ] **C3 — Upload d'image non assaini.**
+- [ ] **C3 : Upload d'image non assaini.**
   📍 `backend/src/modules/imagier/imagier-admin.controller.ts:100-143`
   Nom de fichier = `file.originalname` brut (path traversal `../../…`) ; `fileFilter` refuse silencieusement sans que
   le handler gère `file === undefined` (→ crash 500 au lieu d'un 400) ; tmpDir en dur `./data/images/imagier/_tmp`
@@ -60,7 +60,7 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
   **Fix :** nom de fichier généré serveur (uuid + extension validée), garde `if (!file) throw new BadRequestException()`,
   tmpDir dérivé de la config.
 
-- [ ] **C4 — `synchronize: true` en prod + aucune migration + backup partiel.** ⭐ *priorité réelle n°1*
+- [ ] **C4 : `synchronize: true` en prod + aucune migration + backup partiel.** ⭐ *priorité réelle n°1*
   📍 `backend/src/database/database.module.ts:18` · `scripts/backup-invitations.sh`
   `synchronize: true` aligne le schéma sur les entités à chaque boot → une modif d'entité peut **détruire des colonnes
   et leurs données** sans avertissement. Les scripts de backup ne couvrent **que les invitations**, pas la progression.
@@ -68,54 +68,54 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 
 ---
 
-## 🟠 Important — professionnalisation
+## 🟠 Important : professionnalisation
 
-- [ ] **I1 — Zéro test.** Aucun `.spec`/`.test` réel. `backend/test/app.e2e-spec.ts` est le boilerplate Nest qui teste
+- [ ] **I1 : Zéro test.** Aucun `.spec`/`.test` réel. `backend/test/app.e2e-spec.ts` est le boilerplate Nest qui teste
   `GET /` → `"Hello World!"` (route inexistante ici → échoue si lancé). `vitest` installé côté front sans un seul fichier.
-  **Fix :** commencer par la logique pure non-triviale — `common/mastery.ts`, `buildChoices` (tables), `weightedSample` (imagier),
+  **Fix :** commencer par la logique pure non-triviale : `common/mastery.ts`, `buildChoices` (tables), `weightedSample` (imagier),
   validation lecture. Fort ROI, faible coût.
 
-- [ ] **I2 — Aucune CI.** Pas de `.github/`. Rien ne relance build + lint + type-check + tests au push.
+- [ ] **I2 : Aucune CI.** Pas de `.github/`. Rien ne relance build + lint + type-check + tests au push.
   **Fix :** un workflow GitHub Actions (ou équivalent) qui fait tourner les 4 sur back **et** front. C'est ce qui empêche I4 de re-dériver.
 
-- [ ] **I3 — TypeScript pas en mode strict.**
+- [ ] **I3 : TypeScript pas en mode strict.**
   📍 `backend/tsconfig.json` (a `strictNullChecks`+`noImplicitAny` mais pas `strict` complet) · `frontend/tsconfig.app.json` (**aucun flag strict**)
   **Fix :** `"strict": true` des deux côtés, activé progressivement (attends-toi à des erreurs à corriger, surtout côté front).
 
-- [ ] **I4 — Lint frontend rouge : 13 erreurs + 1 warning** (constaté à l'exécution, ce n'est plus le 0/0 du Lot 7).
+- [ ] **I4, Lint frontend rouge : 13 erreurs + 1 warning** (constaté à l'exécution, ce n'est plus le 0/0 du Lot 7).
   Détail à corriger :
   - [ ] `react-hooks/static-components` / « Cannot create components during render » : `GameEngine.tsx:214`, `geo.game.tsx:49`
-    — `map.getComponent` retourne une closure-composant recréée à chaque render (**bug de perf réel** : la carte se démonte/remonte).
+   , `map.getComponent` retourne une closure-composant recréée à chaque render (**bug de perf réel** : la carte se démonte/remonte).
   - [ ] `no-unused-expressions` (ternaire `cond ? next.delete(x) : next.add(x)` en instruction) : `GeoSettings.tsx:50`, `FranceSettings.tsx:52` → passer en `if/else`.
   - [ ] `react-hooks/set-state-in-effect` : `GameEngine.tsx:66`.
   - [ ] `react-refresh/only-export-components` : `ThemeContext.tsx`, `lecture.game.tsx`, `numeration.game.tsx`.
   - [ ] `no-unused-vars` : `_textId` dans `lecture.api.ts:67`.
-  *(Note : ce sont surtout les modules ajoutés après la refonte — geo, france, lecture, numeration — qui ont réintroduit la dette.)*
+  *(Note : ce sont surtout les modules ajoutés après la refonte, geo, france, lecture, numeration, qui ont réintroduit la dette.)*
 
-- [ ] **I5 — Config qualité incohérente entre les 2 packages.**
+- [ ] **I5 : Config qualité incohérente entre les 2 packages.**
   📍 `backend/eslint.config.mjs:30` désactive `@typescript-eslint/no-explicit-any` (un `any` passerait inaperçu) ·
   le **front n'a pas Prettier branché** dans ESLint (seulement en devDep).
   **Fix :** réactiver `no-explicit-any` côté back ; brancher Prettier côté front. C'est très probablement la cause du retour
-  de l'**alignement vertical** (banni par tes règles) visible dans `game.types.ts` et `FranceSettings.tsx` — rien ne le reformate.
+  de l'**alignement vertical** (banni par tes règles) visible dans `game.types.ts` et `FranceSettings.tsx` : rien ne le reformate.
 
-- [ ] **I6 — Pas de rate-limiting sur `verify-pin`.**
+- [ ] **I6 : Pas de rate-limiting sur `verify-pin`.**
   📍 `backend/src/modules/auth/auth.controller.ts:33`
   **Fix :** `@nestjs/throttler` sur cette route (brute-force en ligne d'un PIN 4 chiffres sinon faisable).
 
-- [ ] **I7 — Fichiers parasites / artefacts versionnés.**
+- [ ] **I7 : Fichiers parasites / artefacts versionnés.**
   - [ ] Fichier littéralement nommé `"; echo ---"` à la racine (résidu d'un `>` shell mal échappé) → supprimer.
   - [ ] `backend/tsconfig.build.tsbuildinfo` **suivi par git** (cache de build, ne doit jamais l'être) → `git rm --cached` + gitignore.
   - [ ] `Dockerfile` racine obsolète : attend le build front dans `/app/backend/static` alors que Vite sort dans `dist/`.
     Les vrais Dockerfiles sont dans `backend/` et `frontend/` → supprimer ou réaligner celui de la racine.
   - [ ] `_diag.log` à la racine → supprimer.
 
-- [ ] **I8 — Documentation projet absente.** Pas de README racine ; ceux de `backend/` et `frontend/` sont les **templates par défaut**
+- [ ] **I8 : Documentation projet absente.** Pas de README racine ; ceux de `backend/` et `frontend/` sont les **templates par défaut**
   (badges CircleCI NestJS, « React + TypeScript + Vite »).
   **Fix :** un README racine (c'est quoi / lancer en dev / déployer / archi en 5 lignes). `frontend/CLAUDE.md` est une bien meilleure base que les READMEs actuels.
 
 ---
 
-## 🟡 Moyen — qualité & maintenabilité
+## 🟡 Moyen : qualité & maintenabilité
 
 - [ ] **Duplication backend.** `shuffle<T>` copié dans **8 services** ; `parseInt(await settingsService.get('questions_per_session'))` dans **9**.
   **Fix :** `common/shuffle.ts` + helper `settingsService.getInt(key, default)`. Même geste que `mastery.ts`, à répéter.
@@ -133,7 +133,7 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 
 - [ ] **Sessions de jeu jamais purgées.** Chaque partie insère une ligne (`tables_sessions`, etc.) jamais nettoyée ;
   `recordAnswer` reçoit `_sessionId` et l'ignore (`tables.service.ts:151`). La table gonfle sans usage réel.
-  **Fix :** décider — s'en servir (stats), purger, ou arrêter d'écrire.
+  **Fix :** décider : s'en servir (stats), purger, ou arrêter d'écrire.
 
 - [ ] **Modèle de confiance client non explicité.** `recordAnswer` reçoit `is_correct` **calculé par le navigateur** ;
   un client modifié peut se déclarer maître de tout. Acceptable pour une app perso, mais à **documenter** :
@@ -146,7 +146,7 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 
 ---
 
-## ⚪ Léger — détails
+## ⚪ Léger : détails
 
 - [ ] Marqueur `//?` résiduel en tête de `frontend/src/assets/styles/_abstracts/_variables.scss:1`.
 - [ ] `_variables.scss` mélange échelles Lot 6 (`$space-*`, `$font-size-*`) et alias historiques (`$border-radius`, `$radius-*`) → trancher.
@@ -158,9 +158,9 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 
 ## Ordre de bataille suggéré
 
-1. **Protéger les données** — **C4** (`synchronize: false` + migrations + backup complet). *La progression de ta fille est irremplaçable.*
-2. **Colmater la sécurité** — C2 (fail-fast secrets), puis C1 (hash exposé), C3, I6. *Proportionne à ton modèle de menace (cf. encadré).*
-3. **Poser le harnais** — `strict: true` (I3) → réparer le lint (I4) → brancher Prettier front (I5) → CI (I2). *Dans cet ordre : chaque étape rend la suivante durable.*
+1. **Protéger les données** : **C4** (`synchronize: false` + migrations + backup complet). *La progression de ta fille est irremplaçable.*
+2. **Colmater la sécurité** : C2 (fail-fast secrets), puis C1 (hash exposé), C3, I6. *Proportionne à ton modèle de menace (cf. encadré).*
+3. **Poser le harnais**, `strict: true` (I3) → réparer le lint (I4) → brancher Prettier front (I5) → CI (I2). *Dans cet ordre : chaque étape rend la suivante durable.*
 4. **Filet de tests** (I1) sur la logique pure, puis nettoyage 🟡/⚪ au fil de l'eau.
 
 ---
@@ -172,7 +172,7 @@ car la seule chose vraiment irremplaçable ici, c'est la progression de ta fille
 - **Backend homogène** : patron entity/dto/service/controller identique partout, DTO `class-validator` + `ValidationPipe({ whitelist, transform })` global.
 - **Sécurité pensée dans sa structure** : PIN bcrypt, JWT 8h, cookie invitation `httpOnly`+`sameSite`, invitations à usage unique,
   backend jamais exposé (réseau Docker interne), défaut *fail-secure*, `.env.example` exemplaire.
-- **`common/mastery.ts`** : modèle de maîtrise unifié bien conçu, documenté, partagé — le geste anti-duplication à généraliser.
+- **`common/mastery.ts`** : modèle de maîtrise unifié bien conçu, documenté, partagé, le geste anti-duplication à généraliser.
 - **Docker/déploiement** soignés (multi-stage + cache de layers, better-sqlite3 natif géré, nginx SPA+proxy commenté).
 - **Hygiène de code rare** : zéro `any` sauvage (3 occurrences, toutes documentées/justifiées), zéro TODO fantôme, zéro `console.log` oublié,
   commentaires « pourquoi » conformes aux règles projet.

@@ -131,7 +131,7 @@ async function writeCollisionsReport(all: Collision[]): Promise<void> {
   lines.push('`slug = normalize(fr)` est unique côté educ_mentor. Quand deux mots EN donnent le même slug FR,');
   lines.push('**la première occurrence est importée, la seconde ignorée**.', '');
 
-  lines.push(`## Concepts distincts perdus (${distinct.length}) — à trancher`, '');
+  lines.push(`## Concepts distincts perdus (${distinct.length}) : à trancher`, '');
   lines.push('Un sens différent disparaît. Pour garder les deux : leur donner une traduction FR distincte dans `translations.overrides.json`.', '');
   lines.push('| slug FR | importé | ignoré |', '|---|---|---|');
   for (const collision of distinct) {
@@ -139,7 +139,7 @@ async function writeCollisionsReport(all: Collision[]): Promise<void> {
   }
   lines.push('');
 
-  lines.push(`## Doublons inter-sets (${sameConcept.length}) — sans perte`, '');
+  lines.push(`## Doublons inter-sets (${sameConcept.length}), sans perte`, '');
   lines.push('Même mot EN, même catégorie : la carte apparaît dans deux sets, une seule suffit.', '');
   lines.push('| slug FR | mot | catégorie |', '|---|---|---|');
   for (const collision of sameConcept) {

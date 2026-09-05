@@ -23,7 +23,7 @@ const LIGNES = 6;
 
 /** Profondeur de recherche par niveau.
  *
- * Le Puissance 4 n'est pas explorable en entier — sa résolution complète demande des
+ * Le Puissance 4 n'est pas explorable en entier : sa résolution complète demande des
  * heures de calcul et une base d'ouvertures. `difficile` reste donc battable, et c'est
  * tant mieux : contrairement au morpion, on ne promet pas qu'il ne perd jamais. */
 const PROFONDEUR: Record<string, number> = {
@@ -41,7 +41,7 @@ export default function Puissance4Game() {
 
   /** Contre la machine, ou à deux sur le même écran.
    *
-   * C'était un choix de pré-jeu rangé parmi les niveaux de difficulté — alors que ce n'en
+   * C'était un choix de pré-jeu rangé parmi les niveaux de difficulté, alors que ce n'en
    * est pas un, et que le moteur injectait DÉJÀ sa propre question de niveau juste à
    * côté. C'est maintenant un bouton sur le plateau, et le basculement ne remet pas la
    * partie à zéro : il change seulement qui tient les jetons jaunes. */

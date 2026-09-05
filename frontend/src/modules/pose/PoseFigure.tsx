@@ -9,7 +9,7 @@ const SIGNE = { addition: '+', soustraction: '−', multiplication: '×' } as co
  * à leur place, trait avant le résultat.
  *
  * Rendue en grille CSS et non en caractères. Une version en texte monospace obligeait à
- * compter les espaces à la main — c'était faux — et le trait dessiné en caractères de
+ * compter les espaces à la main, c'était faux, et le trait dessiné en caractères de
  * remplissage se lisait comme un cadratin. Ici l'alignement vient de la grille et le trait
  * d'une bordure.
  */

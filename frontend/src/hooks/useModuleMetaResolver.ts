@@ -6,7 +6,7 @@ export interface ModuleMeta {
 }
 
 /**
- * Métadonnées catalogue (label/icon) d'un module par id — **source unique = backend**.
+ * Métadonnées catalogue (label/icon) d'un module par id : **source unique = backend**.
  * Les surfaces (header, layout admin, dashboard, sidebar) résolvent leur libellé ainsi
  * plutôt que de le redéclarer côté front.
  */

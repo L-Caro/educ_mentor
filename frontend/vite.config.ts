@@ -19,7 +19,7 @@ export default defineConfig({
   },
   build: {
     // Sortie standard Vite : frontend/dist/.
-    // En dev on utilise le serveur Vite (npm run dev) — ce chemin ne sert qu'au build Docker/prod.
+    // En dev on utilise le serveur Vite (npm run dev) : ce chemin ne sert qu'au build Docker/prod.
     outDir: 'dist',
     emptyOutDir: true,
   },
@@ -28,7 +28,7 @@ export default defineConfig({
     host: true,   // nécessaire dans Docker pour écouter sur 0.0.0.0 (pas seulement 127.0.0.1)
     watch: {
       // Le filesystem de Docker/WSL ne propage pas les événements inotify correctement.
-      // Le polling garantit que le HMR fonctionne — activé uniquement dans Docker dev.
+      // Le polling garantit que le HMR fonctionne : activé uniquement dans Docker dev.
       usePolling: !!process.env.DOCKER_DEV,
     },
     proxy: {

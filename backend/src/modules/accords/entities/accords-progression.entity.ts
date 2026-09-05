@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-/** Une entrée par NOTION — « genre_nom », « accord_sujet_verbe » — et non par mot.
+/** Une entrée par NOTION, « genre_nom », « accord_sujet_verbe », et non par mot.
  * C'est le grain auquel la maîtrise se joue, et celui que le parent lit pour savoir quelle
  * fiche de cours ouvrir : « l'accord sujet-verbe raté huit fois sur dix » est actionnable,
  * « le mot gâteau raté deux fois » ne l'est pas. */

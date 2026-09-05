@@ -20,7 +20,7 @@ const DIFFICULTE = 'medium' as const;
 /**
  * Le péage des jeux : une ou plusieurs questions à résoudre avant d'ouvrir un plateau.
  *
- * Rien n'est ENREGISTRÉ ici — ni séance, ni progression. C'est délibéré, et pour deux
+ * Rien n'est ENREGISTRÉ ici, ni séance, ni progression. C'est délibéré, et pour deux
  * raisons. La première est comptable : une question posée à la porte d'un morpion n'est
  * pas une séance de travail, et la voir apparaître dans « séances récentes » brouillerait
  * ce que l'adulte y lit. La seconde est plus juste : une réponse donnée pour avoir le
@@ -68,7 +68,7 @@ export class PeageService {
    *
    * `null` n'est pas une erreur et ne doit jamais empêcher de jouer : tous les modules
    * peuvent être éteints, ou toutes leurs notions fermées. Un péage qui se referme sur
-   * une enfant parce qu'il n'a rien à demander serait la pire des pannes — elle irait
+   * une enfant parce qu'il n'a rien à demander serait la pire des pannes : elle irait
    * chercher un adulte pour un jeu de morpion.
    */
   async tirerQuestion(): Promise<PeageQuestion | null> {
@@ -87,7 +87,7 @@ export class PeageService {
   /** Interroge un module, et traite son refus comme un SILENCE.
    *
    * Grammaire et accords lèvent une exception quand aucune notion ouverte ne permet de
-   * composer une question — un message utile quand on ouvre leur jeu, qui explique quoi
+   * composer une question : un message utile quand on ouvre leur jeu, qui explique quoi
    * activer. Ici, non : laissée passer, elle sortait en 400 et l'enfant restait devant un
    * morpion qu'elle ne pouvait pas lancer. Pour le péage, « je n'ai rien à demander » est
    * une réponse, pas une panne : on essaie le module suivant.
@@ -166,7 +166,7 @@ export class PeageService {
     if (!question) return null;
     return this.emballer('conjugaison', {
       consigne: `Conjugue au ${question.tense} :`,
-      enonce: `${question.infinitif} — ${question.pronoun}`,
+      enonce: `${question.infinitif} : ${question.pronoun}`,
       choix: question.choices,
       reponse: question.conjugated,
     });
@@ -186,7 +186,7 @@ export class PeageService {
     );
     if (!question) return null;
 
-    // La phrase, avec le mot visé encadré de guillemets. Le jeu, lui, le souligne — ici
+    // La phrase, avec le mot visé encadré de guillemets. Le jeu, lui, le souligne : ici
     // il n'y a pas de mise en forme à disposition, et « le mot souligné » sans soulignement
     // ne désignerait rien.
     const phrase = question.mots

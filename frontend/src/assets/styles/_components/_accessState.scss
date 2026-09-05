@@ -1,6 +1,6 @@
 @use '../_abstracts/variables' as v;
 
-// Écrans d'état plein écran (accès / invitation) — remplace les classes utilitaires Bootstrap.
+// Écrans d'état plein écran (accès / invitation) : remplace les classes utilitaires Bootstrap.
 .AccessState {
   display: flex;
   flex-direction: column;

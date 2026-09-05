@@ -1,4 +1,4 @@
-# Audit delta + orientation « Cours » — ÉducMentor
+# Audit delta + orientation « Cours » : ÉducMentor
 
 > **Date :** 2026-08-24 · **Audit précédent :** `AUDIT_FULLSTACK_2026-07-07.md` (7 semaines)
 > **Méthode :** lecture du socle back (app.module, config, database, catalog, settings, auth, invitation),
@@ -10,39 +10,39 @@
 
 ---
 
-# Partie 1 — Audit delta
+# Partie 1 : Audit delta
 
 ## 1.1 Ce qui a bougé depuis le 7 juillet
 
 | Item | Statut | Commentaire |
 |---|---|---|
-| C1 — hash PIN exposé par `GET /settings` | ❌ **ouvert** | `settings.controller.ts:22` inchangé, `getAll()` renvoie toujours `admin_pin_hash` sans guard |
-| C2 — secrets par défaut, pas de fail-fast | ❌ **ouvert** | `configuration.ts` inchangé, `main.ts` ne vérifie rien au boot |
-| C3 — upload image non assaini | ❌ **ouvert** | `imagier-admin.controller.ts:104-140` : `filename: file.originalname` brut, tmpDir en dur, pas de garde `!file` |
-| C4 — `synchronize: true` + zéro migration | ❌ **ouvert** | `database.module.ts:18` inchangé. **Devient bloquant** (cf. partie 2) |
-| I1 — zéro test | ❌ **ouvert** | `find` sur `*.spec.*` / `*.test.*` : **0 fichier**, back et front |
-| I2 — aucune CI | ⚠️ **régressé** | Voir N2 : il y a maintenant un pipeline, mais il **déploie sans rien vérifier** |
-| I3 — TS pas strict | ❌ **ouvert** | Ni `backend/tsconfig.json` ni `frontend/tsconfig.app.json` n'ont `"strict": true` |
-| I4 — lint front rouge | ❌ **ouvert, +1** | 14 erreurs + 1 warning. Liste **identique** à juillet, plus `formatNumber.ts:1` (espace insécable) |
-| I5 — config qualité incohérente | ❌ **ouvert, aggravé** | Voir N3 |
-| I6 — pas de rate-limit `verify-pin` | ❌ ouvert | |
-| I7 — fichiers parasites | 🟡 **partiel** | `; echo ---` supprimé ✅ · `_diag.log` supprimé ✅ · `backend/tsconfig.build.tsbuildinfo` **toujours suivi par git** ❌ · `Dockerfile` racine obsolète toujours là ❌ |
-| I8 — documentation | 🟡 **partiel** | Toujours pas de README racine ; les READMEs back/front sont **encore les templates NestJS / Vite**. En revanche `frontend/CLAUDE.md` a été écrit — et il est excellent |
+| C1 : hash PIN exposé par `GET /settings` | ❌ **ouvert** | `settings.controller.ts:22` inchangé, `getAll()` renvoie toujours `admin_pin_hash` sans guard |
+| C2 : secrets par défaut, pas de fail-fast | ❌ **ouvert** | `configuration.ts` inchangé, `main.ts` ne vérifie rien au boot |
+| C3, upload image non assaini | ❌ **ouvert** | `imagier-admin.controller.ts:104-140` : `filename: file.originalname` brut, tmpDir en dur, pas de garde `!file` |
+| C4 : `synchronize: true` + zéro migration | ❌ **ouvert** | `database.module.ts:18` inchangé. **Devient bloquant** (cf. partie 2) |
+| I1, zéro test | ❌ **ouvert** | `find` sur `*.spec.*` / `*.test.*` : **0 fichier**, back et front |
+| I2, aucune CI | ⚠️ **régressé** | Voir N2 : il y a maintenant un pipeline, mais il **déploie sans rien vérifier** |
+| I3 : TS pas strict | ❌ **ouvert** | Ni `backend/tsconfig.json` ni `frontend/tsconfig.app.json` n'ont `"strict": true` |
+| I4 : lint front rouge | ❌ **ouvert, +1** | 14 erreurs + 1 warning. Liste **identique** à juillet, plus `formatNumber.ts:1` (espace insécable) |
+| I5 : config qualité incohérente | ❌ **ouvert, aggravé** | Voir N3 |
+| I6 : pas de rate-limit `verify-pin` | ❌ ouvert | |
+| I7 : fichiers parasites | 🟡 **partiel** | `; echo ---` supprimé ✅ · `_diag.log` supprimé ✅ · `backend/tsconfig.build.tsbuildinfo` **toujours suivi par git** ❌ · `Dockerfile` racine obsolète toujours là ❌ |
+| I8, documentation | 🟡 **partiel** | Toujours pas de README racine ; les READMEs back/front sont **encore les templates NestJS / Vite**. En revanche `frontend/CLAUDE.md` a été écrit, et il est excellent |
 
 **Verdict franc :** en 7 semaines, 5 modules ont été ajoutés ou corrigés et **aucun item de l'audit n'a été traité**,
 à part deux fichiers parasites. La dette identifiée n'a pas été payée, elle a été construite dessus.
-Ce n'est pas un jugement moral — c'est un fait à regarder avant d'ouvrir un chantier « Cours » qui est
+Ce n'est pas un jugement moral : c'est un fait à regarder avant d'ouvrir un chantier « Cours » qui est
 **plus gros que n'importe quel module existant**.
 
 ## 1.2 Nouveaux findings
 
-### 🔴 N1 — 448 fichiers HTML tiers (46 Mo) prêts à être commités par accident
+### 🔴 N1 : 448 fichiers HTML tiers (46 Mo) prêts à être commités par accident
 `data/lecons/` n'est **pas** dans `.gitignore` et n'est pas suivi. `git status -uall data/` → **448 fichiers `??`**.
 Un `git add .` distrait grave dans l'historique, définitivement, 46 Mo de HTML scrapé Kartable avec
 webfonts inlinées (chaque fichier fait ~135 Ko dont ~133 Ko de `@font-face` base64).
 **Fix immédiat :** `echo "/data/lecons/" >> .gitignore` **avant** de toucher à quoi que ce soit d'autre.
 
-### 🔴 N2 — Le pipeline CI déploie en prod sans aucune barrière
+### 🔴 N2 : Le pipeline CI déploie en prod sans aucune barrière
 `.github/workflows/deploy.yml` : sur chaque push `main` → build Docker → `docker compose pull && up -d` sur le VPS.
 Aucun `lint`, aucun `tsc`, aucun test. Sachant que le lint front est rouge depuis au moins 7 semaines,
 **le pipeline actuel ne fait qu'accélérer la mise en prod de code cassé**. Un CI sans gate est pire que pas de CI :
@@ -51,7 +51,7 @@ Second point : `sudo docker image prune -af` supprime **toutes** les images inut
 celles d'ÉducMentor. Si tu héberges autre chose derrière ce Traefik, tu le purges à chaque déploiement.
 **Fix :** un job `checks` (lint + tsc + test) en `needs` du job `build`.
 
-### 🟠 N3 — Le script `lint` du backend ne peut structurellement pas échouer
+### 🟠 N3 : Le script `lint` du backend ne peut structurellement pas échouer
 `backend/package.json` : `"lint": "eslint ... --fix"`. Le `--fix` est **dans le script**.
 Résultat : `npm run lint` réécrit les fichiers et sort vert. Sans `--fix`, l'état réel est :
 
@@ -60,7 +60,7 @@ Résultat : `npm run lint` réécrit les fichiers et sort vert. Sans `--fix`, l'
   8  @typescript-eslint/no-unused-vars
   3  @typescript-eslint/no-unnecessary-type-assertion
   2  @typescript-eslint/no-unsafe-return
-  1  @typescript-eslint/no-floating-promises     main.ts:22 — bootstrap() non awaité
+  1  @typescript-eslint/no-floating-promises     main.ts:22 : bootstrap() non awaité
   1  @typescript-eslint/no-unused-expressions    france.service.ts:202
   1  @typescript-eslint/no-unsafe-assignment     imagier-import.service.ts:49
   1  @typescript-eslint/no-unsafe-member-access  imagier-import.service.ts:50
@@ -71,13 +71,13 @@ Les 649 prettier sont du bruit auto-fixable, mais tant qu'ils sont là, ils **no
 `no-explicit-any` est toujours `off` (I5) et `ecmaVersion: 5` toujours présent alors que la cible est ES2023.
 **Fix :** `"lint": "eslint src"` + `"lint:fix": "eslint src --fix"`, lancer `lint:fix` une fois, commiter, puis brancher au CI.
 
-### 🟠 N4 — Deux registres de modules qui divergent déjà silencieusement
+### 🟠 N4 : Deux registres de modules qui divergent déjà silencieusement
 `modules.manifest.tsx` se documente comme « la source unique des modules ». Ce n'est pas vrai :
 `HomeLayout` construit la grille depuis **`useGetModulesQuery`**, c'est-à-dire depuis `MODULES_CONFIG`
 côté backend. Le manifest front ne fournit que la `category`.
 
 Conséquence mesurée : `snake` est dans le manifest front, **absent de `MODULES_CONFIG`**.
-La tuile Snake ne peut donc **jamais** apparaître sur l'accueil — seulement via l'URL directe
+La tuile Snake ne peut donc **jamais** apparaître sur l'accueil : seulement via l'URL directe
 `/module/snake`. Sa route admin, elle, existe. Personne ne s'en est aperçu.
 
 Ce n'est pas un détail cosmétique : ajouter un module demande aujourd'hui **deux enregistrements
@@ -85,7 +85,7 @@ dans deux dépôts différents**, sans rien pour vérifier qu'ils correspondent.
 genre de couture qui casse quand on ajoutera les « Cours ».
 **Fix :** un test (ou un check au boot) qui compare les deux ensembles d'ids et hurle en cas d'écart.
 
-### 🟡 N5 — Aucune notion de « niveau scolaire » ni d'apprenant dans le modèle
+### 🟡 N5 : Aucune notion de « niveau scolaire » ni d'apprenant dans le modèle
 `grep -i "niveau|CE1|CM2|grade|level"` sur tout `src/` : 5 fichiers, tous du vocabulaire local
 (« niveau de difficulté »). Il n'y a **aucune entité apprenant, aucun niveau, aucune notion partagée**.
 13 modules = 13 tables `*_progression`, avec 13 formes de clé différentes :
@@ -107,7 +107,7 @@ sans réponse**. C'est le point central de la partie 2.
 
 ---
 
-# Partie 2 — Orientation « Cours »
+# Partie 2 : Orientation « Cours »
 
 ## 2.1 Trois choses à trancher avant d'écrire une ligne
 
@@ -120,7 +120,7 @@ L'app est déployée publiquement (`educmentor.lionelcaro.fr`), derrière invita
   ou bloquent le referer.
 
 **La bonne nouvelle : ta propre intuition résout le problème.** Tu as écrit « les afficher tel quel n'aurait
-aucun intérêt ». Exact — et c'est aussi la seule voie propre. Le corpus est ta **source de travail privée**,
+aucun intérêt ». Exact, et c'est aussi la seule voie propre. Le corpus est ta **source de travail privée**,
 pas ton contenu livré. Ce que tu livres, c'est une réécriture à toi. Reste le sujet des images : à recréer
 ou à sourcer libre (Wikimedia Commons, openclipart), pas à copier.
 
@@ -157,7 +157,7 @@ Images : 1 824, toutes hotlinkées sur media-image.kartable.fr
 ```
 
 J'ai prototypé l'extraction : sections numérotées (`bt_section1/2/3`), titre, texte, exemples, images,
-définitions, astuces, pièges — **tout sort proprement, sans heuristique fragile**. Un parseur déterministe
+définitions, astuces, pièges : **tout sort proprement, sans heuristique fragile**. Un parseur déterministe
 de ~150 lignes suffit. C'est le point le plus encourageant du dossier.
 
 Sur `La proportionnalité` (CM2) : 16 blocs, 3 sections, chacune titre + texte + exemple illustré. Parfait.
@@ -174,7 +174,7 @@ Notion {
   subject   'francais'
   title     'Le présent des verbes du 1er groupe'
 
-  // La fiche — écrite par TOI, dérivée du corpus, jamais copiée
+  // La fiche : écrite par TOI, dérivée du corpus, jamais copiée
   card {
     idee:    string   // 1 phrase, l'idée clé
     regle:   string   // 1-2 phrases
@@ -184,7 +184,7 @@ Notion {
   }
   status  'draft' | 'validated'   // rien n'est montré à l'enfant tant que ce n'est pas validé
 
-  // Le lien vers les tuiles — c'est là que tout se joue
+  // Le lien vers les tuiles : c'est là que tout se joue
   practice: [
     { moduleId: 'conjugaison', setup: { tenses: ['présent'], verbGroups: ['1'] } }
   ]
@@ -213,7 +213,7 @@ verso = la réponse. C'est une carte, pas une page.
 fiche 1 → 3 questions (module conjugaison, préconfiguré) → fiche 2 → 3 questions → … → badge de thème
 ```
 
-C'est ça, « le cours ». Le mini-quiz réutilise `GameEngine` tel quel — il sait déjà faire une session
+C'est ça, « le cours ». Le mini-quiz réutilise `GameEngine` tel quel : il sait déjà faire une session
 de N questions avec timer et correction. Le seul composant neuf, c'est la fiche.
 
 **La carte du savoir (la motivation).** Les thèmes en carte/arbre, chaque notion un nœud coloré selon
@@ -227,17 +227,17 @@ Pour colorer un nœud « maîtrisé », il faut savoir agréger les progressions
 Aujourd'hui c'est impossible : chaque module a sa clé propre, et `numeration` n'a qu'**une seule ligne
 globale** de progression. Deux options :
 
-- **A (léger, recommandé pour commencer)** — une table `notion_progression` alimentée par le parcours
+- **A (léger, recommandé pour commencer)** : une table `notion_progression` alimentée par le parcours
   lui-même : le mini-quiz du parcours enregistre son résultat sur la notion, en plus du module.
   Le module reste maître de sa propre progression, la notion a la sienne. Duplication assumée,
   découplage total, aucun module à réécrire.
-- **B (propre, plus tard)** — les modules déclarent une `notionKey` par question, et
+- **B (propre, plus tard)** : les modules déclarent une `notionKey` par question, et
   `notion_progression` est dérivée. Correct, mais demande de toucher aux 13 modules. À ne pas faire
   au démarrage.
 
 **Prends A.** Tu changeras pour B quand tu sauras si la feature tient la route.
 
-## 2.6 Par où commencer — et surtout, par où ne pas commencer
+## 2.6 Par où commencer, et surtout, par où ne pas commencer
 
 **Ne fais pas 448 fiches.** À 5 minutes de relecture par fiche, c'est 37 heures de travail éditorial
 avant la première utilisation. Le projet mourra là.
@@ -248,7 +248,7 @@ CE2→CM2), et la tuile `conjugaison` expose déjà exactement ces axes en `setu
 (`tenses`, `verbGroups`). Les `practice[]` s'écrivent sans effort.
 
 Cible du pilote : **1 thème, 8 notions, un parcours jouable de bout en bout.**
-Si Maëve ne tient pas 10 minutes dessus, l'idée est à revoir — et tu l'auras appris pour 8 fiches, pas 448.
+Si Maëve ne tient pas 10 minutes dessus, l'idée est à revoir, et tu l'auras appris pour 8 fiches, pas 448.
 
 ### Séquence
 
@@ -256,7 +256,7 @@ Si Maëve ne tient pas 10 minutes dessus, l'idée est à revoir — et tu l'aura
 |---|---|---|---|
 | 0 | `/data/lecons/` dans `.gitignore` · `synchronize: false` + 1ʳᵉ migration + backup complet du `.db` | ½ j | **bloquant, cf. C4/N1** |
 | 1 | Script `scripts/parse-lecons.mjs` : 448 HTML → `corpus.json` structuré + miroir local des images | 1 j | corpus offline, requêtable, HTML jamais livré |
-| 2 | Taxonomie : 448 titres → ~40 thèmes × notions, avec `level`/`subject`. Semi-manuel | 1 j | `themes.json` — **la carte du programme que l'app n'a pas** |
+| 2 | Taxonomie : 448 titres → ~40 thèmes × notions, avec `level`/`subject`. Semi-manuel | 1 j | `themes.json`, **la carte du programme que l'app n'a pas** |
 | 3 | Backend : entités `Theme` / `Notion` / `NotionProgression` + CRUD admin | 1-2 j | |
 | 4 | Admin : file de relecture « brouillon → validée » d'une fiche, avec le bloc source du corpus en regard | 1 j | l'outil qui rend le travail éditorial supportable |
 | 5 | Front : composant `NotionCard` + `ParcoursRunner` (fiche ↔ `GameEngine` préconfiguré) | 2 j | |
@@ -269,7 +269,7 @@ réutilisables pour alimenter les tuiles existantes (banques de mots, phrases, e
 
 ### Le point aveugle à garder en tête
 Histoire (31 leçons) et « Questionner le monde » (38 leçons) sont les seuls domaines où les Cours
-apporteraient une couverture **nouvelle** — aucune tuile ne les touche. Mais ce sont aussi ceux qui
+apporteraient une couverture **nouvelle** : aucune tuile ne les touche. Mais ce sont aussi ceux qui
 demandent le module QCM générique (étape 7). Autrement dit : la partie la plus utile de la feature
 est aussi la plus lointaine. C'est normal, mais ne l'oublie pas en cours de route.
 
@@ -277,12 +277,12 @@ est aussi la plus lointaine. C'est normal, mais ne l'oublie pas en cours de rout
 
 ## Ordre de bataille global
 
-1. **`.gitignore` sur `data/lecons/`** — 10 secondes, évite une bêtise irréversible.
-2. **C4** — `synchronize: false`, migrations, backup complet. Tu es sur le point d'ajouter 3 entités :
+1. **`.gitignore` sur `data/lecons/`** : 10 secondes, évite une bêtise irréversible.
+2. **C4** : `synchronize: false`, migrations, backup complet. Tu es sur le point d'ajouter 3 entités :
    c'est maintenant ou jamais. La progression de ta fille est la seule donnée irremplaçable du projet.
-3. **N2 + N3** — un job `checks` dans le CI, `--fix` hors du script `lint`, un `lint:fix` commité une fois.
+3. **N2 + N3** : un job `checks` dans le CI, `--fix` hors du script `lint`, un `lint:fix` commité une fois.
    Sans ça, l'étape 3 du plan Cours va empiler de la dette au même rythme.
-4. **I4** — les 14 erreurs front, dont `react-hooks/static-components` qui est un **vrai bug de perf**
+4. **I4** : les 14 erreurs front, dont `react-hooks/static-components` qui est un **vrai bug de perf**
    (la carte se démonte/remonte à chaque render).
 5. **Puis** le plan Cours, étapes 1 → 6.
 6. C1 / C2 / C3 / I6 au fil de l'eau, calibrés sur ton modèle de menace réel (cf. encadré de l'audit de juillet).

@@ -9,7 +9,7 @@ import { MODULES } from 'src/modules.manifest';
  * Ce qui est en jeu n'est pas visible à l'œil en jouant : que « Au hasard » n'attrape
  * jamais un jeu, que la section Jeux soit bien celle qui est repliée, et que chaque
  * module actif tombe dans une section. Un module sans catégorie n'apparaîtrait dans
- * AUCUNE section — il disparaîtrait de l'accueil sans que rien ne le signale.
+ * AUCUNE section : il disparaîtrait de l'accueil sans que rien ne le signale.
  */
 
 const SOURCE = readFileSync(

@@ -130,7 +130,7 @@ export class NumerationService {
     _itemKey: string,
     _isCorrect: boolean,
   ): Promise<void> {
-    // Totaux de session uniquement — enregistrés via completeSession.
+    // Totaux de session uniquement : enregistrés via completeSession.
   }
 
   // ─── Progression ───────────────────────────────────────────────────────────
@@ -180,7 +180,7 @@ export class NumerationService {
   }
 
   /** Le catalogue COMPLET des positions, des millièmes aux centaines de millions, avec la
-   * classe de chacune. L'administration doit voir les fermées — sinon rien à ouvrir. */
+   * classe de chacune. L'administration doit voir les fermées, sinon rien à ouvrir. */
   getPositions() {
     return POSITIONS;
   }
@@ -270,7 +270,7 @@ export class NumerationService {
     const min = exposantMin(positions);
     // Tout circule en entiers d'unité la plus petite ; `formater` n'insère la virgule
     // qu'à l'affichage. Comparer des flottants ferait échouer 3,45 contre 3,5 sur un
-    // arrondi — et c'est précisément la notion que la question travaille.
+    // arrondi, et c'est précisément la notion que la question travaille.
     const ecrire = (valeur: number) => formater(valeur, min);
 
     switch (type) {
@@ -293,7 +293,7 @@ export class NumerationService {
         if (steps.length === 0) return null;
         // Le pas est réglé en unités D'AFFICHAGE : « compter de 2 en 2 » veut dire 2, pas
         // deux centièmes. Il faut donc le convertir dans l'unité de base avant de s'en
-        // servir — sans quoi, les centièmes ouverts, une suite « de 2 en 2 » compterait
+        // servir, sans quoi, les centièmes ouverts, une suite « de 2 en 2 » compterait
         // 0,02 par 0,02.
         const facteur = 10 ** -min;
         const utilisables = steps

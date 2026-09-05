@@ -1,4 +1,4 @@
-# Architecture front — educ_mentor
+# Architecture front : educ_mentor
 
 ## Structure `src/`
 
@@ -8,10 +8,10 @@ src/
 │                         Règle co-location : si un module a son propre style, il l'écrit dans son dossier.
 ├── components/
 │   ├── auth/             AccessGate (garde d'accès appareil) + PinModal (code PIN admin)
-│   ├── common/           Button, Badge, Spinner, etc. — composants réutilisables sans logique métier
+│   ├── common/           Button, Badge, Spinner, etc. : composants réutilisables sans logique métier
 │   ├── game/
 │   │   ├── engine/       GameEngine (orchestrateur) + ses briques UI (GameCard, GameFooter, GameChoices…)
-│   │   ├── setup/        GamePreSetup — rendu générique des options de configuration avant de jouer
+│   │   ├── setup/        GamePreSetup : rendu générique des options de configuration avant de jouer
 │   │   ├── result/       GameResultView, GameResultPage, GameErrorList
 │   │   ├── error/        GameErrorList (liste des erreurs d'une partie)
 │   │   ├── LazyGame.tsx  Charge le spec d'un module en import() dynamique, passe-plat vers GameEngine
@@ -33,7 +33,7 @@ src/
 │       ├── <id>.api.ts       Endpoints RTK Query du module (injectEndpoints sur baseApi)
 │       └── admin/            Composants d'administration du module
 ├── modules.manifest.tsx  MODULES = [ ...tous les descripteurs ]. Ajouter un module = 1 ligne ici.
-├── routes/               router.tsx — génère les routes depuis MODULES (buildChildRoutes, buildAdminRoute)
+├── routes/               router.tsx : génère les routes depuis MODULES (buildChildRoutes, buildAdminRoute)
 ├── store/
 │   ├── api/
 │   │   ├── baseApi.ts        Socle RTK Query (baseUrl, token header)
@@ -72,9 +72,9 @@ ModulePreSetup → dispatch(setModuleSetup) → navigate(/play)
 |---|---|---|
 | Token admin | `auth` | `auth_token` |
 | Choix de session | `gameSetup` | `maeve_game_setup` |
-| Résultat de partie | `gameResult` | — (session uniquement) |
+| Résultat de partie | `gameResult` | : (session uniquement) |
 | Dev mode | `devMode` | `maeve_dev_mode` |
-| Settings / catalogue / progression | cache RTK Query | — |
+| Settings / catalogue / progression | cache RTK Query | : |
 
 ---
 
@@ -82,10 +82,16 @@ ModulePreSetup → dispatch(setModuleSetup) → navigate(/play)
 
 ## Conventions d'écriture
 
-**Pas de cadratins (—) dans le texte affiché.** Ni dans les libellés, ni dans les messages,
-ni dans le contenu des fiches. Utiliser `·`, `:` ou une phrase séparée selon le cas.
-Le test `frontend/src/__tests__/fiche-conjugaison.test.ts` le vérifie pour les fiches.
-*(Les commentaires de code en contiennent encore : nettoyage à faire, la règle vaut pour la suite.)*
+**Pas de cadratins (—) nulle part.** Ni dans les libellés, ni dans les messages, ni dans
+le contenu des fiches, ni dans les commentaires de code. Utiliser `·`, `:` ou une phrase
+séparée selon le cas.
+
+La règle ne valait que pour le texte affiché, avec une note « nettoyage à faire » pour les
+commentaires. La note a vécu assez longtemps pour que 762 cadratins s'accumulent. Deux
+tests la tiennent désormais sur TOUT le code, `frontend/src/__tests__/cadratins.test.ts`
+et `backend/src/common/cadratins.spec.ts`, chacun avec la liste explicite des rares
+endroits où le caractère est une donnée (la ponctuation rognée par la dictée, le tiret
+« rien à afficher » d'un tableau).
 
 **Apostrophe droite (`'`), jamais typographique (`’`)**, dans tout le texte affiché.
 C'est ce que le reste de l'interface utilise ; mélanger les deux se voit à l'écran.
@@ -101,13 +107,13 @@ Le moteur supporte trois modes, détectés automatiquement par question :
 
 | Mode | Déclencheur | Validation |
 |---|---|---|
-| QCM single | `spec.qcm` + `getChoices` non vide + `correctKey` | `clicked === correctKey` — dans le moteur |
-| QCM multi | `spec.qcm` + `correctKeys` non vide | `new Set(correctKeys)` vs `selectedKeys` — **dans le moteur** |
-| Saisie libre | `spec.free` (ou `getChoices` vide sans carte) | `spec.free.isCorrect(question, given)` — dans le spec |
-| Carte single | `spec.map` + `isMapQuestion` + `!isMultiSelect` | `spec.map.isCorrect(question, clicked)` — dans le spec |
-| Carte multi | `spec.map` + `isMapQuestion` + `isMultiSelect` | `new Set(correctKeys)` vs `selectedKeys` — **dans le moteur** |
+| QCM single | `spec.qcm` + `getChoices` non vide + `correctKey` | `clicked === correctKey` : dans le moteur |
+| QCM multi | `spec.qcm` + `correctKeys` non vide | `new Set(correctKeys)` vs `selectedKeys` : **dans le moteur** |
+| Saisie libre | `spec.free` (ou `getChoices` vide sans carte) | `spec.free.isCorrect(question, given)` : dans le spec |
+| Carte single | `spec.map` + `isMapQuestion` + `!isMultiSelect` | `spec.map.isCorrect(question, clicked)` : dans le spec |
+| Carte multi | `spec.map` + `isMapQuestion` + `isMultiSelect` | `new Set(correctKeys)` vs `selectedKeys` : **dans le moteur** |
 
-**Règle de conception** : toute validation par comparaison de sets (`correctKeys`) est centralisée dans le moteur — QCM multi et carte multi partagent exactement la même logique. Le spec ne déclare que `correctKeys` (les clés attendues) ; le moteur compare. Cela garantit que tout module utilisant `spec.map.isMultiSelect` obtient le multi-select gratuitement, sans logique à réécrire dans le spec.
+**Règle de conception** : toute validation par comparaison de sets (`correctKeys`) est centralisée dans le moteur, QCM multi et carte multi partagent exactement la même logique. Le spec ne déclare que `correctKeys` (les clés attendues) ; le moteur compare. Cela garantit que tout module utilisant `spec.map.isMultiSelect` obtient le multi-select gratuitement, sans logique à réécrire dans le spec.
 
 `spec.map.isCorrect` ne couvre que le cas single (un clic sur un code connu).
 

@@ -6,7 +6,7 @@ import { buildInitialValues } from 'src/components/game/setup/setupOptions';
 
 /**
  * Le module grammaire décrit le même vocabulaire dans TROIS fichiers qui doivent rester
- * d'accord — et aucun outil ne les relie :
+ * d'accord, et aucun outil ne les relie :
  *   1. `backend/.../grammaire.notions.ts`   le catalogue de notions, source de vérité
  *   2. `frontend/.../grammaire.type.ts`     l'union `NotionKey`, qui type la table des leçons
  *   3. `frontend/.../grammaire.setup.ts`    les types d'exercice proposés au pré-jeu
@@ -14,7 +14,7 @@ import { buildInitialValues } from 'src/components/game/setup/setupOptions';
  * Une notion ajoutée côté backend sans son pendant frontend passe le typage des deux côtés
  * et casse à l'exécution, sur `LECONS[question.skill_key]` : la fiche vaut `undefined` et
  * l'écran de correction plante. Un type d'exercice renommé côté backend rend une option de
- * pré-jeu silencieusement inerte — la case se coche et ne produit rien.
+ * pré-jeu silencieusement inerte : la case se coche et ne produit rien.
  *
  * Les fichiers sont lus sur disque, pas importés : les deux paquets ont des configurations
  * TypeScript distinctes et aucune dépendance entre eux, comme dans `modules-registry.test.ts`.
@@ -71,7 +71,7 @@ describe('registres du module grammaire', () => {
     }).toEqual({ absentesDuFrontend: [], absentesDuBackend: [] });
   });
 
-  it('donne une leçon à chaque notion — sinon la fiche vaut undefined à l’écran', () => {
+  it('donne une leçon à chaque notion, sinon la fiche vaut undefined à l’écran', () => {
     // La table `LECONS` est typée `Record<NotionKey, Lecon>`, donc exhaustive au regard du
     // typage ; ce test vérifie qu'elle l'est au regard du BACKEND, qui est la vraie source.
     const sansLecon = notionsBackend().filter(

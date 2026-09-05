@@ -71,7 +71,7 @@ const MAX_DIGITS = 10;
  * multiplication doit en plus loger ses PRODUITS PARTIELS DÉCALÉS : « 250 × 41 » a pour
  * résultat 10 250, cinq colonnes, mais son produit décalé « 1000 » en occupe cinq lui
  * aussi. Se fier à la seule longueur des opérandes donnait quatre colonnes, et la ligne
- * intermédiaire se retrouvait tronquée — un test de bout en bout l'a attrapé.
+ * intermédiaire se retrouvait tronquée : un test de bout en bout l'a attrapé.
  */
 function nombreDeColonnes(base: PoseQuestion): number {
   const parOperandes =
@@ -140,7 +140,7 @@ export class PoseService {
     const count = isUnlimited ? 20 : perSession;
 
     // Le pré-jeu propose, l'administration dispose : un type coché mais non ouvert ne doit
-    // rien produire. Le pré-jeu ne montre déjà que les actifs — ce filtre est la ceinture.
+    // rien produire. Le pré-jeu ne montre déjà que les actifs : ce filtre est la ceinture.
     const actives = await this.getActiveOperations();
     const demandees = (dto.operations ?? [])
       .filter(isPoseOperation)

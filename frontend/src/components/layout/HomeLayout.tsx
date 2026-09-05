@@ -135,7 +135,7 @@ export default function HomeLayout() {
    *
    * Jamais celui qu'elle vient de faire : retomber deux fois de suite sur le même donne
    * l'impression que le bouton est cassé. Avec un seul module disponible, on n'a pas le
-   * choix — mieux vaut le reproposer que ne rien faire. */
+   * choix : mieux vaut le reproposer que ne rien faire. */
   const auHasard = useCallback(() => {
     if (pochette.length === 0) return;
     const dernier = lireDernierHasard();
@@ -160,7 +160,7 @@ export default function HomeLayout() {
 
   // « Serveur injoignable » et « rien d'activé » se ressemblaient à l'écran : les deux
   // rendaient « Aucun module activé pour l'instant ». Un backend mort affichait donc à
-  // Maëve un message qui l'accusait, elle, d'avoir une application vide — et qui envoyait
+  // Maëve un message qui l'accusait, elle, d'avoir une application vide, et qui envoyait
   // son parent régler des activations déjà bonnes. Ce sont deux causes opposées, elles
   // demandent deux messages.
   if (isError) {

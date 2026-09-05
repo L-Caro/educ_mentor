@@ -2,8 +2,8 @@
  *
  * L'application vise CP → CM2 : chaque catalogue de module contient donc les notions de
  * toutes les classes, et non celles d'une seule année. Le niveau sert à dire, dans
- * l'écran d'administration, à quelle classe une notion appartient — « passé simple · CM1 »
- * — pour qu'on sache quand l'ouvrir.
+ * l'écran d'administration, à quelle classe une notion appartient : « passé simple · CM1 »
+ * - pour qu'on sache quand l'ouvrir.
  *
  * Ce n'est PAS une porte. Ce qui est jouable reste décidé par la liste des notions actives
  * du module, comme pour les figures de la géométrie : on ouvre ce qu'on veut, quand la

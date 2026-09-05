@@ -12,7 +12,7 @@ services:
       - "traefik.http.routers.educmentor.rule=Host(`educmentor.lionelcaro.fr`)"
       - "traefik.http.routers.educmentor.entrypoints=websecure"
       - "traefik.http.routers.educmentor.tls.certresolver=letsencrypt"
-      # Port interne du container nginx — Traefik doit savoir où envoyer le trafic.
+      # Port interne du container nginx : Traefik doit savoir où envoyer le trafic.
       - "traefik.http.services.educmentor.loadbalancer.server.port=80"
     depends_on:
       - backend

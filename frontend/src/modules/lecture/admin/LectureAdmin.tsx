@@ -72,7 +72,7 @@ function ImportForm({ onDone, onCancel }: { onDone: () => void; onCancel: () => 
       );
       onDone();
     } catch {
-      setError('Erreur lors de la création — vérifiez que le serveur est démarré.');
+      setError('Erreur lors de la création : vérifiez que le serveur est démarré.');
       setLoading(false);
     }
   }
@@ -158,7 +158,7 @@ function QuestionForm({
         onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
       />
       <p className="LectureAdmin__formLabel">
-        Mauvaises réponses — 1 min (facile), 3 (moyen), 5 (difficile)
+        Mauvaises réponses : 1 min (facile), 3 (moyen), 5 (difficile)
       </p>
       {Array.from({ length: MAX_DISTRACTORS }, (_, i) => (
         <input
@@ -171,7 +171,7 @@ function QuestionForm({
       ))}
       <input
         className="AdminInput"
-        placeholder="Extrait surligné (facile) — copier la phrase exacte du texte, optionnel"
+        placeholder="Extrait surligné (facile) : copier la phrase exacte du texte, optionnel"
         value={draft.excerpt}
         onChange={(e) => setDraft({ ...draft, excerpt: e.target.value })}
       />

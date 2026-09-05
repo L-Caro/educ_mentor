@@ -36,7 +36,7 @@ export default function FranceCityMap({
       viewBox={france.viewBox}
       className="FranceCityMap"
       onClick={handleClick}
-      aria-label="Carte de France — placer la ville"
+      aria-label="Carte de France : placer la ville"
       style={{ cursor: locked ? 'default' : 'crosshair' }}
     >
       {france.locations.map((loc) => (

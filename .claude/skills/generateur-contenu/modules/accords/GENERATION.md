@@ -1,4 +1,4 @@
-# Module Accords — génération
+# Module Accords : génération
 
 Ce skill produit des **entrées de corpus TypeScript** pour
 `backend/src/modules/accords/accords.corpus.ts`. Trois listes : `NOMS`, `ADJECTIFS`,
@@ -9,7 +9,7 @@ Ce skill produit des **entrées de corpus TypeScript** pour
 
 Dans les autres modules, une erreur de contenu donne une question médiocre. Ici la réponse
 attendue de l'enfant **est une orthographe**. `nom('cheval', 'cheval', 'chevals', ...)`
-compile, passe le lint, et « chevals » devient la bonne réponse — l'enfant qui écrit
+compile, passe le lint, et « chevals » devient la bonne réponse : l'enfant qui écrit
 « chevaux » a tort contre la machine.
 
 C'est pourquoi `accords.corpus.spec.ts` tient une vingtaine d'invariants, et pourquoi la
@@ -51,7 +51,7 @@ une question piégée.
   UNE des quatre formes sort du périmètre est entièrement exclu.
 
 **Ce que la fiche du SUJET-VERBE énonce :** « Plusieurs : le verbe prend -nt. » Tout verbe
-dont la 3ᵉ personne du pluriel finit par `nt` est donc acceptable — y compris les
+dont la 3ᵉ personne du pluriel finit par `nt` est donc acceptable : y compris les
 irréguliers (sont, ont, vont, font), qui respectent la règle.
 
 ## Les trois constructeurs
@@ -73,7 +73,7 @@ verbe('jouer', 'jouer', 'joue', 'jouent', 'dans le jardin.', true, ANIME)
   d'exister sans code, et c'est ce que les tests vérifient.
 - `categorie` : `personne` `animal` `objet` `aliment` `lieu` `nature` `corps` `abstrait`.
 - `elision` : se déduit d'une voyelle initiale. À passer **explicitement** pour un h muet
-  (`l’histoire`, `l’hiver`) — rien dans l'orthographe ne distingue le h muet du h aspiré
+  (`l’histoire`, `l’hiver`) : rien dans l'orthographe ne distingue le h muet du h aspiré
   (`le hibou`), donc aucune règle ne peut le deviner.
 
 ### `adjectif(key, [ms, fs, mp, fp], place, famille, sappliqueA)`
@@ -83,7 +83,7 @@ verbe('jouer', 'jouer', 'joue', 'jouent', 'dans le jardin.', true, ANIME)
 - `place` : `avant` (petit, grand, joli, jeune) ou `apres` (couleurs et presque tout le
   reste). Se tromper produit « un chat petit ».
 - `famille` : `taille` `couleur` `caractere` `etat` `forme` `gout` `age` `vitesse`
-  `aspect`. Deux adjectifs de la même famille dans un groupe nominal se contredisent —
+  `aspect`. Deux adjectifs de la même famille dans un groupe nominal se contredisent :
   « le chapeau vert rouge ».
 - `sappliqueA` : les catégories de noms qu'il peut qualifier. Raccourcis disponibles :
   `TOUT`, `ANIME` (personne + animal), `CHOSES` (objet, aliment, lieu, nature, corps).
@@ -95,15 +95,15 @@ verbe('jouer', 'jouer', 'joue', 'jouent', 'dans le jardin.', true, ANIME)
   produirait « les chats prennent dans le jardin ». Un verbe transitif doit fournir son
   objet ; un intransitif fournit un complément ou rien de plus qu'un point.
 - `homophone` : `true` si `s3` et `p3` se **prononcent** pareil (joue/jouent,
-  chante/chantent — tous les verbes en -er). C'est le cas difficile, et la difficulté du
+  chante/chantent : tous les verbes en -er). C'est le cas difficile, et la difficulté du
   module s'y accroche. Les irréguliers audibles (est/sont, va/vont) sont `false`, donc
-  **plus faciles** — à l'envers de l'intuition.
+  **plus faciles** : à l'envers de l'intuition.
 - `sujets` : qui peut faire cette action. `['personne']` pour écrire, lire, dessiner,
   danser ; `ANIME` pour dormir, courir, manger.
 
 ## Le piège de l'absurdité sémantique
 
-`categorie`, `sappliqueA`, `famille` et `sujets` ne servent **pas** l'accord — l'accord de
+`categorie`, `sappliqueA`, `famille` et `sujets` ne servent **pas** l'accord : l'accord de
 « chapeau » ne dépend pas de ce qu'est un chapeau. Ils existent parce qu'une première
 version sans eux produisait :
 
@@ -121,7 +121,7 @@ de la décoration : un `TOUT` posé par facilité rouvre le problème.
 ## Méthode
 
 1. **Regarder ce qui manque.** Combien de noms par famille de pluriel ? Les tests exigent
-   au moins 15 réguliers, 5 en -x, 3 invariables — mais l'enjeu réel est la variété, pour
+   au moins 15 réguliers, 5 en -x, 3 invariables, mais l'enjeu réel est la variété, pour
    que l'enfant ne revoie pas « gâteau » à chaque partie.
 2. **Vocabulaire de CE1.** École, maison, animaux, nourriture, corps, jeux. Un mot inconnu
    déplace la question : elle porte sur l'accord, pas sur le lexique.
@@ -131,7 +131,7 @@ de la décoration : un `TOUT` posé par facilité rouvre le problème.
    demander quels adjectifs du corpus vont l'atteindre ; pour un adjectif neuf, quels noms.
 5. **Doser.** Un lot de 10 à 20 entrées, réparties sur les trois listes.
 
-## Après génération — obligatoire
+## Après génération : obligatoire
 
 ```bash
 cd backend

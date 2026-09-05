@@ -19,8 +19,8 @@ import { NIVEAUX } from '../../common/niveau';
  * conjugaisons fausses en masse, sans rien casser d'autre.
  *
  * D'où deux niveaux de vérification :
- *   — les règles, isolées, sur des cas choisis pour leur difficulté ;
- *   — les 1 800 formes réelles, confrontées à des tableaux de référence recopiés à la
+ *   - les règles, isolées, sur des cas choisis pour leur difficulté ;
+ *   - les 1 800 formes réelles, confrontées à des tableaux de référence recopiés à la
  *     main depuis un Bescherelle pour dix verbes couvrant les trois groupes, les deux
  *     auxiliaires et les quatre familles de passé simple.
  */
@@ -263,8 +263,8 @@ describe('données incomplètes', () => {
    * backend au démarrage par un « Cannot read properties of undefined (reading
    * 'conjugaisons') » au fond d'un `.map`, sans dire ni quel verbe ni quel champ.
    *
-   * Planter au démarrage reste le bon comportement — une conjugaison fausse ne doit
-   * jamais atteindre l'enfant — mais le message doit nommer le coupable.
+   * Planter au démarrage reste le bon comportement : une conjugaison fausse ne doit
+   * jamais atteindre l'enfant, mais le message doit nommer le coupable.
    */
 
   const AUX = { avoir: VERBES['avoir'], être: VERBES['être'] };

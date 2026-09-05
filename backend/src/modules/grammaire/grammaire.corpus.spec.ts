@@ -11,7 +11,7 @@ import { NATURES } from './grammaire.notions';
  * Les invariants du corpus, que le typage ne peut pas voir.
  *
  * Une annotation fausse ne casse ni le typage ni le lint : `nc('dort')` compile
- * parfaitement et enseigne que « dort » est un nom. Ces tests sont le seul filet — et
+ * parfaitement et enseigne que « dort » est un nom. Ces tests sont le seul filet, et
  * comme ils tournent dans la barrière de déploiement, une erreur d'annotation ne peut
  * pas atteindre l'enfant.
  *
@@ -147,7 +147,7 @@ describe('corpus de grammaire', () => {
     ).toEqual([]);
   });
 
-  it('laisse le pronom sujet hors de tout groupe nominal — il en prend la place', () => {
+  it('laisse le pronom sujet hors de tout groupe nominal : il en prend la place', () => {
     expect(
       fautives((phrase) =>
         phrase.mots

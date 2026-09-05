@@ -14,7 +14,7 @@ async function bootstrap() {
   const secretIssues = collectProductionSecretIssues(process.env);
   if (secretIssues.length > 0) {
     const logger = new Logger('Bootstrap');
-    logger.error('Démarrage refusé — configuration de production incomplète :');
+    logger.error('Démarrage refusé : configuration de production incomplète :');
     for (const issue of secretIssues) logger.error(`  - ${issue}`);
     process.exit(1);
   }
@@ -32,7 +32,7 @@ async function bootstrap() {
 }
 bootstrap().catch((error) => {
   // Sans ce catch, un échec de démarrage (port occupé, migration en erreur) laissait le
-  // process vivant sans serveur à l'écoute — un conteneur « up » mais inutilisable.
+  // process vivant sans serveur à l'écoute : un conteneur « up » mais inutilisable.
   Logger.error(
     'Échec du démarrage',
     error instanceof Error ? error.stack : String(error),

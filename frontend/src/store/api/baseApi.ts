@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 /**
  * Socle RTK Query unique : une seule baseQuery, une seule injection du token.
- * Les endpoints ne sont pas déclarés ici — chaque domaine (transverse ou module)
+ * Les endpoints ne sont pas déclarés ici : chaque domaine (transverse ou module)
  * les injecte via `baseApi.injectEndpoints` depuis son propre fichier, partageant
  * le même reducer et le même cache.
  */

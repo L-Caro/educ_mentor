@@ -13,7 +13,7 @@ RUN npm run build
 
 # ── Stage 2 : production ────────────────────────────────────────────────────────
 # nginx:alpine est l'image standard pour servir des fichiers statiques.
-# On y copie uniquement le résultat du build — pas node_modules, pas les sources.
+# On y copie uniquement le résultat du build : pas node_modules, pas les sources.
 FROM nginx:alpine AS production
 
 # Copier le build React dans le dossier servi par nginx par défaut.

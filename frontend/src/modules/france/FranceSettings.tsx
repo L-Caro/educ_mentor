@@ -90,7 +90,7 @@ export default function FranceSettings() {
       <div className="AdminCard GameSettings__card GameSettings__card--full">
         <p className="GameSettings__cardTitle">Types de questions actifs</p>
         <p className="GameSettings__hint" style={{ marginBottom: '1rem' }}>
-          Active les types au fur et à mesure — seuls les types cochés apparaissent dans les sessions.
+          Active les types au fur et à mesure : seuls les types cochés apparaissent dans les sessions.
         </p>
 
         <div className="GroupActions">

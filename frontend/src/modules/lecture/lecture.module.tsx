@@ -15,7 +15,7 @@ async function loadTexts(): Promise<SetupChoice[]> {
       label:       t.titre,
       icon:        t.play_count > 0 ? '✅' : '📖',
       description: t.play_count > 0
-        ? `Meilleur score : ${t.best_correct}/${t.best_total} — joué ${t.play_count} fois`
+        ? `Meilleur score : ${t.best_correct}/${t.best_total}, joué ${t.play_count} fois`
         : `${t.question_count} question${t.question_count > 1 ? 's' : ''}`,
     }));
   } catch {
@@ -32,9 +32,9 @@ export const lectureModule: ModuleManifest = {
       type: 'single',
       label: 'Quel niveau ?',
       choices: [
-        { value: 'easy',   icon: '🟢', label: 'Facile',    description: 'Texte visible + passage surligné — 2 choix' },
-        { value: 'medium', icon: '🟡', label: 'Moyen',     description: 'Texte visible et scrollable — 4 choix' },
-        { value: 'hard',   icon: '🔴', label: 'Difficile', description: 'Texte caché, de mémoire — 6 choix' },
+        { value: 'easy',   icon: '🟢', label: 'Facile',    description: 'Texte visible + passage surligné : 2 choix' },
+        { value: 'medium', icon: '🟡', label: 'Moyen',     description: 'Texte visible et scrollable : 4 choix' },
+        { value: 'hard',   icon: '🔴', label: 'Difficile', description: 'Texte caché, de mémoire : 6 choix' },
       ],
     },
     {

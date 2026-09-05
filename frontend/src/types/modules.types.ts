@@ -22,7 +22,7 @@ export interface ModuleManifest {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   loadGameSpec?: () => Promise<GameModuleSpec<any, any>>;
   /** Porte de sortie pour les modules hors-moule (ex : Snake) : déclarer `Game` ici
-   * court-circuite <LazyGame> + <GameEngine> — c'est un composant de route libre.
+   * court-circuite <LazyGame> + <GameEngine> : c'est un composant de route libre.
    * Le résultat passe par <GameResultView> (store Redux) comme les autres modules. */
   child?: {
     Game?: ComponentType;

@@ -1,7 +1,7 @@
 import { isPrivateKey } from './settings.service';
 
 /**
- * `GET /api/settings` n'est pas protégé — le frontend enfant en a besoin. C'est donc ce
+ * `GET /api/settings` n'est pas protégé : le frontend enfant en a besoin. C'est donc ce
  * prédicat, et lui seul, qui empêche un secret de sortir de l'application.
  */
 

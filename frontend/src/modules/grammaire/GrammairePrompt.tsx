@@ -5,7 +5,7 @@ import type { GrammaireQuestion } from './grammaire.type';
  * L'énoncé, et la phrase quand elle n'est pas déjà rendue par la zone de sélection.
  *
  * Pour `nature_mot`, la phrase appartient à l'énoncé : le mot souligné est ce sur quoi
- * porte la question, et la phrase est ce qui rend la question décidable — « ferme » est
+ * porte la question, et la phrase est ce qui rend la question décidable : « ferme » est
  * un nom ou un verbe selon elle. Pour les questions de sélection, la phrase est la zone
  * de réponse : c'est `PhraseCliquable` qui la rend, et l'afficher deux fois embrouillerait.
  */

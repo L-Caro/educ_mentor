@@ -1,6 +1,6 @@
 import { Column, Entity, PrimaryColumn } from 'typeorm';
 
-/** Une entrée par NOTION — « verbe », « determinant », « sujet » — et non par phrase.
+/** Une entrée par NOTION, « verbe », « determinant », « sujet », et non par phrase.
  * C'est le grain auquel la maîtrise se joue, et celui que le parent lit pour savoir
  * quelle fiche de cours ouvrir : « l'adjectif raté huit fois sur dix » est actionnable,
  * « la phrase chat-dort ratée deux fois » ne l'est pas. */

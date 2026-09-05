@@ -84,7 +84,7 @@ export class ConjugaisonService {
   // ─── Temps actifs ─────────────────────────────────────────────────────────
 
   /** Le catalogue complet : tous les temps du CP au CM2, ouverts comme fermés.
-   * L'administration doit voir les fermés — sinon il n'y a rien à ouvrir. */
+   * L'administration doit voir les fermés, sinon il n'y a rien à ouvrir. */
   getTenses() {
     return TENSES;
   }
@@ -111,7 +111,7 @@ export class ConjugaisonService {
 
   /** Les temps actifs, avec leur libellé et un exemple. Servi au PRÉ-JEU : l'enfant ne
    * doit voir que ce qu'elle peut réellement jouer. Les coder en dur côté front laisserait
-   * cocher un temps fermé, que le service filtrerait ensuite — une case sans effet. */
+   * cocher un temps fermé, que le service filtrerait ensuite : une case sans effet. */
   async getTempsOuverts() {
     const actifs = await this.getActiveTenseKeys();
     return TENSES.filter((temps) => actifs.includes(temps.key));
@@ -123,7 +123,7 @@ export class ConjugaisonService {
    *
    * Séparé de `startSession` pour le péage des jeux, qui a besoin d'une question mais pas
    * d'une séance. Sans cette coupure, chaque partie de morpion aurait déposé une séance
-   * fantôme d'une question dans « séances récentes » — la liste que lit l'adulte pour
+   * fantôme d'une question dans « séances récentes » : la liste que lit l'adulte pour
    * savoir ce qui a été travaillé.
    *
    * La description de la séance sort d'ici elle aussi : elle se compose des mêmes

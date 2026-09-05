@@ -15,7 +15,7 @@ interface GamePreSetupProps {
 /**
  * Écran de pré-jeu générique, partagé par tous les modules. Rend les `setupOptions`
  * déclarées par le module, mémorise la sélection et lance la partie via `onStart`.
- * Le titre du module est déjà porté par le Header — on n'affiche ici que les options.
+ * Le titre du module est déjà porté par le Header : on n'affiche ici que les options.
  * La logique de sélection (valeurs initiales, cascade `dependsOn`) vit dans `setupOptions.ts`.
  */
 export default function GamePreSetup({

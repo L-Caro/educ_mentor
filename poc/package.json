@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "POC — extraction des flashcards de kids-flashcards.com pour le module imagier",
+  "description": "POC : extraction des flashcards de kids-flashcards.com pour le module imagier",
   "scripts": {
     "catalog": "node src/catalog.ts",
     "set": "node src/scrapeSet.ts",

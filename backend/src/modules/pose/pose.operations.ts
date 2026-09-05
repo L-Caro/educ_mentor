@@ -6,7 +6,7 @@
  * géométrie ou les temps de la conjugaison.
  *
  * La division posée n'y figure pas, et c'est délibéré : sa potence est une autre
- * géométrie — quotient construit de gauche à droite, abaissements successifs, reste — que
+ * géométrie, quotient construit de gauche à droite, abaissements successifs, reste, que
  * la grille en colonnes ne sait pas rendre. La déclarer ici sans savoir la jouer ouvrirait
  * une case qui ne produirait rien.
  */

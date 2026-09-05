@@ -39,7 +39,7 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
   /**
    * Fiche dérivée de la question : la table du plus PETIT facteur, avec la ligne cherchée
    * mise en avant. On récite toujours la plus petite (7 × 8 renvoie à la table de 7) parce
-   * que c'est celle que l'enfant a apprise, et la commutativité fait le reste — c'est
+   * que c'est celle que l'enfant a apprise, et la commutativité fait le reste : c'est
    * justement l'idée clé de la fiche.
    *
    * Fonction pure : réutilisable telle quelle par le futur mode « école ».

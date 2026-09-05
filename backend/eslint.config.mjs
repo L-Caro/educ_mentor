@@ -28,7 +28,7 @@ export default tseslint.config(
   {
     rules: {
       // `no-explicit-any` était désactivé : un `any` pouvait passer inaperçu à la relecture.
-      // Réactivé en erreur — les rares cas légitimes se justifient par un commentaire
+      // Réactivé en erreur : les rares cas légitimes se justifient par un commentaire
       // et un `eslint-disable-next-line` explicite.
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-floating-promises': 'error',

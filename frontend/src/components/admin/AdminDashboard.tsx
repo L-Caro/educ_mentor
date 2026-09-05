@@ -96,8 +96,8 @@ export default function AdminDashboard() {
 
         {/* Sans catalogue, rien de ce qui suit n'est fiable : les noms et les icônes en
             viennent, et l'interrupteur ne s'affiche que si le module y est trouvé. Les
-            cartes se dégradaient donc en silence — ids bruts, pas d'icône, pas
-            d'interrupteur — ce qui ressemble à « rien n'est configuré » alors que la
+            cartes se dégradaient donc en silence : ids bruts, pas d'icône, pas
+            d'interrupteur : ce qui ressemble à « rien n'est configuré » alors que la
             cause est « le serveur ne répond pas ». Mieux vaut le dire et ne rien
             afficher que présenter une liste dont on ne peut rien faire. */}
         {catalogueEnPanne ? (
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             <p className="AdminDashboard__panneTexte">
               Le catalogue des modules n&apos;a pas pu être chargé : ni les noms, ni les
               icônes, ni les interrupteurs d&apos;activation ne sont disponibles. Rien
-              n&apos;est perdu — vérifie que le backend tourne, puis recharge.
+              n&apos;est perdu : vérifie que le backend tourne, puis recharge.
             </p>
             <button
               className="AdminBtn"

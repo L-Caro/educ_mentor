@@ -276,7 +276,7 @@
 
 		// « Aucune session jouée » est un état normal, à peine visible. « Progression
 		// indisponible » est une panne : elle doit se distinguer du silence, sinon on
-		// cherche le problème au mauvais endroit — c'est exactement ce qui est arrivé.
+		// cherche le problème au mauvais endroit : c'est exactement ce qui est arrivé.
 		&--panne {
 			opacity: 0.8;
 			font-style: italic;
@@ -285,7 +285,7 @@
 	}
 
 	// Catalogue injoignable. On préfère le dire et ne rien afficher que présenter dix-huit
-	// cartes dégradées — ids bruts, sans icône ni interrupteur — qui ressemblent à
+	// cartes dégradées, ids bruts, sans icône ni interrupteur, qui ressemblent à
 	// « rien n'est configuré » alors que le serveur ne répond pas.
 	&__panne {
 		border-radius: v.$border-radius;

@@ -4,7 +4,7 @@ import { baseApi } from 'src/store/api/baseApi.ts';
 
 export const conjugaisonApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    /** Les temps ACTIFS — pré-jeu. */
+    /** Les temps ACTIFS : pré-jeu. */
     getConjugaisonTemps: builder.query<
       { key: string; label: string; exemple: string; niveau: string }[],
       void
@@ -13,7 +13,7 @@ export const conjugaisonApi = baseApi.injectEndpoints({
       providesTags: ['ConjugaisonActiveTenses'],
     }),
 
-    /** Le catalogue COMPLET, fermés compris — administration. */
+    /** Le catalogue COMPLET, fermés compris : administration. */
     getConjugaisonTempsCatalogue: builder.query<
       {
         key: string;
