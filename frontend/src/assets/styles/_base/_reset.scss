@@ -41,3 +41,19 @@ p, h1, h2, h3, h4, h5, h6 {
 #root, #__next {
 	isolation : isolate;
 }
+
+/*
+  7. Faire tenir l'attribut `hidden`
+
+  `[hidden] { display: none }` vient de la feuille du NAVIGATEUR. Toute règle d'auteur qui
+  pose un `display` la bat — l'origine auteur l'emporte sur l'origine navigateur, quelle
+  que soit la spécificité. Une section repliée par `hidden={vrai}` restait donc affichée
+  dès que sa classe portait `display: grid`, et c'est arrivé sur l'accueil : le chevron
+  passait à « replié », les tuiles ne bougeaient pas.
+
+  Le `!important` est ici à sa place : `hidden` n'est pas une préférence de mise en page,
+  c'est une affirmation qu'un élément n'est pas dans la page. Rien ne doit la contredire.
+*/
+[hidden] {
+	display : none !important;
+}

@@ -14,6 +14,10 @@ const SCSS = readFileSync(
   'utf-8',
 );
 const COURS = readFileSync(join(__dirname, '../cours/cours.scss'), 'utf-8');
+const RESET = readFileSync(
+  join(__dirname, '../assets/styles/_base/_reset.scss'),
+  'utf-8',
+);
 
 function bloc(selecteur: string, source = SCSS): string {
   const debut = source.indexOf(`${selecteur} {`);
@@ -50,6 +54,26 @@ describe('accueil', () => {
     // Le chevron change de glyphe (▸ / ▾) plutôt que de tourner : sans largeur fixe, le
     // titre se décalerait horizontalement à chaque pliage.
     expect(bloc('&__chevron')).toMatch(/width:\s*1ch/);
+  });
+
+  it('fait tenir l’attribut `hidden` contre le display de la grille', () => {
+    // `[hidden] { display: none }` vient de la feuille du NAVIGATEUR, et toute règle
+    // d'auteur posant un `display` la bat — l'origine auteur l'emporte sur l'origine
+    // navigateur, quelle que soit la spécificité. Sans cette règle, une section repliée
+    // par `hidden={vrai}` reste affichée : le chevron passe à « replié » et les tuiles
+    // ne bougent pas. C'est arrivé, et ce test ne le voyait pas — il vérifiait la
+    // grille, jamais le pliage.
+    expect(RESET).toMatch(/\[hidden\]\s*\{[^}]*display\s*:\s*none\s*!important/);
+  });
+
+  it('replie bien par `hidden`, et non par démontage du sous-arbre', () => {
+    // Démonter perdrait l'état des tuiles et provoquerait un re-rendu complet à chaque
+    // pliage. Le corollaire est la règle ci-dessus : sans elle, `hidden` ne fait rien.
+    const accueil = readFileSync(
+      join(__dirname, '../components/layout/HomeLayout.tsx'),
+      'utf-8',
+    );
+    expect(accueil).toMatch(/hidden=\{repliee\}/);
   });
 
   it('garde la grille responsive dans chaque section', () => {
