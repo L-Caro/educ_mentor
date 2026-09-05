@@ -175,4 +175,13 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 20,
   },
+  {
+    id: 'compte',
+    name: 'Le compte est bon',
+    description:
+      'Atteindre une cible avec six plaques et quatre opérations, une étape à la fois',
+    icon: '🎯',
+    is_active: false,
+    display_order: 21,
+  },
 ];

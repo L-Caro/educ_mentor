@@ -12,6 +12,8 @@ import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
 import { NumerationService } from './../src/modules/numeration/numeration.service';
 import { CalculService } from './../src/modules/calcul/calcul.service';
 import { PoseService } from './../src/modules/pose/pose.service';
+import { CompteService } from './../src/modules/compte/compte.service';
+import { rejouer, type Etape } from './../src/modules/compte/compte.generator';
 import { NOMS } from './../src/modules/accords/accords.corpus';
 import { familleDuNom } from './../src/modules/accords/accords.familles';
 
@@ -732,5 +734,80 @@ describe("Démarrage de l'application (e2e)", () => {
     }
 
     await service.setActiveOperations(['addition', 'soustraction']);
+  });
+
+  // ─── Le compte est bon ──────────────────────────────────────────────────────
+
+  it('sert des tirages TOUJOURS solubles, vérifiés en rejouant', async () => {
+    // Le tirage traverse ici toute la pile — service, contrôleur, sérialisation JSON.
+    // Et il est jugé comme l'enfant le jugera : en rejouant la solution sur les plaques
+    // reçues. Recalculer avec le code qui l'a produite ne vérifierait rien.
+    const session = (
+      await request(server())
+        .post('/api/compte/session')
+        .send({ difficulty: 'hard' })
+        .expect(201)
+    ).body as {
+      questions: { cible: number; plaques: number[]; solution: Etape[] }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      expect(question.plaques).toHaveLength(6);
+      const controle = rejouer(question.plaques, question.solution);
+      expect(controle).not.toBeNull();
+      expect(controle!.resultat).toBe(question.cible);
+    }
+  });
+
+  it('n’ouvre que l’addition et la soustraction à l’installation', async () => {
+    const operations = (
+      await request(server()).get('/api/compte/operations').expect(200)
+    ).body as { key: string }[];
+    expect(operations.map((o) => o.key)).toEqual(['+', '-']);
+  });
+
+  it('refuse la division tant qu’elle est fermée', async () => {
+    const session = (
+      await request(server())
+        .post('/api/compte/session')
+        .send({ operations: ['÷'] })
+        .expect(201)
+    ).body as { questions: { solution: Etape[] }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      for (const etape of question.solution) {
+        expect(etape.operation).not.toBe('÷');
+      }
+    }
+  });
+
+  it('sert des divisions EXACTES une fois la division ouverte', async () => {
+    const service = app.get(CompteService);
+    await service.setActiveOperations(['÷']);
+
+    const session = (
+      await request(server())
+        .post('/api/compte/session')
+        .send({ difficulty: 'medium', operations: ['÷'] })
+        .expect(201)
+    ).body as {
+      questions: { cible: number; plaques: number[]; solution: Etape[] }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      for (const etape of question.solution) {
+        expect(etape.operation).toBe('÷');
+        // Une division inexacte n'a pas de plaque : le reste doit être nul.
+        expect(etape.a % etape.b).toBe(0);
+        expect(etape.a / etape.b).toBe(etape.resultat);
+      }
+      expect(rejouer(question.plaques, question.solution)!.resultat).toBe(
+        question.cible,
+      );
+    }
+
+    await service.setActiveOperations(['+', '-']);
   });
 });
