@@ -1,0 +1,71 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+.MorpionGame {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $space-6;
+  padding: $space-6 0;
+
+  &__message {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: var(--color-base-content);
+    min-height: 1.6em; // la hauteur ne bouge pas quand le message change
+    text-align: center;
+  }
+
+  &__plateau {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-2;
+    // La grille reste carrée et tient sur un téléphone comme sur un écran large.
+    width: min(80vw, 20rem);
+    aspect-ratio: 1;
+  }
+
+  &__case {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border: 2px solid var(--color-base-300);
+    border-radius: $radius-sm;
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    font-family: inherit;
+    font-size: clamp(2rem, 12vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background 0.12s ease,
+      border-color 0.12s ease;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 8%, var(--color-base-100));
+    }
+
+    // Une case occupée n'est plus actionnable mais reste pleinement lisible : la griser
+    // comme un bouton désactivé rendrait le plateau illisible en fin de partie.
+    &:disabled {
+      cursor: default;
+      opacity: 1;
+    }
+
+    &--j1 { color: var(--color-primary); }
+    &--j2 { color: var(--color-secondary, var(--color-warning)); }
+
+    &--gagnante {
+      background: color-mix(in srgb, var(--color-success) 22%, transparent);
+      border-color: var(--color-success);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $space-4;
+  }
+}

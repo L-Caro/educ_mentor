@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -25,13 +25,33 @@ const CATALOG_PATH = join(FRONT_SRC, '../../backend/src/modules/catalog/modules.
 
 /** Modules présents sur disque : nom de dossier + identifiant déclaré.
  * Les deux diffèrent parfois — le dossier `calcul` déclare l'identifiant `calcul-mental`. */
-function declaredModules(): { folder: string; id: string }[] {
+function moduleFolders(): string[] {
   return readdirSync(MODULES_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
-    .flatMap((entry) => {
-      const source = readFileSync(join(MODULES_DIR, entry.name, `${entry.name}.module.tsx`), 'utf-8');
+    .map((entry) => entry.name);
+}
+
+/** Les dossiers de `modules/` qui n'ont pas de descripteur.
+ *
+ * Sous `modules/`, un dossier EST un module. Y déposer une bibliothèque partagée faisait
+ * échouer les trois tests suivants sur un `ENOENT` brut, qui ne disait pas la règle — le
+ * temps perdu à le comprendre est allé à la trace d'appel au lieu du diagnostic. Une
+ * bibliothèque va dans `utils/`. */
+function foldersSansDescripteur(): string[] {
+  return moduleFolders().filter(
+    (folder) => !existsSync(join(MODULES_DIR, folder, `${folder}.module.tsx`)),
+  );
+}
+
+function declaredModules(): { folder: string; id: string }[] {
+  return moduleFolders()
+    .filter((folder) =>
+      existsSync(join(MODULES_DIR, folder, `${folder}.module.tsx`)),
+    )
+    .flatMap((folder) => {
+      const source = readFileSync(join(MODULES_DIR, folder, `${folder}.module.tsx`), 'utf-8');
       const id = /\bid:\s*'([^']+)'/.exec(source)?.[1];
-      return id ? [{ folder: entry.name, id }] : [];
+      return id ? [{ folder, id }] : [];
     })
     .sort((a, b) => a.id.localeCompare(b.id));
 }
@@ -53,6 +73,16 @@ function backendCatalogIds(): string[] {
 }
 
 describe('registres de modules', () => {
+  it("n'a sous modules/ que des dossiers de module", () => {
+    // Un dossier sans `<nom>.module.tsx` n'est pas un module : c'est une bibliothèque,
+    // et sa place est dans `utils/`. Ce test doit passer AVANT les autres, sinon ils
+    // échouent tous les trois sur une erreur de fichier introuvable qui ne dit pas
+    // pourquoi.
+    expect({
+      dossiersSansDescripteur: foldersSansDescripteur(),
+    }).toEqual({ dossiersSansDescripteur: [] });
+  });
+
   it('trouve bien les trois registres (garde-fou sur les expressions régulières)', () => {
     expect(declaredModuleIds().length).toBeGreaterThan(5);
     expect(manifestModuleNames().length).toBeGreaterThan(5);
