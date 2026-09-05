@@ -5,6 +5,43 @@ import { baseApi } from 'src/store/api/baseApi.ts';
 /** Endpoints RTK Query propres au module Calcul Mental (co-localisés avec le module). */
 export const calculApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    /** Les types ACTIFS — pré-jeu. */
+    getCalculTypes: builder.query<
+      { key: string; label: string; exemple: string; niveau: string }[],
+      void
+    >({
+      query: () => '/calcul/types',
+      providesTags: ['CalculActiveTypes'],
+    }),
+
+    /** Le catalogue COMPLET, fermés compris — administration. */
+    getCalculOperations: builder.query<
+      {
+        key: string;
+        label: string;
+        exemple: string;
+        niveau: string;
+        defaultActive: boolean;
+      }[],
+      void
+    >({
+      query: () => '/calcul/operations',
+    }),
+
+    getCalculActiveTypes: builder.query<string[], void>({
+      query: () => '/calcul/types-actifs',
+      providesTags: ['CalculActiveTypes'],
+    }),
+
+    updateCalculActiveTypes: builder.mutation<string[], string[]>({
+      query: (keys) => ({
+        url: '/calcul/types-actifs',
+        method: 'PATCH',
+        body: { keys },
+      }),
+      invalidatesTags: ['CalculActiveTypes'],
+    }),
+
     // ─── Jeu (impératif : déclenché par la spec via store.dispatch) ─────────────
     startCalculSession: builder.mutation<
       CalculSessionResponse,
@@ -49,3 +86,10 @@ export const calculApi = baseApi.injectEndpoints({
     }),
   }),
 });
+
+export const {
+  useGetCalculTypesQuery,
+  useGetCalculOperationsQuery,
+  useGetCalculActiveTypesQuery,
+  useUpdateCalculActiveTypesMutation,
+} = calculApi;

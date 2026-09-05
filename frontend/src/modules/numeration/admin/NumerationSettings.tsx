@@ -70,7 +70,7 @@ export default function NumerationSettings() {
                 onClick={() => togglePosition(key as PositionKey)}
               >
                 {label}
-                <span className="NumerationSettings__niveau">
+                <span className="GameSettings__niveau">
                   {niveau.toUpperCase()}
                 </span>
               </button>

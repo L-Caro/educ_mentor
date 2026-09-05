@@ -61,7 +61,7 @@ function TempsActifs() {
             title={temps.exemple}
           >
             {temps.label}
-            <span className="ConjugaisonSettings__niveau">
+            <span className="GameSettings__niveau">
               {temps.niveau.toUpperCase()}
             </span>
           </button>

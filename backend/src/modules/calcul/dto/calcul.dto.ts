@@ -35,3 +35,9 @@ export class CompleteCalculSessionDto {
   @IsInt()
   total_questions: number;
 }
+
+export class UpdateActiveTypesDto {
+  @IsArray()
+  @IsString({ each: true })
+  keys: string[];
+}

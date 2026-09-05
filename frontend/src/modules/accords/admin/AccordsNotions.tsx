@@ -78,7 +78,7 @@ function FamillesActives() {
                     title={famille.exemple}
                   >
                     {famille.label}
-                    <span className="AccordsNotions__niveau">
+                    <span className="GameSettings__niveau">
                       {famille.niveau.toUpperCase()}
                     </span>
                   </button>

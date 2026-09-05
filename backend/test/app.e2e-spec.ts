@@ -10,6 +10,7 @@ import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.ser
 import { AccordsService } from './../src/modules/accords/accords.service';
 import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
 import { NumerationService } from './../src/modules/numeration/numeration.service';
+import { CalculService } from './../src/modules/calcul/calcul.service';
 import { NOMS } from './../src/modules/accords/accords.corpus';
 import { familleDuNom } from './../src/modules/accords/accords.familles';
 
@@ -428,7 +429,7 @@ describe("Démarrage de l'application (e2e)", () => {
       expect(question.tense).toBe('passé composé');
       // Auxiliaire + participe, et jamais le pronom : l'élision est faite à l'affichage.
       expect(question.conjugated).toContain(' ');
-      expect(question.conjugated).not.toMatch(/^(je|j\')/);
+      expect(question.conjugated).not.toMatch(/^(je|j')/);
     }
   });
 
@@ -487,7 +488,8 @@ describe("Démarrage de l'application (e2e)", () => {
     await service.setActiveNotionKeys(['nom_commun', 'verbe', 'determinant']);
 
     const grandes = new Set(
-      (await service.getClasses())
+      service
+        .getClasses()
         .filter((c) => !c.defaultActive)
         .map((c) => c.key),
     );
@@ -571,5 +573,92 @@ describe("Démarrage de l'application (e2e)", () => {
     }
 
     await service.setActivePositions(['u', 'd']);
+  });
+
+  // ─── Calcul mental : le multiplicatif ───────────────────────────────────────
+
+  it('n’ouvre que l’additif à l’installation', async () => {
+    const types = (await request(server()).get('/api/calcul/types').expect(200))
+      .body as { key: string }[];
+    expect(types.map((t) => t.key).sort()).toEqual(
+      ['addition', 'complement', 'double', 'moitie', 'soustraction'].sort(),
+    );
+  });
+
+  it('refuse une multiplication tant que le type est fermé', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplication'] })
+        .expect(201)
+    ).body as { questions: { operation: string }[] };
+    for (const question of session.questions) {
+      expect(question.operation).not.toContain('×');
+    }
+  });
+
+  it('sert des multiplications et des divisions exactes une fois ouvertes', async () => {
+    const service = app.get(CalculService);
+    await service.setActiveOperationTypes([
+      'multiplication',
+      'division',
+      'multiplier_10',
+      'diviser_10',
+      'complement_100',
+    ]);
+
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplication', 'division'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      // La réponse doit être un entier : une division inexacte ne se pose pas de tête.
+      expect(Number.isInteger(question.answer)).toBe(true);
+      expect(question.answer).toBeGreaterThan(0);
+
+      const mult = /^(\d+) × (\d+) = \?$/.exec(question.operation);
+      const div = /^(\d+) ÷ (\d+) = \?$/.exec(question.operation);
+      expect(Boolean(mult || div)).toBe(true);
+      if (mult) {
+        expect(Number(mult[1]) * Number(mult[2])).toBe(question.answer);
+      }
+      if (div) {
+        // Exacte par construction : le dividende est bâti depuis le quotient.
+        expect(Number(div[1]) % Number(div[2])).toBe(0);
+        expect(Number(div[1]) / Number(div[2])).toBe(question.answer);
+      }
+    }
+  });
+
+  it('multiplie et divise par 10, 100, 1000 sans jamais produire de décimal', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplier_10', 'diviser_10'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    for (const question of session.questions) {
+      expect(Number.isInteger(question.answer)).toBe(true);
+      expect(question.operation).toMatch(/(×|÷) (10|100|1000) = \?$/);
+    }
+  });
+
+  it('donne des compléments à 100 et 1000 sur des nombres ronds', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['complement_100'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    for (const question of session.questions) {
+      const m = /^(\d+) pour aller à (100|1000)$/.exec(question.operation)!;
+      expect(m).not.toBeNull();
+      expect(Number(m[2]) - Number(m[1])).toBe(question.answer);
+      expect(question.answer).toBeGreaterThan(0);
+    }
   });
 });
