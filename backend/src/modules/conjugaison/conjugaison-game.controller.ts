@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ConjugaisonService } from './conjugaison.service';
 import {
   StartConjugaisonSessionDto,
@@ -9,6 +9,13 @@ import {
 @Controller('conjugaison')
 export class ConjugaisonGameController {
   constructor(private readonly conjugaisonService: ConjugaisonService) {}
+
+  /** Les temps ACTIFS, pour le pré-jeu. Les coder en dur côté front laisserait cocher un
+   * temps fermé, que le service filtrerait ensuite : une case sans effet. */
+  @Get('temps')
+  getTempsOuverts() {
+    return this.conjugaisonService.getTempsOuverts();
+  }
 
   @Post('session')
   startSession(@Body() dto: StartConjugaisonSessionDto) {

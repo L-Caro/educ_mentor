@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { DIFFICULTIES, type Difficulty } from '../../../common/difficulty';
 
-const OPERATIONS = ['addition', 'soustraction'] as const;
+const OPERATIONS = ['addition', 'soustraction', 'multiplication'] as const;
 
 export class StartPoseSessionDto {
   /** La difficulté commande l'échafaudage des retenues, pas la taille des nombres :
@@ -37,4 +37,10 @@ export class CompletePoseSessionDto {
 
   @IsInt()
   total_questions: number;
+}
+
+export class UpdateActiveOperationsDto {
+  @IsArray()
+  @IsString({ each: true })
+  keys: string[];
 }

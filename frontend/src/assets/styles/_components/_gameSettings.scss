@@ -213,4 +213,13 @@
 
 		input { accent-color: var(--color-primary); }
 	}
+	// La classe scolaire d'une notion, sur sa pastille : elle dit quand l'ouvrir, elle
+	// n'ouvre rien. Partagée par les modules qui portent un catalogue CP→CM2.
+	&__niveau {
+		margin-left: 0.4em;
+		font-size: 0.7em;
+		font-weight: 700;
+		opacity: 0.6;
+	}
+
 }

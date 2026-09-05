@@ -1,7 +1,16 @@
 import { useEffect, useRef } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession';
 import type { PoseQuestion } from './pose.type';
-import { colonnesBarrees, colonnesFausses, decode, encode, type PoseSaisie } from './poseValue';
+import {
+  colonnesBarrees,
+  colonnesFausses,
+  colonnesPartielFausses,
+  decode,
+  encode,
+  lignesPartielles,
+  partielAttendu,
+  type PoseSaisie,
+} from './poseValue';
 
 interface Props {
   question: PoseQuestion;
@@ -16,7 +25,7 @@ function indices(columns: number): number[] {
   return Array.from({ length: columns }, (_, i) => columns - 1 - i);
 }
 
-const SIGNE = { addition: '+', soustraction: '−' } as const;
+const SIGNE = { addition: '+', soustraction: '−', multiplication: '×' } as const;
 
 /**
  * La grille d'une opération posée, telle qu'on l'écrit sur un cahier.
@@ -39,6 +48,21 @@ const SIGNE = { addition: '+', soustraction: '−' } as const;
  *      ─────────────────
  *      [ ] [ ] [ ] [ ]
  *
+ * La multiplication a sa propre géométrie : une rangée par produit partiel, décalée d'un
+ * rang à chaque fois. C'est ce décalage qui fait toute la difficulté de l'opération, et
+ * c'est pour ça qu'il se saisit au lieu d'être posé d'avance.
+ *
+ *        2   4   7
+ *    ×       3   6
+ *      ─────────────
+ *      [ ] [ ] [ ] [ ]      ← 247 × 6
+ *  [ ] [ ] [ ] ·            ← 247 × 3, décalé d'un rang
+ *      ─────────────
+ *      [ ] [ ] [ ] [ ]      ← la somme
+ *
+ * Aucune rangée de retenue en multiplication : à l'école elles s'écrivent petit et
+ * s'effacent d'une ligne à l'autre, et une rangée par produit rendrait la grille illisible.
+ *
  * La saisie avance de DROITE À GAUCHE, comme on calcule. Les rangées de retenue
  * n'apparaissent que si la difficulté et la méthode les prévoient.
  */
@@ -60,7 +84,11 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
     premierRef.current?.focus();
   }, [identiteQuestion]);
 
-  function ecrire(rangee: keyof PoseSaisie, colonne: number, brut: string) {
+  function ecrire(
+    rangee: 'haut' | 'bas' | 'resultat',
+    colonne: number,
+    brut: string,
+  ) {
     if (verrouille) return;
     const chiffres = brut.replace(/\D/g, '');
     const suivant: PoseSaisie = {
@@ -72,10 +100,26 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
     onChange(encode(suivant));
   }
 
+  function ecrirePartiel(ligne: number, colonne: number, brut: string) {
+    if (verrouille) return;
+    const chiffre = brut.replace(/\D/g, '').slice(-1);
+    const suivant: PoseSaisie = {
+      ...saisie,
+      partiels: saisie.partiels.map((rangee, l) =>
+        l === ligne
+          ? rangee.map((v, c) => (c === colonne ? chiffre : v))
+          : rangee,
+      ),
+    };
+    onChange(encode(suivant));
+  }
+
   const chiffresDe = (n: number) => {
     const s = String(n).split('').reverse();
     return cols.map((c) => s[c] ?? '');
   };
+
+  const partiels = lignesPartielles(question);
 
   const montrerHaut = question.carry_display !== 'hidden';
   const montrerBas =
@@ -147,6 +191,63 @@ export default function PoseGrid({ question, value, onChange, onSubmit, answerSt
       )}
 
       <div className="PoseGrid__bar" aria-hidden="true" />
+
+      {partiels.map((partiel, ligne) => {
+        const attendu = partielAttendu(question, partiel);
+        const fautives = verrouille
+          ? colonnesPartielFausses(question, saisie, ligne)
+          : [];
+        return (
+          <div
+            key={partiel.decalage}
+            className="PoseGrid__row PoseGrid__row--partiel"
+          >
+            {cols.map((c) => {
+              // À gauche du nombre comme à droite du décalage, aucune case : un trou
+              // visuel vaut mieux qu'une case qui invite à écrire n'importe quoi, et le
+              // décalage doit se VOIR — c'est lui qu'on apprend.
+              if (attendu[c] === '') {
+                return (
+                  <span
+                    key={c}
+                    className="PoseGrid__cell PoseGrid__cell--none"
+                    aria-hidden="true"
+                  />
+                );
+              }
+              return (
+                <input
+                  key={c}
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  maxLength={1}
+                  autoComplete="off"
+                  aria-label={`produit partiel ${ligne + 1}, colonne ${c + 1} en partant de la droite`}
+                  className={[
+                    'PoseGrid__cell',
+                    'PoseGrid__cell--partiel',
+                    fautives.includes(c) ? 'PoseGrid__cell--wrong' : '',
+                    verrouille && !fautives.includes(c)
+                      ? 'PoseGrid__cell--right'
+                      : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  value={saisie.partiels[ligne]?.[c] ?? ''}
+                  readOnly={verrouille}
+                  onChange={(e) => ecrirePartiel(ligne, c, e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && onSubmit()}
+                />
+              );
+            })}
+          </div>
+        );
+      })}
+
+      {partiels.length > 0 && (
+        <div className="PoseGrid__bar" aria-hidden="true" />
+      )}
 
       <div className="PoseGrid__row PoseGrid__row--result">
         {cols.map((c) => {

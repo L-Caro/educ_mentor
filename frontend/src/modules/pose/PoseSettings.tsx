@@ -1,5 +1,10 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
+import {
+  useGetPoseActiveOperationsQuery,
+  useGetPoseCatalogueQuery,
+  useUpdatePoseActiveOperationsMutation,
+} from './pose.api.ts';
 import './pose.scss';
 
 const METHODES = [
@@ -17,6 +22,65 @@ const METHODES = [
   },
 ] as const;
 
+/** Les opérations ouvertes. La multiplication posée est là mais fermée : on l'ouvre quand
+ * la classe l'a vue, comme les figures de la géométrie.
+ *
+ * La division posée n'y figure pas : sa potence est une autre géométrie — quotient
+ * construit de gauche à droite, abaissements, reste — que la grille en colonnes ne sait
+ * pas rendre. La proposer sans savoir la jouer ouvrirait une case muette. */
+function OperationsActives() {
+  const { data: catalogue = [], isLoading: loadingCatalogue } =
+    useGetPoseCatalogueQuery();
+  const { data: actives = [], isLoading: loadingActives } =
+    useGetPoseActiveOperationsQuery();
+  const [updateActives, { isLoading: saving }] =
+    useUpdatePoseActiveOperationsMutation();
+
+  if (loadingCatalogue || loadingActives) return <Spinner size="sm" />;
+
+  function toggle(key: string) {
+    const next = actives.includes(key)
+      ? actives.filter((k) => k !== key)
+      : [...actives, key];
+    if (next.length === 0) return; // toujours au moins une opération jouable
+    updateActives(next);
+  }
+
+  return (
+    <div className="AdminCard GameSettings__card">
+      <div className="GameSettings__header">
+        <p className="GameSettings__cardTitle">Opérations posées</p>
+        {saving && <Spinner size="xs" />}
+      </div>
+      <p className="GameSettings__hint">
+        La classe indiquée dit quand ouvrir — rien n&rsquo;empêche d&rsquo;ouvrir plus
+        tôt. La multiplication demande d&rsquo;écrire les produits partiels et leur
+        décalage : c&rsquo;est là qu&rsquo;elle se joue.
+      </p>
+      <div className="GameSettings__denominations">
+        {catalogue.map((operation) => (
+          <button
+            key={operation.key}
+            type="button"
+            className={`GameSettings__denomination${
+              actives.includes(operation.key)
+                ? ' GameSettings__denomination--active'
+                : ''
+            }`}
+            onClick={() => toggle(operation.key)}
+            title={operation.exemple}
+          >
+            {operation.label}
+            <span className="GameSettings__niveau">
+              {operation.niveau.toUpperCase()}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function PoseSettings() {
   const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
   const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
@@ -28,6 +92,8 @@ export default function PoseSettings() {
 
   return (
     <div className="GameSettings">
+      <OperationsActives />
+
       <div className="GameSettings__header">
         <p className="GameSettings__hint">
           La méthode et la taille des nombres dépendent de la classe, pas de la partie :

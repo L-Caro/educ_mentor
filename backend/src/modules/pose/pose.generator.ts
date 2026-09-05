@@ -6,7 +6,7 @@
  * une addition sans retenue quand on en demandait une) ne se verrait qu'à l'usage.
  */
 
-export type PoseOperation = 'addition' | 'soustraction';
+export type PoseOperation = 'addition' | 'soustraction' | 'multiplication';
 
 /**
  * Les deux méthodes de soustraction posée enseignées à l'école. Elles donnent le même
@@ -30,6 +30,25 @@ export interface Retenues {
   bas: (number | null)[];
 }
 
+/** Un produit partiel de la multiplication posée : la valeur, et de combien de rangs elle
+ * se décale vers la gauche. 247 × 36 en donne deux : 1482 sans décalage, 741 décalé d'un
+ * rang — c'est le décalage qui fait toute la difficulté de l'opération. */
+export interface ProduitPartiel {
+  valeur: number;
+  decalage: number;
+}
+
+/** Les produits partiels d'une multiplication posée, du chiffre des unités du
+ * multiplicateur vers la gauche. Un multiplicateur à un chiffre n'en donne qu'un, égal au
+ * résultat : la grille n'affiche alors aucune ligne intermédiaire. */
+export function produitsPartiels(a: number, b: number): ProduitPartiel[] {
+  return String(b)
+    .split('')
+    .reverse()
+    .map((chiffre, decalage) => ({ valeur: a * Number(chiffre), decalage }))
+    .filter((partiel, _, tous) => tous.length === 1 || partiel.valeur > 0);
+}
+
 export interface PoseQuestion {
   /** Clé de progression : « soustraction_3_retenue ». Le grain auquel la difficulté se joue. */
   skill_key: string;
@@ -41,6 +60,8 @@ export interface PoseQuestion {
   answer_length: number;
   /** Y a-t-il au moins une retenue ? Sert à l'explication de la fiche. */
   has_carry: boolean;
+  /** Les produits partiels — multiplication seulement, vide ailleurs. */
+  partiels: ProduitPartiel[];
 }
 
 /** Une retenue apparaît dès qu'une colonne dépasse 9 (addition) ou passe sous 0 (soustraction). */
@@ -52,6 +73,12 @@ export function hasCarry(
   const chiffresA = String(a).split('').reverse().map(Number);
   const chiffresB = String(b).split('').reverse().map(Number);
   const rangs = Math.max(chiffresA.length, chiffresB.length);
+
+  // Une multiplication pose une retenue dès qu'un produit chiffre × chiffre dépasse 9.
+  // Le parcours colonne par colonne des deux autres opérations n'a pas de sens ici.
+  if (operation === 'multiplication') {
+    return chiffresA.some((x) => chiffresB.some((y) => x * y > 9));
+  }
 
   let retenue = 0;
   for (let i = 0; i < rangs; i++) {
@@ -95,7 +122,13 @@ export function generatePose(
 
   for (let essai = 0; essai < 80; essai++) {
     let a = rand(min, max);
-    let b = rand(1, max);
+    // Le multiplicateur reste court : une multiplication posée s'apprend à un puis deux
+    // chiffres. Tirer un multiplicateur aussi long que le multiplicande donnerait des
+    // grilles de dix colonnes, injouables sur un téléphone et hors programme.
+    let b =
+      operation === 'multiplication'
+        ? rand(2, digits >= 3 ? 99 : 9)
+        : rand(1, max);
 
     // Une soustraction posée ne descend pas sous zéro à ce niveau : on ordonne les opérandes.
     if (operation === 'soustraction' && b > a) [a, b] = [b, a];
@@ -105,7 +138,12 @@ export function generatePose(
     if (carry === 'with' && !retenue) continue;
     if (carry === 'without' && retenue) continue;
 
-    const answer = operation === 'addition' ? a + b : a - b;
+    const answer =
+      operation === 'addition'
+        ? a + b
+        : operation === 'soustraction'
+          ? a - b
+          : a * b;
 
     return {
       skill_key: `${operation}_${digits}_${retenue ? 'retenue' : 'simple'}`,
@@ -114,6 +152,7 @@ export function generatePose(
       answer,
       answer_length: String(answer).length,
       has_carry: retenue,
+      partiels: operation === 'multiplication' ? produitsPartiels(a, b) : [],
     };
   }
 
@@ -145,6 +184,14 @@ export function computeRetenues(
   // `Array(n).fill(null)` est typé `any[]` : on construit le tableau typé directement.
   const haut: (number | null)[] = Array.from({ length: taille }, () => null);
   const bas: (number | null)[] = Array.from({ length: taille }, () => null);
+
+  // La multiplication posée n'affiche pas de rangée de retenue : à l'école elles
+  // s'écrivent petit et s'effacent d'une ligne à l'autre, et une rangée par produit
+  // partiel rendrait la grille illisible. Ce qui est demandé, ce sont les produits
+  // partiels eux-mêmes et leur décalage.
+  if (operation === 'multiplication') {
+    return { haut, bas };
+  }
 
   if (operation === 'addition') {
     // La retenue s'écrit au-dessus de la colonne SUIVANTE, comme on l'apprend.

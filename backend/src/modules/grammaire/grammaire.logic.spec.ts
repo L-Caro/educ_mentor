@@ -1,11 +1,11 @@
 import {
   generateQuestion,
   generateQuestions,
-  niveauxPour,
+  difficultesPour,
   nombreDeChoix,
   notionsRequises,
 } from './grammaire.logic';
-import { CORPUS, texteDe } from './grammaire.corpus';
+import { CORPUS, DEFAULT_ACTIVE_CLASSES, texteDe } from './grammaire.corpus';
 import {
   NATURES,
   NOTION_KEYS,
@@ -36,11 +36,11 @@ const SOCLE: NotionKey[] = [
   'adjectif',
 ];
 
-describe('niveauxPour / nombreDeChoix', () => {
+describe('difficultesPour / nombreDeChoix', () => {
   it('ouvre les phrases progressivement', () => {
-    expect(niveauxPour('easy')).toEqual(['simple']);
-    expect(niveauxPour('medium')).toEqual(['simple', 'moyen']);
-    expect(niveauxPour('hard')).toEqual(['simple', 'moyen', 'complexe']);
+    expect(difficultesPour('easy')).toEqual(['simple']);
+    expect(difficultesPour('medium')).toEqual(['simple', 'moyen']);
+    expect(difficultesPour('hard')).toEqual(['simple', 'moyen', 'complexe']);
   });
 
   it('ne bascule jamais en saisie libre, même en difficile', () => {
@@ -224,7 +224,7 @@ describe('generateQuestions', () => {
 
   it('ne sert que des phrases du niveau autorisé', () => {
     const simples = new Set(
-      CORPUS.filter((p) => p.niveau === 'simple').map((p) => texteDe(p)),
+      CORPUS.filter((p) => p.difficulte === 'simple').map((p) => texteDe(p)),
     );
     const questions = generateQuestions(
       10,
@@ -258,5 +258,88 @@ describe('notionsRequises', () => {
       'complement',
       'sujet',
     ]);
+  });
+});
+
+// ─── La porte des classes ───────────────────────────────────────────────────
+
+describe('classes actives', () => {
+  it('ne sert aucune phrase de grande classe tant qu’elle est fermée', () => {
+    const grandes = CORPUS.filter(
+      (p) => !DEFAULT_ACTIVE_CLASSES.includes(p.niveau),
+    ).map((p) => texteDe(p));
+    expect(grandes.length).toBeGreaterThan(0);
+
+    for (let n = 0; n < 40; n++) {
+      const questions = generateQuestions(
+        10,
+        ['nature_mot'],
+        'hard',
+        TOUTES,
+        randReel,
+      );
+      for (const q of questions) {
+        const texte = q.mots
+          .map(
+            (mot, i) =>
+              `${i === 0 || mot.colle ? '' : ' '}${mot.mot}${mot.apres}`,
+          )
+          .join('');
+        expect(grandes).not.toContain(texte);
+      }
+    }
+  });
+
+  it('sert les phrases de CM2 une fois la classe ouverte', () => {
+    const attendues = CORPUS.filter((p) => p.niveau === 'cm2').map((p) =>
+      texteDe(p),
+    );
+    const vues = new Set<string>();
+    for (let n = 0; n < 40; n++) {
+      for (const q of generateQuestions(
+        10,
+        ['nature_mot'],
+        'hard',
+        TOUTES,
+        randReel,
+        CORPUS,
+        ['cp', 'ce1', 'ce2', 'cm1', 'cm2'],
+      )) {
+        vues.add(
+          q.mots
+            .map(
+              (mot, i) =>
+                `${i === 0 || mot.colle ? '' : ' '}${mot.mot}${mot.apres}`,
+            )
+            .join(''),
+        );
+      }
+    }
+    expect(attendues.some((t) => vues.has(t))).toBe(true);
+  });
+
+  it('interroge l’attribut du sujet quand la notion et la classe sont ouvertes', () => {
+    const q = generateQuestion(
+      'trouver_fonction',
+      CORPUS.filter((p) => p.niveau === 'cm1'),
+      ['attribut'],
+      4,
+      randReel,
+    );
+    expect(q).not.toBeNull();
+    expect(q!.skill_key).toBe('attribut');
+    expect(q!.answer_indices.length).toBeGreaterThan(0);
+  });
+
+  it('interroge le complément d’objet, distinct du circonstanciel', () => {
+    const q = generateQuestion(
+      'trouver_fonction',
+      CORPUS.filter((p) => p.niveau === 'ce2'),
+      ['complement_objet'],
+      4,
+      randReel,
+    )!;
+    expect(q.skill_key).toBe('complement_objet');
+    expect(q.display).toContain("complément d'objet");
   });
 });

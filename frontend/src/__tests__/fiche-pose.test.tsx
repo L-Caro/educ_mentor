@@ -11,6 +11,7 @@ const q = (over: Partial<PoseQuestion> = {}): PoseQuestion => ({
   columns: 5,
   has_carry: true,
   method: 'compensation',
+  partiels: [],
   retenues: { haut: [14, null, null, null, null], bas: [null, 9, null, null, null] },
   carry_display: 'empty',
   ...over,

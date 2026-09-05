@@ -6,6 +6,14 @@ import { ValidationPipe, type INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import type { Server } from 'node:http';
 import { AppModule } from './../src/app.module';
+import { ConjugaisonService } from './../src/modules/conjugaison/conjugaison.service';
+import { AccordsService } from './../src/modules/accords/accords.service';
+import { GrammaireService } from './../src/modules/grammaire/grammaire.service';
+import { NumerationService } from './../src/modules/numeration/numeration.service';
+import { CalculService } from './../src/modules/calcul/calcul.service';
+import { PoseService } from './../src/modules/pose/pose.service';
+import { NOMS } from './../src/modules/accords/accords.corpus';
+import { familleDuNom } from './../src/modules/accords/accords.familles';
 
 interface CatalogModule {
   id: string;
@@ -56,6 +64,12 @@ describe("Démarrage de l'application (e2e)", () => {
   }, 60_000);
 
   const server = () => app.getHttpServer() as Server;
+
+  /** Les pluriels réellement classés en `pluriel_aux` — chevaux, animaux, journaux,
+   * hôpitaux. Lus du corpus plutôt que devinés d'une terminaison. */
+  const PLURIELS_EN_AUX = NOMS.filter(
+    (nom) => familleDuNom(nom) === 'pluriel_aux',
+  ).map((nom) => nom.pluriel);
 
   afterAll(async () => {
     await app?.close();
@@ -363,5 +377,360 @@ describe("Démarrage de l'application (e2e)", () => {
       // Le QCM oppose toujours deux formes du même verbe : c'est toute la notion.
       expect(question.choices.length).toBeGreaterThanOrEqual(2);
     }
+
+    // Remettre le socle : ce réglage est global, le laisser modifié ferait échouer les
+    // tests suivants pour une raison qui n'a rien à voir avec ce qu'ils vérifient.
+    await request(server())
+      .patch('/api/accords/notions-actives')
+      .send({ keys: ['genre_nom', 'nombre_nom', 'accord_adjectif'] })
+      .expect(200);
+  });
+
+  // ─── Conjugaison : les temps des grandes classes ────────────────────────────
+
+  it('n’ouvre que les trois temps simples à l’installation', async () => {
+    const temps = (
+      await request(server()).get('/api/conjugaison/temps').expect(200)
+    ).body as { key: string; niveau: string }[];
+    expect(temps.map((t) => t.key)).toEqual(['présent', 'imparfait', 'futur']);
+  });
+
+  it('refuse de jouer un temps fermé, même demandé explicitement', async () => {
+    // Le passé composé EXISTE dans le catalogue, mais il n'est pas ouvert : le service
+    // ne doit pas le servir sous prétexte qu'il a été demandé.
+    const session = (
+      await request(server())
+        .post('/api/conjugaison/session')
+        .send({ tenses: ['passé composé'], verb_groups: ['1'] })
+        .expect(201)
+    ).body as { questions: { tense: string }[] };
+    for (const question of session.questions) {
+      expect(question.tense).not.toBe('passé composé');
+    }
+  });
+
+  it('sert le passé composé une fois le temps ouvert en administration', async () => {
+    await app
+      .get(ConjugaisonService)
+      .setActiveTenseKeys(['présent', 'passé composé']);
+
+    const temps = (
+      await request(server()).get('/api/conjugaison/temps').expect(200)
+    ).body as { key: string }[];
+    expect(temps.map((t) => t.key)).toContain('passé composé');
+
+    const session = (
+      await request(server())
+        .post('/api/conjugaison/session')
+        .send({ tenses: ['passé composé'], verb_groups: ['1'] })
+        .expect(201)
+    ).body as { questions: { tense: string; conjugated: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.tense).toBe('passé composé');
+      // Auxiliaire + participe, et jamais le pronom : l'élision est faite à l'affichage.
+      expect(question.conjugated).toContain(' ');
+      expect(question.conjugated).not.toMatch(/^(je|j')/);
+    }
+  });
+
+  // ─── Accords : les familles des grandes classes ─────────────────────────────
+
+  it('ne sert pas un pluriel en -aux tant que la famille est fermée', async () => {
+    await app
+      .get(AccordsService)
+      .setActiveNotionKeys(['genre_nom', 'nombre_nom', 'accord_adjectif']);
+
+    const session = (
+      await request(server())
+        .post('/api/accords/session')
+        .send({ question_types: ['nombre_nom'], difficulty: 'hard' })
+        .expect(201)
+    ).body as { questions: { answer: string }[] };
+    // Comparer à la LISTE réelle, pas à une terminaison : « eaux », pluriel de « eau »,
+    // se termine par `aux` sans être un pluriel en -aux. C'est exactement le piège que
+    // `familleDuNom` évite en testant aussi le singulier.
+    for (const question of session.questions) {
+      expect(PLURIELS_EN_AUX).not.toContain(question.answer);
+    }
+  });
+
+  it('sert le pluriel en -aux une fois la famille ouverte', async () => {
+    const service = app.get(AccordsService);
+    await service.setActiveNotionKeys([
+      'genre_nom',
+      'nombre_nom',
+      'accord_adjectif',
+    ]);
+    const socle = await service.getActiveFamilleKeys();
+    await service.setActiveFamilleKeys([...socle, 'pluriel_aux']);
+
+    const vus = new Set<string>();
+    for (let essai = 0; essai < 6; essai++) {
+      const session = (
+        await request(server())
+          .post('/api/accords/session')
+          .send({ question_types: ['nombre_nom'], difficulty: 'hard' })
+          .expect(201)
+      ).body as { questions: { answer: string }[] };
+      for (const question of session.questions) vus.add(question.answer);
+    }
+    expect([...vus].some((forme) => PLURIELS_EN_AUX.includes(forme))).toBe(
+      true,
+    );
+
+    await service.setActiveFamilleKeys(socle);
+  });
+
+  // ─── Grammaire : les classes de phrases ─────────────────────────────────────
+
+  it('ne sert aucune phrase de grande classe tant qu’elle est fermée', async () => {
+    const service = app.get(GrammaireService);
+    await service.setActiveNotionKeys(['nom_commun', 'verbe', 'determinant']);
+
+    const grandes = new Set(
+      service
+        .getClasses()
+        .filter((c) => !c.defaultActive)
+        .map((c) => c.key),
+    );
+    expect(grandes.size).toBeGreaterThan(0);
+    expect(await service.getActiveClassKeys()).toEqual(['cp', 'ce1']);
+
+    // Les phrases de CE2+ portent un complément d'objet annoté ; aucune ne doit sortir.
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({ question_types: ['nature_mot'], difficulty: 'hard' })
+        .expect(201)
+    ).body as { questions: { item_key: string }[] };
+    for (const question of session.questions) {
+      expect(question.item_key).not.toMatch(/_(ce2|cm1|cm2)-/);
+    }
+  });
+
+  it('sert les phrases de CM1 et interroge l’attribut une fois ouverts', async () => {
+    const service = app.get(GrammaireService);
+    await service.setActiveClassKeys(['cp', 'ce1', 'ce2', 'cm1', 'cm2']);
+    await service.setActiveNotionKeys(['attribut']);
+
+    const session = (
+      await request(server())
+        .post('/api/grammaire/session')
+        .send({ question_types: ['trouver_fonction'], difficulty: 'hard' })
+        .expect(201)
+    ).body as {
+      questions: { skill_key: string; answer_indices: number[] }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.skill_key).toBe('attribut');
+      expect(question.answer_indices.length).toBeGreaterThan(0);
+    }
+
+    await service.setActiveClassKeys(['cp', 'ce1']);
+  });
+
+  // ─── Numération : millions et décimaux ──────────────────────────────────────
+
+  it('sert le catalogue des positions, des millièmes aux centaines de millions', async () => {
+    const positions = (
+      await request(server()).get('/api/numeration/positions').expect(200)
+    ).body as { key: string; exposant: number; niveau: string }[];
+    expect(positions.map((p) => p.key)).toContain('millieme');
+    expect(positions.map((p) => p.key)).toContain('cmi');
+    expect(Math.min(...positions.map((p) => p.exposant))).toBe(-3);
+    expect(Math.max(...positions.map((p) => p.exposant))).toBe(8);
+  });
+
+  it('reste entier tant qu’aucune décimale n’est ouverte', async () => {
+    const session = (
+      await request(server())
+        .post('/api/numeration/session')
+        .send({ question_types: ['comparaison'] })
+        .expect(201)
+    ).body as { questions: { display: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      expect(question.display).not.toContain(',');
+    }
+  });
+
+  it('fait apparaître la virgule une fois les centièmes ouverts', async () => {
+    const service = app.get(NumerationService);
+    await service.setActivePositions(['centieme', 'dixieme', 'u', 'd']);
+
+    const session = (
+      await request(server())
+        .post('/api/numeration/session')
+        .send({ question_types: ['comparaison'] })
+        .expect(201)
+    ).body as { questions: { display: string; answer: string }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+    for (const question of session.questions) {
+      // Deux décimales exactement, virgule française, jamais de point.
+      expect(question.display).toMatch(/^\d+,\d{2} {2}□ {2}\d+,\d{2}$/);
+      expect(['<', '>', '=']).toContain(question.answer);
+    }
+
+    await service.setActivePositions(['u', 'd']);
+  });
+
+  // ─── Calcul mental : le multiplicatif ───────────────────────────────────────
+
+  it('n’ouvre que l’additif à l’installation', async () => {
+    const types = (await request(server()).get('/api/calcul/types').expect(200))
+      .body as { key: string }[];
+    expect(types.map((t) => t.key).sort()).toEqual(
+      ['addition', 'complement', 'double', 'moitie', 'soustraction'].sort(),
+    );
+  });
+
+  it('refuse une multiplication tant que le type est fermé', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplication'] })
+        .expect(201)
+    ).body as { questions: { operation: string }[] };
+    for (const question of session.questions) {
+      expect(question.operation).not.toContain('×');
+    }
+  });
+
+  it('sert des multiplications et des divisions exactes une fois ouvertes', async () => {
+    const service = app.get(CalculService);
+    await service.setActiveOperationTypes([
+      'multiplication',
+      'division',
+      'multiplier_10',
+      'diviser_10',
+      'complement_100',
+    ]);
+
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplication', 'division'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      // La réponse doit être un entier : une division inexacte ne se pose pas de tête.
+      expect(Number.isInteger(question.answer)).toBe(true);
+      expect(question.answer).toBeGreaterThan(0);
+
+      const mult = /^(\d+) × (\d+) = \?$/.exec(question.operation);
+      const div = /^(\d+) ÷ (\d+) = \?$/.exec(question.operation);
+      expect(Boolean(mult || div)).toBe(true);
+      if (mult) {
+        expect(Number(mult[1]) * Number(mult[2])).toBe(question.answer);
+      }
+      if (div) {
+        // Exacte par construction : le dividende est bâti depuis le quotient.
+        expect(Number(div[1]) % Number(div[2])).toBe(0);
+        expect(Number(div[1]) / Number(div[2])).toBe(question.answer);
+      }
+    }
+  });
+
+  it('multiplie et divise par 10, 100, 1000 sans jamais produire de décimal', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['multiplier_10', 'diviser_10'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    for (const question of session.questions) {
+      expect(Number.isInteger(question.answer)).toBe(true);
+      expect(question.operation).toMatch(/(×|÷) (10|100|1000) = \?$/);
+    }
+  });
+
+  it('donne des compléments à 100 et 1000 sur des nombres ronds', async () => {
+    const session = (
+      await request(server())
+        .post('/api/calcul/session')
+        .send({ operation_types: ['complement_100'] })
+        .expect(201)
+    ).body as { questions: { operation: string; answer: number }[] };
+    for (const question of session.questions) {
+      const m = /^(\d+) pour aller à (100|1000)$/.exec(question.operation)!;
+      expect(m).not.toBeNull();
+      expect(Number(m[2]) - Number(m[1])).toBe(question.answer);
+      expect(question.answer).toBeGreaterThan(0);
+    }
+  });
+
+  // ─── Calcul posé : la multiplication ────────────────────────────────────────
+
+  it('n’ouvre que l’addition et la soustraction à l’installation', async () => {
+    const operations = (
+      await request(server()).get('/api/pose/operations').expect(200)
+    ).body as { key: string }[];
+    expect(operations.map((o) => o.key).sort()).toEqual([
+      'addition',
+      'soustraction',
+    ]);
+  });
+
+  it('refuse une multiplication posée tant qu’elle est fermée', async () => {
+    const session = (
+      await request(server())
+        .post('/api/pose/session')
+        .send({ operations: ['multiplication'] })
+        .expect(201)
+    ).body as { questions: { operation: string }[] };
+    for (const question of session.questions) {
+      expect(question.operation).not.toBe('multiplication');
+    }
+  });
+
+  it('sert des multiplications posées justes une fois ouvertes', async () => {
+    const service = app.get(PoseService);
+    await service.setActiveOperations(['multiplication']);
+
+    const session = (
+      await request(server())
+        .post('/api/pose/session')
+        .send({ operations: ['multiplication'] })
+        .expect(201)
+    ).body as {
+      questions: {
+        operation: string;
+        operands: number[];
+        answer: number;
+        columns: number;
+        partiels: { valeur: number; decalage: number }[];
+        retenues: { haut: (number | null)[]; bas: (number | null)[] };
+      }[];
+    };
+    expect(session.questions.length).toBeGreaterThan(0);
+
+    for (const question of session.questions) {
+      expect(question.operation).toBe('multiplication');
+      expect(question.answer).toBe(question.operands[0] * question.operands[1]);
+
+      // Les produits partiels, remis à leur décalage, doivent redonner le résultat.
+      const somme = question.partiels.reduce(
+        (total, p) => total + p.valeur * 10 ** p.decalage,
+        0,
+      );
+      expect(somme).toBe(question.answer);
+
+      // La grille doit être assez large pour le résultat ET pour le produit le plus décalé.
+      const largeurMax = Math.max(
+        String(question.answer).length,
+        ...question.partiels.map((p) => String(p.valeur).length + p.decalage),
+      );
+      expect(question.columns).toBeGreaterThanOrEqual(largeurMax);
+
+      // Aucune rangée de retenue en multiplication.
+      expect(question.retenues.haut.every((v) => v === null)).toBe(true);
+      expect(question.retenues.bas.every((v) => v === null)).toBe(true);
+    }
+
+    await service.setActiveOperations(['addition', 'soustraction']);
   });
 });

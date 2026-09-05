@@ -1,4 +1,4 @@
-import type { PoseQuestion } from './pose.type';
+import type { PoseQuestion, ProduitPartiel } from './pose.type';
 
 /**
  * Ce que l'enfant a écrit dans la grille : les retenues du haut, celles du bas, et le
@@ -13,11 +13,39 @@ export interface PoseSaisie {
   haut: string[];
   bas: string[];
   resultat: string[];
+  /** Une rangée par produit partiel, indexée comme les autres depuis la DROITE.
+   * Vide hors multiplication. */
+  partiels: string[][];
 }
 
 export function saisieVide(question: PoseQuestion): PoseSaisie {
   const cases = () => Array.from({ length: question.columns }, () => '');
-  return { haut: cases(), bas: cases(), resultat: cases() };
+  return {
+    haut: cases(),
+    bas: cases(),
+    resultat: cases(),
+    partiels: lignesPartielles(question).map(() => cases()),
+  };
+}
+
+/** Les produits partiels que l'enfant doit écrire. Un multiplicateur à un chiffre n'en
+ * demande aucun : son unique produit EST le résultat, et lui faire écrire deux fois la
+ * même ligne n'apprend rien. */
+export function lignesPartielles(question: PoseQuestion): ProduitPartiel[] {
+  if (question.operation !== 'multiplication') return [];
+  return question.partiels.length > 1 ? question.partiels : [];
+}
+
+/** Les chiffres d'un produit partiel, placés à leur décalage, indexés depuis la droite. */
+export function partielAttendu(
+  question: PoseQuestion,
+  partiel: ProduitPartiel,
+): string[] {
+  const chiffres = String(partiel.valeur).split('').reverse();
+  return Array.from({ length: question.columns }, (_, colonne) => {
+    const rang = colonne - partiel.decalage;
+    return rang >= 0 ? (chiffres[rang] ?? '') : '';
+  });
 }
 
 /** En difficulté « facile » les retenues sont déjà écrites : la grille part pré-remplie. */
@@ -47,6 +75,7 @@ export function decode(raw: string, question: PoseQuestion): PoseSaisie {
       haut: parsed.haut ?? vide.haut,
       bas: parsed.bas ?? vide.bas,
       resultat: parsed.resultat ?? vide.resultat,
+      partiels: parsed.partiels ?? vide.partiels,
     };
   } catch {
     // Saisie corrompue : on repart d'une grille vide plutôt que de planter en pleine partie.
@@ -81,6 +110,19 @@ export function estComplete(question: PoseQuestion, saisie: PoseSaisie): boolean
   const sansTrou = cases.slice(0, dernierRempli + 1).every((v) => v !== '');
   if (!sansTrou) return false;
 
+  // Les produits partiels sont l'exercice de la multiplication posée, pas un échafaudage :
+  // on exige qu'ils soient écrits, sinon l'enfant pourrait sauter directement au résultat
+  // et le décalage — la seule vraie difficulté — ne serait jamais travaillé.
+  const partiels = lignesPartielles(question);
+  const partielsComplets = partiels.every((partiel, ligne) => {
+    const attendu = partielAttendu(question, partiel);
+    return attendu.every(
+      (chiffre, colonne) =>
+        chiffre === '' || (saisie.partiels[ligne]?.[colonne] ?? '') !== '',
+    );
+  });
+  if (!partielsComplets) return false;
+
   if (question.carry_display !== 'empty') return true;
 
   return (['haut', 'bas'] as const).every((rangee) =>
@@ -98,7 +140,33 @@ export function estComplete(question: PoseQuestion, saisie: PoseSaisie): boolean
  */
 export function estCorrecte(question: PoseQuestion, saisie: PoseSaisie): boolean {
   const attendu = resultatAttendu(question);
-  return attendu.every((chiffre, i) => (saisie.resultat[i] ?? '') === chiffre);
+  const resultatJuste = attendu.every(
+    (chiffre, i) => (saisie.resultat[i] ?? '') === chiffre,
+  );
+  if (!resultatJuste) return false;
+
+  // Les produits partiels comptent, eux. Contrairement aux retenues, ce ne sont pas un
+  // support : un résultat juste obtenu avec des produits faux est un résultat deviné, et
+  // la multiplication posée s'apprend précisément par ces lignes-là.
+  return lignesPartielles(question).every(
+    (_, ligne) => colonnesPartielFausses(question, saisie, ligne).length === 0,
+  );
+}
+
+/** Colonnes d'un produit partiel mal remplies, pour montrer OÙ ça a coincé. */
+export function colonnesPartielFausses(
+  question: PoseQuestion,
+  saisie: PoseSaisie,
+  ligne: number,
+): number[] {
+  const partiel = lignesPartielles(question)[ligne];
+  if (!partiel) return [];
+  const attendu = partielAttendu(question, partiel);
+  return attendu.flatMap((chiffre, colonne) =>
+    chiffre === '' || (saisie.partiels[ligne]?.[colonne] ?? '') === chiffre
+      ? []
+      : [colonne],
+  );
 }
 
 /** Colonnes du résultat mal remplies, pour que la correction montre OÙ ça a coincé. */

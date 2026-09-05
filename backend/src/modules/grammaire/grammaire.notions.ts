@@ -8,6 +8,8 @@
  * rencontrer deux mots différents pour la même notion selon qu'elle joue ou qu'elle lit.
  */
 
+import type { Niveau } from '../../common/niveau';
+
 export type Nature =
   | 'nom_commun'
   | 'nom_propre'
@@ -17,13 +19,16 @@ export type Nature =
   | 'pronom_sujet'
   | 'invariable';
 
-export type Fonction = 'sujet' | 'complement';
+export type Fonction = 'sujet' | 'complement' | 'complement_objet' | 'attribut';
 
 /** Ce qui est activable en administration, et ce qui est suivi en progression. */
 export type NotionKey = Nature | Fonction | 'groupe_nominal';
 
 export interface NotionMeta {
   key: NotionKey;
+  /** La classe où la notion s'introduit. ÉTIQUETTE affichée en administration pour savoir
+   * quand l'ouvrir ; elle n'ouvre rien d'elle-même. */
+  niveau: Niveau;
   /** `nature` = ce que le mot EST ; `fonction` = ce qu'il FAIT dans la phrase. */
   categorie: 'nature' | 'fonction';
   /** Réponse de QCM : « un verbe », « un déterminant ». */
@@ -39,6 +44,7 @@ export interface NotionMeta {
 export const NOTIONS: NotionMeta[] = [
   {
     key: 'nom_commun',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un nom commun',
     singulier: 'le nom commun',
@@ -47,6 +53,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'nom_propre',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un nom propre',
     singulier: 'le nom propre',
@@ -55,6 +62,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'verbe',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un verbe',
     singulier: 'le verbe',
@@ -63,6 +71,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'determinant',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un déterminant',
     singulier: 'le déterminant',
@@ -71,6 +80,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'adjectif',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un adjectif',
     singulier: "l'adjectif",
@@ -79,6 +89,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'pronom_sujet',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un pronom',
     singulier: 'le pronom',
@@ -87,6 +98,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'invariable',
+    niveau: 'ce1',
     categorie: 'nature',
     label: 'un mot invariable',
     singulier: 'le mot invariable',
@@ -95,6 +107,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'groupe_nominal',
+    niveau: 'ce1',
     categorie: 'fonction',
     label: 'un groupe nominal',
     singulier: 'le groupe nominal',
@@ -103,6 +116,7 @@ export const NOTIONS: NotionMeta[] = [
   },
   {
     key: 'sujet',
+    niveau: 'ce1',
     categorie: 'fonction',
     label: 'le sujet',
     singulier: 'le sujet du verbe',
@@ -110,7 +124,26 @@ export const NOTIONS: NotionMeta[] = [
     defaultActive: false,
   },
   {
+    key: 'complement_objet',
+    niveau: 'ce2',
+    categorie: 'fonction',
+    label: "un complément d'objet",
+    singulier: "le complément d'objet",
+    pluriel: "les compléments d'objet",
+    defaultActive: false,
+  },
+  {
+    key: 'attribut',
+    niveau: 'cm1',
+    categorie: 'fonction',
+    label: 'un attribut du sujet',
+    singulier: 'l’attribut du sujet',
+    pluriel: 'les attributs du sujet',
+    defaultActive: false,
+  },
+  {
     key: 'complement',
+    niveau: 'ce1',
     categorie: 'fonction',
     label: 'un complément',
     singulier: 'le complément',

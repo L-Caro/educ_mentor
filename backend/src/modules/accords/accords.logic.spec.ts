@@ -6,6 +6,12 @@ import {
 } from './accords.logic';
 import { NOTION_KEYS, type NotionKey } from './accords.notions';
 import { ADJECTIFS, NOMS, VERBES, plurielIrregulier } from './accords.corpus';
+import {
+  DEFAULT_ACTIVE_FAMILLES,
+  FAMILLE_KEYS,
+  familleDuNom,
+  famillesDeLAdjectif,
+} from './accords.familles';
 
 /**
  * La génération et la validation. Deux familles de pannes silencieuses sont visées.
@@ -334,5 +340,102 @@ describe('validation de la saisie', () => {
     expect(normaliseReponse(normaliseReponse(brut))).toBe(
       normaliseReponse(brut),
     );
+  });
+});
+
+// ─── La porte des familles ──────────────────────────────────────────────────
+
+describe('familles morphologiques', () => {
+  const SOCLE = DEFAULT_ACTIVE_FAMILLES;
+  const TOUT = FAMILLE_KEYS;
+
+  it('ne sert jamais un pluriel dont la famille est fermée', () => {
+    // « cheval / chevaux » est dans le corpus mais fermé au départ : le servir
+    // enseignerait un pluriel qui n'a pas été vu en classe.
+    const fermes = NOMS.filter((nom) => !SOCLE.includes(familleDuNom(nom))).map(
+      (nom) => nom.pluriel,
+    );
+    expect(fermes.length).toBeGreaterThan(0);
+
+    for (let n = 0; n < 200; n++) {
+      const q = generateQuestion(
+        'nombre_nom',
+        'hard',
+        TOUTES,
+        randReel,
+        SOCLE,
+      )!;
+      expect(fermes).not.toContain(q.answer);
+    }
+  });
+
+  it('sert le pluriel en -aux une fois la famille ouverte', () => {
+    const ouvertes = [...SOCLE, 'pluriel_aux' as const];
+    const attendus = NOMS.filter(
+      (nom) => familleDuNom(nom) === 'pluriel_aux',
+    ).map((nom) => nom.pluriel);
+
+    const vus = new Set<string>();
+    for (let n = 0; n < 400; n++) {
+      const q = generateQuestion(
+        'nombre_nom',
+        'hard',
+        TOUTES,
+        randReel,
+        ouvertes,
+      )!;
+      vus.add(q.answer);
+    }
+    expect(attendus.some((forme) => vus.has(forme))).toBe(true);
+  });
+
+  it("n'utilise un adjectif que si TOUTES ses familles sont ouvertes", () => {
+    // « gros » demande la consonne doublée (CE2) ET le pluriel invariable (CM1). Ouvrir
+    // seulement la première ne doit pas le rendre jouable : « les gros chats »
+    // enseignerait le pluriel invariable au passage.
+    const ouvertes = [...SOCLE, 'feminin_double' as const];
+    const interdits = ADJECTIFS.filter(
+      (adj) => !famillesDeLAdjectif(adj).every((f) => ouvertes.includes(f)),
+    ).map((adj) => adj.ms);
+    expect(interdits).toContain('gros');
+
+    for (let n = 0; n < 300; n++) {
+      const q = generateQuestion(
+        'accord_adjectif',
+        'hard',
+        TOUTES,
+        randReel,
+        ouvertes,
+      )!;
+      expect(interdits).not.toContain(q.indice);
+    }
+  });
+
+  it('rend le corpus entier jouable quand tout est ouvert', () => {
+    const vus = new Set<string>();
+    for (let n = 0; n < 600; n++) {
+      const q = generateQuestion(
+        'accord_adjectif',
+        'hard',
+        TOUTES,
+        randReel,
+        TOUT,
+      )!;
+      if (q.indice) vus.add(q.indice);
+    }
+    // Au moins un adjectif de chaque famille fermée au départ doit finir par sortir.
+    expect(vus.has('beau') || vus.has('vieux') || vus.has('blanc')).toBe(true);
+  });
+
+  it('ne casse pas quand une famille ouverte n’a aucun mot compatible', () => {
+    // Ouvrir `pluriel_oux` seul laisse quatre noms, tous masculins : la génération doit
+    // rendre une question ou `null`, jamais planter.
+    for (let n = 0; n < 50; n++) {
+      expect(() =>
+        generateQuestion('accord_gn', 'hard', TOUTES, randReel, [
+          'pluriel_oux',
+        ]),
+      ).not.toThrow();
+    }
   });
 });

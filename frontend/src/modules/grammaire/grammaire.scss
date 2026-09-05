@@ -134,3 +134,12 @@
     }
   }
 }
+
+// Le nombre de phrases d'une classe, sur sa pastille : ouvrir une classe vide donnerait
+// un exercice muet, autant le voir avant de cliquer.
+.GrammaireNotions__compte {
+  margin-left: 0.4em;
+  font-size: 0.7em;
+  font-weight: 700;
+  opacity: 0.6;
+}

@@ -1,5 +1,10 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
-import { useGetConjugaisonVerbsQuery } from './conjugaison.api.ts';
+import {
+  useGetConjugaisonActiveTempsQuery,
+  useGetConjugaisonTempsCatalogueQuery,
+  useGetConjugaisonVerbsQuery,
+  useUpdateConjugaisonActiveTempsMutation,
+} from './conjugaison.api.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
 import './conjugaison.scss';
 
@@ -10,6 +15,61 @@ const GROUP_LABELS: Record<string, string> = {
   '2': '2ème groupe',
   '3': '3ème groupe',
 };
+
+/** Les temps ouverts. Le catalogue contient les sept temps du CP au CM2 ; seuls les trois
+ * temps simples sont actifs à l'installation, les autres attendent d'avoir été vus en
+ * classe. La classe est affichée à côté de chacun, pour savoir quand l'ouvrir. */
+function TempsActifs() {
+  const { data: catalogue = [], isLoading: loadingCatalogue } =
+    useGetConjugaisonTempsCatalogueQuery();
+  const { data: actifs = [], isLoading: loadingActifs } =
+    useGetConjugaisonActiveTempsQuery();
+  const [updateActifs, { isLoading: saving }] =
+    useUpdateConjugaisonActiveTempsMutation();
+
+  if (loadingCatalogue || loadingActifs) return <Spinner size="sm" />;
+
+  function toggle(key: string) {
+    const next = actifs.includes(key)
+      ? actifs.filter((k) => k !== key)
+      : [...actifs, key];
+    if (next.length === 0) return; // toujours au moins un temps jouable
+    updateActifs(next);
+  }
+
+  return (
+    <div className="AdminCard GameSettings__card">
+      <div className="GameSettings__header">
+        <p className="GameSettings__cardTitle">Temps travaillés</p>
+        {saving && <Spinner size="xs" />}
+      </div>
+      <p className="GameSettings__hint">
+        Les sept temps du CP au CM2 sont là. Ouvre-les au fil du programme — la classe
+        indiquée dit quand, mais rien n&rsquo;empêche d&rsquo;ouvrir plus tôt.
+      </p>
+      <div className="GameSettings__denominations">
+        {catalogue.map((temps) => (
+          <button
+            key={temps.key}
+            type="button"
+            className={`GameSettings__denomination${
+              actifs.includes(temps.key)
+                ? ' GameSettings__denomination--active'
+                : ''
+            }`}
+            onClick={() => toggle(temps.key)}
+            title={temps.exemple}
+          >
+            {temps.label}
+            <span className="GameSettings__niveau">
+              {temps.niveau.toUpperCase()}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function ConjugaisonSettings() {
   const { data: verbs = [], isLoading: loadingVerbs } = useGetConjugaisonVerbsQuery();
@@ -53,6 +113,8 @@ export default function ConjugaisonSettings() {
 
   return (
     <div className="GameSettings">
+      <TempsActifs />
+
       <div className="GameSettings__header">
         <p className="GameSettings__hint">
           Choisissez les verbes inclus dans les sessions. Tous les verbes sont actifs par défaut.

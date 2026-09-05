@@ -4,6 +4,23 @@ import { baseApi } from 'src/store/api/baseApi';
 
 export const numerationApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    /** Le catalogue des positions, des millièmes aux centaines de millions. Servi par le
+     * backend plutôt que redéclaré ici : la liste vivait en double, et un ajout côté
+     * serveur restait invisible en administration. */
+    getNumerationPositions: builder.query<
+      {
+        key: string;
+        exposant: number;
+        nom: string;
+        label: string;
+        niveau: string;
+        defaultActive: boolean;
+      }[],
+      void
+    >({
+      query: () => '/numeration/positions',
+    }),
+
     startNumerationSession: builder.mutation<
       NumerationSessionResponse,
       { questionTypes?: string[] }
@@ -49,3 +66,4 @@ export const numerationApi = baseApi.injectEndpoints({
     }),
   }),
 });
+export const { useGetNumerationPositionsQuery } = numerationApi;

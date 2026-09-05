@@ -1,4 +1,17 @@
 import { randomUUID } from 'node:crypto';
+import {
+  DEFAULT_ACTIVE_POSITIONS,
+  POSITIONS,
+  chiffreA,
+  exposantMin,
+  formater,
+  getPosition,
+  isPositionKey,
+  maximum,
+  pas,
+  trierPositions,
+  type PositionKey,
+} from './numeration.positions';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -12,30 +25,11 @@ import type {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type PositionKey = 'u' | 'd' | 'c' | 'm' | 'dm' | 'cm';
 type QuestionType =
   | 'comparaison'
   | 'suite'
   | 'decomposition'
   | 'valeur_positionnelle';
-
-const POSITION_ORDER: PositionKey[] = ['u', 'd', 'c', 'm', 'dm', 'cm'];
-const POSITION_VALUE: Record<PositionKey, number> = {
-  u: 1,
-  d: 10,
-  c: 100,
-  m: 1000,
-  dm: 10000,
-  cm: 100000,
-};
-const POSITION_NAME: Record<PositionKey, string> = {
-  u: 'unités',
-  d: 'dizaines',
-  c: 'centaines',
-  m: 'milliers',
-  dm: 'dizaines de milliers',
-  cm: 'centaines de milliers',
-};
 
 const VALID_TYPES: QuestionType[] = [
   'comparaison',
@@ -165,17 +159,30 @@ export class NumerationService {
 
   // ─── Private helpers ───────────────────────────────────────────────────────
 
-  private async getActivePositions(): Promise<PositionKey[]> {
-    const raw =
-      (await this.settingsService.get('numeration_active_positions')) ??
-      '["u","d"]';
+  async getActivePositions(): Promise<PositionKey[]> {
+    const raw = await this.settingsService.get('numeration_active_positions');
     try {
-      const parsed = JSON.parse(raw) as PositionKey[];
-      const valid = parsed.filter((p) => POSITION_ORDER.includes(p));
-      return valid.length > 0 ? valid : ['u', 'd'];
+      const parsed = JSON.parse(raw ?? '[]') as unknown;
+      const valid = Array.isArray(parsed) ? parsed.filter(isPositionKey) : [];
+      return valid.length > 0 ? valid : DEFAULT_ACTIVE_POSITIONS;
     } catch {
-      return ['u', 'd'];
+      return DEFAULT_ACTIVE_POSITIONS;
     }
+  }
+
+  async setActivePositions(keys: string[]): Promise<PositionKey[]> {
+    const valid = keys.filter(isPositionKey);
+    await this.settingsService.set(
+      'numeration_active_positions',
+      JSON.stringify(valid),
+    );
+    return valid;
+  }
+
+  /** Le catalogue COMPLET des positions, des millièmes aux centaines de millions, avec la
+   * classe de chacune. L'administration doit voir les fermées — sinon rien à ouvrir. */
+  getPositions() {
+    return POSITIONS;
   }
 
   private async getActiveSteps(): Promise<number[]> {
@@ -192,17 +199,15 @@ export class NumerationService {
   }
 
   private maxFromPositions(positions: PositionKey[]): number {
-    const sorted = [...positions].sort(
-      (a, b) => POSITION_ORDER.indexOf(a) - POSITION_ORDER.indexOf(b),
-    );
-    return POSITION_VALUE[sorted[sorted.length - 1]] * 10 - 1;
+    return maximum(positions);
   }
 
+  /** Le plus petit nombre qui occupe réellement la position la plus haute : sans ça, une
+   * décomposition « en milliers » pourrait tomber sur 42, dont le chiffre des milliers
+   * vaut 0 et n'apprend rien. */
   private minForDecompose(positions: PositionKey[]): number {
-    const sorted = [...positions].sort(
-      (a, b) => POSITION_ORDER.indexOf(a) - POSITION_ORDER.indexOf(b),
-    );
-    return POSITION_VALUE[sorted[sorted.length - 1]];
+    const haute = trierPositions(positions).at(-1)!;
+    return pas(haute, exposantMin(positions));
   }
 
   private async updateProgression(
@@ -262,6 +267,11 @@ export class NumerationService {
     steps: number[],
   ): NumerationSessionQuestion | null {
     const max = this.maxFromPositions(positions);
+    const min = exposantMin(positions);
+    // Tout circule en entiers d'unité la plus petite ; `formater` n'insère la virgule
+    // qu'à l'affichage. Comparer des flottants ferait échouer 3,45 contre 3,5 sur un
+    // arrondi — et c'est précisément la notion que la question travaille.
+    const ecrire = (valeur: number) => formater(valeur, min);
 
     switch (type) {
       case 'comparaison': {
@@ -271,7 +281,7 @@ export class NumerationService {
         return {
           item_key: `comp_${left}_${right}`,
           type,
-          display: `${left}  □  ${right}`,
+          display: `${ecrire(left)}  □  ${ecrire(right)}`,
           answer,
           choices: ['<', '=', '>'],
           decompose_positions: null,
@@ -281,7 +291,17 @@ export class NumerationService {
 
       case 'suite': {
         if (steps.length === 0) return null;
-        const step = steps[Math.floor(Math.random() * steps.length)];
+        // Le pas est réglé en unités D'AFFICHAGE : « compter de 2 en 2 » veut dire 2, pas
+        // deux centièmes. Il faut donc le convertir dans l'unité de base avant de s'en
+        // servir — sans quoi, les centièmes ouverts, une suite « de 2 en 2 » compterait
+        // 0,02 par 0,02.
+        const facteur = 10 ** -min;
+        const utilisables = steps
+          .map((affiche) => affiche * facteur)
+          .filter((base) => Number.isInteger(base) && base > 0);
+        if (utilisables.length === 0) return null;
+        const step =
+          utilisables[Math.floor(Math.random() * utilisables.length)];
         const ascending = Math.random() < 0.5;
 
         if (ascending) {
@@ -295,8 +315,8 @@ export class NumerationService {
           return {
             item_key: `suite_asc_${start}_${step}`,
             type,
-            display: terms.join(', ') + ', ...',
-            answer: String(start + step * 3),
+            display: terms.map(ecrire).join(', ') + ', ...',
+            answer: ecrire(start + step * 3),
             choices: [],
             decompose_positions: null,
             suite_terms: terms,
@@ -314,8 +334,8 @@ export class NumerationService {
           return {
             item_key: `suite_desc_${start}_${step}`,
             type,
-            display: terms.join(', ') + ', ...',
-            answer: String(start - step * 3),
+            display: terms.map(ecrire).join(', ') + ', ...',
+            answer: ecrire(start - step * 3),
             choices: [],
             decompose_positions: null,
             suite_terms: terms,
@@ -329,14 +349,12 @@ export class NumerationService {
         const number = this.rand(min, max);
         // Ordre mélangé : évite que l'enfant recopie simplement les chiffres du nombre de gauche à droite
         const shuffled = this.shuffle(positions);
-        const digits = shuffled.map(
-          (p) => Math.floor(number / POSITION_VALUE[p]) % 10,
-        );
+        const digits = shuffled.map((p) => chiffreA(number, p, min));
         const answer = digits.join(':');
         return {
           item_key: `decomp_${number}`,
           type,
-          display: String(number),
+          display: ecrire(number),
           answer,
           choices: [],
           decompose_positions: shuffled,
@@ -350,11 +368,11 @@ export class NumerationService {
         const number = this.rand(min, max);
         const position =
           positions[Math.floor(Math.random() * positions.length)];
-        const digit = Math.floor(number / POSITION_VALUE[position]) % 10;
+        const digit = chiffreA(number, position, min);
         return {
           item_key: `valpos_${number}_${position}`,
           type,
-          display: `Dans ${number}, quel est le chiffre des ${POSITION_NAME[position]} ?`,
+          display: `Dans ${ecrire(number)}, quel est le chiffre des ${getPosition(position).nom} ?`,
           answer: String(digit),
           choices: [],
           decompose_positions: null,

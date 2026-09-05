@@ -11,6 +11,12 @@ import type {
 import { masteryScore, isMastered } from '../../common/mastery';
 import { normalizeDifficulty, qcmChoiceCount } from '../../common/difficulty';
 import { randomUUID } from 'node:crypto';
+import {
+  DEFAULT_ACTIVE_OPERATIONS,
+  OPERATIONS,
+  isOperationType,
+  type OperationType,
+} from './calcul.operations';
 
 export interface CalculQuestion {
   operation: string;
@@ -26,20 +32,6 @@ export interface CalculSessionResult {
   max_value: number;
   is_unlimited: boolean;
 }
-
-type OperationType =
-  | 'complement'
-  | 'addition'
-  | 'soustraction'
-  | 'double'
-  | 'moitie';
-const VALID_OPERATION_TYPES: OperationType[] = [
-  'complement',
-  'addition',
-  'soustraction',
-  'double',
-  'moitie',
-];
 
 @Injectable()
 export class CalculService {
@@ -71,15 +63,15 @@ export class CalculService {
       10,
     );
 
-    // Types d'opérations = choix de pré-jeu (body) ; fallback sur les 3 de base si rien de valide.
-    const requestedTypes = (dto.operation_types ?? []).filter(
-      (rawType): rawType is OperationType =>
-        VALID_OPERATION_TYPES.includes(rawType as OperationType),
-    );
+    // Le pré-jeu propose, l'administration dispose : un type coché mais non ouvert ne
+    // doit rien produire. Le pré-jeu ne montre déjà que les types actifs — ce filtre est
+    // la ceinture, au cas où une requête arriverait d'ailleurs.
+    const actifs = await this.getActiveOperationTypes();
+    const requestedTypes = (dto.operation_types ?? [])
+      .filter(isOperationType)
+      .filter((type) => actifs.includes(type));
     const operationTypes: OperationType[] =
-      requestedTypes.length > 0
-        ? requestedTypes
-        : ['complement', 'addition', 'soustraction'];
+      requestedTypes.length > 0 ? requestedTypes : actifs;
 
     const isUnlimited = questionsPerSession === 0;
     const count = isUnlimited ? 50 : questionsPerSession;
@@ -264,6 +256,40 @@ export class CalculService {
     return a;
   }
 
+  // ─── Types actifs ─────────────────────────────────────────────────────────
+
+  /** Le catalogue COMPLET, du CP au CM2, ouverts comme fermés : l'administration doit
+   * voir les fermés, sinon il n'y a rien à ouvrir. */
+  getOperations() {
+    return OPERATIONS;
+  }
+
+  async getActiveOperationTypes(): Promise<OperationType[]> {
+    const raw = await this.settingsService.get('calcul_types_actifs');
+    try {
+      const parsed = JSON.parse(raw ?? '[]') as unknown;
+      const valid = Array.isArray(parsed) ? parsed.filter(isOperationType) : [];
+      return valid.length > 0 ? valid : DEFAULT_ACTIVE_OPERATIONS;
+    } catch {
+      return DEFAULT_ACTIVE_OPERATIONS;
+    }
+  }
+
+  async setActiveOperationTypes(keys: string[]): Promise<OperationType[]> {
+    const valid = keys.filter(isOperationType);
+    await this.settingsService.set(
+      'calcul_types_actifs',
+      JSON.stringify(valid),
+    );
+    return valid;
+  }
+
+  /** Les types actifs, avec libellé et exemple. Servi au PRÉ-JEU. */
+  async getTypesOuverts() {
+    const actifs = await this.getActiveOperationTypes();
+    return OPERATIONS.filter((operation) => actifs.includes(operation.key));
+  }
+
   private generateForType(
     type: OperationType,
     minValue: number,
@@ -310,6 +336,59 @@ export class CalculService {
         if (maxEven < 2) return null;
         const even = this.rand(1, maxEven / 2) * 2;
         return { operation: `Moitié de ${even} = ?`, answer: even / 2 };
+      }
+
+      // ── Types bornés par les tables, pas par `calcul_max_value` ─────────────
+      // Voir `calcul.operations.ts` : la borne additive (20 par défaut) ne laisserait
+      // passer que 2×2 à 4×5, et la table de 7 ne sortirait jamais.
+
+      case 'multiplication': {
+        const a = this.rand(2, 10);
+        const b = this.rand(2, 10);
+        return { operation: `${a} × ${b} = ?`, answer: a * b };
+      }
+
+      case 'division': {
+        // On part du QUOTIENT et du diviseur, jamais du dividende : tirer 53 ÷ 7 puis
+        // arrondir donnerait une division inexacte, que le CM1 ne pose pas de tête.
+        const diviseur = this.rand(2, 10);
+        const quotient = this.rand(2, 10);
+        return {
+          operation: `${diviseur * quotient} ÷ ${diviseur} = ?`,
+          answer: quotient,
+        };
+      }
+
+      case 'multiplier_10': {
+        const facteur = [10, 100, 1000][this.rand(0, 2)];
+        const nombre = this.rand(2, 99);
+        return {
+          operation: `${nombre} × ${facteur} = ?`,
+          answer: nombre * facteur,
+        };
+      }
+
+      case 'diviser_10': {
+        // Le dividende est construit comme un multiple exact : « 4 500 ÷ 100 » et jamais
+        // « 4 523 ÷ 100 », qui donnerait un décimal.
+        const facteur = [10, 100, 1000][this.rand(0, 2)];
+        const quotient = this.rand(2, 99);
+        return {
+          operation: `${quotient * facteur} ÷ ${facteur} = ?`,
+          answer: quotient,
+        };
+      }
+
+      case 'complement_100': {
+        const cible = [100, 1000][this.rand(0, 1)];
+        // Des nombres ronds : un complément à 100 se calcule de tête sur des dizaines
+        // (65 → 35), pas sur 67,4.
+        const connu =
+          cible === 100 ? this.rand(1, 19) * 5 : this.rand(1, 19) * 50;
+        return {
+          operation: `${connu} pour aller à ${cible}`,
+          answer: cible - connu,
+        };
       }
     }
   }

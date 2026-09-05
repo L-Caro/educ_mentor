@@ -15,6 +15,12 @@ import {
   type NotionKey,
 } from './accords.notions';
 import {
+  DEFAULT_ACTIVE_FAMILLES,
+  FAMILLES,
+  isFamilleKey,
+  type FamilleKey,
+} from './accords.familles';
+import {
   QUESTION_TYPES,
   generateQuestions,
   isQuestionType,
@@ -35,6 +41,7 @@ export interface AccordsSessionResult {
 }
 
 const SETTING_ACTIVE_NOTIONS = 'accords_notions_actives';
+const SETTING_ACTIVE_FAMILLES = 'accords_familles_actives';
 
 @Injectable()
 export class AccordsService {
@@ -75,6 +82,7 @@ export class AccordsService {
       difficulty,
       notionsActives,
       this.rand,
+      await this.getActiveFamilleKeys(),
     );
 
     if (questions.length === 0) {
@@ -191,6 +199,34 @@ export class AccordsService {
     const valid = keys.filter(isNotionKey);
     await this.settingsService.set(
       SETTING_ACTIVE_NOTIONS,
+      JSON.stringify(valid),
+    );
+    return valid;
+  }
+
+  // ─── Admin — familles morphologiques ──────────────────────────────────────
+
+  /** Le catalogue COMPLET, du CE1 au CM2, ouvertes comme fermées. L'administration doit
+   * voir les fermées — sinon il n'y a rien à ouvrir. */
+  getFamilles() {
+    return FAMILLES;
+  }
+
+  async getActiveFamilleKeys(): Promise<FamilleKey[]> {
+    const raw = await this.settingsService.get(SETTING_ACTIVE_FAMILLES);
+    try {
+      const parsed = JSON.parse(raw ?? '[]') as unknown;
+      const valid = Array.isArray(parsed) ? parsed.filter(isFamilleKey) : [];
+      return valid.length > 0 ? valid : DEFAULT_ACTIVE_FAMILLES;
+    } catch {
+      return DEFAULT_ACTIVE_FAMILLES;
+    }
+  }
+
+  async setActiveFamilleKeys(keys: string[]): Promise<FamilleKey[]> {
+    const valid = keys.filter(isFamilleKey);
+    await this.settingsService.set(
+      SETTING_ACTIVE_FAMILLES,
       JSON.stringify(valid),
     );
     return valid;

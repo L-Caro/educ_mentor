@@ -1,6 +1,9 @@
 import Spinner from 'src/components/common/Spinner';
 import {
+  useGetAccordsActiveFamillesQuery,
   useGetAccordsActiveNotionsQuery,
+  useGetAccordsFamillesQuery,
+  useUpdateAccordsActiveFamillesMutation,
   useGetAccordsNotionsQuery,
   useGetAccordsProgressionParNotionQuery,
   useUpdateAccordsActiveNotionsMutation,
@@ -12,6 +15,81 @@ import '../accords.scss';
  * sont lues d'un coup d'œil, l'article n'y apporte rien et allonge chaque bouton. */
 function pastille(notion: NotionMeta): string {
   return notion.label.replace(/^(Le|La|L’|Les)\s*/, '');
+}
+
+// ─── Familles morphologiques ──────────────────────────────────────────────────
+
+const PORTE_TITRE = {
+  nom: 'Pluriel des noms',
+  adjectif: "Féminin et pluriel de l'adjectif",
+} as const;
+
+/** Les familles de mots ouvertes. Le corpus contient toutes celles du CE1 au CM2 — les
+ * pluriels en -aux, les féminins irréguliers, les adjectifs invariables. On les ouvre
+ * quand la classe les a vues, comme les figures de la géométrie.
+ *
+ * Un mot fermé n'apparaît nulle part : ni en question, ni en distracteur. */
+function FamillesActives() {
+  const { data: familles = [], isLoading: loadingFamilles } =
+    useGetAccordsFamillesQuery();
+  const { data: actives = [], isLoading: loadingActives } =
+    useGetAccordsActiveFamillesQuery();
+  const [updateActives, { isLoading: saving }] =
+    useUpdateAccordsActiveFamillesMutation();
+
+  if (loadingFamilles || loadingActives) return <Spinner size="sm" />;
+
+  function toggle(key: string) {
+    const next = actives.includes(key)
+      ? actives.filter((k) => k !== key)
+      : [...actives, key];
+    if (next.length === 0) return; // toujours au moins une famille jouable
+    updateActives(next);
+  }
+
+  return (
+    <>
+      <p className="GameSettings__hint">
+        Les familles de mots vont du CE1 au CM2. La classe indiquée dit quand les
+        ouvrir — rien n&rsquo;empêche d&rsquo;ouvrir plus tôt. Un adjectif comme
+        <em> gros</em> appartient à deux familles : il n&rsquo;apparaît que si les
+        deux sont ouvertes, sinon il enseignerait au passage celle qui est fermée.
+        {saving && <Spinner size="xs" />}
+      </p>
+
+      <div className="GameSettings__grid">
+        {(['nom', 'adjectif'] as const).map((porte) => {
+          const duGroupe = familles.filter((f) => f.porte === porte);
+          if (duGroupe.length === 0) return null;
+          return (
+            <div key={porte} className="AdminCard GameSettings__card">
+              <p className="GameSettings__cardTitle">{PORTE_TITRE[porte]}</p>
+              <div className="GameSettings__denominations">
+                {duGroupe.map((famille) => (
+                  <button
+                    key={famille.key}
+                    type="button"
+                    className={`GameSettings__denomination${
+                      actives.includes(famille.key)
+                        ? ' GameSettings__denomination--active'
+                        : ''
+                    }`}
+                    onClick={() => toggle(famille.key)}
+                    title={famille.exemple}
+                  >
+                    {famille.label}
+                    <span className="GameSettings__niveau">
+                      {famille.niveau.toUpperCase()}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
 }
 
 // ─── Notions à retravailler ───────────────────────────────────────────────────
@@ -123,6 +201,8 @@ export default function AccordsNotions() {
         et les trois accords suivants ne sont que la façon dont les autres mots
         recopient ces marques.
       </p>
+
+      <FamillesActives />
 
       <NotionsARetravailler notions={notions} />
     </div>

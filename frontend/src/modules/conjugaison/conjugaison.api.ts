@@ -4,6 +4,43 @@ import { baseApi } from 'src/store/api/baseApi.ts';
 
 export const conjugaisonApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    /** Les temps ACTIFS — pré-jeu. */
+    getConjugaisonTemps: builder.query<
+      { key: string; label: string; exemple: string; niveau: string }[],
+      void
+    >({
+      query: () => '/conjugaison/temps',
+      providesTags: ['ConjugaisonActiveTenses'],
+    }),
+
+    /** Le catalogue COMPLET, fermés compris — administration. */
+    getConjugaisonTempsCatalogue: builder.query<
+      {
+        key: string;
+        label: string;
+        exemple: string;
+        niveau: string;
+        defaultActive: boolean;
+      }[],
+      void
+    >({
+      query: () => '/conjugaison/temps-catalogue',
+    }),
+
+    getConjugaisonActiveTemps: builder.query<string[], void>({
+      query: () => '/conjugaison/temps-actifs',
+      providesTags: ['ConjugaisonActiveTenses'],
+    }),
+
+    updateConjugaisonActiveTemps: builder.mutation<string[], string[]>({
+      query: (keys) => ({
+        url: '/conjugaison/temps-actifs',
+        method: 'PATCH',
+        body: { keys },
+      }),
+      invalidatesTags: ['ConjugaisonActiveTenses'],
+    }),
+
     // ─── Jeu ────────────────────────────────────────────────────────────────
     startConjugaisonSession: builder.mutation<
       ConjugaisonSessionResponse,
@@ -68,4 +105,8 @@ export const conjugaisonApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetConjugaisonVerbsQuery } = conjugaisonApi;
+export const {
+  useGetConjugaisonTempsQuery,
+  useGetConjugaisonTempsCatalogueQuery,
+  useGetConjugaisonActiveTempsQuery,
+  useUpdateConjugaisonActiveTempsMutation, useGetConjugaisonVerbsQuery } = conjugaisonApi;

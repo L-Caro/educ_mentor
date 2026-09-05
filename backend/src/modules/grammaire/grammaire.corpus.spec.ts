@@ -1,4 +1,10 @@
-import { CORPUS, texteDe, type PhraseAnnotee } from './grammaire.corpus';
+import {
+  CORPUS,
+  DEFAULT_ACTIVE_CLASSES,
+  texteDe,
+  type PhraseAnnotee,
+} from './grammaire.corpus';
+import { NIVEAUX } from '../../common/niveau';
 import { NATURES } from './grammaire.notions';
 
 /**
@@ -59,7 +65,7 @@ describe('corpus de grammaire', () => {
     const parNiveau = Object.fromEntries(
       (['simple', 'moyen', 'complexe'] as const).map((niveau) => [
         niveau,
-        CORPUS.filter((phrase) => phrase.niveau === niveau).length >= 10,
+        CORPUS.filter((phrase) => phrase.difficulte === niveau).length >= 10,
       ]),
     );
     expect(parNiveau).toEqual({ simple: true, moyen: true, complexe: true });
@@ -169,5 +175,48 @@ describe('corpus de grammaire', () => {
       (phrase) => nombreDeGroupes(phrase, 'complement') === 1,
     );
     expect(utilisables.length).toBeGreaterThanOrEqual(10);
+  });
+});
+
+// ─── Les classes ────────────────────────────────────────────────────────────
+
+describe('classes de phrases', () => {
+  it('porte des phrases jusqu’au CM2', () => {
+    const parClasse = Object.fromEntries(
+      NIVEAUX.map((n) => [n, CORPUS.filter((p) => p.niveau === n).length]),
+    );
+    // CP et CE1 forment le socle ; les grandes classes existent mais restent modestes,
+    // elles se remplissent avec le skill `generateur-contenu`.
+    expect(parClasse.ce1).toBeGreaterThanOrEqual(50);
+    expect(parClasse.ce2).toBeGreaterThan(0);
+    expect(parClasse.cm1).toBeGreaterThan(0);
+    expect(parClasse.cm2).toBeGreaterThan(0);
+  });
+
+  it('n’ouvre que le socle à l’installation', () => {
+    expect(DEFAULT_ACTIVE_CLASSES).toEqual(['cp', 'ce1']);
+  });
+
+  it('réserve le complément d’objet et l’attribut aux grandes classes', () => {
+    // Ces deux fonctions ne s'apprennent pas au CE1 : aucune phrase du socle ne doit en
+    // porter, sinon un enfant de CE1 croiserait la notion sans qu'elle ait été ouverte.
+    const fautives = CORPUS.filter(
+      (phrase) =>
+        DEFAULT_ACTIVE_CLASSES.includes(phrase.niveau) &&
+        phrase.mots.some((mot) => mot.fonction === 'attribut'),
+    ).map((phrase) => phrase.key);
+    expect(fautives).toEqual([]);
+  });
+
+  it('n’a aucun verbe attributif hors des phrases d’attribut', () => {
+    // « être » suivi d'un adjectif sans annotation d'attribut laisserait l'adjectif
+    // flotter sans fonction, et la question « touche l'attribut » serait sans réponse.
+    const fautives = CORPUS.filter((phrase) => {
+      const attributs = phrase.mots.filter((m) => m.fonction === 'attribut');
+      if (attributs.length === 0) return false;
+      // Un attribut suppose un verbe d'état, et il s'accorde donc jamais dans un gn.
+      return attributs.some((mot) => mot.gn !== null);
+    }).map((phrase) => phrase.key);
+    expect(fautives).toEqual([]);
   });
 });

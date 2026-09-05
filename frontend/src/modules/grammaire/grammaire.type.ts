@@ -14,7 +14,9 @@ export type NotionKey =
   | 'invariable'
   | 'groupe_nominal'
   | 'sujet'
-  | 'complement';
+  | 'complement'
+  | 'complement_objet'
+  | 'attribut';
 
 export interface NotionMeta {
   key: NotionKey;

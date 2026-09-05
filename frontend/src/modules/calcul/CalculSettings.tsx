@@ -1,5 +1,70 @@
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
+import {
+  useGetCalculActiveTypesQuery,
+  useGetCalculOperationsQuery,
+  useUpdateCalculActiveTypesMutation,
+} from './calcul.api.ts';
+
+/** Les types de calcul ouverts. Le catalogue va du CP au CM2 ; seul l'additif est actif à
+ * l'installation, le multiplicatif attend d'avoir été vu en classe.
+ *
+ * La plage de nombres ci-dessous ne borne QUE l'additif : une multiplication bornée à 20
+ * ne sortirait jamais la table de 7. Les types multiplicatifs portent leurs propres
+ * bornes, tirées des tables. */
+function TypesActifs() {
+  const { data: operations = [], isLoading: loadingOps } =
+    useGetCalculOperationsQuery();
+  const { data: actifs = [], isLoading: loadingActifs } =
+    useGetCalculActiveTypesQuery();
+  const [updateActifs, { isLoading: saving }] =
+    useUpdateCalculActiveTypesMutation();
+
+  if (loadingOps || loadingActifs) return <Spinner size="sm" />;
+
+  function toggle(key: string) {
+    const next = actifs.includes(key)
+      ? actifs.filter((k) => k !== key)
+      : [...actifs, key];
+    if (next.length === 0) return; // toujours au moins un type jouable
+    updateActifs(next);
+  }
+
+  return (
+    <div className="AdminCard GameSettings__card">
+      <div className="GameSettings__header">
+        <p className="GameSettings__cardTitle">Types de calcul</p>
+        {saving && <Spinner size="xs" />}
+      </div>
+      <p className="GameSettings__hint">
+        Du CP au CM2. La classe indiquée dit quand ouvrir — rien n&rsquo;empêche
+        d&rsquo;ouvrir plus tôt. La plage de nombres ci-dessous ne borne que
+        l&rsquo;additif : les multiplications et divisions tirent leurs bornes des
+        tables.
+      </p>
+      <div className="GameSettings__denominations">
+        {operations.map((operation) => (
+          <button
+            key={operation.key}
+            type="button"
+            className={`GameSettings__denomination${
+              actifs.includes(operation.key)
+                ? ' GameSettings__denomination--active'
+                : ''
+            }`}
+            onClick={() => toggle(operation.key)}
+            title={operation.exemple}
+          >
+            {operation.label}
+            <span className="GameSettings__niveau">
+              {operation.niveau.toUpperCase()}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 export default function CalculSettings() {
   const { data: settings = {}, isLoading: loading } = useGetSettingsQuery();
@@ -22,6 +87,8 @@ export default function CalculSettings() {
 
   return (
     <div className="GameSettings">
+      <TypesActifs />
+
       <div className="GameSettings__header">
         <p className="GameSettings__hint">Ces paramètres s'appliquent à la session de jeu.</p>
         {saving && <Spinner size="xs" />}

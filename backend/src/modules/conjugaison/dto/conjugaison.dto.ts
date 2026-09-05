@@ -46,3 +46,9 @@ export class CompleteConjugaisonSessionDto {
   @IsInt()
   total_questions: number;
 }
+
+export class UpdateActiveTensesDto {
+  @IsArray()
+  @IsString({ each: true })
+  keys: string[];
+}

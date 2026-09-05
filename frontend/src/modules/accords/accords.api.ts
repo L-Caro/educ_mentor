@@ -64,6 +64,35 @@ export const accordsApi = baseApi.injectEndpoints({
       invalidatesTags: [{ type: 'Progression', id: 'accords' }],
     }),
 
+    // ─── Admin — familles morphologiques ─────────────────────────────────────
+    getAccordsFamilles: builder.query<
+      {
+        key: string;
+        label: string;
+        exemple: string;
+        porte: 'nom' | 'adjectif';
+        niveau: string;
+        defaultActive: boolean;
+      }[],
+      void
+    >({
+      query: () => '/accords/familles',
+    }),
+
+    getAccordsActiveFamilles: builder.query<string[], void>({
+      query: () => '/accords/familles-actives',
+      providesTags: ['AccordsActiveFamilles'],
+    }),
+
+    updateAccordsActiveFamilles: builder.mutation<string[], string[]>({
+      query: (keys) => ({
+        url: '/accords/familles-actives',
+        method: 'PATCH',
+        body: { keys },
+      }),
+      invalidatesTags: ['AccordsActiveFamilles'],
+    }),
+
     // ─── Admin — notions actives ──────────────────────────────────────────────
     getAccordsNotions: builder.query<NotionMeta[], void>({
       query: () => '/accords/notions',
@@ -86,6 +115,9 @@ export const accordsApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useGetAccordsFamillesQuery,
+  useGetAccordsActiveFamillesQuery,
+  useUpdateAccordsActiveFamillesMutation,
   useStartAccordsSessionMutation,
   useRecordAccordsAnswerMutation,
   useCompleteAccordsSessionMutation,

@@ -13,11 +13,13 @@
  */
 
 import type { Difficulty } from '../../common/difficulty';
+import { type Niveau } from '../../common/niveau';
 import {
   CORPUS,
-  NIVEAUX,
+  DEFAULT_ACTIVE_CLASSES,
+  DIFFICULTES,
+  type Difficulte,
   type MotAnnote,
-  type Niveau,
   type PhraseAnnotee,
 } from './grammaire.corpus';
 import {
@@ -84,14 +86,14 @@ export type Rand = (min: number, max: number) => number;
  * `hard` vaut 0, c'est-à-dire saisie libre, et faire taper « déterminant » évalue
  * l'orthographe d'un mot de douze lettres, pas la grammaire. En grammaire, `hard` veut
  * dire une phrase plus dure et tous les choix ouverts. */
-export function niveauxPour(difficulty: Difficulty): Niveau[] {
+export function difficultesPour(difficulty: Difficulty): Difficulte[] {
   switch (difficulty) {
     case 'easy':
       return ['simple'];
     case 'medium':
       return ['simple', 'moyen'];
     case 'hard':
-      return NIVEAUX;
+      return DIFFICULTES;
   }
 }
 
@@ -362,9 +364,8 @@ export function generateQuestion(
   rand: Rand,
 ): GrammaireQuestion | null {
   const naturesActives = notionsActives.filter(isNature);
-  const fonctionsActives = notionsActives.filter(
-    (notion): notion is Fonction =>
-      notion === 'sujet' || notion === 'complement',
+  const fonctionsActives = notionsActives.filter((notion): notion is Fonction =>
+    ['sujet', 'complement', 'complement_objet', 'attribut'].includes(notion),
   );
 
   switch (type) {
@@ -388,9 +389,17 @@ export function generateQuestions(
   notionsActives: NotionKey[],
   rand: Rand,
   corpus: PhraseAnnotee[] = CORPUS,
+  classesActives: Niveau[] = DEFAULT_ACTIVE_CLASSES,
 ): GrammaireQuestion[] {
-  const niveaux = niveauxPour(difficulty);
-  const phrases = corpus.filter((phrase) => niveaux.includes(phrase.niveau));
+  const difficultes = difficultesPour(difficulty);
+  // Deux filtres, deux axes : la CLASSE dit si la phrase est abordable — « Chaque matin,
+  // le boulanger prépare de bons pains dans son fournil » n'est pas pour un CE1, quelle
+  // que soit la question posée — et la DIFFICULTÉ dit sa complexité syntaxique.
+  const phrases = corpus.filter(
+    (phrase) =>
+      classesActives.includes(phrase.niveau) &&
+      difficultes.includes(phrase.difficulte),
+  );
   const nbChoix = nombreDeChoix(difficulty);
 
   const questions: GrammaireQuestion[] = [];

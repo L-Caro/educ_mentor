@@ -15,6 +15,13 @@ import {
   type NotionKey,
 } from './grammaire.notions';
 import {
+  NIVEAUX,
+  NIVEAU_LABEL,
+  isNiveau,
+  type Niveau,
+} from '../../common/niveau';
+import { CORPUS, DEFAULT_ACTIVE_CLASSES } from './grammaire.corpus';
+import {
   QUESTION_TYPES,
   generateQuestions,
   isQuestionType,
@@ -36,6 +43,7 @@ export interface GrammaireSessionResult {
 }
 
 const SETTING_ACTIVE_NOTIONS = 'grammaire_notions_actives';
+const SETTING_ACTIVE_CLASSES = 'grammaire_classes_actives';
 
 @Injectable()
 export class GrammaireService {
@@ -76,6 +84,8 @@ export class GrammaireService {
       difficulty,
       notionsActives,
       this.rand,
+      undefined,
+      await this.getActiveClassKeys(),
     );
 
     if (questions.length === 0) {
@@ -193,6 +203,39 @@ export class GrammaireService {
     const valid = keys.filter(isNotionKey);
     await this.settingsService.set(
       SETTING_ACTIVE_NOTIONS,
+      JSON.stringify(valid),
+    );
+    return valid;
+  }
+
+  // ─── Admin — classes de phrases ───────────────────────────────────────────
+
+  /** Les cinq classes, avec le nombre de phrases que le corpus porte pour chacune.
+   * Ouvrir une classe vide donnerait un exercice muet : le compte le dit d'avance. */
+  getClasses() {
+    return NIVEAUX.map((niveau) => ({
+      key: niveau,
+      label: NIVEAU_LABEL[niveau],
+      phrases: CORPUS.filter((phrase) => phrase.niveau === niveau).length,
+      defaultActive: DEFAULT_ACTIVE_CLASSES.includes(niveau),
+    }));
+  }
+
+  async getActiveClassKeys(): Promise<Niveau[]> {
+    const raw = await this.settingsService.get(SETTING_ACTIVE_CLASSES);
+    try {
+      const parsed = JSON.parse(raw ?? '[]') as unknown;
+      const valid = Array.isArray(parsed) ? parsed.filter(isNiveau) : [];
+      return valid.length > 0 ? valid : DEFAULT_ACTIVE_CLASSES;
+    } catch {
+      return DEFAULT_ACTIVE_CLASSES;
+    }
+  }
+
+  async setActiveClassKeys(keys: string[]): Promise<Niveau[]> {
+    const valid = keys.filter(isNiveau);
+    await this.settingsService.set(
+      SETTING_ACTIVE_CLASSES,
       JSON.stringify(valid),
     );
     return valid;

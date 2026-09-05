@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   colonnesBarrees,
   colonnesFausses,
+  colonnesPartielFausses,
   decode,
   encode,
   estComplete,
   estCorrecte,
+  lignesPartielles,
+  partielAttendu,
   resultatAttendu,
   saisieInitiale,
   saisieVide,
@@ -29,6 +32,7 @@ const q = (over: Partial<PoseQuestion> = {}): PoseQuestion => ({
   columns: 5,
   has_carry: true,
   method: 'compensation',
+  partiels: [],
   retenues: {
     haut: [17, null, null, null, null],
     bas: [null, 4, null, null, null],
@@ -41,6 +45,7 @@ const saisie = (resultat: string[], reste: Partial<PoseSaisie> = {}): PoseSaisie
   haut: ['', '', '', '', ''],
   bas: ['', '', '', '', ''],
   resultat,
+  partiels: [],
   ...reste,
 });
 
@@ -205,5 +210,95 @@ describe('colonnesBarrees', () => {
     // `computeRetenues` travaille sur une colonne de plus que la grille : une marque
     // qui tomberait hors grille ne doit pas produire un index sans chiffre à barrer.
     expect(colonnesBarrees(cassage({ columns: 2 }))).toEqual([0, 1]);
+  });
+});
+
+// ─── Multiplication posée ───────────────────────────────────────────────────
+
+describe('produits partiels', () => {
+  /** 247 × 36 = 8892, avec deux produits partiels : 1482 et 741 décalé d'un rang. */
+  const mult = (): PoseQuestion => ({
+    skill_key: 'multiplication_3_retenue',
+    operation: 'multiplication',
+    operands: [247, 36],
+    answer: 8892,
+    answer_length: 4,
+    columns: 5,
+    has_carry: true,
+    retenues: {
+      haut: [null, null, null, null, null],
+      bas: [null, null, null, null, null],
+    },
+    carry_display: 'hidden',
+    method: 'compensation',
+    partiels: [
+      { valeur: 1482, decalage: 0 },
+      { valeur: 741, decalage: 1 },
+    ],
+  });
+
+  const saisieMult = (
+    partiels: string[][],
+    resultat: string[],
+  ): PoseSaisie => ({
+    haut: ['', '', '', '', ''],
+    bas: ['', '', '', '', ''],
+    resultat,
+    partiels,
+  });
+
+  // 1482 → colonnes 0..3 = 2,8,4,1 · 741 décalé → colonnes 1..3 = 1,4,7
+  const P0 = ['2', '8', '4', '1', ''];
+  const P1 = ['', '1', '4', '7', ''];
+  const R = ['2', '9', '8', '8', ''];
+
+  it('place chaque produit à son décalage', () => {
+    expect(partielAttendu(mult(), { valeur: 1482, decalage: 0 })).toEqual(P0);
+    expect(partielAttendu(mult(), { valeur: 741, decalage: 1 })).toEqual(P1);
+  });
+
+  it('demande les lignes intermédiaires dès qu’il y en a plusieurs', () => {
+    expect(lignesPartielles(mult())).toHaveLength(2);
+  });
+
+  it('n’en demande aucune pour un multiplicateur à un chiffre', () => {
+    // Son unique produit EST le résultat : faire écrire deux fois la même ligne
+    // n'apprend rien.
+    const simple: PoseQuestion = {
+      ...mult(),
+      operands: [47, 6],
+      answer: 282,
+      partiels: [{ valeur: 282, decalage: 0 }],
+    };
+    expect(lignesPartielles(simple)).toEqual([]);
+  });
+
+  it('accepte une grille entièrement juste', () => {
+    expect(estCorrecte(mult(), saisieMult([P0, P1], R))).toBe(true);
+  });
+
+  it('refuse un résultat juste obtenu avec un produit faux', () => {
+    // C'est un résultat deviné : la multiplication posée s'apprend par ces lignes-là,
+    // contrairement aux retenues, qui restent un support.
+    const faux = ['2', '8', '4', '2', ''];
+    expect(estCorrecte(mult(), saisieMult([faux, P1], R))).toBe(false);
+  });
+
+  it('refuse un produit juste mais mal décalé', () => {
+    // Le décalage EST la difficulté de l'opération.
+    const malDecale = ['1', '4', '7', '', ''];
+    expect(estCorrecte(mult(), saisieMult([P0, malDecale], R))).toBe(false);
+  });
+
+  it('signale les colonnes fautives du bon produit', () => {
+    const faux = ['2', '8', '9', '1', ''];
+    expect(colonnesPartielFausses(mult(), saisieMult([faux, P1], R), 0)).toEqual([2]);
+    expect(colonnesPartielFausses(mult(), saisieMult([faux, P1], R), 1)).toEqual([]);
+  });
+
+  it('n’est pas complète tant qu’un produit manque', () => {
+    // Sans ça l'enfant sauterait au résultat, et le décalage ne serait jamais travaillé.
+    expect(estComplete(mult(), saisieMult([P0, ['', '', '', '', '']], R))).toBe(false);
+    expect(estComplete(mult(), saisieMult([P0, P1], R))).toBe(true);
   });
 });

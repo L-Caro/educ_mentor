@@ -8,7 +8,10 @@ import {
 } from '@nestjs/common';
 import { AccordsService } from './accords.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { UpdateActiveNotionsDto } from './dto/accords.dto';
+import {
+  UpdateActiveFamillesDto,
+  UpdateActiveNotionsDto,
+} from './dto/accords.dto';
 
 @Controller('accords')
 @UseGuards(JwtAuthGuard)
@@ -30,6 +33,23 @@ export class AccordsAdminController {
   @Patch('notions-actives')
   setActiveNotions(@Body() dto: UpdateActiveNotionsDto) {
     return this.accordsService.setActiveNotionKeys(dto.keys);
+  }
+
+  // ─── Familles morphologiques ──────────────────────────────────────────────
+
+  @Get('familles')
+  getFamilles() {
+    return this.accordsService.getFamilles();
+  }
+
+  @Get('familles-actives')
+  getActiveFamilles() {
+    return this.accordsService.getActiveFamilleKeys();
+  }
+
+  @Patch('familles-actives')
+  setActiveFamilles(@Body() dto: UpdateActiveFamillesDto) {
+    return this.accordsService.setActiveFamilleKeys(dto.keys);
   }
 
   // ─── Progression ──────────────────────────────────────────────────────────

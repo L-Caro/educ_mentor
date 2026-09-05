@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { PoseService } from './pose.service';
 import {
   CompletePoseSessionDto,
@@ -9,6 +9,14 @@ import {
 @Controller('pose')
 export class PoseGameController {
   constructor(private readonly poseService: PoseService) {}
+
+  /** Les opérations ACTIVES, pour le pré-jeu. Les coder en dur côté front laisserait
+   * cocher une opération fermée : la case serait filtrée par le service, et la partie
+   * servirait autre chose que ce qui a été demandé. */
+  @Get('operations')
+  getOperationsOuvertes() {
+    return this.poseService.getOperationsOuvertes();
+  }
 
   @Post('session')
   startSession(@Body() dto: StartPoseSessionDto) {

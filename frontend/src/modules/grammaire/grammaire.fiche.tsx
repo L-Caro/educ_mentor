@@ -127,6 +127,28 @@ const LECONS: Record<NotionKey, Lecon> = {
     piege:
       "Le sujet n'est pas toujours devant le verbe. Dans « Sous la table dort le chat », c'est le chat qui dort.",
   },
+  complement_objet: {
+    titre: "Le complément d'objet",
+    idee: "Le complément d'objet dit sur QUOI porte l'action : on mange quelque chose, on regarde quelqu'un. Il se trouve en posant la question « qui ? » ou « quoi ? » juste après le verbe — et c'est ce test, pas la place dans la phrase, qui le désigne.",
+    regle: [
+      'Je trouve le verbe.',
+      'Je demande : le sujet + le verbe + quoi ? ou qui ?',
+      "La réponse est le complément d'objet.",
+    ],
+    piege:
+      "On ne peut pas l'enlever sans que la phrase boite : « Léa mange » se dit encore, mais « Léa offre » attend qu'on dise quoi. C'est ce qui le distingue du complément de lieu ou de temps, qui s'enlève sans gêne.",
+  },
+  attribut: {
+    titre: 'L’attribut du sujet',
+    idee: "L'attribut du sujet dit ce que le sujet EST, et non ce qu'il fait. Il arrive après un verbe d'état — être, sembler, devenir, paraître, rester — et il s'accorde avec le sujet, ce qu'aucun complément d'objet ne fait jamais.",
+    regle: [
+      "Je cherche un verbe d'état : être, sembler, devenir, rester.",
+      'Ce qui suit dit comment est le sujet.',
+      "Je change le sujet : l'attribut change aussi.",
+    ],
+    piege:
+      "C'est l'accord qui tranche, pas le sens. « Les fleurs semblent fanées » s'accorde, donc fanées est attribut ; « les fleurs sentent bon » ne s'accorde pas, bon n'est pas attribut.",
+  },
   complement: {
     titre: 'Le complément',
     idee: "Le complément donne une information de plus sur le verbe : où, quand, comment. La différence avec le sujet tient en un test : on peut souvent l'enlever, et la phrase reste correcte.",

@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { CalculService } from './calcul.service';
 import {
   RecordCalculAnswerDto,
@@ -9,6 +9,14 @@ import {
 @Controller('calcul')
 export class CalculGameController {
   constructor(private readonly calculService: CalculService) {}
+
+  /** Les types de calcul ACTIFS, pour le pré-jeu. Les coder en dur côté front laisserait
+   * un CE1 cocher « division » : la case serait ensuite filtrée par le service, et la
+   * partie servirait autre chose que ce qui a été demandé. */
+  @Get('types')
+  getTypesOuverts() {
+    return this.calculService.getTypesOuverts();
+  }
 
   @Post('session')
   startSession(@Body() dto: StartCalculSessionDto) {

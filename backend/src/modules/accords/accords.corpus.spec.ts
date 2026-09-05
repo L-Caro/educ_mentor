@@ -1,4 +1,9 @@
 import {
+  FAMILLES,
+  familleDuNom,
+  famillesDeLAdjectif,
+} from './accords.familles';
+import {
   ADJECTIFS,
   NOMS,
   VERBES,
@@ -42,26 +47,46 @@ describe('noms', () => {
     expect(invariables.length).toBeGreaterThanOrEqual(3);
   });
 
-  it("n'a que des pluriels que la fiche explique : +s, +x, ou invariable", () => {
-    // La fiche énumère : « en général un s », « les noms en -eau, -au, -eu prennent un x »,
-    // « les noms en -s, -x, -z ne changent pas ». Elle ne dit RIEN de -al → -aux ni de
-    // -ou → -oux, donc cheval et genou n'ont pas leur place ici.
-    const horsPerimetre = NOMS.filter(
-      (nom) =>
-        nom.pluriel !== `${nom.singulier}s` &&
-        nom.pluriel !== `${nom.singulier}x` &&
-        nom.pluriel !== nom.singulier,
-    ).map((nom) => nom.key);
-    expect(horsPerimetre).toEqual([]);
+  it('range chaque nom dans une famille de pluriel déclarée', () => {
+    // Le corpus va jusqu'au CM2 : il contient les pluriels en -aux et en -oux. Ce qui
+    // doit rester vrai n'est plus « rien hors du CE1 », c'est « rien hors des familles
+    // déclarées » — un pluriel fantaisiste tomberait dans `pluriel_s` par défaut et
+    // deviendrait jouable sans avoir jamais été décidé.
+    const mauvais = NOMS.filter((nom) => {
+      switch (familleDuNom(nom)) {
+        case 'pluriel_invariable':
+          return nom.pluriel !== nom.singulier;
+        case 'pluriel_aux':
+          return !(nom.singulier.endsWith('al') && nom.pluriel.endsWith('aux'));
+        case 'pluriel_oux':
+          return !(nom.singulier.endsWith('ou') && nom.pluriel.endsWith('oux'));
+        case 'pluriel_x':
+          return nom.pluriel !== `${nom.singulier}x`;
+        default:
+          return nom.pluriel !== `${nom.singulier}s`;
+      }
+    }).map((nom) => nom.key);
+    expect(mauvais).toEqual([]);
   });
 
   it('ne met le x du pluriel que sur les noms en -eau, -au ou -eu', () => {
+    // Les noms en -ou qui prennent un x ont leur propre famille : ce test ne parle que
+    // de `pluriel_x`.
     const mauvais = NOMS.filter(
       (nom) =>
-        nom.pluriel === `${nom.singulier}x` &&
+        familleDuNom(nom) === 'pluriel_x' &&
         !/(eau|au|eu)$/.test(nom.singulier),
     ).map((nom) => nom.key);
     expect(mauvais).toEqual([]);
+  });
+
+  it('couvre chaque famille de pluriel par au moins un nom', () => {
+    // Une famille ouverte en administration mais vide dans le corpus donnerait un
+    // exercice qui ne produit rien, sans rien dire.
+    const vides = FAMILLES.filter((f) => f.porte === 'nom')
+      .filter((f) => !NOMS.some((nom) => familleDuNom(nom) === f.key))
+      .map((f) => f.key);
+    expect(vides).toEqual([]);
   });
 
   it('ne rend invariables que les noms en -s, -x ou -z', () => {
@@ -117,20 +142,44 @@ describe('adjectifs', () => {
     expect(doublons(ADJECTIFS.map((adj) => adj.key))).toEqual([]);
   });
 
-  it("n'a que des féminins que la fiche explique : +e, ou déjà en e", () => {
-    // « Au féminin, en général on ajoute un e » + « certains ne changent pas : rouge,
-    // jaune, calme ». Donc pas de beau/belle, blanc/blanche, long/longue.
-    const horsPerimetre = ADJECTIFS.filter(
-      (adj) => adj.fs !== `${adj.ms}e` && adj.fs !== adj.ms,
-    ).map((adj) => adj.key);
-    expect(horsPerimetre).toEqual([]);
+  it('range chaque adjectif dans une famille de féminin déclarée', () => {
+    const mauvais = ADJECTIFS.filter((adj) => {
+      const familles = famillesDeLAdjectif(adj);
+      if (familles.includes('feminin_identique')) return adj.fs !== adj.ms;
+      if (familles.includes('feminin_e')) return adj.fs !== `${adj.ms}e`;
+      if (familles.includes('feminin_double'))
+        return adj.fs !== `${adj.ms}${adj.ms.slice(-1)}e`;
+      // Irrégulier : rien à vérifier par règle, c'est justement sa définition. On exige
+      // seulement qu'il diffère du masculin — sinon il serait « identique ».
+      return adj.fs === adj.ms;
+    }).map((adj) => adj.key);
+    expect(mauvais).toEqual([]);
   });
 
-  it('forme tous ses pluriels en +s — aucune exception non expliquée', () => {
-    const horsPerimetre = ADJECTIFS.filter(
-      (adj) => adj.mp !== `${adj.ms}s` || adj.fp !== `${adj.fs}s`,
+  it('forme toujours le féminin pluriel en +s sur le féminin singulier', () => {
+    // Aucune exception en français : « belle → belles », « grosse → grosses ». Le
+    // masculin pluriel, lui, peut être invariable — c'est sa propre famille.
+    const mauvais = ADJECTIFS.filter((adj) => adj.fp !== `${adj.fs}s`).map(
+      (adj) => adj.key,
+    );
+    expect(mauvais).toEqual([]);
+  });
+
+  it('ne rend le masculin pluriel invariable que sur un -s ou un -x final', () => {
+    const mauvais = ADJECTIFS.filter(
+      (adj) => adj.mp === adj.ms && !/[sx]$/.test(adj.ms),
     ).map((adj) => adj.key);
-    expect(horsPerimetre).toEqual([]);
+    expect(mauvais).toEqual([]);
+  });
+
+  it('couvre chaque famille d’adjectif par au moins un mot', () => {
+    const vides = FAMILLES.filter((f) => f.porte === 'adjectif')
+      .filter(
+        (f) =>
+          !ADJECTIFS.some((adj) => famillesDeLAdjectif(adj).includes(f.key)),
+      )
+      .map((f) => f.key);
+    expect(vides).toEqual([]);
   });
 
   it('ne garde un féminin identique que si le masculin finit déjà par e', () => {
