@@ -1,0 +1,164 @@
+import type { PositionTourelle } from './tourelle';
+
+/**
+ * La geometrie du plateau : des coordonnees en demi-unites vers des pixels.
+ *
+ * ── Pourquoi une projection OBLIQUE, et pas de la 3D ─────────────────────────────────
+ *
+ * Une premiere version posait une vraie scene 3D CSS (`perspective` + `rotateX(55deg)`,
+ * un cube par tuile). Deux choses la condamnaient. La rotation ECRASE les faces
+ * verticalement, donc les symboles, alors que c'est la seule chose que l'enfant doit
+ * lire. Et le tri en profondeur revenait au navigateur, sur 144 elements quasi
+ * coplanaires : c'est precisement le cas ou il n'est pas fiable.
+ *
+ * Un Mahjong Solitaire ne se dessine pas en perspective. C'est une projection oblique en
+ * deux dimensions : aucune rotation, les faces restent des rectangles droits, et la
+ * profondeur n'est qu'un DECALAGE constant. Les constantes ci-dessous sont celles du
+ * projet d'ou viennent les dispositions (`ui/src/geometry.ts`, voir ATTRIBUTIONS.md) :
+ * ce sont ses layouts, donc sa geometrie.
+ *
+ * ── La regle qui decide de tout ──────────────────────────────────────────────────────
+ *
+ * `EPAISSEUR` vaut `DECALAGE_ETAGE`, et ce n'est pas une coincidence a simplifier : le
+ * cote d'une tuile doit combler exactement l'espace qui la separe de l'etage du dessous.
+ * S'ils different, une pile cesse de ressembler a une colonne : soit les etages flottent,
+ * soit ils s'enfoncent les uns dans les autres.
+ */
+
+/** Pixels par demi-unite. L'empreinte d'une tuile fait 2x2 demi-unites. */
+export const DEMI_UNITE_X = 32;
+export const DEMI_UNITE_Y = 42;
+export const LARGEUR_TUILE = 2 * DEMI_UNITE_X;
+export const HAUTEUR_TUILE = 2 * DEMI_UNITE_Y;
+
+/** De combien un etage se decale : vers le HAUT et vers la GAUCHE. */
+export const DECALAGE_ETAGE = 11;
+
+/** Epaisseur du cote visible. Voir ci-dessus : la meme valeur, obligatoirement. */
+export const EPAISSEUR = DECALAGE_ETAGE;
+
+export interface Rectangle {
+  x: number;
+  y: number;
+  largeur: number;
+  hauteur: number;
+}
+
+/** Le rectangle de la face superieure, celle qu'on voit et qu'on touche. */
+export function rectangleFace(position: PositionTourelle): Rectangle {
+  return {
+    x: position.x * DEMI_UNITE_X - position.z * DECALAGE_ETAGE,
+    y: position.y * DEMI_UNITE_Y - position.z * DECALAGE_ETAGE,
+    largeur: LARGEUR_TUILE,
+    hauteur: HAUTEUR_TUILE,
+  };
+}
+
+/**
+ * L'ordre du peintre : du plus loin au plus proche.
+ *
+ * L'etage d'abord, puis les rangees de l'arriere vers l'avant, puis la gauche vers la
+ * droite. Ce dernier terme n'est pas decoratif : les etages se decalent vers la gauche,
+ * donc la camera est a DROITE, et dans une rangee la tuile la plus a droite est la plus
+ * proche. Inverser ce signe fait que le cote de chaque tuile vient manger le bord de sa
+ * voisine, alors qu'il est physiquement cache par elle.
+ *
+ * Un `z-index` plutot qu'un tri du tableau : l'ordre du DOM reste celui des tuiles, donc
+ * stable pour React et pour la navigation au clavier, pendant que la superposition suit
+ * la geometrie. Les coordonnees tiennent largement dans les paliers choisis (les
+ * dispositions livrees vont jusqu'a 18 demi-unites en x et 20 en y).
+ */
+export function planDeSuperposition(position: PositionTourelle): number {
+  return position.z * 10000 + position.y * 100 + position.x;
+}
+
+/** La boite du plateau entier, cotes compris : sans `EPAISSEUR`, le relief du bord droit
+ * et du bord bas serait rogne. */
+export function boiteDuPlateau(positions: PositionTourelle[]): Rectangle {
+  if (positions.length === 0) return { x: 0, y: 0, largeur: 0, hauteur: 0 };
+
+  let gauche = Infinity;
+  let haut = Infinity;
+  let droite = -Infinity;
+  let bas = -Infinity;
+  for (const position of positions) {
+    const r = rectangleFace(position);
+    gauche = Math.min(gauche, r.x);
+    haut = Math.min(haut, r.y);
+    droite = Math.max(droite, r.x + r.largeur + EPAISSEUR);
+    bas = Math.max(bas, r.y + r.hauteur + EPAISSEUR);
+  }
+  return { x: gauche, y: haut, largeur: droite - gauche, hauteur: bas - haut };
+}
+
+/**
+ * De combien assombrir une tuile selon sa profondeur sous le sommet du plateau.
+ *
+ * L'encre bouge DEUX FOIS plus vite que la face. Assombrir la face seule mangerait le
+ * contraste entre le symbole et son fond ; deplacer l'encre plus vite l'ELARGIT a mesure
+ * que les etages s'eloignent. Un etage recule est donc plus contraste que celui du
+ * dessus, jamais moins.
+ */
+export const PAS_FACE = 0.015;
+export const PAS_ENCRE = 0.03;
+
+export function eclairementFace(z: number, zSommet: number): number {
+  return 1 - PAS_FACE * Math.max(0, zSommet - z);
+}
+
+export function eclairementEncre(z: number, zSommet: number): number {
+  return 1 - PAS_ENCRE * Math.max(0, zSommet - z);
+}
+
+/**
+ * Ce qui distingue une tuile BLOQUEE d'une tuile jouable.
+ *
+ * Une premiere version n'en distinguait aucune, au motif qu'un vrai Mahjong Solitaire ne
+ * grise jamais ses tuiles et que le relief suffit a dire ce qui est jouable. C'est faux,
+ * et mesurable : le relief dit la HAUTEUR, pas la liberte. Une tuile peut etre au sommet
+ * de sa pile, bien eclairee, bien detachee, et rester injouable parce qu'elle a une
+ * voisine de chaque cote. Sur la disposition Tortue, 23 tuiles sur 144 sont libres au
+ * depart : 121 clics ne repondent pas, sans que rien n'explique pourquoi.
+ *
+ * ── Desaturer plutot qu'assombrir ────────────────────────────────────────────────────
+ *
+ * Une premiere version se contentait d'assombrir a 0,75. Compare a l'ecran sur un vrai
+ * plateau, c'etait trop faible : avec 23 tuiles libres sur 144, il faut les reperer d'un
+ * coup d'oeil, et une difference de luminosite se cherche. La couleur, elle, saute aux
+ * yeux - les jouables deviennent les SEULES tuiles colorees du plateau.
+ *
+ * Les deux indices sont conserves, desaturation ET luminosite : la couleur seule ne doit
+ * jamais porter une information a elle toute seule.
+ *
+ * La desaturation preserve la luminance, et l'assombrissement porte sur la tuile ENTIERE,
+ * face et encre ensemble : le rapport des deux ne change pas, donc le symbole d'une tuile
+ * bloquee reste aussi lisible qu'avant. Il le faut - elles sont la moitie du plateau, et
+ * on doit pouvoir y chercher sa paire.
+ */
+export const ECLAIRAGE_BLOQUEE = 0.85;
+export const COULEUR_BLOQUEE = 0.15;
+
+/**
+ * L'ombre portee d'une tuile, selon sa HAUTEUR.
+ *
+ * C'est le seul indice qui reste pour dire l'etage. Le relief d'une tuile est le meme a
+ * tous les etages, volontairement - l'extruder de toute la hauteur de la pile ferait lire
+ * une tuile haute comme une dalle epaisse et une tuile au sol comme du papier. Et la
+ * luminosite sert desormais a dire la LIBERTE, pas la hauteur.
+ *
+ * Une premiere version gardait un decalage FIXE de 3 x 4 px et ne faisait grandir que le
+ * flou. Une tuile au quatrieme etage projetait donc la meme ombre qu'une tuile posee sur
+ * la table, et rien ne les distinguait. Or la projection oblique laisse une tuile haute
+ * recouvrir une voisine plus basse sans reposer dessus : mesure sur les dix dispositions,
+ * 43 tuiles libres sont masquees de plus de 8 % par une tuile d'un etage superieur. Sans
+ * ombre qui s'allonge, ces deux situations sont indistinguables :
+ *
+ *     une tuile POSEE dessus       -> elle bloque
+ *     une tuile HAUTE a cote       -> elle ne bloque pas
+ *
+ * Le decalage ET le flou grandissent donc avec l'etage. Au sol, l'ombre est courte et
+ * serree, la tuile touche la table ; en haut, elle s'ecarte franchement, la tuile flotte.
+ */
+export function ombrePortee(z: number): { x: number; y: number; flou: number } {
+  return { x: 2 + 3 * z, y: 3 + 4 * z, flou: 4 + 2 * z };
+}
