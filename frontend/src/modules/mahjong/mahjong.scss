@@ -37,6 +37,16 @@ $tuile-epaisseur: 11px;
     font-weight: 700;
     color: var(--color-primary);
   }
+
+  // La place est reservee en permanence : sans hauteur fixe, le plateau sauterait chaque
+  // fois que le message apparait ou disparait.
+  &__blocage {
+    margin: 0;
+    min-height: 2.2rem;
+    text-align: center;
+    font-size: $font-size-base;
+    color: var(--color-base-content);
+  }
 }
 
 .MahjongBoard {
@@ -169,6 +179,13 @@ $tuile-epaisseur: 11px;
 
   &--echec .TuileBloc__face {
     outline: 3px solid var(--color-error);
+    outline-offset: -3px;
+  }
+
+  // Les voisines designees comme fautives. Elles gardent leur place et leur couleur :
+  // seul le liseré les nomme, le temps de suivre le doigt jusqu'a elles.
+  &--bloqueur .TuileBloc__face {
+    outline: 3px dashed var(--color-warning);
     outline-offset: -3px;
   }
 

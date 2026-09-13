@@ -19,6 +19,8 @@ interface TuileBlocProps {
   libre: boolean;
   selectionnee: boolean;
   enEchec: boolean;
+  /** Cette tuile est l'une de celles qui bloquent la tuile qu'on vient de refuser. */
+  bloqueur: boolean;
   libelle: string;
   onClick: () => void;
 }
@@ -51,6 +53,7 @@ export default function TuileBloc({
   libre,
   selectionnee,
   enEchec,
+  bloqueur,
   libelle,
   onClick,
 }: TuileBlocProps) {
@@ -73,13 +76,16 @@ export default function TuileBloc({
         'TuileBloc',
         selectionnee ? 'TuileBloc--selectionnee' : '',
         enEchec ? 'TuileBloc--echec' : '',
+        bloqueur ? 'TuileBloc--bloqueur' : '',
         !libre ? 'TuileBloc--verrouillee' : '',
       ]
         .filter(Boolean)
         .join(' ')}
       style={style}
-      disabled={!libre}
-      aria-label={libelle}
+      // Pas `disabled` : une tuile bloquee doit rester cliquable pour pouvoir expliquer
+      // ce qui la bloque. `aria-disabled` porte l'information sans couper l'interaction.
+      aria-disabled={!libre}
+      aria-label={libre ? libelle : `${libelle}, bloquée`}
       aria-pressed={selectionnee}
       onClick={onClick}
     >

@@ -6,13 +6,22 @@ import { setGameResult } from 'src/store/slice/gameResultSlice';
 import TuileBloc from './TuileBloc';
 import { libelleFace } from './tuiles';
 import { trouverForme } from './formes';
-import { estLibre, genererPlateauTourelle, tenterAppariementTourelle, type CaseTourelle } from './tourelle';
+import {
+  estLibre,
+  genererPlateauTourelle,
+  raisonDuBlocage,
+  tenterAppariementTourelle,
+  type CaseTourelle,
+} from './tourelle';
 import { boiteDuPlateau, planDeSuperposition, rectangleFace } from './mahjong.geometrie';
 import './mahjong.scss';
 
 const MODULE_ID = 'mahjong';
 const DELAI_ECHEC_MS = 800;
 const DELAI_VICTOIRE_MS = 400;
+/** Combien de temps on montre qui bloque une tuile refusee. Assez long pour suivre le
+ * doigt jusqu'aux voisines designees, assez court pour ne pas gener le coup suivant. */
+const DELAI_BLOCAGE_MS = 2200;
 
 /**
  * Le plateau est dessine a taille FIXE, en pixels de plateau (voir mahjong.geometrie.ts),
@@ -55,6 +64,8 @@ export default function MahjongDifficile() {
   const [cases, setCases] = useState<CaseTourelle[]>(() => genererPlateauTourelle(forme));
   const [selectionId, setSelectionId] = useState<string | null>(null);
   const [echec, setEchec] = useState<{ idA: string; idB: string } | null>(null);
+  /** La derniere tuile refusee, et qui la bloque. Voir `handleTileClick`. */
+  const [blocage, setBlocage] = useState<{ cause: 'dessus' | 'cotes'; ids: string[] } | null>(null);
   const [essais, setEssais] = useState(0);
 
   // Garde contre les clics pendant le delai d'affichage d'un echec.
@@ -78,6 +89,23 @@ export default function MahjongDifficile() {
   const handleTileClick = useCallback(
     (idClique: string) => {
       if (enPauseRef.current || selectionId === idClique) return;
+
+      // Une tuile bloquee reste CLIQUABLE, et son clic sert a quelque chose : il montre
+      // qui la bloque. La rendre inerte laissait l'enfant devant une tuile qui ne
+      // repondait pas, sans moyen de comprendre - et dans ces dispositions en quinconce,
+      // la voisine fautive est le plus souvent en diagonale, donc invisible a la lecture.
+      // Ce clic ne compte pas comme un essai : il n'y avait rien a tenter.
+      const cliquee = cases.find((c) => c.tuile.id === idClique);
+      if (cliquee && !estLibre(cases, cliquee)) {
+        const raison = raisonDuBlocage(cases, cliquee);
+        if (raison.cause) {
+          setBlocage({ cause: raison.cause, ids: raison.bloqueurs.map((c) => c.tuile.id) });
+          setTimeout(() => setBlocage(null), DELAI_BLOCAGE_MS);
+        }
+        return;
+      }
+
+      setBlocage(null);
 
       if (selectionId === null) {
         setSelectionId(idClique);
@@ -117,6 +145,15 @@ export default function MahjongDifficile() {
     <div className="MahjongDifficile">
       <p className="MahjongDifficile__compteur">
         {pairesTrouvees} / {pairesCount} paires, {essais} essai{essais > 1 ? 's' : ''}
+      </p>
+
+      {/* `role="status"` : le texte change sans que rien ne bouge a l'ecran, une synthese
+          vocale doit donc l'annoncer. La place est reservee en permanence pour que le
+          plateau ne saute pas quand le message apparait. */}
+      <p className="MahjongDifficile__blocage" role="status">
+        {blocage?.cause === 'dessus' && 'Celle-ci est coincée : une tuile est posée dessus.'}
+        {blocage?.cause === 'cotes' &&
+          'Celle-ci est coincée : elle a une voisine de chaque côté. Il faut un côté libre.'}
       </p>
 
       <div className="MahjongTourelle" ref={conteneurRef}>
@@ -161,6 +198,7 @@ export default function MahjongDifficile() {
                     libre={estLibre(cases, caseTourelle)}
                     selectionnee={caseTourelle.tuile.id === selectionId}
                     enEchec={echec?.idA === caseTourelle.tuile.id || echec?.idB === caseTourelle.tuile.id}
+                  bloqueur={blocage?.ids.includes(caseTourelle.tuile.id) ?? false}
                     libelle={libelleFace(caseTourelle.tuile.face)}
                     onClick={() => handleTileClick(caseTourelle.tuile.id)}
                   />

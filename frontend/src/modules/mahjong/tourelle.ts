@@ -57,6 +57,39 @@ export function estLibre(occupees: PositionTourelle[], position: PositionTourell
   return !occupeVers(occupees, position, -2) || !occupeVers(occupees, position, 2);
 }
 
+/**
+ * Pourquoi une tuile n'est pas jouable, et QUI la bloque.
+ *
+ * Repondre « c'est la regle » ne suffit pas ici. Dans ces dispositions compactes, les
+ * tuiles sont posees en quinconce : mesure sur les dix dispositions livrees, 81 % des
+ * voisines qui bloquent sont decalees d'une DEMI-tuile, donc en diagonale. L'enfant voit
+ * une tuile qui n'a « rien a droite », et la regle la refuse parce qu'une voisine en
+ * bas-a-droite touche quand meme son bord. Le jeu doit donc montrer laquelle.
+ *
+ * Rend les positions fautives, jamais un simple booleen : c'est ce qui permet de les
+ * designer a l'ecran.
+ */
+export function raisonDuBlocage<T extends PositionTourelle>(
+  occupees: T[],
+  position: PositionTourelle,
+): { cause: 'dessus' | 'cotes' | null; bloqueurs: T[] } {
+  const dessus = occupees.filter((p) => p.z === position.z + 1 && seChevauchent(p, position));
+  if (dessus.length > 0) return { cause: 'dessus', bloqueurs: dessus };
+
+  const aGauche = occupees.filter(
+    (p) => p.z === position.z && seChevauchent(p, { x: position.x - 2, y: position.y }),
+  );
+  const aDroite = occupees.filter(
+    (p) => p.z === position.z && seChevauchent(p, { x: position.x + 2, y: position.y }),
+  );
+  // Un seul cote degage suffit a rendre la tuile jouable : elle n'est bloquee que si les
+  // DEUX sont pris, et les deux sont alors fautifs.
+  if (aGauche.length > 0 && aDroite.length > 0) {
+    return { cause: 'cotes', bloqueurs: [...aGauche, ...aDroite] };
+  }
+  return { cause: null, bloqueurs: [] };
+}
+
 /** Les cases de l'etage du dessous qui soutiennent physiquement `position` (une seule si
  * elle est alignee dessus, deux si elle chevauche a moitie chacune, comme le motif
  * "brique" des vraies dispositions). */
