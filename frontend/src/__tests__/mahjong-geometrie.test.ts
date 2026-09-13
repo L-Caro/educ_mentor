@@ -153,12 +153,13 @@ describe('les indices de relief', () => {
 });
 
 describe('ce qui distingue une tuile bloquee', () => {
-  it('assombrit la tuile ENTIERE, et seulement quand elle est bloquee', () => {
+  it('marque la tuile ENTIERE, et seulement quand elle est bloquee', () => {
     // Le relief dit la HAUTEUR, pas la liberte : une tuile peut etre au sommet de sa
     // pile, bien eclairee, bien detachee, et rester injouable parce qu'elle a une voisine
     // de chaque cote. Sur la Tortue, 23 tuiles sur 144 sont libres au depart : sans cet
     // indice, 121 clics ne repondent pas et rien n'explique pourquoi.
-    expect(RENDU).toMatch(/libre \? '' : ` brightness\(\$\{ECLAIRAGE_BLOQUEE\}\)`/);
+    expect(RENDU).toMatch(/libre\s*\n?\s*\? ''/);
+    expect(RENDU).toMatch(/grayscale[^]{0,60}brightness\(\$\{ECLAIRAGE_BLOQUEE\}\)/);
     // Sur le BOUTON, donc face et encre ensemble : les deux luminances bougent du meme
     // facteur, leur rapport ne change pas, et le symbole reste aussi lisible qu'avant.
     // Assombrir la face seule aurait mange le contraste.
@@ -166,9 +167,10 @@ describe('ce qui distingue une tuile bloquee', () => {
   });
 
   it('reste franchement visible, sans rendre les bloquees illisibles', () => {
-    // Elles sont la moitie du plateau : on doit pouvoir y chercher sa paire.
-    expect(ECLAIRAGE_BLOQUEE).toBeLessThanOrEqual(0.8);
-    expect(ECLAIRAGE_BLOQUEE).toBeGreaterThanOrEqual(0.65);
+    // Le gros du signal est desormais la DESATURATION ; la luminosite n'est que le
+    // second indice, donc elle peut rester douce. Voir `mahjong-blocage.test.ts`.
+    expect(ECLAIRAGE_BLOQUEE).toBeLessThan(1);
+    expect(ECLAIRAGE_BLOQUEE).toBeGreaterThanOrEqual(0.8);
   });
 });
 

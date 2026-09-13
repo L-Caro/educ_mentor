@@ -2,7 +2,11 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { estLibre, raisonDuBlocage } from 'src/modules/mahjong/tourelle';
-import { ombrePortee } from 'src/modules/mahjong/mahjong.geometrie';
+import {
+  ombrePortee,
+  COULEUR_BLOQUEE,
+  ECLAIRAGE_BLOQUEE,
+} from 'src/modules/mahjong/mahjong.geometrie';
 import { FORMES } from 'src/modules/mahjong/formes';
 
 const TUILE = readFileSync(
@@ -105,6 +109,28 @@ describe('l’ombre porte la hauteur', () => {
     const sol = ombrePortee(0);
     expect(sol.x).toBeLessThanOrEqual(4);
     expect(sol.y).toBeLessThanOrEqual(4);
+  });
+});
+
+describe('reperer les tuiles jouables', () => {
+  it('fait des jouables les SEULES tuiles colorees', () => {
+    // Avec 23 tuiles libres sur 144, il faut les voir d'un coup d'oeil. Une premiere
+    // version se contentait d'assombrir a 0,75 : compare a l'ecran sur un vrai plateau,
+    // c'etait trop faible - une difference de luminosite se cherche, une difference de
+    // couleur saute aux yeux.
+    expect(COULEUR_BLOQUEE).toBeLessThanOrEqual(0.25);
+    expect(TUILE).toMatch(/grayscale\(\$\{1 - COULEUR_BLOQUEE\}\)/);
+  });
+
+  it('garde DEUX indices, jamais la couleur seule', () => {
+    // La couleur seule ne doit jamais porter une information a elle toute seule.
+    expect(ECLAIRAGE_BLOQUEE).toBeLessThan(1);
+    expect(TUILE).toMatch(/brightness\(\$\{ECLAIRAGE_BLOQUEE\}\)/);
+  });
+
+  it('laisse les bloquees lisibles : on doit pouvoir y chercher sa paire', () => {
+    // Elles sont la moitie du plateau. Les effacer reviendrait a interdire de prevoir.
+    expect(ECLAIRAGE_BLOQUEE).toBeGreaterThanOrEqual(0.8);
   });
 });
 

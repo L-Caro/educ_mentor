@@ -120,13 +120,23 @@ export function eclairementEncre(z: number, zSommet: number): number {
  * voisine de chaque cote. Sur la disposition Tortue, 23 tuiles sur 144 sont libres au
  * depart : 121 clics ne repondent pas, sans que rien n'explique pourquoi.
  *
- * L'assombrissement porte sur la tuile ENTIERE, face et encre ensemble, et non sur la
- * face seule : les deux luminances bougent du meme facteur, donc leur rapport ne change
- * pas et le symbole reste aussi lisible qu'avant. C'est ce qui permet d'aller jusqu'a
- * 0,75, franchement visible, sans rendre les tuiles bloquees difficiles a lire - elles
- * restent la moitie du plateau et on doit pouvoir y chercher sa paire.
+ * ── Desaturer plutot qu'assombrir ────────────────────────────────────────────────────
+ *
+ * Une premiere version se contentait d'assombrir a 0,75. Compare a l'ecran sur un vrai
+ * plateau, c'etait trop faible : avec 23 tuiles libres sur 144, il faut les reperer d'un
+ * coup d'oeil, et une difference de luminosite se cherche. La couleur, elle, saute aux
+ * yeux - les jouables deviennent les SEULES tuiles colorees du plateau.
+ *
+ * Les deux indices sont conserves, desaturation ET luminosite : la couleur seule ne doit
+ * jamais porter une information a elle toute seule.
+ *
+ * La desaturation preserve la luminance, et l'assombrissement porte sur la tuile ENTIERE,
+ * face et encre ensemble : le rapport des deux ne change pas, donc le symbole d'une tuile
+ * bloquee reste aussi lisible qu'avant. Il le faut - elles sont la moitie du plateau, et
+ * on doit pouvoir y chercher sa paire.
  */
-export const ECLAIRAGE_BLOQUEE = 0.75;
+export const ECLAIRAGE_BLOQUEE = 0.85;
+export const COULEUR_BLOQUEE = 0.15;
 
 /**
  * L'ombre portee d'une tuile, selon sa HAUTEUR.

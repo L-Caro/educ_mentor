@@ -3,6 +3,7 @@ import type { TuileFace } from './mahjong.types';
 import TuileFaceSvg from './TuileFaceSvg';
 import {
   ombrePortee,
+  COULEUR_BLOQUEE,
   ECLAIRAGE_BLOQUEE,
   EPAISSEUR,
   HAUTEUR_TUILE,
@@ -43,8 +44,9 @@ interface TuileBlocProps {
  *      projettent aucune ombre l'une sur l'autre.
  *
  * Et un cinquieme indice, qui ne dit pas la hauteur mais la LIBERTE : une tuile bloquee
- * est assombrie (voir `ECLAIRAGE_BLOQUEE`). Sans lui, la plupart des tuiles ne repondent
- * pas au clic et rien n'explique pourquoi.
+ * est desaturee et legerement assombrie, de sorte que les jouables sont les SEULES tuiles
+ * colorees du plateau (voir `ECLAIRAGE_BLOQUEE`). Sans lui, la plupart des tuiles ne
+ * repondent pas au clic et rien n'explique pourquoi.
  *
  * L'ombre passe par `filter: drop-shadow` et non `box-shadow` : elle doit epouser la
  * silhouette en L du bloc, pas son rectangle englobant.
@@ -68,7 +70,9 @@ export default function TuileBloc({
     // une tuile en retrait projette une ombre en retrait.
     filter:
       `drop-shadow(${ombre.x}px ${ombre.y}px ${ombre.flou}px rgba(0, 0, 0, 0.45))` +
-      (libre ? '' : ` brightness(${ECLAIRAGE_BLOQUEE})`),
+      (libre
+        ? ''
+        : ` grayscale(${1 - COULEUR_BLOQUEE}) brightness(${ECLAIRAGE_BLOQUEE})`),
   };
 
   return (
