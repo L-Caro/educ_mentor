@@ -1,0 +1,173 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+// Couleurs propres aux tuiles Mahjong (proches de l'ivoire des vraies images de tuiles,
+// voir ATTRIBUTIONS.md), pas la palette chaude de l'application. Locales a ce fichier.
+$tuile-fond: #fdf6e3;
+$tuile-bordure: #c9b896;
+$tuile-bloc-avant: color-mix(in srgb, $tuile-fond 55%, $tuile-bordure);
+// Face droite plus sombre que l'avant (comme un cote a l'ombre) : c'est ce contraste entre
+// les deux faces visibles, en plus du decalage diagonal, qui donne le volume.
+$tuile-bloc-droite: color-mix(in srgb, $tuile-fond 30%, $tuile-bordure);
+
+.MahjongFacile,
+.MahjongMoyen,
+.MahjongDifficile {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+  padding: $space-5;
+  gap: $space-5;
+
+  &__compteur {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+}
+
+.MahjongBoard {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 6), 1fr);
+  gap: $space-3;
+  width: 100%;
+  max-width: 700px;
+}
+
+.MahjongGrilleConnect {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 6), 1fr);
+  gap: $space-2;
+  width: 100%;
+  max-width: 800px;
+
+  &__case--vide {
+    aspect-ratio: 5 / 7;
+    border-radius: $radius-sm;
+    border: 1px dashed color-mix(in srgb, $tuile-bordure 60%, transparent);
+  }
+}
+
+.MahjongTuile {
+  aspect-ratio: 5 / 7;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  transition: transform 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+
+  &--selectionnee .TuileFaceSvg {
+    outline: 3px solid var(--color-primary);
+    outline-offset: -3px;
+  }
+
+  &--echec .TuileFaceSvg {
+    outline: 3px solid var(--color-error);
+    outline-offset: -3px;
+  }
+}
+
+// Vraie scene 3D (voir TuileCube3D.tsx) : `perspective` sur le conteneur, `preserve-3d` en
+// cascade sur la scene et chaque case, pour que les transformations 3D de tous les cubes
+// se composent dans un seul et meme espace au lieu d'etre chacune a plat.
+.MahjongTourelle {
+  position: relative;
+  margin: 0 auto;
+  perspective: 2200px;
+}
+
+.MahjongTourelle__scene {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(55deg);
+}
+
+.MahjongTourelleCase {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.TuileCube3D {
+  position: relative;
+  transform-style: preserve-3d;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  &__face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    backface-visibility: hidden;
+  }
+
+  &__avant {
+    background: $tuile-bloc-avant;
+    border: 1px solid $tuile-bordure;
+  }
+
+  &__droite {
+    background: $tuile-bloc-droite;
+    border: 1px solid $tuile-bordure;
+  }
+
+  &--selectionnee .TuileFaceSvg {
+    outline: 3px solid var(--color-primary);
+    outline-offset: -3px;
+  }
+
+  &--echec .TuileFaceSvg {
+    outline: 3px solid var(--color-error);
+    outline-offset: -3px;
+  }
+
+  // Un vrai Mahjong Solitaire ne grise jamais les tuiles verrouillees : elles restent en
+  // pleine couleur, seul le relief indique ce qui est jouable.
+  &--verrouillee {
+    cursor: not-allowed;
+  }
+}
+
+// Fond + symbole superposes (voir tuiles-images.ts) : le set d'images ne fournit pas des
+// tuiles completes, `Front.svg` (le fond ivoire) est commun a toutes les faces.
+.TuileFaceSvg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: $radius-sm;
+  overflow: hidden;
+
+  &__fond,
+  &__symbole {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  // Dragon blanc : pas d'image (voir le commentaire dans TuileFaceSvg.tsx), juste un
+  // cadre. Bleu comme le reste de l'interface (--color-info) plutot qu'une couleur
+  // inventee pour l'occasion.
+  &--dragonBlanc::after {
+    content: '';
+    position: absolute;
+    inset: 20%;
+    border: 3px solid var(--color-info);
+    border-radius: 2px;
+  }
+
+  &__symbole {
+    pointer-events: none;
+  }
+}

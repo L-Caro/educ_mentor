@@ -184,4 +184,12 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     is_active: false,
     display_order: 21,
   },
+  {
+    id: 'mahjong',
+    name: 'Mahjong',
+    description: 'Retrouver les paires de tuiles identiques, sur trois niveaux de difficulté',
+    icon: '🀄',
+    is_active: true,
+    display_order: 22,
+  },
 ];
