@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import type { TuileFace } from './mahjong.types';
 import TuileFaceSvg from './TuileFaceSvg';
 import {
+  ombrePortee,
   ECLAIRAGE_BLOQUEE,
   EPAISSEUR,
   HAUTEUR_TUILE,
@@ -32,8 +33,10 @@ interface TuileBlocProps {
  * Le relief ne tient pas au dessin du bloc, qui ne fait que quelques pixels de large. Il
  * tient a QUATRE indices, et c'est leur cumul qui rend un plateau lisible :
  *
- *   1. une ombre portee vers le bas-droite, qui grandit avec la hauteur : c'est elle,
- *      plus que le reste, qui DETACHE une tuile surelevee de ce qu'il y a dessous ;
+ *   1. une ombre portee vers le bas-droite, dont le DECALAGE grandit avec la hauteur :
+ *      c'est elle, plus que le reste, qui detache une tuile surelevee de ce qu'il y a
+ *      dessous, et le seul indice qui distingue une tuile posee dessus d'une tuile haute
+ *      posee a cote (voir `ombrePortee`) ;
  *   2. un cote en degrade, clair contre la face eclairee, sombre a sa base ;
  *   3. un assombrissement par etage, pour que les etages bas reculent ;
  *   4. un contour franc, seul separateur entre deux voisines du meme etage, qui ne
@@ -57,15 +60,14 @@ export default function TuileBloc({
   libelle,
   onClick,
 }: TuileBlocProps) {
+  const ombre = ombrePortee(z);
   const style: CSSProperties = {
     width: LARGEUR_TUILE + EPAISSEUR,
     height: HAUTEUR_TUILE + EPAISSEUR,
-    // L'ombre s'allonge avec la hauteur : une tuile au sol est posee sur la table et
-    // garde une ombre courte, une tuile surelevee flotte au-dessus de l'etage du dessous.
-    // L'assombrissement des bloquees vient APRES, donc il porte aussi sur l'ombre : une
-    // tuile en retrait projette une ombre en retrait.
+    // L'assombrissement des bloquees vient APRES l'ombre, donc il porte aussi sur elle :
+    // une tuile en retrait projette une ombre en retrait.
     filter:
-      `drop-shadow(3px 4px ${3 + 2 * z}px rgba(0, 0, 0, 0.45))` +
+      `drop-shadow(${ombre.x}px ${ombre.y}px ${ombre.flou}px rgba(0, 0, 0, 0.45))` +
       (libre ? '' : ` brightness(${ECLAIRAGE_BLOQUEE})`),
   };
 

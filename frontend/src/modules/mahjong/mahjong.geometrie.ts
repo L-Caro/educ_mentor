@@ -127,3 +127,28 @@ export function eclairementEncre(z: number, zSommet: number): number {
  * restent la moitie du plateau et on doit pouvoir y chercher sa paire.
  */
 export const ECLAIRAGE_BLOQUEE = 0.75;
+
+/**
+ * L'ombre portee d'une tuile, selon sa HAUTEUR.
+ *
+ * C'est le seul indice qui reste pour dire l'etage. Le relief d'une tuile est le meme a
+ * tous les etages, volontairement - l'extruder de toute la hauteur de la pile ferait lire
+ * une tuile haute comme une dalle epaisse et une tuile au sol comme du papier. Et la
+ * luminosite sert desormais a dire la LIBERTE, pas la hauteur.
+ *
+ * Une premiere version gardait un decalage FIXE de 3 x 4 px et ne faisait grandir que le
+ * flou. Une tuile au quatrieme etage projetait donc la meme ombre qu'une tuile posee sur
+ * la table, et rien ne les distinguait. Or la projection oblique laisse une tuile haute
+ * recouvrir une voisine plus basse sans reposer dessus : mesure sur les dix dispositions,
+ * 43 tuiles libres sont masquees de plus de 8 % par une tuile d'un etage superieur. Sans
+ * ombre qui s'allonge, ces deux situations sont indistinguables :
+ *
+ *     une tuile POSEE dessus       -> elle bloque
+ *     une tuile HAUTE a cote       -> elle ne bloque pas
+ *
+ * Le decalage ET le flou grandissent donc avec l'etage. Au sol, l'ombre est courte et
+ * serree, la tuile touche la table ; en haut, elle s'ecarte franchement, la tuile flotte.
+ */
+export function ombrePortee(z: number): { x: number; y: number; flou: number } {
+  return { x: 2 + 3 * z, y: 3 + 4 * z, flou: 4 + 2 * z };
+}

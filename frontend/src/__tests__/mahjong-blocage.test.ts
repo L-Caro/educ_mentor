@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { estLibre, raisonDuBlocage } from 'src/modules/mahjong/tourelle';
+import { ombrePortee } from 'src/modules/mahjong/mahjong.geometrie';
 import { FORMES } from 'src/modules/mahjong/formes';
 
 const TUILE = readFileSync(
@@ -59,6 +60,51 @@ describe('pourquoi une tuile est refusee', () => {
         });
       }
     }
+  });
+});
+
+describe('l’hypothese que fait `estLibre`', () => {
+  it('ne trouve AUCUNE tuile en surplomb, sur les dix dispositions', () => {
+    // `estLibre` ne regarde que l'etage z+1 : une tuile posee deux etages plus haut, en
+    // porte-a-faux, passerait inapercue et le jeu accepterait une tuile couverte.
+    // Physiquement possible (elle reposerait sur une voisine sans reposer sur celle du
+    // dessous), et ces dispositions n'en contiennent aucune. Ce test le garde : une
+    // disposition ajoutee plus tard qui en introduirait une casserait la regle en
+    // silence.
+    const chevauchent = (a: { x: number; y: number }, b: { x: number; y: number }) =>
+      Math.abs(a.x - b.x) < 2 && Math.abs(a.y - b.y) < 2;
+
+    for (const forme of FORMES) {
+      const surplombs = forme.slots.filter((t) => {
+        const justeAuDessus = forme.slots.some((p) => p.z === t.z + 1 && chevauchent(p, t));
+        if (justeAuDessus) return false;
+        return forme.slots.some((p) => p.z > t.z + 1 && chevauchent(p, t));
+      });
+      expect({ id: forme.id, surplombs: surplombs.length }).toEqual({
+        id: forme.id,
+        surplombs: 0,
+      });
+    }
+  });
+});
+
+describe('l’ombre porte la hauteur', () => {
+  it('s’ecarte franchement quand l’etage monte', () => {
+    // C'est le seul indice qui reste pour dire l'etage : le relief d'une tuile est le
+    // meme partout, et la luminosite sert desormais a dire la LIBERTE. Une version
+    // precedente gardait un decalage fixe et ne faisait grandir que le flou, donc une
+    // tuile du quatrieme etage projetait la meme ombre qu'une tuile posee sur la table.
+    const sol = ombrePortee(0);
+    const haut = ombrePortee(4);
+    expect(haut.x).toBeGreaterThan(sol.x * 3);
+    expect(haut.y).toBeGreaterThan(sol.y * 3);
+    expect(haut.flou).toBeGreaterThan(sol.flou);
+  });
+
+  it('reste courte et serree au sol : la tuile TOUCHE la table', () => {
+    const sol = ombrePortee(0);
+    expect(sol.x).toBeLessThanOrEqual(4);
+    expect(sol.y).toBeLessThanOrEqual(4);
   });
 });
 

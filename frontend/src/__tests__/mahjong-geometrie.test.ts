@@ -141,11 +141,14 @@ describe('les indices de relief', () => {
     expect(eclairementEncre(4, 4)).toBe(1);
   });
 
-  it('allonge l’ombre avec la hauteur', () => {
+  it('confie l’ombre a `ombrePortee`, qui la fait grandir avec l’etage', () => {
     // Une tuile au sol est POSEE sur la table et garde une ombre courte ; une tuile
     // surelevee flotte au-dessus de l'etage du dessous. C'est cet indice, plus que le
-    // dessin du bloc, qui detache les etages.
-    expect(RENDU).toMatch(/drop-shadow\(3px 4px \$\{3 \+ 2 \* z\}px/);
+    // dessin du bloc, qui detache les etages - et le seul qui distingue une tuile posee
+    // DESSUS d'une tuile haute posee A COTE. Le detail des valeurs est verrouille dans
+    // `mahjong-blocage.test.ts`.
+    expect(RENDU).toMatch(/const ombre = ombrePortee\(z\)/);
+    expect(RENDU).toMatch(/drop-shadow\(\$\{ombre\.x\}px \$\{ombre\.y\}px \$\{ombre\.flou\}px/);
   });
 });
 
