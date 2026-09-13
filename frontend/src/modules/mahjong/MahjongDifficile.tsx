@@ -1,26 +1,50 @@
-import { useCallback, useRef, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 import { setGameResult } from 'src/store/slice/gameResultSlice';
-import TuileCube3D from './TuileCube3D';
+import TuileBloc from './TuileBloc';
 import { libelleFace } from './tuiles';
 import { trouverForme } from './formes';
 import { estLibre, genererPlateauTourelle, tenterAppariementTourelle, type CaseTourelle } from './tourelle';
+import { boiteDuPlateau, planDeSuperposition, rectangleFace } from './mahjong.geometrie';
 import './mahjong.scss';
 
 const MODULE_ID = 'mahjong';
 const DELAI_ECHEC_MS = 800;
 const DELAI_VICTOIRE_MS = 400;
 
-// Une demi-unite de coordonnee (voir tourelle.ts) vaut la moitie d'une largeur de tuile :
-// une tuile pleine (2 demi-unites) fait donc LARGEUR_TUILE de large.
-const LARGEUR_TUILE = 48;
-const PROFONDEUR_TUILE = 68;
-const DEMI_UNITE_X = LARGEUR_TUILE / 2;
-const DEMI_UNITE_Y = PROFONDEUR_TUILE / 2;
-/** Hauteur physique d'une tuile (axe Z) : combien un etage eleve le plateau. */
-const EPAISSEUR_TUILE = 18;
+/**
+ * Le plateau est dessine a taille FIXE, en pixels de plateau (voir mahjong.geometrie.ts),
+ * puis mis a l'echelle d'un bloc pour tenir dans la place disponible.
+ *
+ * C'est ce qui permet de garder une geometrie entiere et des constantes lisibles : sans
+ * ce decouplage, chaque taille d'ecran aurait sa propre arithmetique, et le decalage d'un
+ * etage finirait par tomber sur une demi-position.
+ */
+function useEchelle(largeurPlateau: number, hauteurPlateau: number) {
+  const conteneurRef = useRef<HTMLDivElement>(null);
+  const [echelle, setEchelle] = useState(1);
+
+  useEffect(() => {
+    const conteneur = conteneurRef.current;
+    if (!conteneur || largeurPlateau === 0 || hauteurPlateau === 0) return;
+
+    const mesurer = () => {
+      const { width, height } = conteneur.getBoundingClientRect();
+      if (width === 0 || height === 0) return;
+      // Jamais d'agrandissement : au-dela de 1, les images de tuiles se deliteraient.
+      setEchelle(Math.min(1, width / largeurPlateau, height / hauteurPlateau));
+    };
+
+    mesurer();
+    const observateur = new ResizeObserver(mesurer);
+    observateur.observe(conteneur);
+    return () => observateur.disconnect();
+  }, [largeurPlateau, hauteurPlateau]);
+
+  return { conteneurRef, echelle };
+}
 
 export default function MahjongDifficile() {
   const navigate = useNavigate();
@@ -82,8 +106,12 @@ export default function MahjongDifficile() {
     [cases, selectionId, terminerPartie],
   );
 
-  const largeurMax = Math.max(...cases.map((c) => c.x)) + 2;
-  const profondeurMax = Math.max(...cases.map((c) => c.y)) + 2;
+  // La boite se calcule sur la disposition COMPLETE, pas sur les tuiles restantes : sinon
+  // le plateau se recentre et grandit a chaque paire retiree, et l'enfant perd de vue ou
+  // se trouvait ce qu'elle regardait.
+  const boite = useMemo(() => boiteDuPlateau(forme.slots), [forme]);
+  const { conteneurRef, echelle } = useEchelle(boite.largeur, boite.hauteur);
+  const zSommet = useMemo(() => Math.max(...forme.slots.map((s) => s.z)), [forme]);
 
   return (
     <div className="MahjongDifficile">
@@ -91,40 +119,55 @@ export default function MahjongDifficile() {
         {pairesTrouvees} / {pairesCount} paires, {essais} essai{essais > 1 ? 's' : ''}
       </p>
 
-      <div
-        className="MahjongTourelle"
-        style={{ width: largeurMax * DEMI_UNITE_X, height: profondeurMax * DEMI_UNITE_Y }}
-      >
-        {/* `perspective` (sur .MahjongTourelle) + `preserve-3d` en cascade jusqu'ici :
-            chaque cube vit dans le MEME espace 3D, le navigateur les trie par profondeur
-            reelle. Plus besoin de trier le tableau ni de calculer un decalage a la main :
-            translateZ EST la hauteur, en vrai, pas une approximation en pixels. */}
-        <div className="MahjongTourelle__scene">
-          {cases.map((caseTourelle) => {
-            const style: CSSProperties = {
-              left: caseTourelle.x * DEMI_UNITE_X,
-              top: caseTourelle.y * DEMI_UNITE_Y,
-              width: LARGEUR_TUILE,
-              height: PROFONDEUR_TUILE,
-              transform: `translateZ(${caseTourelle.z * EPAISSEUR_TUILE}px)`,
-            };
+      <div className="MahjongTourelle" ref={conteneurRef}>
+        {/* Deux boites imbriquees, et c'est necessaire. `transform` ne change pas la
+            place qu'un element occupe : une scene de 598 px reduite a 0,47 occupe
+            toujours 598 px, deborde du conteneur, et le centrage ne s'applique plus a
+            rien. Le cadre porte donc la taille REELLE apres reduction, la scene garde
+            ses pixels de plateau, et la reduction part de son coin haut-gauche pour que
+            les deux coincident.
 
-            return (
-              <div key={caseTourelle.tuile.id} className="MahjongTourelleCase" style={style}>
-                <TuileCube3D
-                  face={caseTourelle.tuile.face}
-                  largeur={LARGEUR_TUILE}
-                  profondeur={PROFONDEUR_TUILE}
-                  epaisseur={EPAISSEUR_TUILE}
-                  libre={estLibre(cases, caseTourelle)}
-                  selectionnee={caseTourelle.tuile.id === selectionId}
-                  enEchec={echec?.idA === caseTourelle.tuile.id || echec?.idB === caseTourelle.tuile.id}
-                  libelle={libelleFace(caseTourelle.tuile.face)}
-                  onClick={() => handleTileClick(caseTourelle.tuile.id)}
-                />
-              </div>
-            );
-          })}
+            Une seule mise a l'echelle pour tout le plateau : les tuiles gardent des
+            positions entieres, et le navigateur n'a qu'une transformation a appliquer
+            plutot que 144. */}
+        <div
+          className="MahjongTourelle__cadre"
+          style={{ width: boite.largeur * echelle, height: boite.hauteur * echelle }}
+        >
+          <div
+            className="MahjongTourelle__scene"
+            style={{
+              width: boite.largeur,
+              height: boite.hauteur,
+              transform: `scale(${echelle})`,
+            }}
+          >
+            {cases.map((caseTourelle) => {
+              const face = rectangleFace(caseTourelle);
+              const style: CSSProperties = {
+                left: face.x - boite.x,
+                top: face.y - boite.y,
+                // La superposition suit la geometrie, l'ordre du DOM reste celui des
+                // tuiles : voir `planDeSuperposition`.
+                zIndex: planDeSuperposition(caseTourelle),
+              };
+
+              return (
+                <div key={caseTourelle.tuile.id} className="MahjongTourelleCase" style={style}>
+                  <TuileBloc
+                    face={caseTourelle.tuile.face}
+                    z={caseTourelle.z}
+                    zSommet={zSommet}
+                    libre={estLibre(cases, caseTourelle)}
+                    selectionnee={caseTourelle.tuile.id === selectionId}
+                    enEchec={echec?.idA === caseTourelle.tuile.id || echec?.idB === caseTourelle.tuile.id}
+                    libelle={libelleFace(caseTourelle.tuile.face)}
+                    onClick={() => handleTileClick(caseTourelle.tuile.id)}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

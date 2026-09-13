@@ -4,10 +4,22 @@
 // voir ATTRIBUTIONS.md), pas la palette chaude de l'application. Locales a ce fichier.
 $tuile-fond: #fdf6e3;
 $tuile-bordure: #c9b896;
-$tuile-bloc-avant: color-mix(in srgb, $tuile-fond 55%, $tuile-bordure);
-// Face droite plus sombre que l'avant (comme un cote a l'ombre) : c'est ce contraste entre
-// les deux faces visibles, en plus du decalage diagonal, qui donne le volume.
-$tuile-bloc-droite: color-mix(in srgb, $tuile-fond 30%, $tuile-bordure);
+// Contour franc, et non un filet clair : deux voisines du meme etage ne projettent
+// aucune ombre l'une sur l'autre, il est leur seul separateur.
+$tuile-contour: #6b5c3a;
+$tuile-cote: #cbb891;
+$tuile-cote-clair: #e6d7b4;
+$tuile-cote-sombre: #8f7f5c;
+// Le feutre de la table. Un vert sombre : les tuiles ivoire s'en detachent, alors
+// qu'elles se fondaient dans le creme de l'application.
+$feutre: #14532d;
+
+// La geometrie, en pixels de plateau. MEMES VALEURS que mahjong.geometrie.ts, et un test
+// le verifie : le decoupage du bloc est ici, la position des tuiles la-bas, et les deux
+// doivent parler de la meme tuile.
+$tuile-largeur: 64px;
+$tuile-hauteur: 84px;
+$tuile-epaisseur: 11px;
 
 .MahjongFacile,
 .MahjongMoyen,
@@ -73,59 +85,89 @@ $tuile-bloc-droite: color-mix(in srgb, $tuile-fond 30%, $tuile-bordure);
   }
 }
 
-// Vraie scene 3D (voir TuileCube3D.tsx) : `perspective` sur le conteneur, `preserve-3d` en
-// cascade sur la scene et chaque case, pour que les transformations 3D de tous les cubes
-// se composent dans un seul et meme espace au lieu d'etre chacune a plat.
+// Le plateau : une projection oblique en 2D, pas une scene 3D (voir
+// mahjong.geometrie.ts). Le conteneur mesure la place disponible, la scene porte la
+// mise a l'echelle, et chaque tuile est posee en absolu a sa position en pixels.
 .MahjongTourelle {
   position: relative;
-  margin: 0 auto;
-  perspective: 2200px;
+  flex: 1;
+  align-self: stretch;
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  // Le feutre de la table : c'est lui qui fait ressortir l'ivoire des tuiles. Le fond
+  // creme de l'application les laissait se fondre dedans.
+  background: $feutre;
+  border-radius: $radius-md;
+  overflow: hidden;
+}
+
+.MahjongTourelle__cadre {
+  position: relative;
 }
 
 .MahjongTourelle__scene {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transform: rotateX(55deg);
+  position: absolute;
+  left: 0;
+  top: 0;
+  // La reduction part du coin haut-gauche : c'est ce qui fait coincider la scene avec le
+  // cadre, qui porte sa taille une fois reduite (voir MahjongDifficile.tsx).
+  transform-origin: top left;
 }
 
 .MahjongTourelleCase {
   position: absolute;
-  transform-style: preserve-3d;
 }
 
-.TuileCube3D {
+.TuileBloc {
   position: relative;
-  transform-style: preserve-3d;
+  display: block;
   padding: 0;
   border: none;
   background: none;
   cursor: pointer;
 
+  // Le bloc en L derriere la face : le cote droit et le cote bas, d'un seul tenant.
+  // Degrade du clair (contre la face, eclairee) au sombre (a la base, dans l'ombre) :
+  // un aplat unique donnait une tranche de carton, pas un volume.
+  &__cote {
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(
+      #{$tuile-largeur} 0,
+      #{$tuile-largeur + $tuile-epaisseur} #{$tuile-epaisseur},
+      #{$tuile-largeur + $tuile-epaisseur} #{$tuile-hauteur + $tuile-epaisseur},
+      #{$tuile-epaisseur} #{$tuile-hauteur + $tuile-epaisseur},
+      0 #{$tuile-hauteur},
+      #{$tuile-largeur} #{$tuile-hauteur}
+    );
+    background: linear-gradient(135deg, $tuile-cote-clair 0%, $tuile-cote 45%, $tuile-cote-sombre 100%);
+  }
+
   &__face {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    backface-visibility: hidden;
+    left: 0;
+    top: 0;
+    border-radius: $radius-sm;
+    // Deux voisines du meme etage ne projettent aucune ombre l'une sur l'autre : ce
+    // contour est le seul chose qui les separe.
+    border: 2px solid $tuile-contour;
+    background: $tuile-fond;
+    overflow: hidden;
   }
 
-  &__avant {
-    background: $tuile-bloc-avant;
-    border: 1px solid $tuile-bordure;
+  &__encre {
+    display: block;
+    width: 100%;
+    height: 100%;
   }
 
-  &__droite {
-    background: $tuile-bloc-droite;
-    border: 1px solid $tuile-bordure;
-  }
-
-  &--selectionnee .TuileFaceSvg {
+  &--selectionnee .TuileBloc__face {
     outline: 3px solid var(--color-primary);
     outline-offset: -3px;
   }
 
-  &--echec .TuileFaceSvg {
+  &--echec .TuileBloc__face {
     outline: 3px solid var(--color-error);
     outline-offset: -3px;
   }
