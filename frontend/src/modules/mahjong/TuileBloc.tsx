@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import type { TuileFace } from './mahjong.types';
 import TuileFaceSvg from './TuileFaceSvg';
 import {
+  ECLAIRAGE_BLOQUEE,
   EPAISSEUR,
   HAUTEUR_TUILE,
   LARGEUR_TUILE,
@@ -36,6 +37,10 @@ interface TuileBlocProps {
  *   4. un contour franc, seul separateur entre deux voisines du meme etage, qui ne
  *      projettent aucune ombre l'une sur l'autre.
  *
+ * Et un cinquieme indice, qui ne dit pas la hauteur mais la LIBERTE : une tuile bloquee
+ * est assombrie (voir `ECLAIRAGE_BLOQUEE`). Sans lui, la plupart des tuiles ne repondent
+ * pas au clic et rien n'explique pourquoi.
+ *
  * L'ombre passe par `filter: drop-shadow` et non `box-shadow` : elle doit epouser la
  * silhouette en L du bloc, pas son rectangle englobant.
  */
@@ -54,7 +59,11 @@ export default function TuileBloc({
     height: HAUTEUR_TUILE + EPAISSEUR,
     // L'ombre s'allonge avec la hauteur : une tuile au sol est posee sur la table et
     // garde une ombre courte, une tuile surelevee flotte au-dessus de l'etage du dessous.
-    filter: `drop-shadow(3px 4px ${3 + 2 * z}px rgba(0, 0, 0, 0.45))`,
+    // L'assombrissement des bloquees vient APRES, donc il porte aussi sur l'ombre : une
+    // tuile en retrait projette une ombre en retrait.
+    filter:
+      `drop-shadow(3px 4px ${3 + 2 * z}px rgba(0, 0, 0, 0.45))` +
+      (libre ? '' : ` brightness(${ECLAIRAGE_BLOQUEE})`),
   };
 
   return (

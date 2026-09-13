@@ -172,8 +172,8 @@ $tuile-epaisseur: 11px;
     outline-offset: -3px;
   }
 
-  // Un vrai Mahjong Solitaire ne grise jamais les tuiles verrouillees : elles restent en
-  // pleine couleur, seul le relief indique ce qui est jouable.
+  // Une tuile bloquee est assombrie par le composant (voir ECLAIRAGE_BLOQUEE) : le relief
+  // dit la hauteur, pas la liberte.
   &--verrouillee {
     cursor: not-allowed;
   }

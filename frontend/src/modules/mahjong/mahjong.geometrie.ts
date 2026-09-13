@@ -109,3 +109,21 @@ export function eclairementFace(z: number, zSommet: number): number {
 export function eclairementEncre(z: number, zSommet: number): number {
   return 1 - PAS_ENCRE * Math.max(0, zSommet - z);
 }
+
+/**
+ * Ce qui distingue une tuile BLOQUEE d'une tuile jouable.
+ *
+ * Une premiere version n'en distinguait aucune, au motif qu'un vrai Mahjong Solitaire ne
+ * grise jamais ses tuiles et que le relief suffit a dire ce qui est jouable. C'est faux,
+ * et mesurable : le relief dit la HAUTEUR, pas la liberte. Une tuile peut etre au sommet
+ * de sa pile, bien eclairee, bien detachee, et rester injouable parce qu'elle a une
+ * voisine de chaque cote. Sur la disposition Tortue, 23 tuiles sur 144 sont libres au
+ * depart : 121 clics ne repondent pas, sans que rien n'explique pourquoi.
+ *
+ * L'assombrissement porte sur la tuile ENTIERE, face et encre ensemble, et non sur la
+ * face seule : les deux luminances bougent du meme facteur, donc leur rapport ne change
+ * pas et le symbole reste aussi lisible qu'avant. C'est ce qui permet d'aller jusqu'a
+ * 0,75, franchement visible, sans rendre les tuiles bloquees difficiles a lire - elles
+ * restent la moitie du plateau et on doit pouvoir y chercher sa paire.
+ */
+export const ECLAIRAGE_BLOQUEE = 0.75;
