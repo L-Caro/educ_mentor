@@ -469,8 +469,13 @@ describe("Démarrage de l'application (e2e)", () => {
     const socle = await service.getActiveFamilleKeys();
     await service.setActiveFamilleKeys([...socle, 'pluriel_aux']);
 
+    // Vingt-cinq seances, pas six. Le corpus ne compte que 4 noms en -aux sur 37
+    // eligibles, soit 10,8 % par tirage : avec six seances la probabilite de n'en voir
+    // aucun n'etait pas negligeable, et ce test a fini par echouer en integration
+    // continue alors qu'il passait douze fois de suite en local. A 25 seances elle tombe
+    // sous le millionieme. Ne pas redescendre ce nombre sans refaire le calcul.
     const vus = new Set<string>();
-    for (let essai = 0; essai < 6; essai++) {
+    for (let essai = 0; essai < 25; essai++) {
       const session = (
         await request(server())
           .post('/api/accords/session')
