@@ -40,6 +40,6 @@ des dispositions larges classiques ramènerait exactement le défaut qu'il évit
 Les constantes de projection et les quatre indices de relief viennent de là : demi-unités
 de 32 x 42 px, décalage d'étage de 11 px vers le haut et la gauche, épaisseur du côté égale
 à ce décalage, assombrissement de 1,5 % par étage sur la face et de 3 % sur l'encre. Le
-code est réécrit, pas copié — leur rendu est un canevas 2D, le nôtre du DOM et du CSS —
+code est réécrit, pas copié : leur rendu est un canevas 2D, le nôtre du DOM et du CSS,
 mais les valeurs sont les leurs, et ce sont leurs dispositions : les reprendre garantit que
 les tuiles tombent là où la disposition les attend.

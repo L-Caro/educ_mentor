@@ -188,7 +188,7 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     id: 'mahjong',
     name: 'Mahjong',
     description:
-      'Retrouver les paires de tuiles identiques, sur trois niveaux de difficulté',
+      'Retrouver les paires de tuiles identiques sur un plateau en volume, dix dispositions',
     icon: '🀄',
     is_active: true,
     display_order: 22,

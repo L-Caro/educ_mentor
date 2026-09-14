@@ -26,7 +26,7 @@ const RENDU = readFileSync(
   'utf-8',
 );
 const PLATEAU = readFileSync(
-  join(__dirname, '../modules/mahjong/MahjongDifficile.tsx'),
+  join(__dirname, '../modules/mahjong/MahjongGame.tsx'),
   'utf-8',
 );
 

@@ -16,3 +16,10 @@ export type TuileFace =
   | { famille: 'caractere'; valeur: TuileValeurSimple }
   | { famille: 'vent'; direction: TuileVent }
   | { famille: 'dragon'; couleur: TuileDragon };
+
+/** Une tuile POSEE sur un plateau : sa face, et une identite stable pour React et pour la
+ * selection. Deux tuiles peuvent porter la meme face, jamais le meme identifiant. */
+export interface TuileJeu {
+  id: string;
+  face: TuileFace;
+}

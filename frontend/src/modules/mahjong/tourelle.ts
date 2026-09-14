@@ -1,5 +1,4 @@
-import type { TuileFace } from './mahjong.types';
-import type { TuileJeu } from './moteur';
+import type { TuileFace, TuileJeu } from './mahjong.types';
 import { construireFaces, identifiantFace } from './tuiles';
 
 /**
@@ -179,12 +178,10 @@ function construirePairesDeFaces(nombrePaires: number): TuileFace[] {
   return melanger(paires);
 }
 
-/** Pipeline complet : disposition solvable sur la forme choisie, puis attribution des
- * faces (voir `construirePairesDeFaces`). */
-export function genererPlateauTourelle(forme: Forme): CaseTourelle[] {
-  const paires = genererDispositionTourelle(forme.slots);
-  const faces = construirePairesDeFaces(paires.length);
-
+/** Pose une face sur chaque paire de positions. Les identifiants sont reconstruits : ils
+ * n'ont pas a survivre a un melange, et les reutiliser ferait croire a React qu'une tuile
+ * a simplement bouge alors que c'est une autre. */
+function poser(paires: [PositionTourelle, PositionTourelle][], faces: TuileFace[]): CaseTourelle[] {
   const cases: CaseTourelle[] = [];
   paires.forEach(([positionA, positionB], index) => {
     const face = faces[index];
@@ -192,6 +189,53 @@ export function genererPlateauTourelle(forme: Forme): CaseTourelle[] {
     cases.push({ ...positionB, tuile: { id: `${index}-b`, face } });
   });
   return cases;
+}
+
+/** Pipeline complet : disposition solvable sur la forme choisie, puis attribution des
+ * faces (voir `construirePairesDeFaces`). */
+export function genererPlateauTourelle(forme: Forme): CaseTourelle[] {
+  const paires = genererDispositionTourelle(forme.slots);
+  return poser(paires, construirePairesDeFaces(paires.length));
+}
+
+/**
+ * Rebat les tuiles restantes sur les positions restantes.
+ *
+ * Un melange naif - permuter les faces au hasard - rendrait la main a l'enfant sur un
+ * plateau qui peut etre MORT des le premier coup. On repasse donc par la meme
+ * construction a l'envers que le tirage initial : le plateau obtenu est solvable par
+ * construction, exactement comme au depart.
+ *
+ * Les positions restantes n'ont jamais de tuile flottante, quoi qu'il se soit passe : on
+ * ne retire que des tuiles LIBRES, et une tuile libre n'a rien au-dessus d'elle. La
+ * construction peut donc repartir telle quelle.
+ *
+ * Rend `null` si aucune disposition solvable n'a ete trouvee : l'appelant garde alors le
+ * plateau en cours plutot que d'en servir un injouable.
+ */
+export function melangerPlateau(cases: CaseTourelle[]): CaseTourelle[] | null {
+  if (cases.length < 2) return null;
+
+  // Les faces encore en jeu, une fois par PAIRE : elles vont toujours par deux, puisque
+  // chaque retrait emporte exactement une paire.
+  const parFace = new Map<string, TuileFace>();
+  const comptes = new Map<string, number>();
+  for (const c of cases) {
+    const cle = identifiantFace(c.tuile.face);
+    parFace.set(cle, c.tuile.face);
+    comptes.set(cle, (comptes.get(cle) ?? 0) + 1);
+  }
+  const faces: TuileFace[] = [];
+  for (const [cle, nombre] of comptes) {
+    for (let copie = 0; copie < Math.floor(nombre / 2); copie++) faces.push(parFace.get(cle)!);
+  }
+
+  try {
+    const paires = genererDispositionTourelle(cases.map(({ x, y, z }) => ({ x, y, z })));
+    return poser(paires, melanger(faces));
+  } catch {
+    return null;
+  }
 }
 
 /** Tente d'apparier deux tuiles du plateau : memes faces, et toutes deux libres. */

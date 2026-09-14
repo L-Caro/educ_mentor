@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   estLibre,
+  melangerPlateau,
   formeEstValide,
   genererDispositionTourelle,
   genererPlateauTourelle,
@@ -135,5 +136,72 @@ describe('tenterAppariementTourelle', () => {
     const resultat = tenterAppariementTourelle(casesSansC, 'a', 'b');
     expect(resultat.reussi).toBe(true);
     expect(resultat.cases).toHaveLength(0);
+  });
+});
+
+describe('melangerPlateau', () => {
+  const plateau = () => genererPlateauTourelle(trouverForme('turtle_classic'));
+  const cle = (c: { x: number; y: number; z: number }) => `${c.x},${c.y},${c.z}`;
+
+  it('rebat les tuiles sans deplacer une seule POSITION', () => {
+    // Melanger, ce n'est pas redistribuer le plateau : la forme reste celle que l'enfant
+    // a devant les yeux, seules les faces changent de place.
+    const avant = plateau();
+    const apres = melangerPlateau(avant)!;
+    expect(apres).not.toBeNull();
+    expect(new Set(apres.map(cle))).toEqual(new Set(avant.map(cle)));
+  });
+
+  it('garde exactement les memes faces, en meme nombre', () => {
+    // En perdre une rendrait la partie insoluble ; en ajouter une casserait le compte des
+    // paires affiche a l'ecran.
+    const avant = plateau();
+    const apres = melangerPlateau(avant)!;
+    const compter = (cases: typeof avant) => {
+      const n = new Map<string, number>();
+      for (const c of cases) {
+        const k = identifiantFace(c.tuile.face);
+        n.set(k, (n.get(k) ?? 0) + 1);
+      }
+      return [...n.entries()].sort();
+    };
+    expect(compter(apres)).toEqual(compter(avant));
+  });
+
+  it('rend un plateau OUVERT : au moins une paire jouable tout de suite', () => {
+    // C'est la raison d'etre du melange. Permuter les faces au hasard peut rendre la main
+    // sur un plateau mort des le premier coup ; on repasse donc par la construction a
+    // l'envers, qui ne rend une disposition qu'apres l'avoir jouee entierement.
+    for (let essai = 0; essai < 20; essai++) {
+      const apres = melangerPlateau(plateau())!;
+      const libres = apres.filter((c) => estLibre(apres, c));
+      const paires = libres.some((a) =>
+        libres.some((b) => a !== b && identifiantFace(a.tuile.face) === identifiantFace(b.tuile.face)),
+      );
+      expect(paires).toBe(true);
+    }
+  });
+
+  it('marche AUSSI en cours de partie, pas seulement au depart', () => {
+    // Le cas qui compte : c'est bloquee, au milieu, qu'on melange.
+    let cases = plateau();
+    for (let retire = 0; retire < 20 && cases.length > 4; retire++) {
+      const libres = cases.filter((c) => estLibre(cases, c));
+      const a = libres.find((x) =>
+        libres.some((y) => y !== x && identifiantFace(x.tuile.face) === identifiantFace(y.tuile.face)),
+      );
+      if (!a) break;
+      const b = libres.find(
+        (y) => y !== a && identifiantFace(y.tuile.face) === identifiantFace(a.tuile.face),
+      )!;
+      cases = tenterAppariementTourelle(cases, a.tuile.id, b.tuile.id).cases;
+    }
+    const apres = melangerPlateau(cases)!;
+    expect(apres).not.toBeNull();
+    expect(apres).toHaveLength(cases.length);
+  });
+
+  it('refuse de melanger ce qui n’a plus rien a melanger', () => {
+    expect(melangerPlateau([])).toBeNull();
   });
 });

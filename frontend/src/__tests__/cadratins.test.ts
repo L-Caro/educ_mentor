@@ -39,7 +39,9 @@ function fichiers(dossier: string): string[] {
   return readdirSync(dossier).flatMap((nom) => {
     const chemin = join(dossier, nom);
     if (statSync(chemin).isDirectory()) return fichiers(chemin);
-    return /\.(ts|tsx|scss)$/.test(nom) ? [chemin] : [];
+    // Les `.md` aussi : un cadratin s'est glisse dans un ATTRIBUTIONS.md ecrit apres le
+    // grand nettoyage, precisement parce qu'ils n'etaient pas balayes.
+    return /\.(ts|tsx|scss|md)$/.test(nom) ? [chemin] : [];
   });
 }
 

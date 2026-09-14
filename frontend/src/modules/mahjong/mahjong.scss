@@ -21,9 +21,7 @@ $tuile-largeur: 64px;
 $tuile-hauteur: 84px;
 $tuile-epaisseur: 11px;
 
-.MahjongFacile,
-.MahjongMoyen,
-.MahjongDifficile {
+.MahjongGame {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -36,6 +34,13 @@ $tuile-epaisseur: 11px;
     font-size: $font-size-lg;
     font-weight: 700;
     color: var(--color-primary);
+  }
+
+  // Le melange, et rien d'autre : « Rejouer » et « Accueil » vivent dans le pied de page
+  // commun du moteur.
+  &__actions {
+    display: flex;
+    gap: $space-4;
   }
 
   // La place est reservee en permanence : sans hauteur fixe, le plateau sauterait chaque
@@ -121,7 +126,7 @@ $tuile-epaisseur: 11px;
   left: 0;
   top: 0;
   // La reduction part du coin haut-gauche : c'est ce qui fait coincider la scene avec le
-  // cadre, qui porte sa taille une fois reduite (voir MahjongDifficile.tsx).
+  // cadre, qui porte sa taille une fois reduite (voir MahjongGame.tsx).
   transform-origin: top left;
 }
 
