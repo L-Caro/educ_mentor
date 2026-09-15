@@ -118,9 +118,17 @@ $encre: #1a1a1a;
     vertical-align: bottom;
   }
 
-  &__pronom {
-    padding-right: 3mm;
-    text-align: right;
+  // A GAUCHE, et non a droite. Aligner les pronoms sur leur fin donnait une colonne en
+  // escalier (`je`, `nous`, `ils` n'ont pas la meme longueur) ou le pronom semblait colle
+  // a son trait. Les formes a ecrire, elles, commencent de toute facon a la meme abscisse.
+  //
+  // Selecteur qualifie par `td` : sans lui, la regle generique ci-dessus est PLUS
+  // specifique (une classe et un element contre une classe seule) et remettait la marge
+  // droite a zero. Le pronom touchait son trait, et la cause ne se voyait pas dans le
+  // fichier ou la marge etait pourtant ecrite.
+  td#{&}__pronom {
+    padding-right: 4mm;
+    text-align: left;
     white-space: nowrap;
   }
 }

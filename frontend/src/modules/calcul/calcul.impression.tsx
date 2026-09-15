@@ -14,14 +14,16 @@ export const calculImpression: FournisseurImpression = {
       // 100 ». On l'imprime tel quel plutot que de le reconstruire, pour que le papier
       // dise exactement ce que dit l'ecran.
       enonce: (d) => <Operation d={d} />,
-      reponse: (d) => `${String(d.operation)} = ${String(d.reponse)}`,
+      // Meme retrait que dans l'enonce : « Moitie de 20 = ? = 10 » se lit deux fois avant
+      // qu'on voie qu'il n'y a qu'une question.
+      reponse: (d) =>
+        `${String(d.operation).replace(/\s*=\s*\?\s*$/, '')} = ${String(d.reponse)}`,
     },
     {
       cle: 'vrai_faux',
       label: 'Vrai ou faux : 7 × 8 = 54',
       enonce: (d) => <VraiFaux d={d} />,
-      reponse: (d) =>
-        d.vrai ? 'vrai' : `faux, c'était ${String(d.reponse)}`,
+      reponse: (d) => (d.vrai ? 'vrai' : `faux, c'était ${String(d.reponse)}`),
     },
     {
       cle: 'trous',

@@ -46,6 +46,11 @@ export interface GrammaireSessionResult {
 const SETTING_ACTIVE_NOTIONS = 'grammaire_notions_actives';
 const SETTING_ACTIVE_CLASSES = 'grammaire_classes_actives';
 
+/** Trois colonnes sur la largeur d'une feuille. Sept, comme il y a de natures ouvertes,
+ * donnaient deux centimetres et demi chacune : on n'y ecrit rien, et le tri n'a plus
+ * d'objet. */
+const COLONNES_DU_TRI = 3;
+
 @Injectable()
 export class GrammaireService {
   constructor(
@@ -147,12 +152,22 @@ export class GrammaireService {
     if (naturesOuvertes.length === 0) return [];
 
     const classes = await this.getActiveClassKeys();
-    const eligibles = CORPUS.filter(
-      (phrase) =>
-        classes.includes(phrase.niveau) &&
-        // Une phrase dont aucun mot n'entre dans une colonne ouverte ne se trie pas.
-        phrase.mots.some((mot) => naturesOuvertes.includes(mot.nature)),
-    );
+    const duNiveau = CORPUS.filter((phrase) => classes.includes(phrase.niveau));
+    // Une phrase ne se trie que si CHACUN de ses mots trouve une colonne. « Sous la table
+    // dort le chat » compte quatre natures : imprimee sur trois colonnes, elle laissait
+    // `Sous` sans place, et l'enfant cherchait ou le mettre au lieu de trier. On preferera
+    // donc les phrases qui tiennent dans trois colonnes, et a defaut dans quatre.
+    const tientEn = (limite: number) =>
+      duNiveau.filter((phrase) => {
+        const naturesDeLaPhrase = new Set(phrase.mots.map((mot) => mot.nature));
+        for (const nature of naturesDeLaPhrase) {
+          if (!naturesOuvertes.includes(nature)) return false;
+        }
+        return naturesDeLaPhrase.size > 0 && naturesDeLaPhrase.size <= limite;
+      });
+    const eligibles = tientEn(COLONNES_DU_TRI).length
+      ? tientEn(COLONNES_DU_TRI)
+      : tientEn(COLONNES_DU_TRI + 1);
     if (eligibles.length === 0) return [];
 
     const melangees = [...eligibles].sort(() => Math.random() - 0.5);
@@ -163,8 +178,42 @@ export class GrammaireService {
         colle: mot.colle,
         nature: mot.nature,
       })),
-      natures: naturesOuvertes,
+      natures: this.colonnesDuTri(phrase.mots, naturesOuvertes),
     }));
+  }
+
+  /**
+   * TROIS colonnes, sauf si la phrase en exige une de plus.
+   *
+   * Les sept natures ouvertes en administration donnaient sept colonnes sur la largeur
+   * d'une feuille, soit deux centimetres et demi chacune pour une phrase de trois mots :
+   * on n'y ecrit rien, et le tri n'a plus d'objet.
+   *
+   * Les natures PRESENTES dans la phrase d'abord, puisqu'elles sont la reponse, puis on
+   * complete avec des natures ouvertes qui n'y sont pas. Une colonne qui reste vide est
+   * une reponse elle aussi : c'est meme le seul endroit ou l'on verifie qu'elle ne remplit
+   * pas une colonne parce qu'elle est la.
+   */
+  private colonnesDuTri(
+    mots: { nature: string }[],
+    ouvertes: NotionKey[],
+  ): NotionKey[] {
+    const presentes = ouvertes.filter((nature) =>
+      mots.some((mot) => mot.nature === nature),
+    );
+    const absentes = ouvertes
+      .filter((nature) => !presentes.includes(nature))
+      .sort(() => Math.random() - 0.5);
+
+    // Toutes les natures presentes, meme si elles depassent : le choix de la phrase les a
+    // deja bornees, et en couper une laisserait un mot sans colonne.
+    const colonnes = [...presentes];
+    while (colonnes.length < COLONNES_DU_TRI && absentes.length > 0) {
+      colonnes.push(absentes.pop()!);
+    }
+    // L'ordre du catalogue, et non celui du tirage : deux feuilles tirees le meme jour
+    // doivent presenter les memes colonnes dans le meme ordre.
+    return ouvertes.filter((nature) => colonnes.includes(nature));
   }
 
   async startSession(

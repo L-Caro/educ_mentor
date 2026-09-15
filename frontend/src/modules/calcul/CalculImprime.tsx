@@ -1,10 +1,17 @@
 import Blanc from 'src/impression/Blanc';
 
-/** `24 + 17 = ____` */
+/**
+ * `24 + 17 = ____`, ou `Moitie de 20 = ____`.
+ *
+ * Certains enonces du module posent deja leur question : « Moitie de 20 = ? ». Leur
+ * ajouter un second `=` donnait « Moitie de 20 = ? = ____ », qu'on ne lit pas deux fois
+ * avant de comprendre qu'il n'y a qu'une question.
+ */
 export function Operation({ d }: { d: Record<string, unknown> }) {
+  const enonce = String(d.operation).replace(/\s*=\s*\?\s*$/, '');
   return (
     <span>
-      {String(d.operation)} = <Blanc />
+      {enonce} = <Blanc />
     </span>
   );
 }

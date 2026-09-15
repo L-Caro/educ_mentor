@@ -2,6 +2,7 @@ import store from 'src/store';
 import { grammaireApi } from './grammaire.api';
 import Phrase from './PhraseImprimee';
 import TriImprime from './TriImprime';
+import { ENTETES } from './grammaire.natures';
 import Blanc from 'src/impression/Blanc';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 import type { MotImprime } from './PhraseImprimee';
@@ -61,7 +62,13 @@ export const grammaireImpression: FournisseurImpression = {
       reponse: (donnees) =>
         (donnees.reponse as { nature: string; mots: string[] }[])
           .filter((colonne) => colonne.mots.length > 0)
-          .map((colonne) => `${colonne.nature} : ${colonne.mots.join(', ')}`)
+          // Le LIBELLE de la colonne, pas sa cle : « nom_commun » est un identifiant de
+          // code, et le corrige se lit en diagonale a cote de la feuille ou la colonne
+          // s'appelle « noms ».
+          .map(
+            (colonne) =>
+              `${ENTETES[colonne.nature] ?? colonne.nature} : ${colonne.mots.join(', ')}`,
+          )
           .join(' ; '),
     },
   ],

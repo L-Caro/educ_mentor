@@ -145,4 +145,38 @@ describe('GrammaireService', () => {
       });
     });
   });
+
+  // ─── Le tri par nature, sur le papier ───────────────────────────────────────
+
+  it('donne a CHAQUE mot de la phrase une colonne ou aller', async () => {
+    // « Sous la table dort le chat » compte quatre natures. Imprimee sur trois colonnes,
+    // elle laissait `Sous` sans place : l'enfant cherchait ou le mettre au lieu de trier,
+    // et la feuille lui donnait tort sans raison.
+    const tris = await service.construireTri(12);
+    expect(tris.length).toBeGreaterThan(0);
+    for (const tri of tris) {
+      for (const mot of tri.phrase) {
+        expect({ mot: mot.mot, colonnes: tri.natures }).toEqual({
+          mot: mot.mot,
+          colonnes: expect.arrayContaining([mot.nature]) as string[],
+        });
+      }
+    }
+  });
+
+  it('tient dans TROIS colonnes, sauf si la phrase en exige une de plus', async () => {
+    // Sept colonnes, comme il y a de natures ouvertes, donnaient deux centimetres et demi
+    // chacune : on n'y ecrit rien, et le tri n'a plus d'objet.
+    const tris = await service.construireTri(12);
+    for (const tri of tris) {
+      expect(tri.natures.length).toBeLessThanOrEqual(4);
+      expect(tri.natures.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('ne trie RIEN quand aucune nature n’est ouverte', async () => {
+    // Une porte fermee reste fermee : la feuille ne va pas plus loin que le jeu.
+    await service.setActiveNotionKeys(['sujet']);
+    expect(await service.construireTri(5)).toEqual([]);
+  });
 });

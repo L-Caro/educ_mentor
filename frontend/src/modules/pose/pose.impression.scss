@@ -13,8 +13,17 @@
 
   // La zone de reponse : des cases vides de la meme largeur que les chiffres au-dessus,
   // pour qu'elle pose son resultat dans les memes colonnes. C'est tout l'exercice.
+  //
+  // Elles portent un TRAIT. Sans lui, la zone de reponse etait un vide de six
+  // millimetres sous la barre : rien ne disait ou ecrire, ni sur combien de colonnes, et
+  // l'alignement des unites sous les unites, qui est tout le sujet de l'operation posee,
+  // n'etait plus guide par rien.
   &__ligne--vide {
     height: 6mm;
+
+    .Posee__chiffre {
+      border-bottom: 0.25mm dotted currentColor;
+    }
   }
 
   &__chiffre {
