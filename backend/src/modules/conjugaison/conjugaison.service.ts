@@ -153,15 +153,22 @@ export class ConjugaisonService {
     const groups = this.normalizeGroups(dto.verb_groups);
     const direction = dto.question_direction ?? 'forward'; // 'random' résolu par question dans generateQuestions
 
+    // Deux filtres de verbes, et l'ordre compte. Celui du DTO est PONCTUEL : il vient
+    // d'une feuille d'exercices ou l'adulte a coche trois verbes pour cette feuille-la.
+    // Celui des reglages est PERMANENT et vaut pour le jeu. Le ponctuel l'emporte, sinon
+    // choisir des verbes pour une feuille changerait aussi ce que l'enfant voit a
+    // l'ecran, ce que personne n'a demande.
     const verbsFilterRaw = await this.settingsService.get(
       'conjugaison_verbs_filter',
     );
-    const verbsFilter = verbsFilterRaw
-      ? verbsFilterRaw
-          .split(',')
-          .map((v) => v.trim())
-          .filter(Boolean)
-      : null;
+    const verbsFilter = dto.verbes?.length
+      ? dto.verbes
+      : verbsFilterRaw
+        ? verbsFilterRaw
+            .split(',')
+            .map((v) => v.trim())
+            .filter(Boolean)
+        : null;
 
     const availableVerbs = Object.entries(this.verbs)
       .filter(([, v]) =>

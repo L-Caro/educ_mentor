@@ -4,6 +4,7 @@ import Spinner from 'src/components/common/Spinner';
 import { MODULES } from 'src/modules.manifest';
 import FeuilleImprimable from './FeuilleImprimable';
 import { useComposerFeuilleMutation } from './impression.api';
+import OptionsExercice from './OptionsExercice';
 import type { ExerciceImprimable, ItemImprime, LigneComposition } from './impression.types';
 import './impression.scss';
 
@@ -38,6 +39,8 @@ export default function ImpressionPage() {
 
   /** Combien d'exercices de chaque type, indexe par `module/exercice`. */
   const [quantites, setQuantites] = useState<Record<string, number>>({});
+  /** Les reglages de chaque exercice, indexes par `module/exercice`. */
+  const [reglages, setReglages] = useState<Record<string, Record<string, unknown>>>({});
   const [avecCorrige, setAvecCorrige] = useState(true);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
   const [composer, { isLoading, isError }] = useComposerFeuilleMutation();
@@ -57,7 +60,7 @@ export default function ImpressionPage() {
       .filter(([, nombre]) => nombre > 0)
       .map(([cle, nombre]) => {
         const [module, exercice] = cle.split('/');
-        return { module, exercice, nombre };
+        return { module, exercice, nombre, options: reglages[cle] };
       });
     if (lignes.length === 0) return;
     try {
@@ -83,7 +86,8 @@ export default function ImpressionPage() {
             {f.exercices.map((exercice) => {
               const cle = `${f.id}/${exercice.cle}`;
               return (
-                <div key={cle} className="GameSettings__rangeRow">
+                <div key={cle}>
+                <div className="GameSettings__rangeRow">
                   <label className="GameSettings__rangeLabel" htmlFor={cle}>
                     {exercice.label}
                   </label>
@@ -102,6 +106,20 @@ export default function ImpressionPage() {
                     className="GameSettings__range"
                     style={{ maxWidth: '6rem' }}
                   />
+                </div>
+
+                {/* Les reglages n'apparaissent QUE si l'exercice est demande : les
+                    afficher tous ferait une page de cases a cocher ou l'essentiel, le
+                    nombre d'exercices, se perdrait. */}
+                {(quantites[cle] ?? 0) > 0 && exercice.options && (
+                  <OptionsExercice
+                    options={exercice.options}
+                    valeurs={reglages[cle] ?? {}}
+                    onChange={(valeurs) =>
+                      setReglages((precedent) => ({ ...precedent, [cle]: valeurs }))
+                    }
+                  />
+                )}
                 </div>
               );
             })}

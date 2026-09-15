@@ -13,6 +13,18 @@ export const tablesImpression: FournisseurImpression = {
         </span>
       ),
       reponse: (d) => `${String(d.a)} × ${String(d.b)} = ${String(d.reponse)}`,
+      options: [
+        {
+          cle: 'tables',
+          label: 'Quelles tables',
+          type: 'multi',
+          // Statique, et pour longtemps : les tables vont de 0 a 10.
+          choix: Array.from({ length: 11 }, (_, n) => ({
+            valeur: String(n),
+            label: `× ${n}`,
+          })),
+        },
+      ],
     },
   ],
 };

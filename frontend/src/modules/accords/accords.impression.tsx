@@ -1,3 +1,5 @@
+import store from 'src/store';
+import { accordsApi } from './accords.api';
 import Blanc from 'src/impression/Blanc';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 
@@ -29,6 +31,24 @@ export const accordsImpression: FournisseurImpression = {
         </div>
       ),
       reponse: (donnees) => String(donnees.reponse),
+      options: [
+        {
+          cle: 'types',
+          label: 'Quelles notions',
+          type: 'multi',
+          // Seulement les notions OUVERTES : imprimer une notion fermee contournerait le
+          // reglage d'administration, exactement comme le ferait le peage.
+          charger: async () => {
+            const [catalogue, actives] = await Promise.all([
+              store.dispatch(accordsApi.endpoints.getAccordsNotions.initiate(undefined)).unwrap(),
+              store.dispatch(accordsApi.endpoints.getAccordsActiveNotions.initiate(undefined)).unwrap(),
+            ]);
+            return catalogue
+              .filter((notion) => actives.includes(notion.key))
+              .map((notion) => ({ valeur: notion.key, label: notion.label }));
+          },
+        },
+      ],
     },
   ],
 };

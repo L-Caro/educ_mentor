@@ -44,6 +44,54 @@ describe('le catalogue imprimable', () => {
   });
 });
 
+describe('les reglages par exercice', () => {
+  it('laisse choisir ce qu’on travaille, la ou ca a du sens', () => {
+    // Sans reglages, une feuille de tables sort les onze tables melangees et une feuille
+    // de grammaire toutes les notions ouvertes. C'est utilisable, mais ca ne permet pas
+    // de travailler ce qu'on VEUT travailler, qui est le seul interet d'une feuille faite
+    // a la main plutot que tiree au hasard.
+    const attendus: Record<string, string[]> = {
+      'tables/produit': ['tables'],
+      'calcul-mental/operation': ['types'],
+      'conjugaison/forme': ['formes', 'verbes', 'tenses'],
+      'accords/accord': ['types'],
+      'grammaire/analyse': ['types'],
+    };
+    for (const [cle, cles] of Object.entries(attendus)) {
+      const [moduleId, exerciceCle] = cle.split('/');
+      const exercice = MODULES.find((m) => m.id === moduleId)?.impression?.exercices.find(
+        (e) => e.cle === exerciceCle,
+      );
+      expect({ cle, options: exercice?.options?.map((o) => o.cle).sort() }).toEqual({
+        cle,
+        options: [...cles].sort(),
+      });
+    }
+  });
+
+  it('borne le nombre de formes d’une conjugaison entre une et six', () => {
+    const formes = MODULES.find((m) => m.id === 'conjugaison')
+      ?.impression?.exercices[0]?.options?.find((o) => o.cle === 'formes');
+    expect(formes).toMatchObject({ type: 'nombre', min: 1, max: 6 });
+  });
+
+  it('ne propose QUE des listes chargees ou statiques, jamais les deux', () => {
+    // Une option qui porterait les deux laisserait deux sources de verite sur ce qui est
+    // proposable, et la statique gagnerait en silence.
+    for (const module of fournisseurs) {
+      for (const exercice of module.impression!.exercices) {
+        for (const option of exercice.options ?? []) {
+          if (option.type !== 'multi') continue;
+          expect({
+            cle: option.cle,
+            uneSeule: Boolean(option.choix) !== Boolean(option.charger),
+          }).toEqual({ cle: option.cle, uneSeule: true });
+        }
+      }
+    }
+  });
+});
+
 describe('la feuille est un objet PHYSIQUE', () => {
   it('se mesure en millimetres, jamais en pixels', () => {
     // Le millimetre est la seule unite que l'imprimante respecte. Une feuille reglee en

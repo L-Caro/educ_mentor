@@ -251,6 +251,12 @@ export class ImpressionService {
           await this.conjugaisonService.construireQuestions({
             difficulty: 'hard',
             question_direction: 'forward',
+            tenses: Array.isArray(ligne.options?.tenses)
+              ? (ligne.options.tenses as string[])
+              : undefined,
+            verbes: Array.isArray(ligne.options?.verbes)
+              ? (ligne.options.verbes as string[])
+              : undefined,
           })
         ).resultat.questions,
     );

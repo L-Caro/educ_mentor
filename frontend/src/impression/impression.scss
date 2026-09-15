@@ -215,6 +215,17 @@ $bleu-fort: #5a7fb0;
   gap: $space-5;
 }
 
+// Les reglages d'un exercice, sous son compteur. Decales et plus discrets : ils
+// dependent de lui, et l'oeil doit pouvoir les sauter quand on compose vite.
+.Impression__options {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  margin: $space-3 0 $space-5 $space-6;
+  padding-left: $space-5;
+  border-left: 2px solid var(--color-base-300);
+}
+
 .Impression__apercu {
   // Le rendu ecran imite la feuille : fond blanc, ombre, pour qu'on voie ce qui sortira.
   padding: $marge-page;
@@ -259,7 +270,18 @@ $bleu-fort: #5a7fb0;
   // Tout ce qui habille l'apercu a l'ecran doit disparaitre : une ombre, un fond, une
   // marge interieure decalent la feuille sur la page ou mangent sa largeur utile.
   .Impression,
-  .Impression__apercu {
+  // Les reglages d'un exercice, sous son compteur. Decales et plus discrets : ils
+// dependent de lui, et l'oeil doit pouvoir les sauter quand on compose vite.
+.Impression__options {
+  display: flex;
+  flex-direction: column;
+  gap: $space-3;
+  margin: $space-3 0 $space-5 $space-6;
+  padding-left: $space-5;
+  border-left: 2px solid var(--color-base-300);
+}
+
+.Impression__apercu {
     display: block;
     padding: 0;
     margin: 0;

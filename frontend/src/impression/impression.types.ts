@@ -19,6 +19,42 @@ export interface ItemImprime {
   donnees: Record<string, unknown>;
 }
 
+/**
+ * Un reglage propre a un exercice : quelles tables, quelles notions, combien de formes.
+ *
+ * Sans ces reglages, une feuille de tables sort les onze tables melangees et une feuille
+ * de grammaire toutes les notions ouvertes. C'est utilisable, mais ca ne permet pas de
+ * travailler ce qu'on veut travailler, qui est le seul interet d'une feuille faite a la
+ * main plutot que tiree au hasard.
+ *
+ * Les listes peuvent etre STATIQUES (les tables vont de 0 a 10, ca ne changera pas) ou
+ * chargees (les notions ouvertes dependent de l'administration). Dans le second cas on ne
+ * propose que ce qui est ACTIF : imprimer une notion fermee contournerait le seul reglage
+ * qui decide de ce que l'enfant voit, exactement comme pour le peage.
+ */
+export interface ChoixImprimable {
+  valeur: string;
+  label: string;
+}
+
+export type OptionImprimable =
+  | {
+      cle: string;
+      label: string;
+      type: 'multi';
+      choix?: ChoixImprimable[];
+      charger?: () => Promise<ChoixImprimable[]>;
+      /** Rien de coche = pas de filtre, le module choisit librement. */
+    }
+  | {
+      cle: string;
+      label: string;
+      type: 'nombre';
+      min: number;
+      max: number;
+      defaut: number;
+    };
+
 export interface ExerciceImprimable {
   /** Identifiant envoye au serveur, avec le module : `tables/produit`. */
   cle: string;
@@ -36,6 +72,8 @@ export interface ExerciceImprimable {
   enonce: (donnees: Record<string, unknown>) => ReactNode;
   /** La reponse, pour la page de corrige. Courte : elle est lue en diagonale. */
   reponse: (donnees: Record<string, unknown>) => ReactNode;
+  /** Ce qu'on peut regler avant de tirer. Voir `OptionImprimable`. */
+  options?: OptionImprimable[];
 }
 
 export interface FournisseurImpression {

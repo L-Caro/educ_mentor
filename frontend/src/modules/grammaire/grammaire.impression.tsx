@@ -1,3 +1,5 @@
+import store from 'src/store';
+import { grammaireApi } from './grammaire.api';
 import Phrase from './PhraseImprimee';
 import Blanc from 'src/impression/Blanc';
 import type { FournisseurImpression } from 'src/impression/impression.types';
@@ -36,6 +38,24 @@ export const grammaireImpression: FournisseurImpression = {
         );
       },
       reponse: (donnees) => String(donnees.reponse),
+      options: [
+        {
+          cle: 'types',
+          label: 'Quelles notions',
+          type: 'multi',
+          // Seulement les notions OUVERTES : imprimer une notion fermee contournerait le
+          // reglage d'administration, exactement comme le ferait le peage.
+          charger: async () => {
+            const [catalogue, actives] = await Promise.all([
+              store.dispatch(grammaireApi.endpoints.getGrammaireNotions.initiate(undefined)).unwrap(),
+              store.dispatch(grammaireApi.endpoints.getGrammaireActiveNotions.initiate(undefined)).unwrap(),
+            ]);
+            return catalogue
+              .filter((notion) => actives.includes(notion.key))
+              .map((notion) => ({ valeur: notion.key, label: notion.label }));
+          },
+        },
+      ],
     },
   ],
 };

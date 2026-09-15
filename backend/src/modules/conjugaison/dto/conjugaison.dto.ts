@@ -29,6 +29,13 @@ export class StartConjugaisonSessionDto {
   @IsOptional()
   @IsIn(VALID_DIRECTIONS)
   question_direction?: QuestionDirection;
+
+  /** Les verbes de CETTE demande. Prime sur le filtre permanent des reglages, qui reste
+   * celui du jeu (voir `ConjugaisonService`). */
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  verbes?: string[];
 }
 
 export class RecordConjugaisonAnswerDto {
