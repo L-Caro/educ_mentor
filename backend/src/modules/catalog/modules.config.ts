@@ -185,6 +185,15 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 21,
   },
   {
+    id: 'programmation',
+    name: 'Programmation',
+    description:
+      'Composer une suite d’ordres pour mener le personnage au but : séquence, répétition, condition',
+    icon: '🤖',
+    is_active: false,
+    display_order: 23,
+  },
+  {
     id: 'mahjong',
     name: 'Mahjong',
     description:

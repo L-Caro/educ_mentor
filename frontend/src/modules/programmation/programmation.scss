@@ -1,0 +1,328 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Programmer un deplacement ───────────────────────────────────────────────
+
+.Prog {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-5;
+
+  &__entete {
+    text-align: center;
+  }
+
+  &__etape {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.7;
+  }
+
+  &__consigne {
+    margin: v.$space-2 0 0;
+    font-size: v.$font-size-xl;
+    font-weight: 700;
+  }
+
+  // Le plateau et les commandes cote a cote sur grand ecran, l'un sous l'autre sinon. Le
+  // plateau passe DEVANT : on regarde ou l'on va avant de composer.
+  &__jeu {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: v.$space-5;
+    align-items: start;
+
+    @media (min-width: 60rem) {
+      grid-template-columns: minmax(0, 1fr) minmax(20rem, 26rem);
+    }
+  }
+
+  &__cote {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-4;
+    min-width: 0;
+  }
+
+  // ── Le plateau ─────────────────────────────────────────────────────────────
+
+  &__grille {
+    position: relative;
+    display: grid;
+    width: 100%;
+    max-width: 34rem;
+    margin: 0 auto;
+    border: 3px solid var(--color-base-content);
+    border-radius: v.$border-radius-2;
+    overflow: hidden;
+  }
+
+  &__case {
+    position: relative;
+    aspect-ratio: 1;
+  }
+
+  &__dessin {
+    position: absolute;
+    inset: 8%;
+    width: 84%;
+    height: 84%;
+  }
+
+  // Le but pulse doucement : c'est le point d'arrivee, il doit se trouver d'un coup
+  // d'oeil sur une grille de soixante-quatre cases.
+  &__but {
+    animation: prog-respire 2.2s ease-in-out infinite;
+  }
+
+  // Le personnage GLISSE d'une case a l'autre. Un saut ne montrerait pas le chemin
+  // parcouru, et c'est justement le chemin qu'on cherche a lui faire lire.
+  &__personnage {
+    position: absolute;
+    transition:
+      left 0.32s ease,
+      top 0.32s ease;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  // ── Les blocs ──────────────────────────────────────────────────────────────
+
+  &__titre {
+    margin: 0 0 v.$space-2;
+    font-size: v.$font-size-sm;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  &__palette,
+  &__programme {
+    background: var(--color-base-100);
+    border: 1px solid var(--color-base-300);
+    border-radius: v.$border-radius-2;
+    padding: v.$space-4;
+  }
+
+  &__paletteBlocs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-2;
+  }
+
+  // Trois familles, trois couleurs : se deplacer, agir, decider. Une couleur par bloc
+  // n'aurait porte aucun sens ; celles-ci disent de quoi il s'agit avant la lecture.
+  &__bloc {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-2;
+    border: 2px solid transparent;
+    border-radius: v.$border-radius-2;
+    padding: v.$space-2 v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-base;
+    font-weight: 600;
+    cursor: pointer;
+    color: #1a1a1a;
+
+    &--deplacement {
+      background: #bfe0f5;
+      border-color: #7fb3d5;
+    }
+
+    &--action {
+      background: #cdeccd;
+      border-color: #8fc98f;
+    }
+
+    &--structure {
+      background: #f6dfae;
+      border-color: #dcb56b;
+    }
+
+    &--offert:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    // Le bloc en cours d'execution, pour suivre du regard ce qui se passe.
+    &--actif {
+      outline: 3px solid var(--color-primary);
+    }
+  }
+
+  &__blocCorps {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-2;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  &__signe {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  &__mot {
+    font-size: v.$font-size-sm;
+  }
+
+  &__liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-2;
+  }
+
+  &__ligne {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-2;
+    // A la TAILLE du bloc. Sans cela, un enfant de conteneur en colonne s'etire sur toute
+    // la largeur, et la file devenait une pile de bandeaux ou l'on ne lisait plus quel
+    // ordre etait long ou court.
+    align-items: flex-start;
+  }
+
+  // Le DEDANS d'un bloc a corps. Decale et encadre : l'emboitement doit se voir, c'est
+  // toute la notion.
+  &__ouvrir {
+    display: block;
+    margin-top: v.$space-2;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
+    font-size: v.$font-size-sm;
+    opacity: 0.7;
+    cursor: pointer;
+  }
+
+  &__dedans {
+    margin-left: v.$space-6;
+    padding: v.$space-3;
+    border: 2px dashed var(--color-base-300);
+    border-radius: v.$border-radius-2;
+    background: none;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+
+    &--ouvert {
+      border-color: var(--color-primary);
+      border-style: solid;
+      background: color-mix(in srgb, var(--color-primary) 8%, transparent);
+    }
+  }
+
+  &__fois {
+    display: inline-flex;
+    align-items: center;
+    gap: v.$space-1;
+    margin-left: v.$space-2;
+  }
+
+  &__foisChoix {
+    min-width: 1.6rem;
+    border: 1px solid #dcb56b;
+    border-radius: v.$border-radius;
+    background: #fff;
+    font: inherit;
+    font-size: v.$font-size-sm;
+    cursor: pointer;
+
+    &--actif {
+      background: #dcb56b;
+      font-weight: 700;
+    }
+  }
+
+  &__vide {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.6;
+  }
+
+  &__sortir,
+  &__retour {
+    align-self: flex-start;
+    background: none;
+    border: none;
+    padding: v.$space-2 0;
+    font: inherit;
+    font-size: v.$font-size-sm;
+    color: var(--color-base-content);
+    opacity: 0.7;
+    cursor: pointer;
+  }
+
+  &__bride {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.75;
+
+    &--trop {
+      color: var(--color-error, #c1442a);
+      font-weight: 700;
+      opacity: 1;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-3;
+
+    .Button {
+      width: auto;
+      padding: v.$space-3 v.$space-6;
+      font-size: 1rem;
+    }
+  }
+
+  &__issue {
+    border-radius: v.$border-radius-2;
+    padding: v.$space-4;
+
+    p {
+      margin: 0 0 v.$space-2;
+    }
+
+    &--gagne {
+      background: #cdeccd;
+      border: 2px solid #8fc98f;
+    }
+
+    &--rate {
+      background: #fbe3d8;
+      border: 2px solid #e8a488;
+    }
+  }
+
+  // Ce qui s'est passe, et non « perdu ». Dire OU ca a coince est la seule chose qui
+  // permette de corriger : « perdu » ne renseigne sur rien.
+  &__astuce {
+    font-size: v.$font-size-sm;
+    opacity: 0.8;
+  }
+}
+
+@keyframes prog-respire {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}

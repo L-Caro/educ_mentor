@@ -25,6 +25,7 @@ import { MemoryModule } from './modules/memory/memory.module';
 import { PenduModule } from './modules/pendu/pendu.module';
 import { PoseModule } from './modules/pose/pose.module';
 import { CompteModule } from './modules/compte/compte.module';
+import { ProgrammationModule } from './modules/programmation/programmation.module';
 import { PeageModule } from './modules/peage/peage.module';
 import { ImpressionModule } from './modules/impression/impression.module';
 import { DicteeModule } from './modules/dictee/dictee.module';
@@ -76,6 +77,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     PenduModule,
     PoseModule,
     CompteModule,
+    ProgrammationModule,
     PeageModule,
     ImpressionModule,
     DicteeModule,
