@@ -165,113 +165,115 @@ export default function ImpressionPage() {
           Imprimer le corrigé, sur une page à part
         </label>
 
-        {fournisseurs.map((f) => {
-          const coches = selection[f.id] ?? [];
-          const actif = actifs[f.id] ?? false;
-          const nombre = compte(f.id);
-          return (
-            <div
-              key={f.id}
-              className={`Impression__module${actif ? ' Impression__module--actif' : ''}`}
-            >
-              <div className="Impression__moduleEntete">
-                <div className="Impression__moduleInfo">
-                  <span className="Impression__moduleIcone">
-                    {getModuleMeta(f.id)?.icon}
-                  </span>
-                  <p className="Impression__moduleNom">{f.label}</p>
-                  {nombre > 0 && (
-                    <span className="Impression__moduleCompte">
-                      {nombre} exercice{nombre > 1 ? 's' : ''}
+        <div className="Impression__grille">
+          {fournisseurs.map((f) => {
+            const coches = selection[f.id] ?? [];
+            const actif = actifs[f.id] ?? false;
+            const nombre = compte(f.id);
+            return (
+              <div
+                key={f.id}
+                className={`Impression__module${actif ? ' Impression__module--actif' : ''}`}
+              >
+                <div className="Impression__moduleEntete">
+                  <div className="Impression__moduleInfo">
+                    <span className="Impression__moduleIcone">
+                      {getModuleMeta(f.id)?.icon}
                     </span>
-                  )}
+                    <p className="Impression__moduleNom">{f.label}</p>
+                    {nombre > 0 && (
+                      <span className="Impression__moduleCompte">
+                        {nombre} exercice{nombre > 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                  <Toggle
+                    checked={actif}
+                    onChange={() => basculer(f.id, f.exercices)}
+                  />
                 </div>
-                <Toggle
-                  checked={actif}
-                  onChange={() => basculer(f.id, f.exercices)}
-                />
-              </div>
 
-              {actif && (
-                <>
-                  {/* Les TYPES d'exercices. On en coche autant qu'on veut : le nombre
+                {actif && (
+                  <>
+                    {/* Les TYPES d'exercices. On en coche autant qu'on veut : le nombre
                       demande se repartit entre eux, ce qui donne la variete sans avoir a
                       faire l'arithmetique soi-meme. */}
-                  <div className="GameSettings__denominations">
-                    {f.exercices.map((exercice) => (
-                      <button
-                        key={exercice.cle}
-                        type="button"
-                        className={`GameSettings__denomination${
-                          coches.includes(exercice.cle)
-                            ? ' GameSettings__denomination--active'
-                            : ''
-                        }`}
-                        onClick={() =>
-                          setSelection((precedent) => ({
+                    <div className="GameSettings__denominations">
+                      {f.exercices.map((exercice) => (
+                        <button
+                          key={exercice.cle}
+                          type="button"
+                          className={`GameSettings__denomination${
+                            coches.includes(exercice.cle)
+                              ? ' GameSettings__denomination--active'
+                              : ''
+                          }`}
+                          onClick={() =>
+                            setSelection((precedent) => ({
+                              ...precedent,
+                              [f.id]: coches.includes(exercice.cle)
+                                ? coches.filter((c) => c !== exercice.cle)
+                                : [...coches, exercice.cle],
+                            }))
+                          }
+                        >
+                          {exercice.label}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="GameSettings__rangeRow">
+                      <label
+                        className="GameSettings__rangeLabel"
+                        htmlFor={`n-${f.id}`}
+                      >
+                        Combien d&rsquo;exercices
+                      </label>
+                      <input
+                        id={`n-${f.id}`}
+                        type="number"
+                        min={0}
+                        max={MAXIMUM_ITEMS}
+                        value={nombres[f.id] ?? 0}
+                        onChange={(e) =>
+                          setNombres((precedent) => ({
                             ...precedent,
-                            [f.id]: coches.includes(exercice.cle)
-                              ? coches.filter((c) => c !== exercice.cle)
-                              : [...coches, exercice.cle],
+                            [f.id]: Math.max(
+                              0,
+                              Math.min(MAXIMUM_ITEMS, Number(e.target.value)),
+                            ),
                           }))
                         }
-                      >
-                        {exercice.label}
-                      </button>
-                    ))}
-                  </div>
+                        className="GameSettings__range"
+                        style={{ maxWidth: '6rem' }}
+                      />
+                    </div>
 
-                  <div className="GameSettings__rangeRow">
-                    <label
-                      className="GameSettings__rangeLabel"
-                      htmlFor={`n-${f.id}`}
-                    >
-                      Combien d&rsquo;exercices
-                    </label>
-                    <input
-                      id={`n-${f.id}`}
-                      type="number"
-                      min={0}
-                      max={MAXIMUM_ITEMS}
-                      value={nombres[f.id] ?? 0}
-                      onChange={(e) =>
-                        setNombres((precedent) => ({
-                          ...precedent,
-                          [f.id]: Math.max(
-                            0,
-                            Math.min(MAXIMUM_ITEMS, Number(e.target.value)),
-                          ),
-                        }))
-                      }
-                      className="GameSettings__range"
-                      style={{ maxWidth: '6rem' }}
-                    />
-                  </div>
+                    {coches.length === 0 && (
+                      <p className="GameSettings__hint">
+                        Coche au moins un type d&rsquo;exercice, sinon ce module
+                        ne sortira rien.
+                      </p>
+                    )}
 
-                  {coches.length === 0 && (
-                    <p className="GameSettings__hint">
-                      Coche au moins un type d&rsquo;exercice, sinon ce module
-                      ne sortira rien.
-                    </p>
-                  )}
-
-                  {f.options && (
-                    <OptionsExercice
-                      options={f.options}
-                      valeurs={reglages[f.id] ?? {}}
-                      onChange={(valeurs) =>
-                        setReglages((precedent) => ({
-                          ...precedent,
-                          [f.id]: valeurs,
-                        }))
-                      }
-                    />
-                  )}
-                </>
-              )}
-            </div>
-          );
-        })}
+                    {f.options && (
+                      <OptionsExercice
+                        options={f.options}
+                        valeurs={reglages[f.id] ?? {}}
+                        onChange={(valeurs) =>
+                          setReglages((precedent) => ({
+                            ...precedent,
+                            [f.id]: valeurs,
+                          }))
+                        }
+                      />
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         <div className="Impression__actions">
           <Button

@@ -237,6 +237,31 @@ $bleu-fort: #5a7fb0;
   cursor: pointer;
 }
 
+// Les modules en GRILLE, et non en liste. Treize lignes pleine largeur ne portaient
+// qu'un nom et un interrupteur chacune : c'etait treize ecrans de large pour une
+// information qui tient en trois mots. Le nombre de colonnes suit la largeur de la
+// fenetre, comme la grille des modules du tableau de bord.
+.Impression__grille {
+  display: grid;
+  // Des paliers EXPLICITES, et non un `auto-fill` : celui-ci donnait huit colonnes sur un
+  // grand ecran, et huit cartes par rangee ne se lisent plus comme une liste de modules
+  // mais comme une barre d'outils. Trois ou quatre selon la largeur, pas davantage.
+  grid-template-columns: 1fr;
+  gap: $space-4;
+
+  @media (min-width: 40rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 60rem) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (min-width: 85rem) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 // Une carte par module, REPLIEE tant qu'elle n'est pas activee. Treize modules deplies
 // faisaient une page ou l'on ne trouvait plus rien : on compose une feuille avec deux ou
 // trois modules, pas avec treize.
@@ -249,9 +274,15 @@ $bleu-fort: #5a7fb0;
   flex-direction: column;
   gap: $space-4;
 
-  // Activee, elle prend la couleur d'accent : d'un coup d'oeil sur la liste repliee on
+  // Activee, elle prend la couleur d'accent : d'un coup d'oeil sur la grille repliee on
   // voit ce qui composera la feuille, sans avoir a deplier.
+  //
+  // Et elle prend TOUTE la largeur. Les types d'exercices portent des libelles entiers
+  // (« Table entiere deja remplie, a garder ») : dans une colonne de quinze rem ils se
+  // coupaient en trois lignes chacun, et la carte ouverte devenait plus haute que la
+  // grille entiere.
   &--actif {
+    grid-column: 1 / -1;
     border-color: var(--color-primary);
     box-shadow: var(--shadow-sm);
   }
