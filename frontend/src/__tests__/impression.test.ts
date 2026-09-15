@@ -54,15 +54,30 @@ describe('la feuille est un objet PHYSIQUE', () => {
   });
 
   it('garde la reglure Seyes a ses vraies mesures', () => {
-    // Interligne de 2 mm, ligne forte tous les 8 mm, verticales tous les 8 mm. Ce sont
-    // les mesures du cahier : approximatives, elles ne servent plus a rien.
-    expect(SCSS).toMatch(/transparent 0\.15mm 2mm/);
-    expect(SCSS).toMatch(/transparent 0\.25mm 8mm/);
-    expect(SCSS).toMatch(/transparent 0\.15mm 8mm/);
+    // Interligne de 2 mm, quatre par groupe, donc une ligne forte tous les 8 mm. Ce sont
+    // les mesures de son cahier : approximatives, elles ne servent plus a rien.
+    expect(SCSS).toMatch(/&__interligne \{[^}]*height: 2mm/);
+    expect(TRAMES).toMatch(/Seyes__interligne--forte/);
+    // On compte les OUVERTURES de classe : `Seyes__interligne--forte` contient deja le
+    // nom de base, et compter les occurrences nues en donnait cinq pour quatre divs.
+    const groupe = TRAMES.slice(TRAMES.indexOf('Seyes__groupe'));
+    expect(groupe.match(/"Seyes__interligne/g)?.length).toBe(4);
   });
 
   it('quadrille a 5 mm, la trame des maths', () => {
-    expect(SCSS).toMatch(/transparent 0\.15mm 5mm/);
+    expect(SCSS).toMatch(/&__case \{[^}]*height: 5mm/);
+    expect(TRAMES).toMatch(/repeat\(\$\{colonnes\}, 5mm\)/);
+  });
+
+  it('dessine les trames en BORDURES, jamais en fonds', () => {
+    // Chrome n'imprime pas les fonds tant que « Graphiques d'arriere-plan » n'est pas
+    // coche, et cette case est DECOCHEE par defaut. Une premiere version utilisait des
+    // `repeating-linear-gradient` : la feuille serait sortie vierge, et l'enfant aurait
+    // eu une page blanche numerotee. Une bordure fait partie du contenu et s'imprime
+    // toujours.
+    const trames = SCSS.slice(SCSS.indexOf('.Seyes {'), SCSS.indexOf('.LignesEcriture'));
+    expect(trames).not.toMatch(/background/);
+    expect(trames).toMatch(/border-bottom: 0\.15mm solid/);
   });
 
   it('ne coupe jamais un exercice entre deux pages', () => {
@@ -75,9 +90,15 @@ describe('la feuille est un objet PHYSIQUE', () => {
     expect(SCSS).toMatch(/&__corrige \{[^}]*break-before: page/);
   });
 
-  it('n’imprime pas les reglages', () => {
-    expect(SCSS).toMatch(/@media print/);
-    expect(SCSS).toMatch(/\.Impression__reglages,/);
+  it('n’imprime QUE la feuille', () => {
+    // Tout est masque, puis la feuille seule est rouverte. Une premiere version masquait
+    // `body > *:not(.Impression__racine)` : le premier enfant de `body` est la racine
+    // React, qui ne porte pas cette classe, et l'apercu sortait VIERGE. Et `visibility`
+    // plutot que `display` : `display: none` sur un ancetre emporte ses descendants quoi
+    // qu'on dise plus bas.
+    const bloc = SCSS.slice(SCSS.indexOf('@media print'));
+    expect(bloc).toMatch(/body \* \{\s*visibility: hidden/);
+    expect(bloc).toMatch(/\.Feuille,\s*\n\s*\.Feuille \* \{\s*visibility: visible/);
   });
 });
 

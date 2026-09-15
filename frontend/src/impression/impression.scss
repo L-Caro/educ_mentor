@@ -92,25 +92,48 @@ $encre: #1a1a1a;
 }
 
 // ─── Les trames ───────────────────────────────────────────────────────────────
+//
+// Des BORDURES et non des fonds : Chrome n'imprime pas les fonds tant que « Graphiques
+// d'arriere-plan » n'est pas coche, et cette case est decochee par defaut. Une feuille
+// dessinee avec des degrades serait sortie vierge (voir trames.tsx).
 
-.Trame {
-  width: 100%;
+$bleu-fin: #9fb8d8;
+$bleu-fort: #5a7fb0;
 
-  // Seyes : interligne de 2 mm, ligne forte tous les 8 mm, verticales tous les 8 mm.
-  // Les couleurs sont celles du cahier, bleu pale et marge rouge : une enfant reconnait
-  // son papier avant de lire ce qu'il y a dessus.
-  &--seyes {
-    background-image:
-      repeating-linear-gradient(to bottom, #9fb8d8 0 0.15mm, transparent 0.15mm 2mm),
-      repeating-linear-gradient(to bottom, #5a7fb0 0 0.25mm, transparent 0.25mm 8mm),
-      repeating-linear-gradient(to right, #c8d6e8 0 0.15mm, transparent 0.15mm 8mm);
+.Seyes {
+  flex: 1;
+  // La ligne forte du haut : celle sur laquelle l'ecriture s'appuie.
+  border-top: 0.25mm solid $bleu-fort;
+  // La marge rouge du cahier. Elle n'a rien d'ornemental : c'est le repere qui lui dit
+  // ou commence sa ligne.
+  border-left: 0.4mm solid #c0392b;
+
+  &__groupe {
+    display: flex;
+    flex-direction: column;
   }
 
-  &--carreaux {
-    background-image:
-      repeating-linear-gradient(to bottom, #9fb8d8 0 0.15mm, transparent 0.15mm 5mm),
-      repeating-linear-gradient(to right, #9fb8d8 0 0.15mm, transparent 0.15mm 5mm);
-    border: 0.2mm solid #7f9dc0;
+  &__interligne {
+    height: 2mm;
+    border-bottom: 0.15mm solid $bleu-fin;
+  }
+
+  &__interligne--forte {
+    border-bottom-width: 0.25mm;
+    border-bottom-color: $bleu-fort;
+  }
+}
+
+.Carreaux {
+  display: grid;
+  border-top: 0.15mm solid $bleu-fin;
+  border-left: 0.15mm solid $bleu-fin;
+  width: max-content;
+
+  &__case {
+    height: 5mm;
+    border-right: 0.15mm solid $bleu-fin;
+    border-bottom: 0.15mm solid $bleu-fin;
   }
 }
 
@@ -138,11 +161,8 @@ $encre: #1a1a1a;
       color: $encre;
     }
 
-    // La marge rouge du cahier. Elle n'a rien d'ornemental : c'est le repere qui lui dit
-    // ou commence sa ligne.
-    .Trame {
+    .Seyes {
       flex: 1;
-      border-left: 0.4mm solid #c0392b;
     }
   }
 }
@@ -171,16 +191,46 @@ $encre: #1a1a1a;
 }
 
 @media print {
-  // Ne reste que la feuille. Tout le reste de l'application, y compris la navigation et
-  // les reglages, disparait.
-  body > *:not(.Impression__racine),
-  .Impression__reglages,
-  .Impression__actions {
-    display: none !important;
+  // Ne reste que la feuille.
+  //
+  // Une premiere version masquait `body > *:not(.Impression__racine)`. Elle cachait TOUT :
+  // le premier enfant de `body` est la racine React, qui ne porte evidemment pas cette
+  // classe, et l'apercu d'impression sortait vierge. Le piege est que la regle a l'air
+  // juste en la lisant.
+  //
+  // La recette fiable passe par `visibility` et non `display` : `display: none` sur un
+  // ancetre emporte ses descendants quoi qu'on dise ensuite, alors que `visibility` se
+  // laisse rouvrir plus bas dans l'arbre. La feuille est ensuite sortie du flux pour
+  // remonter en haut de la page, sinon la place reservee par tout ce qui est masque la
+  // pousserait vers le bas.
+  body * {
+    visibility: hidden;
   }
 
+  .Feuille,
+  .Feuille * {
+    visibility: visible;
+  }
+
+  // Pas de `position: absolute` ici : elle sort la feuille du flux, et la boite qui la
+  // contient alors n'est plus la zone imprimable mais la page entiere, marges comprises.
+  // Le contenu debordait a droite. La feuille reste donc dans le flux, et ce sont les
+  // conteneurs de l'application qui perdent leur mise en forme d'ecran.
+  .Feuille {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
+
+  // Tout ce qui habille l'apercu a l'ecran doit disparaitre : une ombre, un fond, une
+  // marge interieure decalent la feuille sur la page ou mangent sa largeur utile.
+  .Impression,
   .Impression__apercu {
+    display: block;
     padding: 0;
+    margin: 0;
+    gap: 0;
+    background: none;
     box-shadow: none;
     border-radius: 0;
     overflow: visible;
