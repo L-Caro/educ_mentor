@@ -16,8 +16,17 @@ export const calculImpression: FournisseurImpression = {
       enonce: (d) => <Operation d={d} />,
       // Meme retrait que dans l'enonce : « Moitie de 20 = ? = 10 » se lit deux fois avant
       // qu'on voie qu'il n'y a qu'une question.
-      reponse: (d) =>
-        `${String(d.operation).replace(/\s*=\s*\?\s*$/, '')} = ${String(d.reponse)}`,
+      // Le corrige remet la reponse LA OU la question la demandait : « 8 + 21 = 29 » se
+      // relit, « 8 + ? = 29 = 21 » se dechiffre.
+      reponse: (d) => {
+        const enonce = String(d.operation).replace(/ - /g, ' \u2212 ');
+        if (/\s*=\s*\?\s*$/.test(enonce)) {
+          return `${enonce.replace(/\s*=\s*\?\s*$/, '')} = ${String(d.reponse)}`;
+        }
+        return enonce.includes('?')
+          ? enonce.replace('?', String(d.reponse))
+          : `${enonce} = ${String(d.reponse)}`;
+      },
     },
     {
       cle: 'vrai_faux',

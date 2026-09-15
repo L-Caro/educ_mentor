@@ -10,14 +10,16 @@
   &__piece {
     overflow: visible;
 
-    rect,
     line {
       fill: none;
       stroke: currentColor;
       stroke-width: 0.15;
     }
 
+    // Le remplissage vient du composant, par rang : il est pose en `style` pour que ce
+    // soit un attribut de CONTENU et non un fond, que l'imprimante laisserait tomber.
     rect {
+      stroke: currentColor;
       stroke-width: 0.3;
     }
   }
@@ -28,5 +30,26 @@
     display: inline-block;
     outline: 0.5mm solid currentColor;
     outline-offset: 0.4mm;
+  }
+}
+
+// Les rangs d'une decomposition : une case, et son nom dessous.
+.Numeration {
+  &__rangs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3mm;
+    margin-top: 1mm;
+  }
+
+  &__rang {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__rangNom {
+    font-size: 7pt;
+    margin-top: 0.5mm;
   }
 }

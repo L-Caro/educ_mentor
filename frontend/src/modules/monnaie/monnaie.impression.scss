@@ -1,7 +1,23 @@
-// ─── Pieces et billets au trait ──────────────────────────────────────────────
+// ─── Pieces et billets ───────────────────────────────────────────────────────
 //
-// Une BORDURE, jamais un fond : Chrome n'imprime pas les arriere-plans sans que l'adulte
-// coche « graphiques d'arriere-plan », et personne ne le coche.
+// Les vraies images, comme dans le jeu. Une image est du CONTENU : elle s'imprime
+// toujours, contrairement a un fond CSS que Chrome laisse tomber tant que « graphiques
+// d'arriere-plan » n'est pas coche.
+
+.Piece__image {
+  display: inline-block;
+  vertical-align: middle;
+  margin: 0 1mm 1mm 0;
+  height: auto;
+
+  // Un billet reste plus large qu'une piece, mais pas au point de manger la colonne :
+  // huit elements doivent tenir dans une demi-feuille.
+  &--billet {
+    width: 17mm;
+  }
+}
+
+// Le trace de secours, pour une denomination qui n'aurait pas d'image.
 
 .Piece {
   display: inline-flex;

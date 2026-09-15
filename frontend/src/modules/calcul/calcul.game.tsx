@@ -1,4 +1,7 @@
-import type { CalculQuestion, CalculSessionResponse } from "src/modules/calcul/calcul.type.ts";
+import type {
+  CalculQuestion,
+  CalculSessionResponse,
+} from 'src/modules/calcul/calcul.type.ts';
 import store from 'src/store';
 import { calculApi } from './calcul.api.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
@@ -9,16 +12,27 @@ function renderOperation(operation: string) {
   const parts = operation.split('?');
   if (parts.length !== 2) return <>{operation}</>;
   return (
-    <>{parts[0]}<span>?</span>{parts[1]}</>
+    <>
+      {parts[0]}
+      <span>?</span>
+      {parts[1]}
+    </>
   );
 }
 
-export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestion> = {
+export const calculGameSpec: GameModuleSpec<
+  CalculSessionResponse,
+  CalculQuestion
+> = {
   loadSession: (setup) =>
-    store.dispatch(calculApi.endpoints.startCalculSession.initiate({
-      operationTypes: setup.operationTypes as string[] | undefined,
-      difficulty: setup.difficulty as string | undefined,
-    })).unwrap(),
+    store
+      .dispatch(
+        calculApi.endpoints.startCalculSession.initiate({
+          operationTypes: setup.operationTypes as string[] | undefined,
+          difficulty: setup.difficulty as string | undefined,
+        }),
+      )
+      .unwrap(),
 
   renderPrompt: (question) => (
     <GamePrompt>
@@ -27,13 +41,18 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
   ),
 
   qcm: {
-    getChoices: (question) => question.choices.map((choice) => ({ key: String(choice), label: choice })),
+    getChoices: (question) =>
+      question.choices.map((choice) => ({
+        key: String(choice),
+        label: choice,
+      })),
     correctKey: (question) => String(question.answer),
   },
 
   free: {
     parse: (raw) => parseInt(raw.trim(), 10),
-    isCorrect: (question, given) => typeof given === 'number' && !isNaN(given) && given === question.answer,
+    isCorrect: (question, given) =>
+      typeof given === 'number' && !isNaN(given) && given === question.answer,
     inputProps: { numeric: true, maxLength: 3, placeholder: '?' },
   },
 
@@ -42,13 +61,25 @@ export const calculGameSpec: GameModuleSpec<CalculSessionResponse, CalculQuestio
   fiche: calculFiche,
 
   recordAnswer: (sessionId, question, correct) =>
-    store.dispatch(calculApi.endpoints.recordCalculAnswer.initiate({
-      sessionId, answerValue: question.answer, isCorrect: correct,
-    })).unwrap(),
+    store
+      .dispatch(
+        calculApi.endpoints.recordCalculAnswer.initiate({
+          sessionId,
+          answerValue: question.answer,
+          isCorrect: correct,
+        }),
+      )
+      .unwrap(),
   completeSession: (sessionId, correctAnswers, totalQuestions) =>
-    store.dispatch(calculApi.endpoints.completeCalculSession.initiate({
-      sessionId, correctAnswers, totalQuestions,
-    })).unwrap(),
+    store
+      .dispatch(
+        calculApi.endpoints.completeCalculSession.initiate({
+          sessionId,
+          correctAnswers,
+          totalQuestions,
+        }),
+      )
+      .unwrap(),
   buildResultEntry: (question, given, correct, timeout) => {
     const value = given == null ? null : Number(given);
     return {

@@ -14,3 +14,10 @@
     vertical-align: -0.5mm;
   }
 }
+
+// La fleche d'une file de calculs. La seule couleur porteuse de sens de la feuille : elle
+// separe les etapes, que le tout-noir soudait en une expression unique.
+.CalculImprime__fleche {
+  color: #c1442a;
+  font-weight: 700;
+}

@@ -78,8 +78,27 @@ export const conjugaisonImpression: FournisseurImpression = {
   ],
   options: [
     {
+      cle: 'pronoms',
+      label: 'Quelles formes',
+      type: 'multi',
+      // Les pronoms du tableau. Choisir « combien » ne suffisait pas : on veut travailler
+      // `nous` et `vous`, que l'enfant oublie, et pas trois formes prises pour nous.
+      choix: [
+        { valeur: 'je', label: 'je' },
+        { valeur: 'tu', label: 'tu' },
+        { valeur: 'il', label: 'il' },
+        { valeur: 'elle', label: 'elle' },
+        { valeur: 'on', label: 'on' },
+        { valeur: 'nous', label: 'nous' },
+        { valeur: 'vous', label: 'vous' },
+        { valeur: 'ils', label: 'ils' },
+        { valeur: 'elles', label: 'elles' },
+      ],
+    },
+    {
+      // Ne sert que si AUCUNE forme n'est cochee : on prend alors les plus instructives.
       cle: 'formes',
-      label: 'Combien de formes',
+      label: 'Sinon, combien de formes au hasard',
       type: 'nombre',
       min: 1,
       max: 6,

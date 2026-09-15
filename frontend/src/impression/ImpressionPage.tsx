@@ -79,7 +79,10 @@ export default function ImpressionPage() {
   const [reglages, setReglages] = useState<
     Record<string, Record<string, unknown>>
   >({});
-  const [avecCorrige, setAvecCorrige] = useState(true);
+  /** Le corrige, DECOCHE par defaut. Il double le nombre de pages, et la plupart des
+   * exercices se corrigent a vue par l'adulte qui est a cote. On le coche quand on veut
+   * qu'elle se corrige seule. */
+  const [avecCorrige, setAvecCorrige] = useState(false);
   /** Numeroter les exercices. DECOCHE par defaut : un numero devant chaque exercice
    * ressemble a une note, et a sept ans la feuille prend l'air d'un controle. Le reglage
    * existe quand meme, parce que le corrige se lit plus vite avec des reperes. */
@@ -217,16 +220,25 @@ export default function ImpressionPage() {
           block: 'start',
         }),
       );
+      // Les TYPES muets, et non les modules. Cocher « accord » et « mettre au pluriel »
+      // alors que la notion `accord_gn` est fermee en administration rendait bien des
+      // accords : le module n'etait donc pas muet, et rien ne signalait que la moitie de
+      // ce qui etait coche n'etait pas sortie.
       setMuets(
-        lignes
-          .filter(
-            (ligne) => !rendus.some((item) => item.module === ligne.module),
-          )
-          .map(
-            (ligne) =>
-              fournisseurs.find((f) => f.id === ligne.module)?.label ??
-              ligne.module,
-          ),
+        lignes.flatMap((ligne) => {
+          const fournisseur = fournisseurs.find((f) => f.id === ligne.module);
+          return ligne.exercices
+            .filter(
+              (cle) =>
+                !rendus.some(
+                  (item) => item.module === ligne.module && item.exercice === cle,
+                ),
+            )
+            .map((cle) => {
+              const exercice = fournisseur?.exercices.find((e) => e.cle === cle);
+              return `${fournisseur?.label ?? ligne.module} \u00b7 ${exercice?.label ?? cle}`;
+            });
+        }),
       );
     } catch {
       setItems(null);
@@ -442,7 +454,7 @@ export default function ImpressionPage() {
         )}
         {muets.length > 0 && (
           <p className="GameSettings__hint">
-            Rien à imprimer pour : {muets.join(', ')}. Ces modules attendent un
+            Rien à imprimer pour : {muets.join(' ; ')}. Ces exercices attendent un
             contenu saisi en administration, ou une notion à ouvrir.
           </p>
         )}

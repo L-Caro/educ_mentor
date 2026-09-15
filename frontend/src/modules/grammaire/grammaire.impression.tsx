@@ -28,7 +28,12 @@ export const grammaireImpression: FournisseurImpression = {
         const cible = donnees.cible as number | null;
         return (
           <div>
-            <p className="Feuille__consigne">{String(donnees.consigne)}</p>
+            {/* La consigne du module parle de TOUCHER : c'est le geste de l'ecran. Sur
+                le papier on entoure au crayon, et une consigne qui demande de toucher une
+                feuille ne veut rien dire. */}
+            <p className="Feuille__consigne">
+              {String(donnees.consigne).replace(/^Touche/, 'Entoure')}
+            </p>
             <Phrase mots={mots} cible={cible} />
             {cible !== null && (
               <span>

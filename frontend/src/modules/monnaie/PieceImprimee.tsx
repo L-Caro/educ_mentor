@@ -1,13 +1,14 @@
-import { formatCents } from './constants/denominations';
+import { formatCents, getMonnaieImageUrl } from './constants/denominations';
 
 /**
- * Une piece ou un billet, au TRAIT.
+ * Une piece ou un billet : la vraie image, comme dans le jeu.
  *
- * Le jeu montre des photographies des vraies pieces, et c'est ce qu'il faut a l'ecran.
- * Sur le papier elles sortiraient en gris indistincts : une piece de vingt centimes et
- * une de cinquante deviendraient le meme rond sale, ce qui est exactement ce que
- * l'exercice demande de distinguer. Un dessin au trait, avec la valeur ecrite dedans,
- * s'imprime toujours et se lit toujours. C'est aussi ce que font les fichiers de classe.
+ * Une premiere version les dessinait au trait, par crainte qu'une photographie sorte en
+ * gris indistinct sur une imprimante noir et blanc. C'etait se tromper de contrainte :
+ * l'imprimante est en couleurs, et surtout l'exercice consiste a RECONNAITRE une piece.
+ * Un rond portant « 20c » ne demande plus de la reconnaitre, il demande de lire un
+ * nombre, ce que l'exercice d'a cote fait deja. Avec la vraie piece, la feuille et
+ * l'ecran montrent la meme chose, et c'est ce qu'elle trouvera dans un porte-monnaie.
  *
  * Les tailles suivent l'ordre des vraies pieces sans en copier les millimetres : ce qui
  * compte est qu'une piece de deux euros soit visiblement plus grosse qu'une de cinq
@@ -16,37 +17,36 @@ import { formatCents } from './constants/denominations';
 
 /** Diametre en millimetres selon la valeur. Les billets sont rectangulaires. */
 const DIAMETRE: Record<number, number> = {
-  1: 9,
-  2: 10,
-  5: 11,
-  10: 10,
-  20: 11,
-  50: 12,
-  100: 12.5,
-  200: 13.5,
+  1: 7,
+  2: 7.5,
+  5: 8.5,
+  10: 8,
+  20: 9,
+  50: 10,
+  100: 10.5,
+  200: 11.5,
 };
 
 export default function PieceImprimee({ valeur }: { valeur: number }) {
+  const source = getMonnaieImageUrl(valeur);
   const estBillet = valeur >= 500;
 
-  if (estBillet) {
+  // Une valeur sans image reste dessinee : mieux vaut un rond chiffre qu'un trou dans la
+  // feuille le jour ou une denomination s'ajoute sans son fichier.
+  if (!source) {
     return (
-      <span className="Piece Piece--billet">
+      <span className={`Piece${estBillet ? ' Piece--billet' : ''}`}>
         <span className="Piece__valeur">{formatCents(valeur)}</span>
       </span>
     );
   }
 
-  const diametre = DIAMETRE[valeur] ?? 11;
   return (
-    <span
-      className="Piece"
-      style={{
-        width: `${String(diametre)}mm`,
-        height: `${String(diametre)}mm`,
-      }}
-    >
-      <span className="Piece__valeur">{formatCents(valeur)}</span>
-    </span>
+    <img
+      src={source}
+      alt={formatCents(valeur)}
+      className={`Piece__image${estBillet ? ' Piece__image--billet' : ''}`}
+      style={estBillet ? undefined : { width: `${String(DIAMETRE[valeur] ?? 12)}mm` }}
+    />
   );
 }

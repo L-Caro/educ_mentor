@@ -15,7 +15,19 @@ import type { QuestionType } from '../geometrie/geometrie.logic';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
-import { maximum } from '../numeration/numeration.positions';
+import { getPosition, maximum } from '../numeration/numeration.positions';
+
+/** Ce que chaque type de question demande, en toutes lettres.
+ *
+ * A l'ecran, l'interface porte la consigne : des cases nommees par rang, une frise a
+ * completer, deux nombres et un signe a choisir. Sur le papier il ne reste que l'enonce,
+ * et « 6 802 » suivi d'un trait ne demande rien. */
+const CONSIGNES_NUMERATION: Record<string, string> = {
+  decomposition: 'Décompose ce nombre.',
+  valeur_positionnelle: '',
+  comparaison: 'Complète avec <, > ou =.',
+  suite: 'Continue la suite.',
+};
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
 import {
   MAXIMUM_ITEMS,
@@ -29,6 +41,10 @@ import {
  * pas un exercice de CE1 mais une construction au compas.
  */
 const TRACABLES_SUR_CARREAUX = ['carre', 'rectangle', 'triangleRectangle'];
+
+/** Combien de pieces au plus dans une palette a entourer. Au-dela, l'exercice devient un
+ * tri avant d'etre un exercice de monnaie, et il ne tient plus dans une colonne. */
+const MAXIMUM_PALETTE = 9;
 
 /**
  * Compose une feuille d'exercices en puisant chez les modules.
@@ -265,9 +281,18 @@ export class ImpressionService {
         enonce: q.display,
         reponse: q.answer,
         type: q.type,
+        // La CONSIGNE, construite ici et pas au rendu. A l'ecran, chaque type a son
+        // interface : des cases par rang, une frise, deux nombres a comparer, et
+        // l'interface dit a elle seule ce qu'on attend. Sur le papier il ne reste que
+        // l'enonce, et « 6 802 » suivi d'un trait ne demande rien du tout.
+        consigne: CONSIGNES_NUMERATION[q.type] ?? 'Complète.',
         // La decomposition attend une case par rang : le rendu papier a besoin de savoir
-        // lesquels, et dans quel ordre ils sont demandes.
+        // lesquels, dans quel ordre, et sous quel NOM. Sans les noms, l'enfant a trois
+        // cases vides et rien qui dise laquelle recoit les dizaines.
         rangs: q.decompose_positions,
+        rangsNoms: (q.decompose_positions ?? []).map(
+          (rang) => getPosition(rang).nom,
+        ),
       },
     }));
   }
@@ -286,10 +311,10 @@ export class ImpressionService {
   private async numerationCubes(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const construite = await this.construireNumeration(ligne);
-    if (!construite) return [];
-    const { positions } = construite;
-    const plafond = Math.min(9999, maximum(positions));
+    const { positions } = (await this.construireNumeration(ligne)) ?? {
+      positions: [],
+    };
+    const plafond = maximum(positions);
     const items: ItemImprime[] = [];
     const vus = new Set<number>();
 
@@ -298,7 +323,18 @@ export class ImpressionService {
       essai < ligne.nombre * 20 && items.length < ligne.nombre;
       essai++
     ) {
-      const valeur = 11 + Math.floor(Math.random() * Math.max(1, plafond - 11));
+      // Les CHIFFRES sont tires, pas la valeur, et chacun est borne. Une valeur tiree au
+      // hasard jusqu'aux milliers donnait « 4 587 », soit quatre plaques de mille, cinq
+      // de cent, huit batons et sept cubes : vingt-quatre dessins qui mangeaient le quart
+      // d'une page pour un seul exercice, et qu'on ne compte plus, on les estime.
+      //
+      // Ces bornes-la tiennent en une quinzaine de pieces. C'est le prix du papier : a
+      // l'ecran on peut defiler, ici la place est finie.
+      const centaines = Math.floor(Math.random() * 4);
+      const dizaines = Math.floor(Math.random() * 6);
+      const unites = 1 + Math.floor(Math.random() * 6);
+      const valeur = centaines * 100 + dizaines * 10 + unites;
+      if (valeur > plafond || valeur < 11) continue;
       if (vus.has(valeur)) continue;
       vus.add(valeur);
       items.push({
@@ -306,10 +342,10 @@ export class ImpressionService {
         exercice: ligne.exercices[0],
         donnees: {
           reponse: valeur,
-          milliers: Math.floor(valeur / 1000),
-          centaines: Math.floor((valeur % 1000) / 100),
-          dizaines: Math.floor((valeur % 100) / 10),
-          unites: valeur % 10,
+          milliers: 0,
+          centaines,
+          dizaines,
+          unites,
         },
       });
     }
@@ -493,15 +529,18 @@ export class ImpressionService {
       essai++
     ) {
       const table = tables[Math.floor(Math.random() * tables.length)];
-      const depart = 1 + Math.floor(Math.random() * 5);
-      const termes = Array.from({ length: 5 }, (_, i) => (depart + i) * table);
-      // Deux trous, jamais le premier ni le dernier.
-      const candidats = [1, 2, 3];
-      const trous = candidats
+      // La suite part de la table FOIS UN, toujours. Commencer a 14 pour la table de 7
+      // demandait de reconnaitre qu'on est deja au deuxieme terme avant meme de compter :
+      // « 14, 21, __, __, 42 » ne se lit pas, alors que « 7, 14, 21, __, __, 42 » se
+      // continue tout seul. C'est un exercice de comptage, pas de devinette.
+      const termes = Array.from({ length: 6 }, (_, i) => (i + 1) * table);
+      // Deux trous, jamais le premier ni le dernier : il faut un point de depart pour
+      // trouver le pas, et une arrivee pour se verifier.
+      const trous = [1, 2, 3, 4]
         .sort(() => Math.random() - 0.5)
         .slice(0, 2)
         .sort((a, b) => a - b);
-      const cle = `${table}-${depart}-${trous.join(',')}`;
+      const cle = `${table}-${trous.join(',')}`;
       if (vus.has(cle)) continue;
       vus.add(cle);
       items.push({
@@ -772,8 +811,13 @@ export class ImpressionService {
    * dictee, et c'est sa longueur qui varie.
    */
   private async dicteeMots(ligne: LigneComposition): Promise<ItemImprime[]> {
+    // `debutant` par defaut, et non `ce1` : ce sont les niveaux que le module connait, et
+    // « ce1 » ne correspondait a AUCUN item en base. La dictee ne sortait donc jamais, et
+    // elle echouait en silence depuis que les lignes sans contenu font silence.
     const niveau =
-      typeof ligne.options?.niveau === 'string' ? ligne.options.niveau : 'ce1';
+      typeof ligne.options?.niveau === 'string'
+        ? ligne.options.niveau
+        : 'debutant';
     const longueur =
       typeof ligne.options?.longueur === 'string'
         ? ligne.options.longueur
@@ -782,6 +826,10 @@ export class ImpressionService {
       this.dicteeService.construireItems({
         niveau,
         longueur,
+        notion:
+          typeof ligne.options?.notion === 'string'
+            ? ligne.options.notion
+            : undefined,
       } as StartDicteeSessionDto),
     );
     if (!construite) return [];
@@ -840,10 +888,22 @@ export class ImpressionService {
         ).resultat.questions,
     );
 
+    // Les pronoms CHOISIS, s'il y en a. Sinon on retombe sur les plus instructifs, dans
+    // la limite du nombre demande : `je`, `tu` et `il` se ressemblent trop pour apprendre
+    // quoi que ce soit, et a trois formes on veut `je`, `nous` et `ils`.
+    const demandes = Array.isArray(ligne.options?.pronoms)
+      ? (ligne.options.pronoms as string[]).filter((p) =>
+          (PRONOMS as string[]).includes(p),
+        )
+      : [];
+
     return questions.map((q) => {
       // On garde l'ordre du tableau pour l'affichage, meme quand la selection suit
       // l'ordre d'utilite : une conjugaison qui commence par `nous` se lit mal.
-      const choisis = ImpressionService.PRONOMS_UTILES.slice(0, formes);
+      const choisis =
+        demandes.length > 0
+          ? demandes
+          : ImpressionService.PRONOMS_UTILES.slice(0, formes);
       const ordonnes = PRONOMS.filter((p) => choisis.includes(p));
       return {
         module: ligne.module,
@@ -1128,12 +1188,15 @@ export class ImpressionService {
       vus.add(cible);
 
       // Les intrus sont melanges a la solution : une palette ou les bonnes pieces sont
-      // groupees se resout sans compter.
-      const palette = [...solution];
-      for (const valeur of denominations) {
-        if (valeur <= cible) palette.push(valeur);
-      }
-      palette.sort(() => Math.random() - 0.5);
+      // groupees se resout sans compter. Leur nombre est BORNE : en ajoutant toutes les
+      // valeurs inferieures a la cible, une cible a 65 euros sortait treize pieces et
+      // billets, qui occupaient un tiers de page et donnaient un exercice de tri avant
+      // d'etre un exercice de monnaie.
+      const intrus = denominations
+        .filter((valeur) => valeur <= cible)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, Math.max(2, MAXIMUM_PALETTE - solution.length));
+      const palette = [...solution, ...intrus].sort(() => Math.random() - 0.5);
 
       items.push({
         module: ligne.module,

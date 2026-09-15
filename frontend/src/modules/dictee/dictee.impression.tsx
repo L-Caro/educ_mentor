@@ -1,3 +1,5 @@
+import store from 'src/store';
+import { dicteeApi } from './dictee.api';
 import { LignesEcriture } from 'src/impression/trames';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 
@@ -47,6 +49,46 @@ export const dicteeImpression: FournisseurImpression = {
             ))}
           </span>
         );
+      },
+    },
+  ],
+  options: [
+    {
+      // Les niveaux du MODULE, pas des classes scolaires. Une premiere version demandait
+      // « ce1 », qui ne correspondait a aucun item en base : la dictee ne sortait jamais,
+      // et sans message puisqu'une ligne sans contenu fait silence.
+      cle: 'niveau',
+      label: 'Quel niveau',
+      type: 'unique',
+      choix: [
+        { valeur: 'debutant', label: 'Débutant' },
+        { valeur: 'normal', label: 'Normal' },
+        { valeur: 'difficile', label: 'Difficile' },
+      ],
+      defaut: 'debutant',
+    },
+    {
+      cle: 'longueur',
+      label: 'Quelle longueur',
+      type: 'unique',
+      choix: [
+        { valeur: 'courte', label: 'Courte' },
+        { valeur: 'moyenne', label: 'Moyenne' },
+        { valeur: 'longue', label: 'Longue' },
+      ],
+      defaut: 'courte',
+    },
+    {
+      cle: 'notion',
+      label: 'Une notion en particulier',
+      type: 'unique',
+      // Les notions REELLEMENT presentes dans les items saisis : proposer une notion que
+      // personne n'a utilisee donnerait une dictee vide.
+      charger: async () => {
+        const notions = await store
+          .dispatch(dicteeApi.endpoints.getDicteeNotions.initiate(undefined))
+          .unwrap();
+        return notions.map((notion) => ({ valeur: notion, label: notion }));
       },
     },
   ],

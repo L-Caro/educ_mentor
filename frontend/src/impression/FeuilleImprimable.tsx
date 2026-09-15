@@ -60,9 +60,11 @@ export default function FeuilleImprimable({
 
   return (
     <div className="Feuille">
+      {/* Ni nom ni date a remplir : la feuille n'est pas ramassee, elle est faite a la
+          maison, a cote de l'adulte qui l'a composee. Deux lignes a remplir avant de
+          commencer, c'est deja le protocole d'un controle. */}
       <div className="Feuille__entete">
         <p className="Feuille__titre">{titre}</p>
-        <span>Nom : ______________ Date : ____ / ____</span>
       </div>
 
       <div className="Feuille__grille">

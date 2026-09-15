@@ -22,7 +22,11 @@ async function loadTypes(): Promise<SetupChoice[]> {
     // Repli sûr : l'additif de base, actif à l'installation.
     return [
       { value: 'addition', label: 'Additions', description: '3 + 4 = ?' },
-      { value: 'soustraction', label: 'Soustractions', description: '10 − 3 = ?' },
+      {
+        value: 'soustraction',
+        label: 'Soustractions',
+        description: '10 − 3 = ?',
+      },
     ];
   }
 }
@@ -42,10 +46,17 @@ export const calculModule: ModuleManifest = {
   id: 'calcul-mental',
   category: 'maths',
   setupOptions: CALCUL_SETUP_OPTIONS,
-  loadGameSpec: () => import('./calcul.game.tsx').then((module) => module.calculGameSpec),
+  loadGameSpec: () =>
+    import('./calcul.game.tsx').then((module) => module.calculGameSpec),
   adminTabs: [{ to: '/admin/calcul-mental', label: 'Paramètres', end: true }],
   adminRoutes: [
-    { index: true, lazy: () => import('./CalculSettings.tsx').then((module) => ({ Component: module.default })) },
+    {
+      index: true,
+      lazy: () =>
+        import('./CalculSettings.tsx').then((module) => ({
+          Component: module.default,
+        })),
+    },
   ],
   progression: buildProgressionEntry({
     getEndpoint: calculApi.endpoints.getCalculProgression,

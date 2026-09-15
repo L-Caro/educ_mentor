@@ -11,13 +11,47 @@ export const numerationImpression: FournisseurImpression = {
     {
       cle: 'question',
       label: 'Décomposer, le chiffre des dizaines…',
-      enonce: (d) => (
-        <div>
-          <p className="Feuille__consigne">{String(d.enonce)}</p>
-          <Blanc largeurMm={40} />
-        </div>
-      ),
-      reponse: (d) => String(d.reponse),
+      enonce: (d) => {
+        const rangs = (d.rangsNoms as string[] | undefined) ?? [];
+        return (
+          <div>
+            {/* La consigne vient du SERVEUR, et elle est indispensable. A l'ecran, chaque
+                type de question a son interface : des cases nommees par rang, une frise,
+                deux nombres et un signe. Sur le papier il ne reste que l'enonce, et
+                « 6 802 » suivi d'un trait ne demande rien du tout. */}
+            {Boolean(d.consigne) && (
+              <p className="Feuille__consigne">{String(d.consigne)}</p>
+            )}
+            <p>{String(d.enonce)}</p>
+            {rangs.length > 0 ? (
+              // Une case par rang, chacune sous son NOM : sans eux, l'enfant a trois
+              // cases vides et rien qui dise laquelle recoit les dizaines. L'ordre est
+              // celui du serveur, qui le melange expres pour qu'on ne recopie pas les
+              // chiffres de gauche a droite.
+              <span className="Numeration__rangs">
+                {rangs.map((nom, index) => (
+                  <span key={index} className="Numeration__rang">
+                    <Blanc largeurMm={14} />
+                    <span className="Numeration__rangNom">{nom}</span>
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <Blanc largeurMm={40} />
+            )}
+          </div>
+        );
+      },
+      reponse: (d) => {
+        const rangs = (d.rangsNoms as string[] | undefined) ?? [];
+        const valeurs = String(d.reponse).split(':');
+        if (rangs.length !== valeurs.length) return String(d.reponse);
+        // « 8 centaines, 2 unites » plutot que « 8:2 » : le corrige se lit, il ne se
+        // decode pas.
+        return rangs
+          .map((nom, index) => `${valeurs[index]} ${nom}`)
+          .join(', ');
+      },
     },
     {
       cle: 'cubes',

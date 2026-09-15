@@ -74,7 +74,8 @@ describe('les reglages par exercice', () => {
     const attendus: Record<string, string[]> = {
       tables: ['tables', 'jusqua', 'trous', 'combien'],
       'calcul-mental': ['types'],
-      conjugaison: ['formes', 'verbes', 'tenses'],
+      conjugaison: ['formes', 'pronoms', 'verbes', 'tenses'],
+      dictee: ['niveau', 'longueur', 'notion'],
       accords: ['types'],
       grammaire: ['types'],
     };
@@ -133,8 +134,17 @@ describe('la feuille est un objet PHYSIQUE', () => {
     // Le millimetre est la seule unite que l'imprimante respecte. Une feuille reglee en
     // pixels depend du zoom, de la densite d'ecran et du navigateur.
     expect(SCSS).toMatch(/@page\s*\{[^}]*size: A4 portrait/);
-    expect(SCSS).toMatch(/\$largeur-utile: 186mm/);
     expect(TRAMES).not.toMatch(/px/);
+    // La largeur utile doit rester l'ARITHMETIQUE de la page : A4 fait 210 mm, moins
+    // deux marges. Une valeur ecrite a la main finirait par mentir sur ce qui tient
+    // vraiment dans une colonne, ce qui est precisement ce que ce fichier promet.
+    const marge = /\$marge-page: (\d+)mm/.exec(SCSS)?.[1];
+    const utile = /\$largeur-utile: (\d+)mm/.exec(SCSS)?.[1];
+    expect({ marge: Boolean(marge), utile: Boolean(utile) }).toEqual({
+      marge: true,
+      utile: true,
+    });
+    expect(Number(utile)).toBe(210 - 2 * Number(marge));
   });
 
   it('garde la reglure Seyes a ses vraies mesures', () => {

@@ -1,4 +1,7 @@
-import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
+import {
+  useGetSettingsQuery,
+  useUpdateSettingMutation,
+} from 'src/store/api/sharedApi.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
 import {
   useGetCalculActiveTypesQuery,
@@ -39,8 +42,8 @@ function TypesActifs() {
       <p className="GameSettings__hint">
         Du CP au CM2. La classe indiquée dit quand ouvrir : rien n&rsquo;empêche
         d&rsquo;ouvrir plus tôt. La plage de nombres ci-dessous ne borne que
-        l&rsquo;additif : les multiplications et divisions tirent leurs bornes des
-        tables.
+        l&rsquo;additif : les multiplications et divisions tirent leurs bornes
+        des tables.
       </p>
       <div className="GameSettings__denominations">
         {operations.map((operation) => (
@@ -90,7 +93,9 @@ export default function CalculSettings() {
       <TypesActifs />
 
       <div className="GameSettings__header">
-        <p className="GameSettings__hint">Ces paramètres s'appliquent à la session de jeu.</p>
+        <p className="GameSettings__hint">
+          Ces paramètres s'appliquent à la session de jeu.
+        </p>
         {saving && <Spinner size="xs" />}
       </div>
 
@@ -100,7 +105,13 @@ export default function CalculSettings() {
           <p className="GameSettings__cardTitle">Plage de nombres</p>
 
           <div className="GameSettings__denominations">
-            {([['0', '20'], ['0', '50'], ['0', '100']] as const).map(([min, max]) => (
+            {(
+              [
+                ['0', '20'],
+                ['0', '50'],
+                ['0', '100'],
+              ] as const
+            ).map(([min, max]) => (
               <button
                 key={max}
                 type="button"
@@ -119,7 +130,9 @@ export default function CalculSettings() {
             <label className="GameSettings__rangeLabel">De</label>
             <input
               type="range"
-              min={0} max={90} step={1}
+              min={0}
+              max={90}
+              step={1}
               value={minValue}
               onChange={(e) => handleMinChange(parseInt(e.target.value, 10))}
               className="GameSettings__range"
@@ -131,7 +144,9 @@ export default function CalculSettings() {
             <label className="GameSettings__rangeLabel">Jusqu'à</label>
             <input
               type="range"
-              min={10} max={100} step={1}
+              min={10}
+              max={100}
+              step={1}
               value={maxValue}
               onChange={(e) => handleMaxChange(parseInt(e.target.value, 10))}
               className="GameSettings__range"
