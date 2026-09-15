@@ -14,13 +14,8 @@ export default function TableRappel({ table, highlight }: Props) {
     <table className="TableRappel">
       <tbody>
         {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-          <tr
-            key={n}
-            className={n === highlight ? 'TableRappel__row--active' : undefined}
-          >
-            <th scope="row">
-              {table} × {n}
-            </th>
+          <tr key={n} className={n === highlight ? 'TableRappel__row--active' : undefined}>
+            <th scope="row">{table} × {n}</th>
             <td>{table * n}</td>
           </tr>
         ))}

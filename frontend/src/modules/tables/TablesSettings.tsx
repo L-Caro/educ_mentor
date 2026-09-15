@@ -1,7 +1,4 @@
-import {
-  useGetSettingsQuery,
-  useUpdateSettingMutation,
-} from 'src/store/api/sharedApi.ts';
+import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import Spinner from 'src/components/common/Spinner.tsx';
 
 export default function TablesSettings() {
@@ -30,12 +27,7 @@ export default function TablesSettings() {
               <input
                 type="checkbox"
                 checked={includeTrivial}
-                onChange={(e) =>
-                  updateSetting({
-                    key: 'tables_include_trivial',
-                    value: String(e.target.checked),
-                  })
-                }
+                onChange={(e) => updateSetting({ key: 'tables_include_trivial', value: String(e.target.checked) })}
               />
               <span>Inclure ×0 et ×1 dans les sessions</span>
             </label>
