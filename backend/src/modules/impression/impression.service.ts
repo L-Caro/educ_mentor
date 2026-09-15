@@ -206,12 +206,35 @@ export class ImpressionService {
   ): Promise<T[]> {
     const retenus = new Map<string, T>();
     for (let essai = 0; essai < 20 && retenus.size < nombre; essai++) {
-      for (const question of await lot()) {
+      const questions = await this.siDisponible(lot());
+      if (!questions) break;
+      for (const question of questions) {
         if (retenus.size >= nombre) break;
         retenus.set(cleDe(question), question);
       }
     }
     return [...retenus.values()].slice(0, nombre);
+  }
+
+  /**
+   * Un module qui ne peut rien produire fait SILENCE, il ne casse pas la feuille.
+   *
+   * Plusieurs modules refusent quand leur contenu manque : pas une seule dictee saisie,
+   * aucune notion de grammaire ouverte, aucun texte de lecture actif. Pour le jeu, cette
+   * erreur est la bonne reponse : elle dit a l'adulte ce qu'il doit ouvrir. Ici elle
+   * ferait echouer TOUTE la feuille, y compris les dix exercices de tables qui n'avaient
+   * rien demande a personne, et l'adulte verrait une feuille vide sans savoir pourquoi.
+   *
+   * La ligne concernee ne rend donc rien, et les autres sortent. La page de composition
+   * dit deja ce qui est disponible, elle n'offre pas de cocher ce qui n'existe pas.
+   */
+  private async siDisponible<T>(promesse: Promise<T>): Promise<T | null> {
+    try {
+      return await promesse;
+    } catch (erreur) {
+      if (erreur instanceof BadRequestException) return null;
+      throw erreur;
+    }
   }
 
   /**
@@ -230,8 +253,9 @@ export class ImpressionService {
   private async numerationQuestion(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { resultat } = await this.construireNumeration(ligne);
-    const questions = resultat.questions.slice(0, ligne.nombre);
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const questions = construite.resultat.questions.slice(0, ligne.nombre);
     return questions.map((q) => ({
       module: ligne.module,
       exercice: ligne.exercices[0],
@@ -260,7 +284,9 @@ export class ImpressionService {
   private async numerationCubes(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { positions } = await this.construireNumeration(ligne);
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const { positions } = construite;
     const plafond = Math.min(9999, maximum(positions));
     const items: ItemImprime[] = [];
     const vus = new Set<number>();
@@ -294,7 +320,9 @@ export class ImpressionService {
   private async numerationRanger(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { positions } = await this.construireNumeration(ligne);
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const { positions } = construite;
     const plafond = Math.max(100, maximum(positions));
     const items: ItemImprime[] = [];
 
@@ -323,7 +351,9 @@ export class ImpressionService {
   private async numerationEncadrer(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { positions } = await this.construireNumeration(ligne);
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const { positions } = construite;
     const plafond = Math.max(100, maximum(positions));
     const items: ItemImprime[] = [];
 
@@ -356,7 +386,9 @@ export class ImpressionService {
   private async numerationLettres(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { positions } = await this.construireNumeration(ligne);
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const { positions } = construite;
     const plafond = Math.min(999_999, Math.max(100, maximum(positions)));
     const items: ItemImprime[] = [];
     const vus = new Set<number>();
@@ -382,11 +414,15 @@ export class ImpressionService {
     return items;
   }
 
+  /** `null` quand aucune position n'est ouverte : la ligne fait silence plutot que de
+   * casser la feuille (voir `siDisponible`). */
   private construireNumeration(ligne: LigneComposition) {
     const demandees = Array.isArray(ligne.options?.positions)
       ? (ligne.options.positions as string[])
       : undefined;
-    return this.numerationService.construireQuestions({ positions: demandees });
+    return this.siDisponible(
+      this.numerationService.construireQuestions({ positions: demandees }),
+    );
   }
 
   private async tablesDepuisUnFait(
@@ -740,10 +776,13 @@ export class ImpressionService {
       typeof ligne.options?.longueur === 'string'
         ? ligne.options.longueur
         : 'courte';
-    const construite = await this.dicteeService.construireItems({
-      niveau,
-      longueur,
-    } as StartDicteeSessionDto);
+    const construite = await this.siDisponible(
+      this.dicteeService.construireItems({
+        niveau,
+        longueur,
+      } as StartDicteeSessionDto),
+    );
+    if (!construite) return [];
 
     return [
       {
@@ -1055,11 +1094,14 @@ export class ImpressionService {
   private async monnaieEntourer(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { denominations } = await this.monnaieService.construireQuestions({
-      exercise_type: 'reconnaitre',
-      difficulty: 'hard',
-    });
-    if (denominations.length === 0) return [];
+    const construite = await this.siDisponible(
+      this.monnaieService.construireQuestions({
+        exercise_type: 'reconnaitre',
+        difficulty: 'hard',
+      }),
+    );
+    if (!construite || construite.denominations.length === 0) return [];
+    const { denominations } = construite;
 
     const items: ItemImprime[] = [];
     const vus = new Set<number>();
@@ -1159,10 +1201,11 @@ export class ImpressionService {
   private async geometrieTracer(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const { figures } = await this.geometrieService.construireQuestions({
-      difficulty: 'hard',
-    });
-    const tracables = figures
+    const construite = await this.siDisponible(
+      this.geometrieService.construireQuestions({ difficulty: 'hard' }),
+    );
+    if (!construite) return [];
+    const tracables = construite.figures
       .map((figure) => figure.key)
       .filter((cle) => TRACABLES_SUR_CARREAUX.includes(cle));
     if (tracables.length === 0) return [];
@@ -1264,8 +1307,10 @@ export class ImpressionService {
       typeof ligne.options?.texte === 'string'
         ? Number(ligne.options.texte)
         : undefined;
-    const lecture = await this.lectureService.construireLecture(
-      Number.isFinite(texteId) ? texteId : undefined,
+    const lecture = await this.siDisponible(
+      this.lectureService.construireLecture(
+        Number.isFinite(texteId) ? texteId : undefined,
+      ),
     );
     if (!lecture) return [];
 
@@ -1453,7 +1498,10 @@ export class ImpressionService {
   private async grammaireTrier(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
-    const tris = await this.grammaireService.construireTri(ligne.nombre);
+    const tris = await this.siDisponible(
+      this.grammaireService.construireTri(ligne.nombre),
+    );
+    if (!tris) return [];
     return tris.map((tri) => ({
       module: ligne.module,
       exercice: ligne.exercices[0],

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { Test, type TestingModule } from '@nestjs/testing';
@@ -14,10 +14,16 @@ import { CalculService } from './../src/modules/calcul/calcul.service';
 import { PoseService } from './../src/modules/pose/pose.service';
 import { CompteService } from './../src/modules/compte/compte.service';
 import { CatalogService } from './../src/modules/catalog/catalog.service';
+import { ImpressionService } from './../src/modules/impression/impression.service';
 import { MODULES_DE_PEAGE } from './../src/modules/peage/peage.types';
 import { rejouer, type Etape } from './../src/modules/compte/compte.generator';
 import { NOMS } from './../src/modules/accords/accords.corpus';
-import { familleDuNom } from './../src/modules/accords/accords.familles';
+import {
+  FAMILLES as FAMILLES_ACCORDS,
+  familleDuNom,
+} from './../src/modules/accords/accords.familles';
+import { NOTIONS as NOTIONS_ACCORDS } from './../src/modules/accords/accords.notions';
+import { NOTIONS as NOTIONS_GRAMMAIRE } from './../src/modules/grammaire/grammaire.notions';
 
 interface CatalogModule {
   id: string;
@@ -877,5 +883,96 @@ describe("Démarrage de l'application (e2e)", () => {
     for (const { id } of MODULES_DE_PEAGE) {
       await catalog.update(id, { is_active: false });
     }
+  });
+
+  // ─── Les feuilles a imprimer ────────────────────────────────────────────────
+
+  /** Les paires `module/exercice` que le repartiteur sait traiter, lues dans sa source.
+   *
+   * Lues plutot qu'ecrites ici : une liste recopiee ne couvrirait que ce qui existait le
+   * jour ou on l'a ecrite, et un generateur ajoute demain passerait au travers sans que
+   * personne ne s'en apercoive. Le fichier est la seule source qui ne peut pas prendre du
+   * retard sur lui-meme.
+   */
+  function pairesDuRepartiteur(): string[] {
+    const source = readFileSync(
+      join(__dirname, '../src/modules/impression/impression.service.ts'),
+      'utf-8',
+    );
+    return [...source.matchAll(/^\s{6}case '([^']+\/[^']+)':$/gm)].map(
+      (trouve) => trouve[1],
+    );
+  }
+
+  /** Ceux qui ne peuvent rien rendre sur une base VIERGE, parce qu'ils lisent un contenu
+   * saisi en administration : il n'y a ni dictee ni texte de lecture au premier
+   * demarrage. Rendre une feuille vide est ici la bonne reponse, pas une panne. */
+  const SANS_CONTENU_AU_DEMARRAGE = ['dictee/dictee', 'lecture/texte'];
+
+  it('produit vraiment quelque chose pour CHAQUE exercice imprimable', async () => {
+    // On repose un etat CONNU avant de mesurer. Les tests precedents ont referme des
+    // notions pour verifier qu'une porte fermee tient ; en heriter ferait passer pour
+    // muet un generateur qui marche tres bien, et le test dirait le contraire de ce
+    // qu'il croit dire.
+    await app
+      .get(GrammaireService)
+      .setActiveNotionKeys(NOTIONS_GRAMMAIRE.map((notion) => notion.key));
+    await app.get(GrammaireService).setActiveClassKeys(['cp', 'ce1']);
+    await app
+      .get(AccordsService)
+      .setActiveNotionKeys(NOTIONS_ACCORDS.map((notion) => notion.key));
+    await app
+      .get(AccordsService)
+      .setActiveFamilleKeys(FAMILLES_ACCORDS.map((famille) => famille.key));
+
+    // Le test qui compte : il traverse les vrais generateurs des treize modules sur une
+    // vraie base, pas des doublures. Une paire `module/exercice` mal orthographiee d'un
+    // cote rend une feuille vide ou une erreur, et cela ne se voit qu'a l'impression.
+    // C'est le defaut qui avait frappe le peage : le dossier s'appelle `calcul`, le
+    // module declare `calcul-mental`.
+    const impression = app.get(ImpressionService);
+    const paires = pairesDuRepartiteur();
+    expect(paires.length).toBeGreaterThan(20);
+
+    const vides: string[] = [];
+    for (const paire of paires) {
+      const [moduleId, exercice] = paire.split('/');
+      const items = await impression.composer([
+        { module: moduleId, exercices: [exercice], nombre: 2 },
+      ]);
+      // Un item porte TOUJOURS le type qu'on a demande : c'est ce qui permet au rendu de
+      // savoir comment le dessiner, et un item mal etiquete sortirait en blanc.
+      for (const item of items) {
+        expect({ module: item.module, exercice: item.exercice }).toEqual({
+          module: moduleId,
+          exercice,
+        });
+        expect(Object.keys(item.donnees).length).toBeGreaterThan(0);
+      }
+      if (items.length === 0) vides.push(paire);
+    }
+
+    expect({ exercicesMuets: vides.sort() }).toEqual({
+      exercicesMuets: [...SANS_CONTENU_AU_DEMARRAGE].sort(),
+    });
+  });
+
+  it('melange plusieurs modules sur UNE feuille, dans l’ordre demande', async () => {
+    // La raison d'etre du module : deux horloges, trois tables, une addition posee. Une
+    // feuille mono-module n'est qu'un cas particulier, et c'est le cas melange qui
+    // traverse le plus de code.
+    const items = await app.get(ImpressionService).composer([
+      { module: 'heure', exercices: ['lire'], nombre: 2 },
+      { module: 'tables', exercices: ['produit'], nombre: 3 },
+      { module: 'pose', exercices: ['operation'], nombre: 1 },
+    ]);
+    expect(items.map((item) => item.module)).toEqual([
+      'heure',
+      'heure',
+      'tables',
+      'tables',
+      'tables',
+      'pose',
+    ]);
   });
 });
