@@ -75,6 +75,10 @@ export default function ImpressionPage() {
     Record<string, Record<string, unknown>>
   >({});
   const [avecCorrige, setAvecCorrige] = useState(true);
+  /** Numeroter les exercices. DECOCHE par defaut : un numero devant chaque exercice
+   * ressemble a une note, et a sept ans la feuille prend l'air d'un controle. Le reglage
+   * existe quand meme, parce que le corrige se lit plus vite avec des reperes. */
+  const [avecNumeros, setAvecNumeros] = useState(false);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
   /** Les modules actifs qui n'ont rien rendu. Ils ne sont plus une erreur (une dictee
    * manquante ne doit pas emporter les dix exercices de tables), mais ils doivent se
@@ -185,14 +189,24 @@ export default function ImpressionPage() {
         {/* Le corrige porte sur la feuille entiere, pas sur un module : sa place est
             au-dessus de la liste. En bas, il se lisait comme un reglage du dernier
             module coche. */}
-        <label className="Impression__enTete">
-          <input
-            type="checkbox"
-            checked={avecCorrige}
-            onChange={(e) => setAvecCorrige(e.target.checked)}
-          />
-          Imprimer le corrigé, sur une page à part
-        </label>
+        <div className="Impression__enTete">
+          <label className="Impression__choix">
+            <input
+              type="checkbox"
+              checked={avecCorrige}
+              onChange={(e) => setAvecCorrige(e.target.checked)}
+            />
+            Imprimer le corrigé, sur une page à part
+          </label>
+          <label className="Impression__choix">
+            <input
+              type="checkbox"
+              checked={avecNumeros}
+              onChange={(e) => setAvecNumeros(e.target.checked)}
+            />
+            Numéroter les exercices
+          </label>
+        </div>
 
         <div className="Impression__grille">
           {fournisseurs.map((f) => {
@@ -389,6 +403,7 @@ export default function ImpressionPage() {
             exercices={catalogue}
             titre={`Feuille du ${dateDuJour()}`}
             avecCorrige={avecCorrige}
+            avecNumeros={avecNumeros}
           />
         </div>
       )}

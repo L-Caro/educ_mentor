@@ -83,6 +83,15 @@ $encre: #1a1a1a;
   &__numero {
     min-width: 6mm;
     font-weight: 700;
+
+    // Le chevron est plus discret que ne l'etait le numero : il n'a rien a dire, il
+    // marque juste le depart. Trop noir, il ferait une colonne de fleches qui tire l'oeil
+    // avant les exercices.
+    &--chevron {
+      min-width: 4mm;
+      font-weight: 400;
+      opacity: 0.55;
+    }
   }
 
   // Le corrige part sur sa propre page : elle se detache, et l'enfant ne l'a pas sous les
@@ -98,6 +107,13 @@ $encre: #1a1a1a;
     font-size: 3.6mm;
     list-style: none;
     padding: 0;
+
+    // Sans numeros, la seule facon de retrouver une reponse est de compter dans le meme
+    // ordre que la feuille. Deux colonnes, comme la feuille, et on suit ligne a ligne ;
+    // en quatre colonnes on perdait le fil des la troisieme reponse.
+    &--suivie {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 }
 
@@ -270,11 +286,18 @@ $bleu-fort: #5a7fb0;
 .Impression__enTete {
   display: flex;
   align-items: center;
-  gap: $space-3;
+  flex-wrap: wrap;
+  gap: $space-3 $space-6;
   padding: $space-4 $space-5;
   background: var(--color-base-100);
   border: 1px solid var(--color-base-300);
   border-radius: $radius-sm;
+}
+
+.Impression__choix {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
   cursor: pointer;
 }
 
