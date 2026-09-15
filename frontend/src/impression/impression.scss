@@ -1,0 +1,188 @@
+@use 'src/assets/styles/_abstracts/variables' as *;
+
+// ─── La feuille ───────────────────────────────────────────────────────────────
+//
+// Tout est en MILLIMETRES, et ce n'est pas un detail de style : c'est la seule unite que
+// l'imprimante respecte. Une feuille d'exercices a des contraintes physiques, pas des
+// contraintes d'ecran.
+//
+// A4 fait 210 x 297 mm. Avec 12 mm de marge, il reste 186 mm de large : deux colonnes de
+// 89 mm. Une addition posee a trois chiffres en occupe 40, une multiplication 7 x 8 en
+// occupe 25. C'est cette arithmetique qui doit gouverner, pas l'intuition.
+
+$marge-page: 12mm;
+$largeur-utile: 186mm;
+$encre: #1a1a1a;
+
+@page {
+  size: A4 portrait;
+  margin: $marge-page;
+}
+
+.Feuille {
+  width: $largeur-utile;
+  margin: 0 auto;
+  color: $encre;
+  background: #fff;
+  font-family: $font-family;
+
+  &__entete {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 0.4mm solid $encre;
+    padding-bottom: 2mm;
+    margin-bottom: 6mm;
+    font-size: 3.4mm;
+  }
+
+  &__titre {
+    margin: 0;
+    font-size: 4.6mm;
+    font-weight: 700;
+  }
+
+  // Une grille plutot que des colonnes CSS : la grille se coupe proprement entre deux
+  // pages, la ou le multi-colonnes rééquilibre son contenu de facon imprevisible a
+  // l'impression. Chaque item occupe une colonne, ou les deux quand il le demande.
+  &__grille {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6mm 8mm;
+    align-items: start;
+  }
+
+  &__item {
+    // Un exercice ne doit jamais etre coupe par un saut de page.
+    break-inside: avoid;
+    display: flex;
+    gap: 2mm;
+    font-size: 4mm;
+  }
+
+  &__item--pleine {
+    grid-column: 1 / -1;
+  }
+
+  &__numero {
+    min-width: 6mm;
+    font-weight: 700;
+  }
+
+  // Le corrige part sur sa propre page : elle se detache, et l'enfant ne l'a pas sous les
+  // yeux pendant qu'elle travaille. C'est ce qui lui permet de se corriger seule apres.
+  &__corrige {
+    break-before: page;
+  }
+
+  &__corrigeListe {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2mm 6mm;
+    font-size: 3.6mm;
+    list-style: none;
+    padding: 0;
+  }
+}
+
+// Le blanc a remplir : une largeur decidee en millimetres, posee par le composant.
+.Blanc {
+  display: inline-block;
+  border-bottom: 0.3mm solid currentColor;
+}
+
+// ─── Les trames ───────────────────────────────────────────────────────────────
+
+.Trame {
+  width: 100%;
+
+  // Seyes : interligne de 2 mm, ligne forte tous les 8 mm, verticales tous les 8 mm.
+  // Les couleurs sont celles du cahier, bleu pale et marge rouge : une enfant reconnait
+  // son papier avant de lire ce qu'il y a dessus.
+  &--seyes {
+    background-image:
+      repeating-linear-gradient(to bottom, #9fb8d8 0 0.15mm, transparent 0.15mm 2mm),
+      repeating-linear-gradient(to bottom, #5a7fb0 0 0.25mm, transparent 0.25mm 8mm),
+      repeating-linear-gradient(to right, #c8d6e8 0 0.15mm, transparent 0.15mm 8mm);
+  }
+
+  &--carreaux {
+    background-image:
+      repeating-linear-gradient(to bottom, #9fb8d8 0 0.15mm, transparent 0.15mm 5mm),
+      repeating-linear-gradient(to right, #9fb8d8 0 0.15mm, transparent 0.15mm 5mm);
+    border: 0.2mm solid #7f9dc0;
+  }
+}
+
+.LignesEcriture {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: ligne;
+
+  &__ligne {
+    counter-increment: ligne;
+    display: flex;
+    align-items: stretch;
+    gap: 2mm;
+    margin-bottom: 4mm;
+
+    // Le numero va dans la MARGE, avant le trait rouge, comme dans son cahier. Le poser
+    // apres reviendrait a lui manger le debut de sa ligne d'ecriture.
+    &::before {
+      content: counter(ligne) '.';
+      flex: 0 0 10mm;
+      text-align: right;
+      padding-right: 3mm;
+      font-size: 3.4mm;
+      color: $encre;
+    }
+
+    // La marge rouge du cahier. Elle n'a rien d'ornemental : c'est le repere qui lui dit
+    // ou commence sa ligne.
+    .Trame {
+      flex: 1;
+      border-left: 0.4mm solid #c0392b;
+    }
+  }
+}
+
+// ─── Les reglages, qui ne s'impriment pas ─────────────────────────────────────
+
+.Impression {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.Impression__reglages {
+  display: flex;
+  flex-direction: column;
+  gap: $space-5;
+}
+
+.Impression__apercu {
+  // Le rendu ecran imite la feuille : fond blanc, ombre, pour qu'on voie ce qui sortira.
+  padding: $marge-page;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+  border-radius: $radius-sm;
+  overflow-x: auto;
+}
+
+@media print {
+  // Ne reste que la feuille. Tout le reste de l'application, y compris la navigation et
+  // les reglages, disparait.
+  body > *:not(.Impression__racine),
+  .Impression__reglages,
+  .Impression__actions {
+    display: none !important;
+  }
+
+  .Impression__apercu {
+    padding: 0;
+    box-shadow: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+}

@@ -9,6 +9,7 @@ import { useGetModulesQuery, useUpdateModuleMutation } from 'src/store/api/share
 
 const SHORTCUTS = [
   { to: '/settings', icon: '⚙️', label: 'Paramètres', desc: 'Options de jeu' },
+  { to: '/admin/impression', icon: '🖨', label: 'Imprimer', desc: 'Composer une feuille d\u2019exercices' },
 ];
 
 interface ProgressionSummary {

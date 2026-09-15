@@ -1,4 +1,5 @@
 import { tablesApi } from './tables.api.ts';
+import { tablesImpression } from './tables.impression';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import { TABLES_SETUP_OPTIONS } from './tables.setup.ts';
@@ -16,4 +17,5 @@ export const tablesModule: ModuleManifest = {
     getEndpoint: tablesApi.endpoints.getTablesProgression,
     resetEndpoint: tablesApi.endpoints.resetTablesProgression,
   }),
+  impression: tablesImpression,
 };

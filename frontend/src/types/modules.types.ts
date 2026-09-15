@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import type { RouteObject } from 'react-router-dom';
 import type { Tab } from 'src/components/common/TabNav.tsx';
 import type { SetupOption, GameModuleSpec } from 'src/types/game.types.ts';
+import type { FournisseurImpression } from 'src/impression/impression.types.ts';
 
 /** Forme normalisée d'une ligne de progression, telle que consommée par le tableau de bord. */
 export interface ProgressionStat {
@@ -33,4 +34,7 @@ export interface ModuleManifest {
     getStats: () => Promise<ProgressionStat[]>;
     reset: () => Promise<void>;
   };
+  /** Ce que le module sait mettre sur une feuille de papier. Absent = rien a imprimer,
+   * et le module n'apparait simplement pas dans la page de composition. */
+  impression?: FournisseurImpression;
 }

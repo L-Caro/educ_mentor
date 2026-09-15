@@ -1,5 +1,6 @@
 import store from 'src/store';
 import { calculApi } from './calcul.api.ts';
+import { calculImpression } from './calcul.impression';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import type { SetupChoice, SetupOption } from 'src/types/game.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
@@ -50,4 +51,5 @@ export const calculModule: ModuleManifest = {
     getEndpoint: calculApi.endpoints.getCalculProgression,
     resetEndpoint: calculApi.endpoints.resetCalculProgression,
   }),
+  impression: calculImpression,
 };

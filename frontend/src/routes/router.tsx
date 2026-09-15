@@ -126,6 +126,11 @@ const Router = createBrowserRouter([
     element: <PinGate><AdminPage /></PinGate>,
     children: [
       { index: true, element: <AdminDashboard />, handle: { title: 'Tableau de bord admin' } },
+      {
+        path: 'impression',
+        handle: { title: 'Imprimer une feuille' },
+        lazy: async () => ({ Component: (await import('src/impression/ImpressionPage')).default }),
+      },
       ...MODULES.map(buildAdminRoute),
     ],
   },
