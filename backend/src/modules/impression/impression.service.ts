@@ -49,15 +49,57 @@ export class ImpressionService {
 
     const items: ItemImprime[] = [];
     for (const ligne of lignes) {
-      items.push(...(await this.pourUneLigne(ligne)));
+      for (const [exercice, nombre] of this.repartir(ligne)) {
+        items.push(
+          ...(await this.pourUneLigne({
+            ...ligne,
+            exercices: [exercice],
+            nombre,
+          })),
+        );
+      }
     }
     return items;
   }
 
+  /**
+   * Repartit `nombre` exercices entre les types coches.
+   *
+   * Tour a tour sur une liste MELANGEE, et non un tirage independant par exercice. Les
+   * deux sont du hasard, mais le tirage independant peut donner dix exercices du meme
+   * type sur trois coches : ce n'est pas ce qu'on attend en cochant trois cases. Le tour
+   * a tour garantit une repartition aussi egale que possible, et le melange decide qui
+   * recoit l'exercice en trop.
+   */
+  private repartir(ligne: LigneComposition): [string, number][] {
+    const types = ligne.exercices.filter(Boolean);
+    if (types.length === 0) return [];
+
+    const melanges = [...types];
+    for (let i = melanges.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [melanges[i], melanges[j]] = [melanges[j], melanges[i]];
+    }
+
+    const parts = new Map<string, number>(melanges.map((t) => [t, 0]));
+    for (let pose = 0; pose < ligne.nombre; pose++) {
+      const type = melanges[pose % melanges.length];
+      parts.set(type, (parts.get(type) ?? 0) + 1);
+    }
+    return [...parts.entries()].filter(([, n]) => n > 0);
+  }
+
   private pourUneLigne(ligne: LigneComposition): Promise<ItemImprime[]> {
-    switch (`${ligne.module}/${ligne.exercice}`) {
+    switch (`${ligne.module}/${ligne.exercices[0]}`) {
       case 'tables/produit':
-        return this.tablesProduit(ligne);
+      case 'tables/facteur_manquant':
+      case 'tables/decomposition':
+        return this.tablesDepuisUnFait(ligne);
+      case 'tables/suite':
+        return this.tablesSuite(ligne);
+      case 'tables/table_complete':
+      case 'tables/table_memo':
+        return this.tablesCompletes(ligne);
       case 'calcul-mental/operation':
         return this.calculOperation(ligne);
       case 'pose/operation':
@@ -72,7 +114,7 @@ export class ImpressionService {
         return this.grammaireAnalyse(ligne);
       default:
         throw new BadRequestException(
-          `Exercice inconnu : ${ligne.module}/${ligne.exercice}`,
+          `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
         );
     }
   }
@@ -103,9 +145,24 @@ export class ImpressionService {
     return [...retenus.values()].slice(0, nombre);
   }
 
-  private async tablesProduit(ligne: LigneComposition): Promise<ItemImprime[]> {
+  /**
+   * Les trois exercices batis sur UN FAIT de la table.
+   *
+   * `7 x 8 = 56` se pose de trois facons : le produit, le facteur manquant
+   * (`7 x __ = 56`), ou la decomposition (`56 = __ x __`). C'est le meme savoir, tire du
+   * meme vivier ; seule la case laissee vide change. Les distinguer cote serveur
+   * n'aurait servi qu'a tripler le meme tirage.
+   *
+   * Pour le facteur manquant, on cache un cote au hasard : toujours le second ferait
+   * apprendre la position plutot que la table.
+   */
+  private async tablesDepuisUnFait(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
     const tables = Array.isArray(ligne.options?.tables)
-      ? (ligne.options.tables as number[])
+      ? (ligne.options.tables as string[])
+          .map(Number)
+          .filter((n) => !Number.isNaN(n))
       : [];
     const questions = await this.tirer(
       ligne.nombre,
@@ -123,9 +180,93 @@ export class ImpressionService {
 
     return questions.map((q) => ({
       module: ligne.module,
-      exercice: ligne.exercice,
-      donnees: { a: q.display_a, b: q.display_b, reponse: q.answer },
+      exercice: ligne.exercices[0],
+      donnees: {
+        a: q.display_a,
+        b: q.display_b,
+        reponse: q.answer,
+        cacheGauche: Math.random() < 0.5,
+      },
     }));
+  }
+
+  /** Les tables demandees, ou toutes si rien n'est coche. Zero et un sont ecartes des
+   * suites et des tables completes : « 0, 0, 0, 0 » n'apprend rien. */
+  private tablesChoisies(ligne: LigneComposition): number[] {
+    const demandees = Array.isArray(ligne.options?.tables)
+      ? (ligne.options.tables as string[])
+          .map(Number)
+          .filter((n) => !Number.isNaN(n))
+      : [];
+    const utiles = (
+      demandees.length ? demandees : [...Array(11).keys()]
+    ).filter((n) => n >= 2);
+    return utiles.length ? utiles : [2, 3, 4, 5, 6, 7, 8, 9, 10];
+  }
+
+  /**
+   * Une suite : `7, 14, __, 28, __`.
+   *
+   * Le meme savoir que la table, vu autrement : on compte de sept en sept au lieu de
+   * reciter. Les trous ne sont jamais aux deux extremites, sinon la suite ne donne plus
+   * son pas et l'exercice devient une devinette.
+   */
+  private tablesSuite(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const tables = this.tablesChoisies(ligne);
+    const items: ItemImprime[] = [];
+    const vus = new Set<string>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 10 && items.length < ligne.nombre;
+      essai++
+    ) {
+      const table = tables[Math.floor(Math.random() * tables.length)];
+      const depart = 1 + Math.floor(Math.random() * 5);
+      const termes = Array.from({ length: 5 }, (_, i) => (depart + i) * table);
+      // Deux trous, jamais le premier ni le dernier.
+      const candidats = [1, 2, 3];
+      const trous = candidats
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2)
+        .sort((a, b) => a - b);
+      const cle = `${table}-${depart}-${trous.join(',')}`;
+      if (vus.has(cle)) continue;
+      vus.add(cle);
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: { termes, trous, pas: table },
+      });
+    }
+    return Promise.resolve(items);
+  }
+
+  /**
+   * Une table entiere, a remplir ou deja remplie.
+   *
+   * La version remplie n'est pas un exercice : c'est un memo a garder sous les yeux ou a
+   * coller dans un cahier. Les deux sortent du meme calcul, seul le rendu differe, d'ou
+   * un seul generateur pour deux types.
+   */
+  private tablesCompletes(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const tables = this.tablesChoisies(ligne);
+    const melangees = [...tables].sort(() => Math.random() - 0.5);
+    const items = Array.from(
+      { length: Math.min(ligne.nombre, melangees.length) },
+      (_, i) => ({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          table: melangees[i],
+          lignes: Array.from({ length: 10 }, (_, k) => ({
+            facteur: k + 1,
+            produit: melangees[i] * (k + 1),
+          })),
+        },
+      }),
+    );
+    return Promise.resolve(items);
   }
 
   private async calculOperation(
@@ -148,7 +289,7 @@ export class ImpressionService {
 
     return questions.map((q) => ({
       module: ligne.module,
-      exercice: ligne.exercice,
+      exercice: ligne.exercices[0],
       donnees: { operation: q.operation, reponse: q.answer },
     }));
   }
@@ -175,7 +316,7 @@ export class ImpressionService {
 
     return questions.map((q) => ({
       module: ligne.module,
-      exercice: ligne.exercice,
+      exercice: ligne.exercices[0],
       // Pas de retenues dans les donnees : elles ne sont pas imprimees, et les envoyer
       // inviterait a les dessiner un jour par megarde.
       donnees: {
@@ -210,7 +351,7 @@ export class ImpressionService {
     return [
       {
         module: ligne.module,
-        exercice: ligne.exercice,
+        exercice: ligne.exercices[0],
         donnees: {
           phrases: construite.items.map((item) => item.contenu),
           niveau: construite.niveau,
@@ -268,7 +409,7 @@ export class ImpressionService {
       const ordonnes = PRONOMS.filter((p) => choisis.includes(p));
       return {
         module: ligne.module,
-        exercice: ligne.exercice,
+        exercice: ligne.exercices[0],
         donnees: {
           infinitif: q.infinitif,
           temps: q.tense,
@@ -299,7 +440,7 @@ export class ImpressionService {
 
     return questions.map((q) => ({
       module: ligne.module,
-      exercice: ligne.exercice,
+      exercice: ligne.exercices[0],
       donnees: {
         consigne: q.display,
         depart: q.depart,
@@ -339,7 +480,7 @@ export class ImpressionService {
 
     return questions.map((q) => ({
       module: ligne.module,
-      exercice: ligne.exercice,
+      exercice: ligne.exercices[0],
       donnees: {
         consigne: q.display,
         mots: q.mots,

@@ -72,20 +72,35 @@ export interface ExerciceImprimable {
   enonce: (donnees: Record<string, unknown>) => ReactNode;
   /** La reponse, pour la page de corrige. Courte : elle est lue en diagonale. */
   reponse: (donnees: Record<string, unknown>) => ReactNode;
-  /** Ce qu'on peut regler avant de tirer. Voir `OptionImprimable`. */
-  options?: OptionImprimable[];
 }
 
 export interface FournisseurImpression {
   /** Le nom du module sur la page de composition. */
   label: string;
+  /**
+   * Les types d'exercices proposes. On en coche ceux qu'on veut, et le nombre demande se
+   * repartit entre eux : les tables en ont cinq, qui travaillent le meme savoir de cinq
+   * facons differentes.
+   */
   exercices: ExerciceImprimable[];
+  /**
+   * Ce qu'on regle une fois pour le module, quel que soit le type choisi : quelles
+   * tables, quelles notions, quels verbes. Ces reglages portent sur le CONTENU, pas sur
+   * la forme de l'exercice, donc ils valent pour tous ses types.
+   */
+  options?: OptionImprimable[];
 }
 
-/** Une ligne de composition, telle que l'adulte la coche. */
+/**
+ * Une ligne de composition : « dix exercices de tables, de ces trois sortes ».
+ *
+ * Une premiere version demandait un nombre PAR TYPE. Plus expressif sur le papier, plus
+ * penible en pratique : il fallait faire l'arithmetique soi-meme pour arriver a dix, et on
+ * n'avait jamais la variete sans y penser.
+ */
 export interface LigneComposition {
   module: string;
-  exercice: string;
+  exercices: string[];
   nombre: number;
   options?: Record<string, unknown>;
 }

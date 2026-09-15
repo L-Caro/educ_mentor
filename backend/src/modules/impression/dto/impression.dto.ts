@@ -14,8 +14,10 @@ export class LigneCompositionDto {
   @IsString()
   module: string;
 
-  @IsString()
-  exercice: string;
+  /** Les types coches. Les exercices sont repartis entre eux (voir `ImpressionService`). */
+  @IsArray()
+  @IsString({ each: true })
+  exercices: string[];
 
   /** Borne haute par ligne. Le total est verifie a part, mais une ligne demesuree ne doit
    * meme pas atteindre le service. */

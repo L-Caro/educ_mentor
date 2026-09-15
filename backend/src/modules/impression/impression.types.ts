@@ -15,12 +15,24 @@
  * navigateur affiche.
  */
 
-/** Une ligne de la composition : « trois multiplications », « deux horloges ». */
+/**
+ * Une ligne de la composition : « dix exercices de tables, de ces trois sortes ».
+ *
+ * `exercices` est une LISTE, et c'est le coeur de la demande. Un module propose plusieurs
+ * types (les tables en ont cinq : le produit, le facteur manquant, la decomposition, la
+ * table complete, la suite). L'adulte coche ceux qu'il veut, donne un nombre, et les
+ * exercices sont repartis entre eux.
+ *
+ * Une premiere version demandait un nombre PAR TYPE. C'etait plus expressif sur le
+ * papier, et plus penible en pratique : il fallait faire l'arithmetique soi-meme pour
+ * arriver a dix, et on n'avait jamais la variete sans y penser.
+ */
 export interface LigneComposition {
   module: string;
-  exercice: string;
+  exercices: string[];
   nombre: number;
-  /** Reglages propres a l'exercice : quelles tables, quels temps, jusqu'ou compter. */
+  /** Reglages du CONTENU, communs aux types du module : quelles tables, quelles notions,
+   * quels verbes. Ils ne dependent pas du type d'exercice mais de ce qu'on travaille. */
   options?: Record<string, unknown>;
 }
 

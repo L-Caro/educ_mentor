@@ -37,9 +37,11 @@ export default function ImpressionPage() {
     [],
   );
 
-  /** Combien d'exercices de chaque type, indexe par `module/exercice`. */
-  const [quantites, setQuantites] = useState<Record<string, number>>({});
-  /** Les reglages de chaque exercice, indexes par `module/exercice`. */
+  /** Les types coches, par module. */
+  const [selection, setSelection] = useState<Record<string, string[]>>({});
+  /** Combien d'exercices par module, repartis entre les types coches. */
+  const [nombres, setNombres] = useState<Record<string, number>>({});
+  /** Les reglages de contenu, par module. */
   const [reglages, setReglages] = useState<Record<string, Record<string, unknown>>>({});
   const [avecCorrige, setAvecCorrige] = useState(true);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
@@ -53,15 +55,20 @@ export default function ImpressionPage() {
     return table;
   }, [fournisseurs]);
 
-  const total = Object.values(quantites).reduce((somme, n) => somme + n, 0);
+  const total = Object.entries(nombres).reduce(
+    (somme, [id, n]) => somme + ((selection[id]?.length ?? 0) > 0 ? n : 0),
+    0,
+  );
 
   async function preparer() {
-    const lignes: LigneComposition[] = Object.entries(quantites)
-      .filter(([, nombre]) => nombre > 0)
-      .map(([cle, nombre]) => {
-        const [module, exercice] = cle.split('/');
-        return { module, exercice, nombre, options: reglages[cle] };
-      });
+    const lignes: LigneComposition[] = Object.entries(selection)
+      .filter(([id, types]) => types.length > 0 && (nombres[id] ?? 0) > 0)
+      .map(([id, types]) => ({
+        module: id,
+        exercices: types,
+        nombre: nombres[id],
+        options: reglages[id],
+      }));
     if (lignes.length === 0) return;
     try {
       setItems(await composer(lignes).unwrap());
@@ -80,51 +87,79 @@ export default function ImpressionPage() {
           papier n&rsquo;est pas mesuré.
         </p>
 
-        {fournisseurs.map((f) => (
-          <div key={f.id} className="AdminCard GameSettings__card">
-            <p className="GameSettings__cardTitle">{f.label}</p>
-            {f.exercices.map((exercice) => {
-              const cle = `${f.id}/${exercice.cle}`;
-              return (
-                <div key={cle}>
-                <div className="GameSettings__rangeRow">
-                  <label className="GameSettings__rangeLabel" htmlFor={cle}>
-                    {exercice.label}
-                  </label>
-                  <input
-                    id={cle}
-                    type="number"
-                    min={0}
-                    max={MAXIMUM_ITEMS}
-                    value={quantites[cle] ?? 0}
-                    onChange={(e) =>
-                      setQuantites((precedent) => ({
+        {fournisseurs.map((f) => {
+          const coches = selection[f.id] ?? [];
+          return (
+            <div key={f.id} className="AdminCard GameSettings__card">
+              <p className="GameSettings__cardTitle">{f.label}</p>
+
+              {/* Les TYPES d'exercices. On en coche autant qu'on veut : le nombre demande
+                  se repartit entre eux, ce qui donne la variete sans avoir a faire
+                  l'arithmetique soi-meme. */}
+              <div className="GameSettings__denominations">
+                {f.exercices.map((exercice) => (
+                  <button
+                    key={exercice.cle}
+                    type="button"
+                    className={`GameSettings__denomination${
+                      coches.includes(exercice.cle)
+                        ? ' GameSettings__denomination--active'
+                        : ''
+                    }`}
+                    onClick={() =>
+                      setSelection((precedent) => ({
                         ...precedent,
-                        [cle]: Math.max(0, Math.min(MAXIMUM_ITEMS, Number(e.target.value))),
+                        [f.id]: coches.includes(exercice.cle)
+                          ? coches.filter((c) => c !== exercice.cle)
+                          : [...coches, exercice.cle],
                       }))
                     }
-                    className="GameSettings__range"
-                    style={{ maxWidth: '6rem' }}
-                  />
-                </div>
+                  >
+                    {exercice.label}
+                  </button>
+                ))}
+              </div>
 
-                {/* Les reglages n'apparaissent QUE si l'exercice est demande : les
-                    afficher tous ferait une page de cases a cocher ou l'essentiel, le
-                    nombre d'exercices, se perdrait. */}
-                {(quantites[cle] ?? 0) > 0 && exercice.options && (
-                  <OptionsExercice
-                    options={exercice.options}
-                    valeurs={reglages[cle] ?? {}}
-                    onChange={(valeurs) =>
-                      setReglages((precedent) => ({ ...precedent, [cle]: valeurs }))
-                    }
-                  />
-                )}
-                </div>
-              );
-            })}
-          </div>
-        ))}
+              {coches.length > 0 && (
+                <>
+                  <div className="GameSettings__rangeRow">
+                    <label className="GameSettings__rangeLabel" htmlFor={`n-${f.id}`}>
+                      Combien d&rsquo;exercices
+                    </label>
+                    <input
+                      id={`n-${f.id}`}
+                      type="number"
+                      min={0}
+                      max={MAXIMUM_ITEMS}
+                      value={nombres[f.id] ?? 0}
+                      onChange={(e) =>
+                        setNombres((precedent) => ({
+                          ...precedent,
+                          [f.id]: Math.max(
+                            0,
+                            Math.min(MAXIMUM_ITEMS, Number(e.target.value)),
+                          ),
+                        }))
+                      }
+                      className="GameSettings__range"
+                      style={{ maxWidth: '6rem' }}
+                    />
+                  </div>
+
+                  {f.options && (
+                    <OptionsExercice
+                      options={f.options}
+                      valeurs={reglages[f.id] ?? {}}
+                      onChange={(valeurs) =>
+                        setReglages((precedent) => ({ ...precedent, [f.id]: valeurs }))
+                      }
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          );
+        })}
 
         <label className="GameSettings__toggleRow">
           <input

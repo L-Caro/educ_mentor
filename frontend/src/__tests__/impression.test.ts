@@ -50,28 +50,27 @@ describe('les reglages par exercice', () => {
     // de grammaire toutes les notions ouvertes. C'est utilisable, mais ca ne permet pas
     // de travailler ce qu'on VEUT travailler, qui est le seul interet d'une feuille faite
     // a la main plutot que tiree au hasard.
+    // Les reglages portent sur le CONTENU et valent pour tous les types du module : les
+    // tables a travailler sont les memes qu'on demande un produit ou une suite.
     const attendus: Record<string, string[]> = {
-      'tables/produit': ['tables'],
-      'calcul-mental/operation': ['types'],
-      'conjugaison/forme': ['formes', 'verbes', 'tenses'],
-      'accords/accord': ['types'],
-      'grammaire/analyse': ['types'],
+      tables: ['tables'],
+      'calcul-mental': ['types'],
+      conjugaison: ['formes', 'verbes', 'tenses'],
+      accords: ['types'],
+      grammaire: ['types'],
     };
-    for (const [cle, cles] of Object.entries(attendus)) {
-      const [moduleId, exerciceCle] = cle.split('/');
-      const exercice = MODULES.find((m) => m.id === moduleId)?.impression?.exercices.find(
-        (e) => e.cle === exerciceCle,
-      );
-      expect({ cle, options: exercice?.options?.map((o) => o.cle).sort() }).toEqual({
-        cle,
-        options: [...cles].sort(),
-      });
+    for (const [moduleId, cles] of Object.entries(attendus)) {
+      const module = MODULES.find((m) => m.id === moduleId);
+      expect({
+        moduleId,
+        options: module?.impression?.options?.map((o) => o.cle).sort(),
+      }).toEqual({ moduleId, options: [...cles].sort() });
     }
   });
 
   it('borne le nombre de formes d’une conjugaison entre une et six', () => {
     const formes = MODULES.find((m) => m.id === 'conjugaison')
-      ?.impression?.exercices[0]?.options?.find((o) => o.cle === 'formes');
+      ?.impression?.options?.find((o) => o.cle === 'formes');
     expect(formes).toMatchObject({ type: 'nombre', min: 1, max: 6 });
   });
 
@@ -79,14 +78,12 @@ describe('les reglages par exercice', () => {
     // Une option qui porterait les deux laisserait deux sources de verite sur ce qui est
     // proposable, et la statique gagnerait en silence.
     for (const module of fournisseurs) {
-      for (const exercice of module.impression!.exercices) {
-        for (const option of exercice.options ?? []) {
-          if (option.type !== 'multi') continue;
-          expect({
-            cle: option.cle,
-            uneSeule: Boolean(option.choix) !== Boolean(option.charger),
-          }).toEqual({ cle: option.cle, uneSeule: true });
-        }
+      for (const option of module.impression!.options ?? []) {
+        if (option.type !== 'multi') continue;
+        expect({
+          cle: option.cle,
+          uneSeule: Boolean(option.choix) !== Boolean(option.charger),
+        }).toEqual({ cle: option.cle, uneSeule: true });
       }
     }
   });

@@ -54,38 +54,38 @@ export const conjugaisonImpression: FournisseurImpression = {
           .map((l) => `${l.pronom} ${l.reponse}`)
           .join(', ')}`;
       },
-      options: [
-        {
-          cle: 'formes',
-          label: 'Combien de formes',
-          type: 'nombre',
-          min: 1,
-          max: 6,
-          defaut: 1,
-        },
-        {
-          cle: 'verbes',
-          label: 'Quels verbes',
-          type: 'multi',
-          charger: async () => {
-            const verbes = await store
-              .dispatch(conjugaisonApi.endpoints.getConjugaisonVerbs.initiate(undefined))
-              .unwrap();
-            return verbes.map((v) => ({ valeur: v.infinitif, label: v.infinitif }));
-          },
-        },
-        {
-          cle: 'tenses',
-          label: 'Quels temps',
-          type: 'multi',
-          charger: async () => {
-            const temps = await store
-              .dispatch(conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined))
-              .unwrap();
-            return temps.map((t) => ({ valeur: t.key, label: t.label }));
-          },
-        },
-      ],
+    },
+  ],
+  options: [
+    {
+      cle: 'formes',
+      label: 'Combien de formes',
+      type: 'nombre',
+      min: 1,
+      max: 6,
+      defaut: 1,
+    },
+    {
+      cle: 'verbes',
+      label: 'Quels verbes',
+      type: 'multi',
+      charger: async () => {
+        const verbes = await store
+          .dispatch(conjugaisonApi.endpoints.getConjugaisonVerbs.initiate(undefined))
+          .unwrap();
+        return verbes.map((v) => ({ valeur: v.infinitif, label: v.infinitif }));
+      },
+    },
+    {
+      cle: 'tenses',
+      label: 'Quels temps',
+      type: 'multi',
+      charger: async () => {
+        const temps = await store
+          .dispatch(conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined))
+          .unwrap();
+        return temps.map((t) => ({ valeur: t.key, label: t.label }));
+      },
     },
   ],
 };

@@ -18,21 +18,21 @@ export const calculImpression: FournisseurImpression = {
         </span>
       ),
       reponse: (d) => `${String(d.operation)} = ${String(d.reponse)}`,
-      options: [
-        {
-          cle: 'types',
-          label: 'Quelles opérations',
-          type: 'multi',
-          // Les types OUVERTS, pas le catalogue complet : imprimer une operation fermee
-          // contournerait le seul reglage qui decide de ce que l'enfant voit.
-          charger: async () => {
-            const types = await store
-              .dispatch(calculApi.endpoints.getCalculTypes.initiate(undefined))
-              .unwrap();
-            return types.map((type) => ({ valeur: type.key, label: type.label }));
-          },
-        },
-      ],
+    },
+  ],
+  options: [
+    {
+      cle: 'types',
+      label: 'Quelles opérations',
+      type: 'multi',
+      // Les types OUVERTS, pas le catalogue complet : imprimer une operation fermee
+      // contournerait le seul reglage qui decide de ce que l'enfant voit.
+      charger: async () => {
+        const types = await store
+          .dispatch(calculApi.endpoints.getCalculTypes.initiate(undefined))
+          .unwrap();
+        return types.map((type) => ({ valeur: type.key, label: type.label }));
+      },
     },
   ],
 };

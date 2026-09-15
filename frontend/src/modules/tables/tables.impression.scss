@@ -1,0 +1,13 @@
+// Une table entiere tient en colonne : dix lignes de 5 mm font 50 mm, la moitie d'une
+// hauteur de page. La table de Pythagore complete, elle, prendrait la pleine largeur et
+// n'est pas proposee ici.
+.TableImprimee {
+  border-collapse: collapse;
+  font-size: 3.8mm;
+
+  td {
+    padding: 0.6mm 1mm 0.6mm 0;
+    vertical-align: bottom;
+    white-space: nowrap;
+  }
+}

@@ -146,7 +146,7 @@ describe('ImpressionService', () => {
     // recentes » brouillerait ce que l'adulte y lit. Surtout, le travail sur papier n'est
     // pas mesure : le compter dans la progression ferait mentir la mesure.
     await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 5 },
+      { module: 'tables', exercices: ['produit'], nombre: 5 },
     ]);
     for (const service of [tables, calcul, pose, dictee]) {
       expect(service.startSession).not.toHaveBeenCalled();
@@ -155,17 +155,18 @@ describe('ImpressionService', () => {
 
   it('rend exactement le nombre d’exercices demande', async () => {
     const items = await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 6 },
+      { module: 'tables', exercices: ['produit'], nombre: 6 },
     ]);
     expect(items).toHaveLength(6);
+    // Un ITEM porte un seul type : c'est la ligne de composition qui en coche plusieurs.
     expect(items[0]).toMatchObject({ module: 'tables', exercice: 'produit' });
   });
 
   it('melange les modules sur une meme feuille, dans l’ordre demande', async () => {
     // C'est la raison d'etre du service : trois tables et deux calculs sur la meme page.
     const items = await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 3 },
-      { module: 'calcul-mental', exercice: 'operation', nombre: 1 },
+      { module: 'tables', exercices: ['produit'], nombre: 3 },
+      { module: 'calcul-mental', exercices: ['operation'], nombre: 1 },
     ]);
     expect(items.map((i) => i.module)).toEqual([
       'tables',
@@ -178,7 +179,7 @@ describe('ImpressionService', () => {
   it('ne pose JAMAIS deux fois le meme exercice sur une feuille', async () => {
     // Deux fois « 7 x 8 » sur la meme page, c'est une ligne perdue.
     const items = await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 10 },
+      { module: 'tables', exercices: ['produit'], nombre: 10 },
     ]);
     const cles = items.map(
       (i) => `${String(i.donnees.a)}x${String(i.donnees.b)}`,
@@ -194,7 +195,7 @@ describe('ImpressionService', () => {
       seance: {},
     });
     const items = await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 20 },
+      { module: 'tables', exercices: ['produit'], nombre: 20 },
     ]);
     expect(items).toHaveLength(3);
   });
@@ -202,7 +203,7 @@ describe('ImpressionService', () => {
   it('refuse une feuille demesuree', async () => {
     await expect(
       service.composer([
-        { module: 'tables', exercice: 'produit', nombre: MAXIMUM_ITEMS + 1 },
+        { module: 'tables', exercices: ['produit'], nombre: MAXIMUM_ITEMS + 1 },
       ]),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
@@ -210,7 +211,7 @@ describe('ImpressionService', () => {
   it('refuse un exercice qu’aucun module ne fournit', async () => {
     await expect(
       service.composer([
-        { module: 'tables', exercice: 'racine_carree', nombre: 1 },
+        { module: 'tables', exercices: ['racine_carree'], nombre: 1 },
       ]),
     ).rejects.toBeInstanceOf(BadRequestException);
   });
@@ -219,7 +220,7 @@ describe('ImpressionService', () => {
     // Sur le papier on ecrit la reponse, on ne coche pas : engendrer des choix serait au
     // mieux inutile, au pire imprime par erreur.
     await service.composer([
-      { module: 'tables', exercice: 'produit', nombre: 2 },
+      { module: 'tables', exercices: ['produit'], nombre: 2 },
     ]);
     expect(tables.construireQuestions).toHaveBeenCalledWith(
       expect.objectContaining({ difficulty: 'hard' }),
@@ -231,7 +232,7 @@ describe('ImpressionService', () => {
     // l'adulte dicte a voix haute. « Trois dictees » sur une feuille n'aurait pas de
     // sens ; c'est la longueur qui varie, pas le nombre.
     const items = await service.composer([
-      { module: 'dictee', exercice: 'dictee', nombre: 3 },
+      { module: 'dictee', exercices: ['dictee'], nombre: 3 },
     ]);
     expect(items).toHaveLength(1);
     expect(items[0].donnees.phrases).toEqual([
@@ -244,7 +245,7 @@ describe('ImpressionService', () => {
     // Elles ne sont pas imprimees : les transmettre inviterait a les dessiner un jour
     // par megarde.
     const items = await service.composer([
-      { module: 'pose', exercice: 'operation', nombre: 1 },
+      { module: 'pose', exercices: ['operation'], nombre: 1 },
     ]);
     expect(items[0].donnees).not.toHaveProperty('retenues');
     expect(items[0].donnees.operandes).toEqual([247, 138]);
@@ -257,7 +258,7 @@ describe('ImpressionService', () => {
     const items = await service.composer([
       {
         module: 'conjugaison',
-        exercice: 'forme',
+        exercices: ['forme'],
         nombre: 1,
         options: { formes: 3 },
       },
@@ -271,7 +272,7 @@ describe('ImpressionService', () => {
     const items = await service.composer([
       {
         module: 'conjugaison',
-        exercice: 'forme',
+        exercices: ['forme'],
         nombre: 1,
         options: { formes: 6 },
       },
@@ -295,7 +296,7 @@ describe('ImpressionService', () => {
       const items = await service.composer([
         {
           module: 'conjugaison',
-          exercice: 'forme',
+          exercices: ['forme'],
           nombre: 1,
           options: { formes: demande },
         },
