@@ -55,6 +55,11 @@ export default function ImpressionPage() {
   >({});
   const [avecCorrige, setAvecCorrige] = useState(true);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
+  /** Les modules coches qui n'ont rien rendu. Ils ne sont plus une erreur (une dictee
+   * manquante ne doit pas emporter les dix exercices de tables), mais ils doivent se
+   * DIRE : sans cela, l'adulte coche la dictee, ne la voit pas sur la feuille, et n'a
+   * aucun moyen de savoir que c'est parce qu'aucune n'est saisie. */
+  const [muets, setMuets] = useState<string[]>([]);
   const [composer, { isLoading, isError }] = useComposerFeuilleMutation();
 
   const catalogue = useMemo(() => {
@@ -82,9 +87,20 @@ export default function ImpressionPage() {
       }));
     if (lignes.length === 0) return;
     try {
-      setItems(await composer(lignes).unwrap());
+      const rendus = await composer(lignes).unwrap();
+      setItems(rendus);
+      setMuets(
+        lignes
+          .filter((ligne) => !rendus.some((item) => item.module === ligne.module))
+          .map(
+            (ligne) =>
+              fournisseurs.find((f) => f.id === ligne.module)?.label ??
+              ligne.module,
+          ),
+      );
     } catch {
       setItems(null);
+      setMuets([]);
     }
   }
 
@@ -191,7 +207,10 @@ export default function ImpressionPage() {
           <Button
             variant="primary"
             onClick={() => void preparer()}
-            disabled={total === 0 || isLoading}
+            // Desactive aussi AU-DESSUS de la borne : sans cela le bouton partait, le
+            // serveur refusait, et l'adulte lisait « reessaie dans un instant » alors
+            // qu'aucune attente n'y changerait rien.
+            disabled={total === 0 || total > MAXIMUM_ITEMS || isLoading}
           >
             {isLoading ? 'Préparation…' : `Préparer la feuille (${total})`}
           </Button>
@@ -206,6 +225,12 @@ export default function ImpressionPage() {
           <p className="GameSettings__hint">
             {total} exercices, c&rsquo;est trop pour une feuille. Maximum{' '}
             {MAXIMUM_ITEMS}.
+          </p>
+        )}
+        {muets.length > 0 && (
+          <p className="GameSettings__hint">
+            Rien à imprimer pour : {muets.join(', ')}. Ces modules attendent un
+            contenu saisi en administration, ou une notion à ouvrir.
           </p>
         )}
         {isError && (
