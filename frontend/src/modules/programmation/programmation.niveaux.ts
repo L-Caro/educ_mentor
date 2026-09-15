@@ -475,11 +475,20 @@ export function engendrerNiveau(
         if (!surLeChemin({ x, y })) libres.push({ x, y });
       }
     }
-    const murs = melanger(libres).slice(0, Math.round(etape.murs * echelle));
+    // Les murs suivent la SURFACE, pas le cote. Quatre rochers sur soixante-quatre cases
+    // font un terrain accidente ; les memes multiplies par deux et demi, soit dix sur
+    // quatre cents cases, font une plaine ou l'on passe partout. La densite est ce qui
+    // rend un detour necessaire, et elle se mesure au carre.
+    const murs = melanger(libres).slice(
+      0,
+      Math.round(etape.murs * echelle * echelle),
+    );
 
     // Les graines se posent SUR le chemin, jamais sur le but : ramasser et arriver au
     // meme instant demande de comprendre deux choses a la fois.
     const interieur = chemin.slice(1, -1);
+    // Les graines, elles, restent proportionnelles a la LONGUEUR du chemin : elles sont
+    // posees dessus, et c'est lui qui s'allonge, pas la surface.
     const graines = melanger(interieur).slice(
       0,
       Math.round(etape.graines * echelle),
