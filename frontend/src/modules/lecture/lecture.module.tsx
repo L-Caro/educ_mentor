@@ -1,3 +1,4 @@
+import { lectureImpression } from './lecture.impression';
 import store from 'src/store';
 import { lectureApi } from './lecture.api';
 import type { ModuleManifest } from 'src/types/modules.types';
@@ -11,12 +12,13 @@ async function loadTexts(): Promise<SetupChoice[]> {
       .unwrap();
 
     return texts.map((t) => ({
-      value:       String(t.id),
-      label:       t.titre,
-      icon:        t.play_count > 0 ? '✅' : '📖',
-      description: t.play_count > 0
-        ? `Meilleur score : ${t.best_correct}/${t.best_total}, joué ${t.play_count} fois`
-        : `${t.question_count} question${t.question_count > 1 ? 's' : ''}`,
+      value: String(t.id),
+      label: t.titre,
+      icon: t.play_count > 0 ? '✅' : '📖',
+      description:
+        t.play_count > 0
+          ? `Meilleur score : ${t.best_correct}/${t.best_total}, joué ${t.play_count} fois`
+          : `${t.question_count} question${t.question_count > 1 ? 's' : ''}`,
     }));
   } catch {
     return [];
@@ -32,26 +34,50 @@ export const lectureModule: ModuleManifest = {
       type: 'single',
       label: 'Quel niveau ?',
       choices: [
-        { value: 'easy',   icon: '🟢', label: 'Facile',    description: 'Texte visible + passage surligné : 2 choix' },
-        { value: 'medium', icon: '🟡', label: 'Moyen',     description: 'Texte visible et scrollable : 4 choix' },
-        { value: 'hard',   icon: '🔴', label: 'Difficile', description: 'Texte caché, de mémoire : 6 choix' },
+        {
+          value: 'easy',
+          icon: '🟢',
+          label: 'Facile',
+          description: 'Texte visible + passage surligné : 2 choix',
+        },
+        {
+          value: 'medium',
+          icon: '🟡',
+          label: 'Moyen',
+          description: 'Texte visible et scrollable : 4 choix',
+        },
+        {
+          value: 'hard',
+          icon: '🔴',
+          label: 'Difficile',
+          description: 'Texte caché, de mémoire : 6 choix',
+        },
       ],
     },
     {
-      key:          'textId',
-      type:         'single',
-      label:        'Quel texte ?',
-      loader:       loadTexts,
-      emptyMessage: 'Aucun texte disponible. Créez-en dans Administration → Textes & Questions.',
+      key: 'textId',
+      type: 'single',
+      label: 'Quel texte ?',
+      loader: loadTexts,
+      emptyMessage:
+        'Aucun texte disponible. Créez-en dans Administration → Textes & Questions.',
     },
   ],
-  loadGameSpec: () => import('./lecture.game.tsx').then((m) => m.lectureGameSpec),
+  loadGameSpec: () =>
+    import('./lecture.game.tsx').then((m) => m.lectureGameSpec),
   adminTabs: [{ to: '/admin/lecture', label: 'Textes & Questions', end: true }],
   adminRoutes: [
-    { index: true, lazy: () => import('./admin/LectureAdmin.tsx').then((m) => ({ Component: m.default })) },
+    {
+      index: true,
+      lazy: () =>
+        import('./admin/LectureAdmin.tsx').then((m) => ({
+          Component: m.default,
+        })),
+    },
   ],
+  impression: lectureImpression,
   progression: buildProgressionEntry({
-    getEndpoint:   lectureApi.endpoints.getLectureProgression,
+    getEndpoint: lectureApi.endpoints.getLectureProgression,
     resetEndpoint: lectureApi.endpoints.resetLectureProgression,
   }),
 };

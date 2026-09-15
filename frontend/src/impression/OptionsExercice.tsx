@@ -49,27 +49,14 @@ export default function OptionsExercice({ options, valeurs, onChange }: Props) {
             />
           </div>
         ) : option.type === 'unique' ? (
-          <div key={option.cle}>
-            <p className="GameSettings__hint">{option.label}</p>
-            <div className="GameSettings__denominations">
-              {option.choix.map((c) => (
-                <button
-                  key={c.valeur}
-                  type="button"
-                  className={`GameSettings__denomination${
-                    (valeurs[option.cle] ?? option.defaut) === c.valeur
-                      ? ' GameSettings__denomination--active'
-                      : ''
-                  }`}
-                  onClick={() =>
-                    onChange({ ...valeurs, [option.cle]: c.valeur })
-                  }
-                >
-                  {c.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <ChoixUnique
+            key={option.cle}
+            option={option}
+            valeur={String(valeurs[option.cle] ?? option.defaut ?? '')}
+            onChange={(valeur) =>
+              onChange({ ...valeurs, [option.cle]: valeur })
+            }
+          />
         ) : (
           <ListeACocher
             key={option.cle}
@@ -85,6 +72,81 @@ export default function OptionsExercice({ options, valeurs, onChange }: Props) {
   );
 }
 
+/** Les choix d'une option, statiques ou charges. `null` tant qu'on ne les a pas.
+ *
+ * En cas d'echec on rend une liste VIDE plutot qu'une erreur : sans filtre, le module
+ * tire librement, donc la feuille sort quand meme. Une page de composition bloquee par
+ * une liste d'options serait pire que la liste manquante.
+ */
+function useChoix(
+  option: Exclude<OptionImprimable, { type: 'nombre' }>,
+): ChoixImprimable[] | null {
+  const { choix: statiques, charger } = option;
+  const [choix, setChoix] = useState<ChoixImprimable[] | null>(
+    statiques ?? null,
+  );
+
+  useEffect(() => {
+    if (statiques || !charger) return;
+    let vivant = true;
+    void charger().then(
+      (recus) => vivant && setChoix(recus),
+      () => vivant && setChoix([]),
+    );
+    return () => {
+      vivant = false;
+    };
+  }, [statiques, charger]);
+
+  return choix;
+}
+
+function ChoixUnique({
+  option,
+  valeur,
+  onChange,
+}: {
+  option: Extract<OptionImprimable, { type: 'unique' }>;
+  valeur: string;
+  onChange: (valeur: string) => void;
+}) {
+  const choix = useChoix(option);
+  if (!choix) return <p className="GameSettings__hint">Chargement…</p>;
+  if (choix.length === 0) return null;
+
+  return (
+    <div>
+      <p className="GameSettings__hint">
+        {option.label}
+        {option.defaut === undefined && <em> (rien de choisi : au hasard)</em>}
+      </p>
+      <div className="GameSettings__denominations">
+        {choix.map((c) => (
+          <button
+            key={c.valeur}
+            type="button"
+            className={`GameSettings__denomination${
+              valeur === c.valeur ? ' GameSettings__denomination--active' : ''
+            }`}
+            // Recliquer sur le choix actif le RETIRE quand il n'y a pas de defaut : sans
+            // cela, une fois un texte choisi on ne pourrait plus revenir au tirage au
+            // hasard sans recharger la page.
+            onClick={() =>
+              onChange(
+                valeur === c.valeur && option.defaut === undefined
+                  ? ''
+                  : c.valeur,
+              )
+            }
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function ListeACocher({
   option,
   selection,
@@ -94,25 +156,9 @@ function ListeACocher({
   selection: string[];
   onChange: (selection: string[]) => void;
 }) {
-  const [choix, setChoix] = useState<ChoixImprimable[] | null>(
-    option.choix ?? null,
-  );
-
-  // Les listes chargees (notions ouvertes, temps actifs) viennent de l'administration :
-  // elles ne sont connues qu'au moment ou on ouvre la page. En cas d'echec on affiche une
-  // liste vide plutot qu'une erreur : sans filtre, le module tire librement, donc la
-  // feuille sort quand meme.
-  useEffect(() => {
-    if (option.choix || !option.charger) return;
-    let vivant = true;
-    void option.charger().then(
-      (recus) => vivant && setChoix(recus),
-      () => vivant && setChoix([]),
-    );
-    return () => {
-      vivant = false;
-    };
-  }, [option]);
+  // Les listes chargees (notions ouvertes, temps actifs, textes actifs) viennent de
+  // l'administration : elles ne sont connues qu'au moment ou on ouvre la page.
+  const choix = useChoix(option);
 
   if (!choix) return <p className="GameSettings__hint">Chargement…</p>;
   if (choix.length === 0) return null;

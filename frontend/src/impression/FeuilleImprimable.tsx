@@ -19,7 +19,12 @@ interface Props {
  * Le corrige part sur sa propre page. L'enfant peut donc la detacher et se corriger seule
  * apres coup, sans l'avoir eue sous les yeux pendant qu'elle travaillait.
  */
-export default function FeuilleImprimable({ items, exercices, titre, avecCorrige }: Props) {
+export default function FeuilleImprimable({
+  items,
+  exercices,
+  titre,
+  avecCorrige,
+}: Props) {
   const rendu = items.map((item, index) => ({
     item,
     numero: index + 1,

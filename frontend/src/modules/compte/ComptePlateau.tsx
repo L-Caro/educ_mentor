@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import type { GameAnswerState } from 'src/hooks/useGameSession';
 import type { CompteQuestion, Etape, Operation } from './compte.type';
-import { appliquer, decode, disponibles, ecrireEtape, encode } from './compteValue';
+import {
+  appliquer,
+  decode,
+  disponibles,
+  ecrireEtape,
+  encode,
+} from './compteValue';
 
 interface Props {
   question: CompteQuestion;

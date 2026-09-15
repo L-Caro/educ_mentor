@@ -1,0 +1,38 @@
+// ─── Un tirage sur le papier ─────────────────────────────────────────────────
+
+.Compte {
+  &__cible {
+    font-size: 13pt;
+  }
+
+  &__plaques {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5mm;
+    margin: 1.5mm 0 2mm;
+  }
+
+  // Une bordure, jamais un fond : Chrome n'imprime pas les arriere-plans sans que
+  // l'adulte coche « graphiques d'arriere-plan », et personne ne le coche.
+  &__plaque {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 9mm;
+    height: 8mm;
+    padding: 0 1mm;
+    border: 0.3mm solid #000;
+    border-radius: 1mm;
+    font-weight: 700;
+  }
+
+  &__etapes {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__etape {
+    margin-bottom: 1.5mm;
+  }
+}

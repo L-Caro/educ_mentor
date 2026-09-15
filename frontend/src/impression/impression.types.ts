@@ -53,8 +53,12 @@ export type OptionImprimable =
        * chiffres arabes ou en chiffres romains, pas les deux a la fois. Une liste a
        * cocher ne saurait pas dire ce que « les deux » veut dire. */
       type: 'unique';
-      choix: ChoixImprimable[];
-      defaut: string;
+      choix?: ChoixImprimable[];
+      charger?: () => Promise<ChoixImprimable[]>;
+      /** Rien de choisi = le module decide, comme pour `multi`. Une liste chargee n'a
+       * souvent pas de defaut sensé : le premier texte du catalogue n'est pas plus
+       * legitime qu'un autre. */
+      defaut?: string;
     }
   | {
       cle: string;

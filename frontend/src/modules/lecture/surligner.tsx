@@ -8,7 +8,11 @@ import type { ReactNode } from 'react';
  * dans ce passage. Un fragment introuvable rend le texte sans marque plutôt que de tenter
  * une approximation : mieux vaut ne rien surligner que surligner à côté.
  */
-export function surligner(texte: string, fragment: string | null, className: string): ReactNode {
+export function surligner(
+  texte: string,
+  fragment: string | null,
+  className: string,
+): ReactNode {
   if (!fragment) return texte;
 
   const index = texte.indexOf(fragment);

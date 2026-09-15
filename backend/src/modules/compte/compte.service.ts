@@ -113,7 +113,14 @@ export class CompteService {
     );
   }
 
-  async startSession(dto: StartCompteSessionDto): Promise<CompteSessionResult> {
+  /** Engendrer les tirages, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `startSession` pour la feuille imprimee, qui emprunte le savoir-faire du
+   * module sans emprunter ses effets : le travail sur papier n'est pas mesure. */
+  async construireQuestions(dto: StartCompteSessionDto): Promise<{
+    resultat: Omit<CompteSessionResult, 'session_id'>;
+    seance: Partial<CompteSession>;
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const reglage = REGLAGE_PAR_DIFFICULTE[difficulty];
 
@@ -159,20 +166,23 @@ export class CompteService {
       questions.push({ ...question, operations });
     }
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      operations: operations.join(','),
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: { questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited },
+      seance: {
+        difficulty,
+        operations: operations.join(','),
+        timer_seconds: timerSeconds,
+      },
+    };
+  }
+
+  async startSession(dto: StartCompteSessionDto): Promise<CompteSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(dto: RecordCompteAnswerDto): Promise<void> {

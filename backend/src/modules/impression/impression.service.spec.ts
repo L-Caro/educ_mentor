@@ -12,6 +12,8 @@ import { NumerationService } from '../numeration/numeration.service';
 import { HeureService } from '../heure/heure.service';
 import { MonnaieService } from '../monnaie/monnaie.service';
 import { GeometrieService } from '../geometrie/geometrie.service';
+import { CompteService } from '../compte/compte.service';
+import { LectureService } from '../lecture/lecture.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -208,6 +210,41 @@ describe('ImpressionService', () => {
               ],
             }),
             startSession: jest.fn(),
+          },
+        },
+        {
+          provide: CompteService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [
+                  {
+                    item_key: 'compte:100:75,25',
+                    cible: 100,
+                    plaques: [75, 25, 3, 8, 1, 10],
+                    solution: [{ a: 75, operation: '+', b: 25, resultat: 100 }],
+                  },
+                ],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+            }),
+            startSession: jest.fn(),
+          },
+        },
+        {
+          provide: LectureService,
+          useValue: {
+            construireLecture: jest.fn().mockResolvedValue({
+              titre: 'Le renard',
+              contenu: 'Un renard passait sous la haie.',
+              questions: [
+                { question: 'Qui passe ?', reponse: 'le renard' },
+                { question: 'Où ?', reponse: 'sous la haie' },
+              ],
+            }),
+            createSession: jest.fn(),
           },
         },
         {
@@ -507,5 +544,25 @@ describe('ImpressionService', () => {
       if (figure === 'carre') expect(largeur).toBe(hauteur);
       else expect(largeur).not.toBe(hauteur);
     }
+  });
+
+  it('ne rend qu’UN texte de lecture, quel que soit le nombre demande', async () => {
+    // Comme la dictee : un texte n'est pas un exercice parmi d'autres mais un bloc, et
+    // « trois lectures » sur une meme feuille n'aurait pas de sens.
+    const items = await service.composer([
+      { module: 'lecture', exercices: ['texte'], nombre: 4 },
+    ]);
+    expect(items).toHaveLength(1);
+    expect(items[0].donnees.questions).toEqual(['Qui passe ?', 'Où ?']);
+  });
+
+  it('donne autant de LIGNES que d’etapes dans la solution du compte', async () => {
+    // Une ligne en trop se lit comme une etape manquante : la feuille laisserait croire
+    // qu'on n'a pas fini.
+    const items = await service.composer([
+      { module: 'compte', exercices: ['tirage'], nombre: 1 },
+    ]);
+    expect(items[0].donnees.etapes).toBe(1);
+    expect(items[0].donnees.solution).toEqual(['75 + 25 = 100']);
   });
 });

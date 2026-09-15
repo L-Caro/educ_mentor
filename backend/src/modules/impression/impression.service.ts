@@ -12,6 +12,8 @@ import { HeureService } from '../heure/heure.service';
 import { MonnaieService } from '../monnaie/monnaie.service';
 import { GeometrieService } from '../geometrie/geometrie.service';
 import type { QuestionType } from '../geometrie/geometrie.logic';
+import { CompteService } from '../compte/compte.service';
+import { LectureService } from '../lecture/lecture.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { maximum } from '../numeration/numeration.positions';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
@@ -55,6 +57,8 @@ export class ImpressionService {
     private readonly heureService: HeureService,
     private readonly monnaieService: MonnaieService,
     private readonly geometrieService: GeometrieService,
+    private readonly compteService: CompteService,
+    private readonly lectureService: LectureService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -165,6 +169,10 @@ export class ImpressionService {
         return this.geometrieQuestion(ligne);
       case 'geometrie/tracer':
         return this.geometrieTracer(ligne);
+      case 'compte/tirage':
+        return this.compteTirage(ligne);
+      case 'lecture/texte':
+        return this.lectureTexte(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -1171,5 +1179,84 @@ export class ImpressionService {
       });
     }
     return items;
+  }
+
+  /**
+   * Un tirage du compte est bon : la cible, les six plaques, et des lignes vides.
+   *
+   * Le tirage est solvable PAR CONSTRUCTION, comme dans le jeu : il est bati depuis une
+   * suite d'operations valides, et la cible est ce qu'elle produit. C'est la raison
+   * d'emprunter le generateur du module plutot que de tirer six nombres au hasard : sur
+   * une feuille, personne ne peut dire a l'enfant qu'un compte est impossible, et elle
+   * chercherait jusqu'a croire que c'est elle qui n'y arrive pas.
+   *
+   * Les lignes vides sont au nombre des etapes de la solution de reference. Pas une de
+   * plus : une ligne en trop se lit comme une etape manquante, et la feuille laisserait
+   * croire qu'on n'a pas fini.
+   */
+  private async compteTirage(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.compteService.construireQuestions({
+            difficulty: 'hard',
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        cible: q.cible,
+        plaques: q.plaques,
+        etapes: q.solution.length,
+        // Une solution, pas LA solution : il y en a souvent plusieurs, et le corrige le
+        // dit, sinon il ferait passer pour fausse une reponse qui atteint la cible
+        // autrement.
+        solution: q.solution.map(
+          (etape) =>
+            // Le vrai signe moins, pas le trait d'union du code : sur du papier, `100 - 25`
+            // se lit comme un tiret de liste.
+            `${String(etape.a)} ${etape.operation === '-' ? '\u2212' : etape.operation} ${String(etape.b)} = ${String(etape.resultat)}`,
+        ),
+      },
+    }));
+  }
+
+  /**
+   * Un texte et ses questions. UN SEUL par feuille, quel que soit le nombre demande.
+   *
+   * Comme la dictee : ce n'est pas un exercice parmi d'autres mais un bloc, et « trois
+   * lectures » sur une meme feuille n'aurait pas de sens. C'est la longueur du texte qui
+   * varie, pas leur nombre.
+   *
+   * Pas de QCM : sur le papier on ecrit la reponse. Engendrer des distracteurs serait au
+   * mieux inutile, au pire imprime par erreur.
+   */
+  private async lectureTexte(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const texteId =
+      typeof ligne.options?.texte === 'string'
+        ? Number(ligne.options.texte)
+        : undefined;
+    const lecture = await this.lectureService.construireLecture(
+      Number.isFinite(texteId) ? texteId : undefined,
+    );
+    if (!lecture) return [];
+
+    return [
+      {
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          titre: lecture.titre,
+          contenu: lecture.contenu,
+          questions: lecture.questions.map((q) => q.question),
+          reponses: lecture.questions.map((q) => q.reponse),
+        },
+      },
+    ];
   }
 }

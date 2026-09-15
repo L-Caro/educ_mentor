@@ -16,5 +16,6 @@ import { AuthModule } from '../auth/auth.module';
   ],
   controllers: [CompteGameController, CompteAdminController],
   providers: [CompteService],
+  exports: [CompteService],
 })
 export class CompteModule {}

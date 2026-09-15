@@ -41,9 +41,9 @@ export default function CompteSettings() {
           {saving && <Spinner size="xs" />}
         </div>
         <p className="GameSettings__hint">
-          La classe indiquée dit quand ouvrir : rien n&rsquo;empêche d&rsquo;ouvrir plus
-          tôt. Avec l&rsquo;addition seule, le jeu reste jouable : on cherche la cible en
-          empilant les plaques.
+          La classe indiquée dit quand ouvrir : rien n&rsquo;empêche
+          d&rsquo;ouvrir plus tôt. Avec l&rsquo;addition seule, le jeu reste
+          jouable : on cherche la cible en empilant les plaques.
         </p>
         <div className="GameSettings__denominations">
           {catalogue.map((operation) => (
@@ -68,15 +68,18 @@ export default function CompteSettings() {
       </div>
 
       <div className="AdminCard GameSettings__card">
-        <p className="GameSettings__cardTitle">Ce qui n&rsquo;est pas réglable ici</p>
-        <p className="GameSettings__hint">
-          Chaque tirage est engendré à l&rsquo;envers, depuis une suite d&rsquo;opérations
-          valides : il est donc TOUJOURS soluble, et la solution est connue. Il n&rsquo;y a
-          pas de banque de tirages à remplir, ni de risque d&rsquo;en servir un impossible.
+        <p className="GameSettings__cardTitle">
+          Ce qui n&rsquo;est pas réglable ici
         </p>
         <p className="GameSettings__hint">
-          Le minuteur et le nombre de questions par séance sont les réglages généraux, dans
-          Administration → Réglages.
+          Chaque tirage est engendré à l&rsquo;envers, depuis une suite
+          d&rsquo;opérations valides : il est donc TOUJOURS soluble, et la
+          solution est connue. Il n&rsquo;y a pas de banque de tirages à
+          remplir, ni de risque d&rsquo;en servir un impossible.
+        </p>
+        <p className="GameSettings__hint">
+          Le minuteur et le nombre de questions par séance sont les réglages
+          généraux, dans Administration → Réglages.
         </p>
       </div>
     </div>

@@ -8,13 +8,19 @@ import './lecture.scss';
 
 // ─── Spec du module ───────────────────────────────────────────────────────────
 
-export const lectureGameSpec: GameModuleSpec<LectureSessionResponse, LectureQuestion> = {
-
+export const lectureGameSpec: GameModuleSpec<
+  LectureSessionResponse,
+  LectureQuestion
+> = {
   loadSession: async (setup) => {
-    return store.dispatch(lectureApi.endpoints.startLectureSession.initiate({
-      textId:     Number(setup.textId),
-      difficulty: setup.difficulty as string | undefined,
-    })).unwrap();
+    return store
+      .dispatch(
+        lectureApi.endpoints.startLectureSession.initiate({
+          textId: Number(setup.textId),
+          difficulty: setup.difficulty as string | undefined,
+        }),
+      )
+      .unwrap();
   },
 
   getQuestions: (session) => session.questions,
@@ -30,7 +36,9 @@ export const lectureGameSpec: GameModuleSpec<LectureSessionResponse, LectureQues
     );
   },
 
-  renderPrompt: (question) => <LecturePromptView key={question.item_key} question={question} />,
+  renderPrompt: (question) => (
+    <LecturePromptView key={question.item_key} question={question} />
+  ),
 
   qcm: {
     getChoices: (q) => q.choices.map((c) => ({ key: c, label: c })),
@@ -43,20 +51,30 @@ export const lectureGameSpec: GameModuleSpec<LectureSessionResponse, LectureQues
   fiche: lectureFiche,
 
   recordAnswer: (sessionId, question, correct) =>
-    store.dispatch(lectureApi.endpoints.recordLectureAnswer.initiate({
-      sessionId,
-      itemKey:   question.item_key,
-      isCorrect: correct,
-    })).unwrap(),
+    store
+      .dispatch(
+        lectureApi.endpoints.recordLectureAnswer.initiate({
+          sessionId,
+          itemKey: question.item_key,
+          isCorrect: correct,
+        }),
+      )
+      .unwrap(),
 
   completeSession: (sessionId, correctAnswers, totalQuestions) =>
-    store.dispatch(lectureApi.endpoints.completeLectureSession.initiate({
-      sessionId, correctAnswers, totalQuestions,
-    })).unwrap(),
+    store
+      .dispatch(
+        lectureApi.endpoints.completeLectureSession.initiate({
+          sessionId,
+          correctAnswers,
+          totalQuestions,
+        }),
+      )
+      .unwrap(),
 
   buildResultEntry: (question, given, correct, timeout) => ({
-    label:    question.display,
-    given:    typeof given === 'string' ? given : null,
+    label: question.display,
+    given: typeof given === 'string' ? given : null,
     expected: question.answer,
     correct,
     timeout,

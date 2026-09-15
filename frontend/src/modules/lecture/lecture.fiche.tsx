@@ -21,7 +21,10 @@ import { surligner } from './surligner';
  * à guider l'œil et reste un fragment unique et non ambigu. Faute de mieux, on ne surligne
  * rien : l'extrait seul indique déjà l'endroit, c'est l'essentiel.
  */
-export function fragmentASurligner(excerpt: string, answer: string): string | null {
+export function fragmentASurligner(
+  excerpt: string,
+  answer: string,
+): string | null {
   if (excerpt.includes(answer)) return answer;
 
   const motLePlusLong = answer
@@ -37,7 +40,7 @@ export function lectureFiche(question: LectureQuestion): Fiche | null {
 
   return {
     titre: question.text_titre,
-    idee: "La réponse est écrite dans le texte. Repère les mots de la question, puis lis la phrase qui les contient.",
+    idee: 'La réponse est écrite dans le texte. Repère les mots de la question, puis lis la phrase qui les contient.',
     exemple: (
       <p className="LectureExtrait">
         {surligner(

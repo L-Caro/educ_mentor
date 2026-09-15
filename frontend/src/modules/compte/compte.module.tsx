@@ -1,3 +1,4 @@
+import { compteImpression } from './compte.impression';
 import store from 'src/store';
 import type { ModuleManifest } from 'src/types/modules.types';
 import type { SetupChoice, SetupOption } from 'src/types/game.types';
@@ -22,8 +23,18 @@ async function loadOperations(): Promise<SetupChoice[]> {
   } catch {
     // Repli sûr : les deux opérations ouvertes à l'installation.
     return [
-      { value: '+', icon: '+', label: 'Addition', description: '75 + 25 = 100' },
-      { value: '-', icon: '−', label: 'Soustraction', description: '100 − 25 = 75' },
+      {
+        value: '+',
+        icon: '+',
+        label: 'Addition',
+        description: '75 + 25 = 100',
+      },
+      {
+        value: '-',
+        icon: '−',
+        label: 'Soustraction',
+        description: '100 − 25 = 75',
+      },
     ];
   }
 }
@@ -37,9 +48,24 @@ const COMPTE_SETUP_OPTIONS: SetupOption[] = [
     type: 'single',
     label: 'Quel niveau ?',
     choices: [
-      { value: 'easy', icon: '🟢', label: 'Facile', description: '2 opérations, petites plaques' },
-      { value: 'medium', icon: '🟡', label: 'Moyen', description: '3 opérations' },
-      { value: 'hard', icon: '🔴', label: 'Difficile', description: '4 opérations' },
+      {
+        value: 'easy',
+        icon: '🟢',
+        label: 'Facile',
+        description: '2 opérations, petites plaques',
+      },
+      {
+        value: 'medium',
+        icon: '🟡',
+        label: 'Moyen',
+        description: '3 opérations',
+      },
+      {
+        value: 'hard',
+        icon: '🔴',
+        label: 'Difficile',
+        description: '4 opérations',
+      },
     ],
   },
   {
@@ -65,6 +91,7 @@ export const compteModule: ModuleManifest = {
         import('./CompteSettings.tsx').then((m) => ({ Component: m.default })),
     },
   ],
+  impression: compteImpression,
   progression: buildProgressionEntry({
     getEndpoint: compteApi.endpoints.getCompteProgression,
     resetEndpoint: compteApi.endpoints.resetCompteProgression,

@@ -19,5 +19,6 @@ import { LectureAdminController } from './lecture-admin.controller';
   ],
   controllers: [LectureGameController, LectureAdminController],
   providers: [LectureService],
+  exports: [LectureService],
 })
 export class LectureModule {}

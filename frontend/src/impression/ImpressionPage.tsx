@@ -5,7 +5,11 @@ import { MODULES } from 'src/modules.manifest';
 import FeuilleImprimable from './FeuilleImprimable';
 import { useComposerFeuilleMutation } from './impression.api';
 import OptionsExercice from './OptionsExercice';
-import type { ExerciceImprimable, ItemImprime, LigneComposition } from './impression.types';
+import type {
+  ExerciceImprimable,
+  ItemImprime,
+  LigneComposition,
+} from './impression.types';
 import './impression.scss';
 
 /** Au-dela, ce n'est plus une feuille d'exercices, c'est une punition. Le serveur applique
@@ -33,7 +37,11 @@ function dateDuJour(): string {
  */
 export default function ImpressionPage() {
   const fournisseurs = useMemo(
-    () => MODULES.filter((m) => m.impression).map((m) => ({ id: m.id, ...m.impression! })),
+    () =>
+      MODULES.filter((m) => m.impression).map((m) => ({
+        id: m.id,
+        ...m.impression!,
+      })),
     [],
   );
 
@@ -42,7 +50,9 @@ export default function ImpressionPage() {
   /** Combien d'exercices par module, repartis entre les types coches. */
   const [nombres, setNombres] = useState<Record<string, number>>({});
   /** Les reglages de contenu, par module. */
-  const [reglages, setReglages] = useState<Record<string, Record<string, unknown>>>({});
+  const [reglages, setReglages] = useState<
+    Record<string, Record<string, unknown>>
+  >({});
   const [avecCorrige, setAvecCorrige] = useState(true);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
   const [composer, { isLoading, isError }] = useComposerFeuilleMutation();
@@ -50,7 +60,8 @@ export default function ImpressionPage() {
   const catalogue = useMemo(() => {
     const table = new Map<string, ExerciceImprimable>();
     for (const f of fournisseurs) {
-      for (const exercice of f.exercices) table.set(`${f.id}/${exercice.cle}`, exercice);
+      for (const exercice of f.exercices)
+        table.set(`${f.id}/${exercice.cle}`, exercice);
     }
     return table;
   }, [fournisseurs]);
@@ -81,10 +92,10 @@ export default function ImpressionPage() {
     <div className="Impression Impression__racine">
       <div className="Impression__reglages">
         <p className="Settings__hint">
-          Coche ce que tu veux sur la feuille. Les exercices sont tirés au hasard à chaque
-          préparation : deux feuilles ne se ressemblent jamais. Rien n&rsquo;est
-          enregistré dans les séances ni dans la progression, puisque le travail sur
-          papier n&rsquo;est pas mesuré.
+          Coche ce que tu veux sur la feuille. Les exercices sont tirés au
+          hasard à chaque préparation : deux feuilles ne se ressemblent jamais.
+          Rien n&rsquo;est enregistré dans les séances ni dans la progression,
+          puisque le travail sur papier n&rsquo;est pas mesuré.
         </p>
 
         {fournisseurs.map((f) => {
@@ -123,7 +134,10 @@ export default function ImpressionPage() {
               {coches.length > 0 && (
                 <>
                   <div className="GameSettings__rangeRow">
-                    <label className="GameSettings__rangeLabel" htmlFor={`n-${f.id}`}>
+                    <label
+                      className="GameSettings__rangeLabel"
+                      htmlFor={`n-${f.id}`}
+                    >
                       Combien d&rsquo;exercices
                     </label>
                     <input
@@ -151,7 +165,10 @@ export default function ImpressionPage() {
                       options={f.options}
                       valeurs={reglages[f.id] ?? {}}
                       onChange={(valeurs) =>
-                        setReglages((precedent) => ({ ...precedent, [f.id]: valeurs }))
+                        setReglages((precedent) => ({
+                          ...precedent,
+                          [f.id]: valeurs,
+                        }))
                       }
                     />
                   )}
@@ -171,7 +188,11 @@ export default function ImpressionPage() {
         </label>
 
         <div className="Impression__actions">
-          <Button variant="primary" onClick={() => void preparer()} disabled={total === 0 || isLoading}>
+          <Button
+            variant="primary"
+            onClick={() => void preparer()}
+            disabled={total === 0 || isLoading}
+          >
             {isLoading ? 'Préparation…' : `Préparer la feuille (${total})`}
           </Button>
           {items && (
@@ -183,7 +204,8 @@ export default function ImpressionPage() {
 
         {total > MAXIMUM_ITEMS && (
           <p className="GameSettings__hint">
-            {total} exercices, c&rsquo;est trop pour une feuille. Maximum {MAXIMUM_ITEMS}.
+            {total} exercices, c&rsquo;est trop pour une feuille. Maximum{' '}
+            {MAXIMUM_ITEMS}.
           </p>
         )}
         {isError && (

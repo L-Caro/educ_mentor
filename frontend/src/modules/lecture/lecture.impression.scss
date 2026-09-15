@@ -1,0 +1,26 @@
+// ─── Un texte a lire, sur le papier ──────────────────────────────────────────
+
+.Lecture {
+  &__titre {
+    margin: 0 0 1mm;
+    font-weight: 700;
+    font-size: 11pt;
+  }
+
+  &__texte {
+    margin: 0 0 3mm;
+    // Plus aere que le reste de la feuille : un texte suivi se lit a sept ans en suivant
+    // la ligne du doigt, et des lignes serrees font sauter d'une ligne a l'autre.
+    line-height: 1.7;
+    text-align: justify;
+  }
+
+  &__questions {
+    margin: 0;
+    padding-left: 5mm;
+
+    li {
+      margin-bottom: 2mm;
+    }
+  }
+}

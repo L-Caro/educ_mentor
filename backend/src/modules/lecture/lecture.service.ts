@@ -94,6 +94,43 @@ export class LectureService {
     });
   }
 
+  /**
+   * Un texte ACTIF et ses questions, sans QCM et sans rien enregistrer.
+   *
+   * Pour la feuille imprimee : sur le papier on ecrit la reponse, on ne coche pas, donc
+   * les distracteurs n'ont pas lieu d'etre. Et rien n'est enregistre, parce que le
+   * travail sur papier n'est pas mesure : le compter dans la progression ferait mentir
+   * la mesure, puisque personne ne ressaisira les resultats.
+   *
+   * `texteId` est facultatif : sans lui on prend un texte actif au hasard. Seuls les
+   * textes ACTIFS sont eligibles, y compris quand un identifiant est donne : imprimer un
+   * texte ferme contournerait le seul reglage qui decide de ce que l'enfant lit.
+   */
+  async construireLecture(texteId?: number): Promise<{
+    titre: string;
+    contenu: string;
+    questions: { question: string; reponse: string }[];
+  } | null> {
+    const actifs = await this.textsRepo.find({
+      where: { actif: true },
+      relations: ['questions'],
+      order: { created_at: 'ASC' },
+    });
+    const eligibles = texteId
+      ? actifs.filter((texte) => texte.id === texteId)
+      : actifs;
+    if (eligibles.length === 0) return null;
+
+    const texte = eligibles[Math.floor(Math.random() * eligibles.length)];
+    return {
+      titre: texte.titre,
+      contenu: texte.contenu,
+      questions: [...(texte.questions ?? [])]
+        .sort((a, b) => a.ordre - b.ordre)
+        .map((q) => ({ question: q.question, reponse: q.answer })),
+    };
+  }
+
   async createSession(
     dto: StartLectureSessionDto,
   ): Promise<LectureSessionResponse> {
