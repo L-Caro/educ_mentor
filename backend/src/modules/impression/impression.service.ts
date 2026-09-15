@@ -7,6 +7,9 @@ import { ConjugaisonService } from '../conjugaison/conjugaison.service';
 import { PRONOMS, type Pronom } from '../conjugaison/conjugaison.temps';
 import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
+import { NumerationService } from '../numeration/numeration.service';
+import { nombreEnLettres } from '../numeration/numeration.lettres';
+import { maximum } from '../numeration/numeration.positions';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
 import {
   MAXIMUM_ITEMS,
@@ -37,6 +40,7 @@ export class ImpressionService {
     private readonly conjugaisonService: ConjugaisonService,
     private readonly accordsService: AccordsService,
     private readonly grammaireService: GrammaireService,
+    private readonly numerationService: NumerationService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -102,7 +106,14 @@ export class ImpressionService {
         return this.tablesCompletes(ligne);
       case 'calcul-mental/operation':
         return this.calculOperation(ligne);
+      case 'calcul-mental/vrai_faux':
+        return this.calculVraiFaux(ligne);
+      case 'calcul-mental/trous':
+        return this.calculTrous(ligne);
+      case 'calcul-mental/file':
+        return this.calculFile(ligne);
       case 'pose/operation':
+      case 'pose/erreur':
         return this.poseOperation(ligne);
       case 'dictee/dictee':
         return this.dicteeMots(ligne);
@@ -112,6 +123,16 @@ export class ImpressionService {
         return this.accordsAccord(ligne);
       case 'grammaire/analyse':
         return this.grammaireAnalyse(ligne);
+      case 'numeration/question':
+        return this.numerationQuestion(ligne);
+      case 'numeration/cubes':
+        return this.numerationCubes(ligne);
+      case 'numeration/ranger':
+        return this.numerationRanger(ligne);
+      case 'numeration/encadrer':
+        return this.numerationEncadrer(ligne);
+      case 'numeration/lettres':
+        return this.numerationLettres(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -156,6 +177,170 @@ export class ImpressionService {
    * Pour le facteur manquant, on cache un cote au hasard : toujours le second ferait
    * apprendre la position plutot que la table.
    */
+
+  /** Les questions du module telles quelles : decomposer, le chiffre des dizaines. */
+  private async numerationQuestion(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const { resultat } = await this.construireNumeration(ligne);
+    const questions = resultat.questions.slice(0, ligne.nombre);
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        enonce: q.display,
+        reponse: q.answer,
+        type: q.type,
+        // La decomposition attend une case par rang : le rendu papier a besoin de savoir
+        // lesquels, et dans quel ordre ils sont demandes.
+        rangs: q.decompose_positions,
+      },
+    }));
+  }
+
+  /**
+   * Le materiel base 10 : cubes, batons, plaques.
+   *
+   * Quatre batons de dix cubes pour quarante. C'est la representation de l'ecole, et
+   * c'est la raison de la preferer a une idee a nous : elle voit le meme dessin en classe
+   * et sur sa feuille, donc elle transporte ce qu'elle sait d'un endroit a l'autre.
+   *
+   * On plafonne aux milliers. Au-dela, le dessin devient une page de petits carres qu'on
+   * ne compte plus : il faudrait les compter par paquets, ce qui est l'exercice suivant,
+   * pas celui-ci.
+   */
+  private async numerationCubes(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const { positions } = await this.construireNumeration(ligne);
+    const plafond = Math.min(9999, maximum(positions));
+    const items: ItemImprime[] = [];
+    const vus = new Set<number>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      const valeur = 11 + Math.floor(Math.random() * Math.max(1, plafond - 11));
+      if (vus.has(valeur)) continue;
+      vus.add(valeur);
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          reponse: valeur,
+          milliers: Math.floor(valeur / 1000),
+          centaines: Math.floor((valeur % 1000) / 100),
+          dizaines: Math.floor((valeur % 100) / 10),
+          unites: valeur % 10,
+        },
+      });
+    }
+    return items;
+  }
+
+  /** Ranger cinq nombres dans l'ordre croissant. Ils sont PROCHES les uns des autres :
+   * cinq nombres tires au hasard dans un large intervalle se rangent d'un coup d'oeil,
+   * sans jamais comparer deux chiffres. */
+  private async numerationRanger(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const { positions } = await this.construireNumeration(ligne);
+    const plafond = Math.max(100, maximum(positions));
+    const items: ItemImprime[] = [];
+
+    for (let pose = 0; pose < ligne.nombre; pose++) {
+      const base = Math.floor(Math.random() * plafond * 0.8);
+      const etendue = Math.max(20, Math.floor(plafond * 0.2));
+      const nombres = new Set<number>();
+      while (nombres.size < 5) {
+        nombres.add(base + Math.floor(Math.random() * etendue));
+      }
+      const liste = [...nombres];
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          nombres: liste.sort(() => Math.random() - 0.5),
+          reponse: [...liste].sort((a, b) => a - b),
+        },
+      });
+    }
+    return items;
+  }
+
+  /** Encadrer un nombre entre deux dizaines, ou deux centaines. Le pas est choisi selon
+   * la taille du nombre : encadrer 4 385 entre deux dizaines n'apprend rien. */
+  private async numerationEncadrer(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const { positions } = await this.construireNumeration(ligne);
+    const plafond = Math.max(100, maximum(positions));
+    const items: ItemImprime[] = [];
+
+    for (let pose = 0; pose < ligne.nombre; pose++) {
+      const valeur = 11 + Math.floor(Math.random() * Math.max(1, plafond - 11));
+      const pasUtile = valeur >= 1000 ? 100 : 10;
+      // Un nombre deja rond n'a rien a encadrer : on le decale.
+      const ajuste = valeur % pasUtile === 0 ? valeur + 1 : valeur;
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          valeur: ajuste,
+          pas: pasUtile,
+          avant: Math.floor(ajuste / pasUtile) * pasUtile,
+          apres: (Math.floor(ajuste / pasUtile) + 1) * pasUtile,
+        },
+      });
+    }
+    return items;
+  }
+
+  /**
+   * Ecrire un nombre en lettres, ou l'inverse.
+   *
+   * Le sens est tire au sort. Les deux ne travaillent pas la meme chose : des chiffres
+   * vers les lettres, c'est l'orthographe (quatre-vingts, deux cents) ; des lettres vers
+   * les chiffres, c'est la lecture des rangs.
+   */
+  private async numerationLettres(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const { positions } = await this.construireNumeration(ligne);
+    const plafond = Math.min(999_999, Math.max(100, maximum(positions)));
+    const items: ItemImprime[] = [];
+    const vus = new Set<number>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      const valeur = 11 + Math.floor(Math.random() * Math.max(1, plafond - 11));
+      if (vus.has(valeur)) continue;
+      vus.add(valeur);
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          valeur,
+          lettres: nombreEnLettres(valeur),
+          versLesLettres: Math.random() < 0.5,
+        },
+      });
+    }
+    return items;
+  }
+
+  private construireNumeration(ligne: LigneComposition) {
+    const demandees = Array.isArray(ligne.options?.positions)
+      ? (ligne.options.positions as string[])
+      : undefined;
+    return this.numerationService.construireQuestions({ positions: demandees });
+  }
+
   private async tablesDepuisUnFait(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
@@ -269,6 +454,142 @@ export class ImpressionService {
     return Promise.resolve(items);
   }
 
+  /**
+   * `7 x 8 = 54`, vrai ou faux.
+   *
+   * Fait travailler l'ESTIMATION plutot que le calcul : on repere qu'un resultat est
+   * impossible avant de savoir lequel est juste. L'ecart propose n'est jamais de un : a
+   * une unite pres, il faut calculer, et l'exercice redevient celui d'a cote.
+   */
+  private async calculVraiFaux(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { operation: string }) => q.operation,
+      async () => (await this.construireCalcul(ligne)).questions,
+    );
+
+    return questions.map((q) => {
+      const vrai = Math.random() < 0.5;
+      const ecart =
+        (2 + Math.floor(Math.random() * 8)) * (Math.random() < 0.5 ? -1 : 1);
+      const affiche = vrai ? q.answer : Math.max(0, q.answer + ecart);
+      return {
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        // `affiche === reponse` peut arriver si l'ecart a ete ramene a zero par le
+        // plancher : on recalcule la verite plutot que de la supposer.
+        donnees: {
+          operation: q.operation,
+          affiche,
+          reponse: q.answer,
+          vrai: affiche === q.answer,
+        },
+      };
+    });
+  }
+
+  /**
+   * `24 + ___ = 41`.
+   *
+   * Engendre ici, et non tire du module : ses questions ne portent que leur ENONCE
+   * redige (« le double de 34 »), pas leurs operandes. Il faudrait analyser une chaine
+   * pour les retrouver, ce qui casserait au premier enonce qui n'est pas une operation.
+   * On reprend seulement ses bornes de valeurs, pour rester dans les nombres qu'elle
+   * manipule a l'ecran.
+   */
+  private async calculTrous(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const { min_value: min, max_value: max } =
+      await this.construireCalcul(ligne);
+    const items: ItemImprime[] = [];
+    const vus = new Set<string>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      const total = min + Math.floor(Math.random() * Math.max(1, max - min));
+      const connu = Math.floor(Math.random() * Math.max(1, total));
+      const manquant = total - connu;
+      if (manquant <= 0) continue;
+      // L'addition ou la soustraction, au hasard : `41 - ___ = 24` fait travailler la
+      // meme relation dans l'autre sens.
+      const addition = Math.random() < 0.5;
+      const cle = `${addition ? 'a' : 's'}-${connu}-${manquant}`;
+      if (vus.has(cle)) continue;
+      vus.add(cle);
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: addition
+          ? { gauche: connu, signe: '+', droite: total, reponse: manquant }
+          : {
+              gauche: total,
+              signe: '\u2212',
+              droite: connu,
+              reponse: manquant,
+            },
+      });
+    }
+    return items;
+  }
+
+  /**
+   * `12 -> +5 -> x2 -> -4 -> ___`.
+   *
+   * Trois operations enchainees, une seule reponse a ecrire. L'interet n'est pas le
+   * calcul, que l'enfant sait faire, mais de le TENIR sur trois etapes sans poser.
+   * Chaque etape reste petite pour cette raison, et jamais de division : un reste casse
+   * la chaine.
+   */
+  private calculFile(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const items: ItemImprime[] = [];
+    for (let pose = 0; pose < ligne.nombre; pose++) {
+      let valeur = 2 + Math.floor(Math.random() * 18);
+      const depart = valeur;
+      const etapes: { signe: string; valeur: number }[] = [];
+
+      for (let pas = 0; pas < 3; pas++) {
+        const choix = Math.random();
+        if (choix < 0.4) {
+          const n = 1 + Math.floor(Math.random() * 9);
+          valeur += n;
+          etapes.push({ signe: '+', valeur: n });
+        } else if (choix < 0.8) {
+          const n = 1 + Math.floor(Math.random() * Math.min(9, valeur - 1));
+          valeur -= n;
+          etapes.push({ signe: '\u2212', valeur: n });
+        } else {
+          valeur *= 2;
+          etapes.push({ signe: '\u00d7', valeur: 2 });
+        }
+      }
+
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: { depart, etapes, reponse: valeur },
+      });
+    }
+    return Promise.resolve(items);
+  }
+
+  /** Le lot de questions du module, avec ses bornes de valeurs. Mutualise entre les
+   * exercices de calcul, qui partagent le meme reglage de types. */
+  private async construireCalcul(ligne: LigneComposition) {
+    const types = Array.isArray(ligne.options?.types)
+      ? (ligne.options.types as string[])
+      : undefined;
+    return (
+      await this.calculService.construireQuestions({
+        operation_types: types,
+        difficulty: 'hard',
+      })
+    ).resultat;
+  }
+
   private async calculOperation(
     ligne: LigneComposition,
   ): Promise<ItemImprime[]> {
@@ -292,6 +613,30 @@ export class ImpressionService {
       exercice: ligne.exercices[0],
       donnees: { operation: q.operation, reponse: q.answer },
     }));
+  }
+
+  /**
+   * Change UN chiffre d'un resultat, jamais celui des unites.
+   *
+   * L'erreur des unites se repere sans rien poser, par la simple parite ou le dernier
+   * chiffre des operandes. En la mettant plus haut, il faut refaire l'operation, ce qui
+   * est tout l'exercice. Et un seul chiffre change : deux erreurs donneraient l'impression
+   * d'un resultat pris au hasard plutot que d'un calcul rate.
+   */
+  private fausserUnChiffre(valeur: number): number {
+    const chiffres = [...String(valeur)];
+    if (chiffres.length < 2) return valeur + 1;
+    const rang = Math.floor(Math.random() * (chiffres.length - 1));
+    const actuel = Number(chiffres[rang]);
+    const ecart = Math.random() < 0.5 ? 1 : -1;
+    let remplacant = actuel + ecart;
+    if (remplacant < 0) remplacant = 1;
+    if (remplacant > 9) remplacant = 8;
+    // Un zero en tete transformerait un nombre a quatre chiffres en nombre a trois, et
+    // l'erreur deviendrait visible a la longueur.
+    if (rang === 0 && remplacant === 0) remplacant = 1;
+    chiffres[rang] = String(remplacant);
+    return Number(chiffres.join(''));
   }
 
   private async poseOperation(ligne: LigneComposition): Promise<ItemImprime[]> {
@@ -324,6 +669,10 @@ export class ImpressionService {
         operandes: q.operands,
         reponse: q.answer,
         colonnes: q.columns,
+        // L'operation FAUSSE, pour l'exercice ou l'on cherche l'erreur. Un seul chiffre
+        // change, jamais le dernier : une erreur au bout se voit sans poser l'operation,
+        // alors que l'exercice consiste justement a la refaire.
+        faux: this.fausserUnChiffre(q.answer),
       },
     }));
   }

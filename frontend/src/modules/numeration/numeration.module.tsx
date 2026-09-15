@@ -1,3 +1,4 @@
+import { numerationImpression } from './numeration.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import { numerationApi } from './numeration.api';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
@@ -28,4 +29,5 @@ export const numerationModule: ModuleManifest = {
     getEndpoint:   numerationApi.endpoints.getNumerationProgression,
     resetEndpoint: numerationApi.endpoints.resetNumerationProgression,
   }),
+  impression: numerationImpression,
 };

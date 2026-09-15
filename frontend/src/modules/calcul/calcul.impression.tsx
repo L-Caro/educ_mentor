@@ -1,6 +1,7 @@
 import store from 'src/store';
 import { calculApi } from './calcul.api';
-import Blanc from 'src/impression/Blanc';
+import { File, Operation, Trous, VraiFaux } from './CalculImprime';
+import './calcul.impression.scss';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 
 export const calculImpression: FournisseurImpression = {
@@ -8,16 +9,31 @@ export const calculImpression: FournisseurImpression = {
   exercices: [
     {
       cle: 'operation',
-      label: 'Opérations (addition, soustraction, doubles, compléments…)',
+      label: 'Opération simple (24 + 17 = …)',
       // L'enonce du module est deja une phrase prete : « 24 + 17 », « 37 pour aller a
       // 100 ». On l'imprime tel quel plutot que de le reconstruire, pour que le papier
       // dise exactement ce que dit l'ecran.
-      enonce: (d) => (
-        <span>
-          {String(d.operation)} = <Blanc />
-        </span>
-      ),
+      enonce: (d) => <Operation d={d} />,
       reponse: (d) => `${String(d.operation)} = ${String(d.reponse)}`,
+    },
+    {
+      cle: 'vrai_faux',
+      label: 'Vrai ou faux : 7 × 8 = 54',
+      enonce: (d) => <VraiFaux d={d} />,
+      reponse: (d) =>
+        d.vrai ? 'vrai' : `faux, c'était ${String(d.reponse)}`,
+    },
+    {
+      cle: 'trous',
+      label: 'Opération à trou : 24 + … = 41',
+      enonce: (d) => <Trous d={d} />,
+      reponse: (d) => String(d.reponse),
+    },
+    {
+      cle: 'file',
+      label: 'File de calculs : 12 → +5 → ×2 → …',
+      enonce: (d) => <File d={d} />,
+      reponse: (d) => String(d.reponse),
     },
   ],
   options: [

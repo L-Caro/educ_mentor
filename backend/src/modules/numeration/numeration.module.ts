@@ -13,5 +13,7 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   controllers: [NumerationGameController],
   providers: [NumerationService],
+  // Exporte pour la feuille imprimee, qui emprunte ses questions sans rien enregistrer.
+  exports: [NumerationService],
 })
 export class NumerationModule {}

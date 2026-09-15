@@ -8,6 +8,7 @@ import { DicteeService } from '../dictee/dictee.service';
 import { ConjugaisonService } from '../conjugaison/conjugaison.service';
 import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
+import { NumerationService } from '../numeration/numeration.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -136,6 +137,20 @@ describe('ImpressionService', () => {
         { provide: ConjugaisonService, useValue: conjugaison },
         { provide: AccordsService, useValue: vide() },
         { provide: GrammaireService, useValue: vide() },
+        {
+          provide: NumerationService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              positions: ['u', 'd', 'c', 'm'],
+            }),
+            createSession: jest.fn(),
+          },
+        },
       ],
     }).compile();
     service = moduleRef.get(ImpressionService);

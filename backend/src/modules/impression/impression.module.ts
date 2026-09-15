@@ -8,6 +8,7 @@ import { DicteeModule } from '../dictee/dictee.module';
 import { ConjugaisonModule } from '../conjugaison/conjugaison.module';
 import { AccordsModule } from '../accords/accords.module';
 import { GrammaireModule } from '../grammaire/grammaire.module';
+import { NumerationModule } from '../numeration/numeration.module';
 import { AuthModule } from '../auth/auth.module';
 
 /** Aucune entite, aucune migration : ce module ne possede rien. Il emprunte les
@@ -21,6 +22,7 @@ import { AuthModule } from '../auth/auth.module';
     ConjugaisonModule,
     AccordsModule,
     GrammaireModule,
+    NumerationModule,
     AuthModule,
   ],
   controllers: [ImpressionController],

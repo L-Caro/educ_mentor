@@ -21,6 +21,12 @@ export const numerationApi = baseApi.injectEndpoints({
       query: () => '/numeration/positions',
     }),
 
+    /** Les positions ouvertes dans l'administration. La feuille d'exercices ne propose
+     * que celles-la : aller plus loin contournerait le reglage. */
+    getNumerationActivePositions: builder.query<string[], void>({
+      query: () => '/numeration/positions-actives',
+    }),
+
     startNumerationSession: builder.mutation<
       NumerationSessionResponse,
       { questionTypes?: string[] }

@@ -1,0 +1,16 @@
+// Les cases a cocher du vrai-faux. Dessinees, et non ecrites en caracteres : une case se
+// coche au crayon, et sa taille ne doit pas dependre de la police.
+.CalculImprime {
+  &__cases {
+    margin-left: 3mm;
+  }
+
+  &__case {
+    display: inline-block;
+    width: 3.5mm;
+    height: 3.5mm;
+    margin: 0 1mm 0 3mm;
+    border: 0.3mm solid currentColor;
+    vertical-align: -0.5mm;
+  }
+}

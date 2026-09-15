@@ -23,7 +23,14 @@ function chiffres(valeur: number, colonnes: number): (string | null)[] {
   return [...texte].map((c) => (c === ' ' ? null : c));
 }
 
-export default function Posee({ donnees }: { donnees: Record<string, unknown> }) {
+export default function Posee({
+  donnees,
+  resultat,
+}: {
+  donnees: Record<string, unknown>;
+  /** Un resultat deja pose, pour l'exercice ou l'on cherche l'erreur. */
+  resultat?: number;
+}) {
   const operandes = donnees.operandes as number[];
   const colonnes = donnees.colonnes as number;
   const signe = SIGNE[donnees.operation as string] ?? '+';
@@ -44,14 +51,25 @@ export default function Posee({ donnees }: { donnees: Record<string, unknown> })
         </div>
       ))}
       <div className="Posee__barre" />
-      {Array.from({ length: lignesReponse }, (_, i) => (
-        <div key={i} className="Posee__ligne Posee__ligne--vide">
+      {resultat === undefined ? (
+        Array.from({ length: lignesReponse }, (_, i) => (
+          <div key={i} className="Posee__ligne Posee__ligne--vide">
+            <span className="Posee__signe" />
+            {Array.from({ length: colonnes }, (_, j) => (
+              <span key={j} className="Posee__chiffre" />
+            ))}
+          </div>
+        ))
+      ) : (
+        <div className="Posee__ligne">
           <span className="Posee__signe" />
-          {Array.from({ length: colonnes }, (_, j) => (
-            <span key={j} className="Posee__chiffre" />
+          {chiffres(resultat, colonnes).map((c, i) => (
+            <span key={i} className="Posee__chiffre">
+              {c}
+            </span>
           ))}
         </div>
-      ))}
+      )}
     </div>
   );
 }

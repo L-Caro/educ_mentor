@@ -72,9 +72,16 @@ export class NumerationService {
 
   // ─── Game ──────────────────────────────────────────────────────────────────
 
-  async createSession(
-    dto: StartNumerationSessionDto,
-  ): Promise<NumerationSessionResponse> {
+  /** Construire les questions, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `createSession` pour la feuille imprimee, qui a besoin de questions mais
+   * pas d'une seance. Le travail sur papier n'etant pas mesure, l'enregistrer fausserait
+   * la progression comme les « seances recentes ».
+   */
+  async construireQuestions(dto: StartNumerationSessionDto): Promise<{
+    resultat: Omit<NumerationSessionResponse, 'session_id'>;
+    positions: PositionKey[];
+  }> {
     const positions = await this.getActivePositions();
     const steps = await this.getActiveSteps();
     const timerSec =
@@ -96,7 +103,29 @@ export class NumerationService {
     const types: QuestionType[] =
       requestedTypes.length > 0 ? requestedTypes : VALID_TYPES;
 
-    const questions = this.generateQuestions(count, types, positions, steps);
+    // Les positions demandees priment sur celles de l'administration, mais ne peuvent
+    // que les RESTREINDRE : imprimer une position fermee contournerait le reglage.
+    const demandees = (dto.positions ?? []).filter((p) =>
+      positions.includes(p as PositionKey),
+    ) as PositionKey[];
+    const retenues = demandees.length > 0 ? demandees : positions;
+
+    const questions = this.generateQuestions(count, types, retenues, steps);
+
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSec,
+        is_unlimited: isUnlimited,
+      },
+      positions: retenues,
+    };
+  }
+
+  async createSession(
+    dto: StartNumerationSessionDto,
+  ): Promise<NumerationSessionResponse> {
+    const { resultat } = await this.construireQuestions(dto);
 
     const session = this.sessionsRepo.create({
       id: randomUUID(),
@@ -104,12 +133,7 @@ export class NumerationService {
     });
     await this.sessionsRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSec,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async completeSession(

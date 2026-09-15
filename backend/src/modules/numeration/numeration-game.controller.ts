@@ -29,6 +29,14 @@ export class NumerationGameController {
     return this.service.getPositions();
   }
 
+  /** Les positions OUVERTES. Servie a cote du catalogue, et non protegee pour la meme
+   * raison : c'est un reglage de contenu, pas une donnee sensible, et la feuille
+   * d'exercices en a besoin pour ne proposer que ce qui est ouvert. */
+  @Get('positions-actives')
+  getActivePositions() {
+    return this.service.getActivePositions();
+  }
+
   @Post('session')
   startSession(@Body() dto: StartNumerationSessionDto) {
     return this.service.createSession(dto);
