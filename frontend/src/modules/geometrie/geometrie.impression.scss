@@ -31,3 +31,25 @@
     gap: 4mm;
   }
 }
+
+// Les denombrements d'une figure : une case par attribut, sous son nom. Sans le nom,
+// l'enfant a trois cases vides et rien qui dise laquelle recoit les aretes.
+.Geometrie {
+  &__attributs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3mm;
+    margin-top: 1mm;
+  }
+
+  &__attribut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__attributNom {
+    font-size: 7pt;
+    margin-top: 0.5mm;
+  }
+}

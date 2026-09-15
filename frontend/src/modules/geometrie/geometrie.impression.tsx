@@ -29,17 +29,46 @@ export const geometrieImpression: FournisseurImpression = {
     },
     {
       cle: 'cotes_sommets',
-      label: 'Compter les côtés et les sommets',
-      enonce: (d) => (
-        <div>
-          <p className="Feuille__consigne">{String(d.consigne)}</p>
-          <FigureImprimee forme={String(d.figure)} />
-          <p>
-            <Blanc largeurMm={20} />
-          </p>
-        </div>
-      ),
-      reponse: (d) => String(d.reponse),
+      label: 'Compter côtés, sommets, faces et arêtes',
+      enonce: (d) => {
+        const attributs =
+          (d.attributs as { nom: string; reponse: number }[] | undefined) ?? [];
+        return (
+          <div>
+            {/* TOUS les denombrements, pas celui que le tirage a choisi. A l'ecran on
+                pose une question a la fois parce qu'il faut quatre propositions a
+                toucher ; ici la figure est deja dessinee, et n'en tirer qu'un nombre
+                gache le dessin. Compter faces, sommets et aretes ensemble montre aussi
+                qu'ils ne sont pas egaux, ce qu'une question isolee ne peut pas faire. */}
+            <p className="Feuille__consigne">
+              {attributs.length > 1 ? 'Compte.' : String(d.consigne)}
+            </p>
+            <FigureImprimee forme={String(d.figure)} />
+            {attributs.length > 0 ? (
+              <span className="Geometrie__attributs">
+                {attributs.map((attribut) => (
+                  <span key={attribut.nom} className="Geometrie__attribut">
+                    <Blanc largeurMm={12} />
+                    <span className="Geometrie__attributNom">{attribut.nom}</span>
+                  </span>
+                ))}
+              </span>
+            ) : (
+              <p>
+                <Blanc largeurMm={20} />
+              </p>
+            )}
+          </div>
+        );
+      },
+      reponse: (d) => {
+        const attributs =
+          (d.attributs as { nom: string; reponse: number }[] | undefined) ?? [];
+        if (attributs.length === 0) return String(d.reponse);
+        return attributs
+          .map((attribut) => `${String(attribut.reponse)} ${attribut.nom}`)
+          .join(', ');
+      },
     },
     {
       cle: 'angle_droit',

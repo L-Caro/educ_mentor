@@ -751,16 +751,32 @@ export class ImpressionService {
   private fausserUnChiffre(valeur: number): number {
     const chiffres = [...String(valeur)];
     if (chiffres.length < 2) return valeur + 1;
+
     const rang = Math.floor(Math.random() * (chiffres.length - 1));
     const actuel = Number(chiffres[rang]);
-    const ecart = Math.random() < 0.5 ? 1 : -1;
-    let remplacant = actuel + ecart;
-    if (remplacant < 0) remplacant = 1;
-    if (remplacant > 9) remplacant = 8;
-    // Un zero en tete transformerait un nombre a quatre chiffres en nombre a trois, et
-    // l'erreur deviendrait visible a la longueur.
-    if (rang === 0 && remplacant === 0) remplacant = 1;
-    chiffres[rang] = String(remplacant);
+
+    // Les chiffres possibles A CE RANG, l'actuel exclu. C'est la seule facon de garantir
+    // que le resultat differe. La version precedente ajoutait ou retranchait un, puis
+    // ramenait a 1 le zero de tete : sur « 102 », retrancher un au premier chiffre
+    // donnait 0, ramene a 1, et l'operation « fausse » etait l'operation juste. La feuille
+    // demandait alors de corriger un calcul correct, et l'enfant cherchait une faute qui
+    // n'existait pas.
+    const possibles: number[] = [];
+    for (let chiffre = 0; chiffre <= 9; chiffre++) {
+      if (chiffre === actuel) continue;
+      // Un zero en tete transformerait un nombre a quatre chiffres en nombre a trois, et
+      // l'erreur se verrait a la longueur sans avoir a compter.
+      if (rang === 0 && chiffre === 0) continue;
+      // Un ecart d'un ou deux : une erreur de calcul ressemble a un report oublie, pas a
+      // un chiffre pris au hasard.
+      if (Math.abs(chiffre - actuel) > 2) continue;
+      possibles.push(chiffre);
+    }
+    if (possibles.length === 0) return valeur + 1;
+
+    chiffres[rang] = String(
+      possibles[Math.floor(Math.random() * possibles.length)],
+    );
     return Number(chiffres.join(''));
   }
 
@@ -1248,8 +1264,45 @@ export class ImpressionService {
         figure: q.shape,
         figureB: q.shapeB,
         reponse: q.answer,
+        // Pour le denombrement, TOUS les attributs de la figure et non celui que le
+        // tirage a choisi. A l'ecran on pose une question a la fois, parce qu'il faut
+        // quatre propositions a toucher ; sur le papier la figure est deja dessinee, et
+        // ne demander qu'un nombre gache le dessin. Un solide a des faces, des sommets ET
+        // des aretes : les compter ensemble, c'est aussi voir qu'ils ne sont pas egaux.
+        attributs:
+          ligne.exercices[0] === 'cotes_sommets'
+            ? this.attributsDe(q.shape_meta)
+            : undefined,
       },
     }));
+  }
+
+  /** Ce qu'on peut denombrer sur une figure : ses cotes et ses sommets si elle est
+   * plane, ses faces, ses sommets et ses aretes si c'est un solide. Le cercle et la boule
+   * n'en ont aucun, et rendent une liste vide plutot qu'un zero, qui se lirait comme une
+   * reponse a donner. */
+  private attributsDe(forme: {
+    type: string;
+    cotes: number | null;
+    sommets: number | null;
+    faces: number | null;
+    aretes: number | null;
+  }): { nom: string; reponse: number }[] {
+    const candidats =
+      forme.type === 'plane'
+        ? ([
+            ['côtés', forme.cotes],
+            ['sommets', forme.sommets],
+          ] as const)
+        : ([
+            ['faces', forme.faces],
+            ['sommets', forme.sommets],
+            ['arêtes', forme.aretes],
+          ] as const);
+
+    return candidats
+      .filter(([, valeur]) => valeur !== null)
+      .map(([nom, valeur]) => ({ nom, reponse: valeur as number }));
   }
 
   /**

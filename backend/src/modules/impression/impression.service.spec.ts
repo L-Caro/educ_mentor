@@ -244,10 +244,19 @@ describe('ImpressionService', () => {
                     type: 'nom_figure',
                     skill_key: 'carre',
                     display: 'Quelle est cette figure ?',
-                    shape: 'carre',
+                    shape: 'cube',
                     shapeB: null,
                     choices: [],
-                    answer: 'carré',
+                    answer: 'cube',
+                    shape_meta: {
+                      key: 'cube',
+                      type: 'solide',
+                      cotes: null,
+                      sommets: 8,
+                      faces: 6,
+                      aretes: 12,
+                    },
+                    shape_b_meta: null,
                   },
                 ],
                 timer_seconds: 0,
@@ -664,5 +673,79 @@ describe('ImpressionService', () => {
       'adjectif',
     ]);
     expect(reponse.find((c) => c.nature === 'adjectif')?.mots).toEqual([]);
+  });
+
+  /** Refait parler le service de calcul pose avec le resultat voulu. Les valeurs piegeuses
+   * commencent par 1 : c'est la seule famille ou le defaut se produisait. */
+  const avecResultat = (answer: number) => {
+    pose.construireQuestions.mockResolvedValue({
+      resultat: {
+        questions: [
+          {
+            skill_key: 'soustraction_3',
+            operation: 'soustraction',
+            operands: [696, 594],
+            answer,
+            columns: String(answer).length,
+          },
+        ],
+        timer_seconds: 0,
+        is_unlimited: false,
+        method: 'compensation',
+      },
+      seance: {},
+    });
+  };
+
+  it('rend une operation VRAIMENT fausse a corriger', async () => {
+    // « 696 − 594 = 102 » etait propose comme faux alors qu'il est juste : la version
+    // precedente retranchait un au premier chiffre, obtenait zero, et le ramenait a un,
+    // c'est-a-dire a sa valeur d'origine. L'enfant cherchait une faute qui n'existait pas.
+    //
+    // Les valeurs testees commencent toutes par 1, et ce n'est pas un hasard : c'est la
+    // SEULE famille ou le defaut se produisait. Un premier test sur « 385 » passait avec
+    // le code fautif, ce qui est pire que pas de test.
+    for (const resultat of [102, 130, 1000, 105, 1234]) {
+      avecResultat(resultat);
+      for (let essai = 0; essai < 40; essai++) {
+        const items = await service.composer([
+          { module: 'pose', exercices: ['erreur'], nombre: 1 },
+        ]);
+        expect({ resultat, faux: items[0].donnees.faux }).not.toEqual({
+          resultat,
+          faux: resultat,
+        });
+      }
+    }
+  });
+
+  it('garde au faux resultat le MEME nombre de chiffres', async () => {
+    // Un zero en tete transformerait « 102 » en « 02 » : l'erreur se verrait a la
+    // longueur, sans avoir a refaire l'operation, qui est pourtant tout l'exercice.
+    for (const resultat of [102, 1000, 385]) {
+      avecResultat(resultat);
+      for (let essai = 0; essai < 30; essai++) {
+        const items = await service.composer([
+          { module: 'pose', exercices: ['erreur'], nombre: 1 },
+        ]);
+        expect(String(items[0].donnees.faux)).toHaveLength(
+          String(resultat).length,
+        );
+      }
+    }
+  });
+
+  it('demande TOUS les denombrements d’une figure, pas un seul', async () => {
+    // A l'ecran on pose une question a la fois, parce qu'il faut quatre propositions a
+    // toucher. Sur le papier la figure est deja dessinee : n'en tirer qu'un nombre gache
+    // le dessin, et compter faces, sommets et aretes ensemble montre qu'ils different.
+    const items = await service.composer([
+      { module: 'geometrie', exercices: ['cotes_sommets'], nombre: 1 },
+    ]);
+    expect(items[0].donnees.attributs).toEqual([
+      { nom: 'faces', reponse: 6 },
+      { nom: 'sommets', reponse: 8 },
+      { nom: 'arêtes', reponse: 12 },
+    ]);
   });
 });
