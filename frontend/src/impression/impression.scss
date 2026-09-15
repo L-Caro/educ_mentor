@@ -58,10 +58,26 @@ $encre: #1a1a1a;
     display: flex;
     gap: 2mm;
     font-size: 4mm;
+
+    // Le contenu occupe toute la case, numero deduit. Sans ca il se reduisait a sa
+    // largeur naturelle : les lignes de dictee, posees dans un item pleine largeur, ne
+    // faisaient qu'un tiers de la feuille. `min-width: 0` autorise la reduction sous la
+    // taille du contenu, sinon une phrase longue deborderait de sa colonne.
+    > div {
+      flex: 1;
+      min-width: 0;
+    }
   }
 
   &__item--pleine {
     grid-column: 1 / -1;
+  }
+
+  // La consigne d'un exercice qui en demande une (la dictee, les phrases a corriger).
+  &__consigne {
+    margin: 0 0 2mm;
+    font-style: italic;
+    font-size: 3.6mm;
   }
 
   &__numero {

@@ -1,3 +1,4 @@
+import { dicteeImpression } from './dictee.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import { dicteeApi } from './dictee.api';
@@ -22,4 +23,5 @@ export const dicteeModule: ModuleManifest = {
     getEndpoint: dicteeApi.endpoints.getDicteeProgression,
     resetEndpoint: dicteeApi.endpoints.resetDicteeProgression,
   }),
+  impression: dicteeImpression,
 };

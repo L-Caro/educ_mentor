@@ -127,7 +127,17 @@ export class PoseService {
     );
   }
 
-  async startSession(dto: StartPoseSessionDto): Promise<PoseSessionResult> {
+  /** Construire les questions, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `startSession` pour la feuille d'exercices imprimee, qui a besoin
+   * d'operations mais pas d'une seance. Sans cette coupure, imprimer une feuille
+   * deposerait une seance fantome dans « seances recentes », et le travail sur papier,
+   * qui n'est pas mesure, viendrait polluer ce que l'adulte y lit.
+   */
+  async construireQuestions(dto: StartPoseSessionDto): Promise<{
+    resultat: Omit<PoseSessionResult, 'session_id'>;
+    seance: Partial<PoseSession>;
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const method = await this.readMethod();
     const digits = await this.readDigits();
@@ -170,21 +180,28 @@ export class PoseService {
       });
     }
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      operations: operations.join(','),
-      timer_seconds: 0,
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: 0,
+        is_unlimited: isUnlimited,
+        method,
+      },
+      seance: {
+        difficulty,
+        operations: operations.join(','),
+        timer_seconds: 0,
+      },
+    };
+  }
+
+  async startSession(dto: StartPoseSessionDto): Promise<PoseSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: 0,
-      is_unlimited: isUnlimited,
-      method,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(dto: RecordPoseAnswerDto): Promise<void> {

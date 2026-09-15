@@ -16,5 +16,8 @@ import { AuthModule } from '../auth/auth.module';
   ],
   controllers: [PoseGameController, PoseAdminController],
   providers: [PoseService],
+  // Exporte pour la feuille d'exercices imprimee, qui emprunte ses operations sans rien
+  // enregistrer. Voir `ImpressionService`.
+  exports: [PoseService],
 })
 export class PoseModule {}

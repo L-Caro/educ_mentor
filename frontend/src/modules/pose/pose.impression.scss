@@ -1,0 +1,36 @@
+// L'operation posee sur le papier. Tout en millimetres : c'est un objet physique, et une
+// colonne de chiffres qui ne tombe pas juste se voit a l'oeil nu.
+.Posee {
+  display: inline-block;
+  font-variant-numeric: tabular-nums;
+  font-size: 4.5mm;
+  line-height: 6mm;
+
+  &__ligne {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  // La zone de reponse : des cases vides de la meme largeur que les chiffres au-dessus,
+  // pour qu'elle pose son resultat dans les memes colonnes. C'est tout l'exercice.
+  &__ligne--vide {
+    height: 6mm;
+  }
+
+  &__chiffre {
+    width: 6mm;
+    text-align: center;
+  }
+
+  &__signe {
+    width: 5mm;
+    text-align: center;
+  }
+
+  &__barre {
+    // La barre couvre les colonnes ET le signe, comme sur un cahier.
+    width: calc(var(--colonnes) * 6mm + 5mm);
+    border-bottom: 0.4mm solid currentColor;
+    margin: 0.5mm 0 1mm;
+  }
+}

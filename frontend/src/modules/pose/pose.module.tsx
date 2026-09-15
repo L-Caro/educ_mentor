@@ -1,4 +1,5 @@
 import store from 'src/store';
+import { poseImpression } from './pose.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import type { SetupChoice, SetupOption } from 'src/types/game.types';
 import { poseApi } from './pose.api';
@@ -61,4 +62,5 @@ export const poseModule: ModuleManifest = {
     getEndpoint: poseApi.endpoints.getPoseProgression,
     resetEndpoint: poseApi.endpoints.resetPoseProgression,
   }),
+  impression: poseImpression,
 };

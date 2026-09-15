@@ -15,6 +15,8 @@ import { AuthModule } from '../auth/auth.module';
     AuthModule,
   ],
   providers: [DicteeService, DicteeImportService],
+  // Exporte pour la feuille imprimee, qui emprunte les mots sans rien enregistrer.
+  exports: [DicteeService],
   controllers: [DicteeGameController, DicteeAdminController],
 })
 export class DicteeModule {}

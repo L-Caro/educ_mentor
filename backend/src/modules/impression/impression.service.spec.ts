@@ -3,12 +3,16 @@ import { BadRequestException } from '@nestjs/common';
 import { ImpressionService } from './impression.service';
 import { TablesService } from '../tables/tables.service';
 import { CalculService } from '../calcul/calcul.service';
+import { PoseService } from '../pose/pose.service';
+import { DicteeService } from '../dictee/dictee.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
   let service: ImpressionService;
   let tables: { construireQuestions: jest.Mock; startSession: jest.Mock };
   let calcul: { construireQuestions: jest.Mock; startSession: jest.Mock };
+  let pose: { construireQuestions: jest.Mock; startSession: jest.Mock };
+  let dictee: { construireItems: jest.Mock; startSession: jest.Mock };
 
   /** Un lot de faits distincts, comme en rendrait une vraie seance. */
   const faits = (n: number) =>
@@ -46,11 +50,46 @@ describe('ImpressionService', () => {
       startSession: jest.fn(),
     };
 
+    pose = {
+      construireQuestions: jest.fn().mockResolvedValue({
+        resultat: {
+          questions: [
+            {
+              skill_key: 'addition_3',
+              operation: 'addition',
+              operands: [247, 138],
+              answer: 385,
+              columns: 4,
+            },
+          ],
+          timer_seconds: 0,
+          is_unlimited: false,
+          method: 'compensation',
+        },
+        seance: {},
+      }),
+      startSession: jest.fn(),
+    };
+    dictee = {
+      construireItems: jest.fn().mockResolvedValue({
+        niveau: 'ce1',
+        preparee: false,
+        total_words: 6,
+        items: [
+          { id: '1', contenu: 'Le chat dort.', notions: [] },
+          { id: '2', contenu: 'Les oiseaux chantent.', notions: [] },
+        ],
+      }),
+      startSession: jest.fn(),
+    };
+
     const moduleRef = await Test.createTestingModule({
       providers: [
         ImpressionService,
         { provide: TablesService, useValue: tables },
         { provide: CalculService, useValue: calcul },
+        { provide: PoseService, useValue: pose },
+        { provide: DicteeService, useValue: dictee },
       ],
     }).compile();
     service = moduleRef.get(ImpressionService);
@@ -63,8 +102,9 @@ describe('ImpressionService', () => {
     await service.composer([
       { module: 'tables', exercice: 'produit', nombre: 5 },
     ]);
-    expect(tables.startSession).not.toHaveBeenCalled();
-    expect(calcul.startSession).not.toHaveBeenCalled();
+    for (const service of [tables, calcul, pose, dictee]) {
+      expect(service.startSession).not.toHaveBeenCalled();
+    }
   });
 
   it('rend exactement le nombre d’exercices demande', async () => {
@@ -138,5 +178,29 @@ describe('ImpressionService', () => {
     expect(tables.construireQuestions).toHaveBeenCalledWith(
       expect.objectContaining({ difficulty: 'hard' }),
     );
+  });
+
+  it('ne rend qu’UNE dictee, quel que soit le nombre demande', async () => {
+    // Une dictee n'est pas un exercice parmi d'autres : c'est un bloc de lignes que
+    // l'adulte dicte a voix haute. « Trois dictees » sur une feuille n'aurait pas de
+    // sens ; c'est la longueur qui varie, pas le nombre.
+    const items = await service.composer([
+      { module: 'dictee', exercice: 'dictee', nombre: 3 },
+    ]);
+    expect(items).toHaveLength(1);
+    expect(items[0].donnees.phrases).toEqual([
+      'Le chat dort.',
+      'Les oiseaux chantent.',
+    ]);
+  });
+
+  it('n’envoie PAS les retenues avec une operation posee', async () => {
+    // Elles ne sont pas imprimees : les transmettre inviterait a les dessiner un jour
+    // par megarde.
+    const items = await service.composer([
+      { module: 'pose', exercice: 'operation', nombre: 1 },
+    ]);
+    expect(items[0].donnees).not.toHaveProperty('retenues');
+    expect(items[0].donnees.operandes).toEqual([247, 138]);
   });
 });

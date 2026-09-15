@@ -80,9 +80,15 @@ export class DicteeService {
     return [...notions].sort((a, b) => a.localeCompare(b, 'fr'));
   }
 
-  async startSession(
+  /** Choisir les items, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `startSession` pour la feuille imprimee. La dictee sur papier n'est pas une
+   * seance a l'ecran : elle n'est pas mesuree, et la compter fausserait la progression
+   * comme les « seances recentes ».
+   */
+  async construireItems(
     dto: StartDicteeSessionDto,
-  ): Promise<DicteeSessionResponse> {
+  ): Promise<Omit<DicteeSessionResponse, 'session_id'>> {
     const niveau = dto.niveau as Niveau;
     const notion = dto.notion?.trim() || null;
 
@@ -103,24 +109,9 @@ export class DicteeService {
       0,
     );
 
-    const session = await this.sessionRepo.save(
-      this.sessionRepo.create({
-        id: randomUUID(),
-        niveau,
-        item_ids: picked.map((item) => item.id),
-        notion,
-        preparee: dto.preparee ?? false,
-        wrong_words: null,
-        total_words: totalWords,
-        started_at: new Date(),
-        completed_at: null,
-      }),
-    );
-
     return {
-      session_id: session.id,
       niveau,
-      preparee: session.preparee,
+      preparee: dto.preparee ?? false,
       total_words: totalWords,
       items: picked.map((item) => ({
         id: item.id,
@@ -128,6 +119,28 @@ export class DicteeService {
         notions: item.notions,
       })),
     };
+  }
+
+  async startSession(
+    dto: StartDicteeSessionDto,
+  ): Promise<DicteeSessionResponse> {
+    const construite = await this.construireItems(dto);
+
+    const session = await this.sessionRepo.save(
+      this.sessionRepo.create({
+        id: randomUUID(),
+        niveau: construite.niveau as Niveau,
+        item_ids: construite.items.map((item) => item.id),
+        notion: dto.notion?.trim() || null,
+        preparee: construite.preparee,
+        wrong_words: null,
+        total_words: construite.total_words,
+        started_at: new Date(),
+        completed_at: null,
+      }),
+    );
+
+    return { session_id: session.id, ...construite };
   }
 
   async completeSession(

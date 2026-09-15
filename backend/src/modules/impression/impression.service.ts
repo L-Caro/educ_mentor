@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { TablesService } from '../tables/tables.service';
 import { CalculService } from '../calcul/calcul.service';
+import { PoseService } from '../pose/pose.service';
+import { DicteeService } from '../dictee/dictee.service';
+import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
 import {
   MAXIMUM_ITEMS,
   type ItemImprime,
@@ -25,6 +28,8 @@ export class ImpressionService {
   constructor(
     private readonly tablesService: TablesService,
     private readonly calculService: CalculService,
+    private readonly poseService: PoseService,
+    private readonly dicteeService: DicteeService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -48,6 +53,10 @@ export class ImpressionService {
         return this.tablesProduit(ligne);
       case 'calcul-mental/operation':
         return this.calculOperation(ligne);
+      case 'pose/operation':
+        return this.poseOperation(ligne);
+      case 'dictee/dictee':
+        return this.dicteeMots(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercice}`,
@@ -129,5 +138,71 @@ export class ImpressionService {
       exercice: ligne.exercice,
       donnees: { operation: q.operation, reponse: q.answer },
     }));
+  }
+
+  private async poseOperation(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const operations = Array.isArray(ligne.options?.operations)
+      ? (ligne.options.operations as (
+          | 'addition'
+          | 'soustraction'
+          | 'multiplication'
+        )[])
+      : undefined;
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { operands: number[] }) => q.operands.join('x'),
+      async () =>
+        (
+          await this.poseService.construireQuestions({
+            operations,
+            difficulty: 'hard',
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercice,
+      // Pas de retenues dans les donnees : elles ne sont pas imprimees, et les envoyer
+      // inviterait a les dessiner un jour par megarde.
+      donnees: {
+        operation: q.operation,
+        operandes: q.operands,
+        reponse: q.answer,
+        colonnes: q.columns,
+      },
+    }));
+  }
+
+  /**
+   * La dictee ne donne qu'UN item par feuille, et c'est voulu.
+   *
+   * Ce n'est pas un exercice parmi d'autres : c'est un bloc de lignes a ecrire, que
+   * l'adulte dicte a voix haute. Le « corrige » n'en est pas un non plus, c'est la liste
+   * des phrases a lire. Demander « trois dictees » n'aurait pas de sens ; on demande une
+   * dictee, et c'est sa longueur qui varie.
+   */
+  private async dicteeMots(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const niveau =
+      typeof ligne.options?.niveau === 'string' ? ligne.options.niveau : 'ce1';
+    const longueur =
+      typeof ligne.options?.longueur === 'string'
+        ? ligne.options.longueur
+        : 'courte';
+    const construite = await this.dicteeService.construireItems({
+      niveau,
+      longueur,
+    } as StartDicteeSessionDto);
+
+    return [
+      {
+        module: ligne.module,
+        exercice: ligne.exercice,
+        donnees: {
+          phrases: construite.items.map((item) => item.contenu),
+          niveau: construite.niveau,
+        },
+      },
+    ];
   }
 }
