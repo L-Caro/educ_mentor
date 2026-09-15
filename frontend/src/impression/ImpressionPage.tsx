@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import Button from 'src/components/common/Button';
 import Spinner from 'src/components/common/Spinner';
 import Toggle from 'src/components/common/Toggle';
@@ -81,6 +81,13 @@ export default function ImpressionPage() {
    * DIRE : sans cela, l'adulte coche la dictee, ne la voit pas sur la feuille, et n'a
    * aucun moyen de savoir que c'est parce qu'aucune n'est saisie. */
   const [muets, setMuets] = useState<string[]>([]);
+  /** La composition telle qu'elle etait au moment ou la feuille a ete tiree.
+   *
+   * Sans elle, on cochait deux exercices de plus, on regardait l'apercu qui n'avait pas
+   * bouge, et on imprimait une feuille qui ne correspondait plus aux cases cochees. Rien
+   * ne le disait : l'apercu a l'air a jour puisqu'il est la. */
+  const [tiree, setTiree] = useState<string | null>(null);
+  const apercuRef = useRef<HTMLDivElement>(null);
   const [composer, { isLoading, isError }] = useComposerFeuilleMutation();
 
   const catalogue = useMemo(() => {
@@ -113,19 +120,40 @@ export default function ImpressionPage() {
     }
   }
 
+  /** Referme toutes les cartes. Les reglages sont gardes : on repart d'une feuille
+   * blanche, pas d'une application neuve. */
+  function toutDecocher() {
+    setActifs({});
+  }
+
+  const lignes: LigneComposition[] = fournisseurs
+    .filter((f) => compte(f.id) > 0)
+    .map((f) => ({
+      module: f.id,
+      exercices: selection[f.id],
+      nombre: nombres[f.id],
+      options: reglages[f.id],
+    }));
+
+  /** La feuille affichee ne correspond plus a ce qui est coche. */
+  const perimee = items !== null && tiree !== JSON.stringify(lignes);
+  /** Une feuille est la, et elle est a jour : il ne reste qu'a imprimer. */
+  const pret = items !== null && !perimee;
+
   async function preparer() {
-    const lignes: LigneComposition[] = fournisseurs
-      .filter((f) => compte(f.id) > 0)
-      .map((f) => ({
-        module: f.id,
-        exercices: selection[f.id],
-        nombre: nombres[f.id],
-        options: reglages[f.id],
-      }));
     if (lignes.length === 0) return;
     try {
       const rendus = await composer(lignes).unwrap();
       setItems(rendus);
+      setTiree(JSON.stringify(lignes));
+      // Amener l'oeil a la feuille. Sur une page de treize cartes, l'apercu apparait
+      // sous la ligne de flottaison et rien ne signale qu'il est la.
+      requestAnimationFrame(() =>
+        apercuRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        }),
+      );
       setMuets(
         lignes
           .filter(
@@ -139,6 +167,7 @@ export default function ImpressionPage() {
       );
     } catch {
       setItems(null);
+      setTiree(null);
       setMuets([]);
     }
   }
@@ -276,22 +305,60 @@ export default function ImpressionPage() {
           })}
         </div>
 
-        <div className="Impression__actions">
-          <Button
-            variant="primary"
-            onClick={() => void preparer()}
-            // Desactive aussi AU-DESSUS de la borne : sans cela le bouton partait, le
-            // serveur refusait, et l'adulte lisait « reessaie dans un instant » alors
-            // qu'aucune attente n'y changerait rien.
-            disabled={total === 0 || total > MAXIMUM_ITEMS || isLoading}
-          >
-            {isLoading ? 'Préparation…' : `Préparer la feuille (${total})`}
-          </Button>
-          {items && (
-            <Button variant="ghost" onClick={() => window.print()}>
-              🖨 Imprimer
+        <div className="Impression__barre">
+          <span className="Impression__compte">
+            {total === 0 ? (
+              'Aucun exercice choisi'
+            ) : (
+              <>
+                <strong>{total}</strong> exercice{total > 1 ? 's' : ''}
+                {perimee && ' · la feuille affichée ne correspond plus'}
+              </>
+            )}
+          </span>
+
+          <div className="Impression__actions">
+            {Object.values(actifs).some(Boolean) && (
+              <button
+                type="button"
+                className="AdminBtn AdminBtn--ghost"
+                onClick={toutDecocher}
+              >
+                Tout décocher
+              </button>
+            )}
+
+            {/* La hierarchie suit ce qu'il RESTE a faire, et un seul bouton est primaire
+                a la fois. Tant qu'aucune feuille n'est tiree, preparer est l'action ; une
+                fois qu'elle est la et a jour, c'est imprimer, et preparer devient
+                « nouveau tirage ». Un « imprimer » en primaire a cote d'un « preparer »
+                grise, comme c'etait le cas, invite a imprimer une page vide. */}
+            <Button
+              variant={pret ? 'outline' : 'primary'}
+              onClick={() => void preparer()}
+              // Desactive aussi AU-DESSUS de la borne : sans cela le bouton partait, le
+              // serveur refusait, et l'adulte lisait « reessaie dans un instant » alors
+              // qu'aucune attente n'y changerait rien.
+              disabled={total === 0 || total > MAXIMUM_ITEMS || isLoading}
+            >
+              {isLoading
+                ? 'Préparation…'
+                : pret
+                  ? 'Nouveau tirage'
+                  : perimee
+                    ? 'Mettre à jour la feuille'
+                    : `Préparer la feuille (${total})`}
             </Button>
-          )}
+
+            {items && (
+              <Button
+                variant={pret ? 'primary' : 'outline'}
+                onClick={() => window.print()}
+              >
+                🖨 Imprimer
+              </Button>
+            )}
+          </div>
         </div>
 
         {total > MAXIMUM_ITEMS && (
@@ -316,7 +383,7 @@ export default function ImpressionPage() {
       {isLoading && <Spinner />}
 
       {items && (
-        <div className="Impression__apercu">
+        <div className="Impression__apercu" ref={apercuRef}>
           <FeuilleImprimable
             items={items}
             exercices={catalogue}

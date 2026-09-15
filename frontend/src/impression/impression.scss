@@ -223,6 +223,47 @@ $bleu-fort: #5a7fb0;
   gap: $space-4;
 }
 
+// La barre d'actions, COLLEE en bas de la fenetre.
+//
+// Elle etait sous les treize cartes : on deroulait la page pour composer, puis on
+// remontait ou l'on redescendait pour trouver le bouton, et le compte d'exercices, qui
+// change a chaque clic, n'etait jamais sous les yeux au moment ou on le fait changer.
+.Impression__barre {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $space-4;
+  margin-top: $space-3;
+  padding: $space-4 $space-5;
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
+  border-radius: $radius-sm;
+  box-shadow: var(--shadow-md);
+}
+
+.Impression__compte {
+  font-size: $font-size-sm;
+}
+
+.Impression__actions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+
+  // Les boutons de l'application font 20 rem de large et prennent toute la place
+  // disponible : dans une barre, ils s'etalent et la hierarchie ne se lit plus.
+  .Button {
+    width: auto;
+    padding: $space-3 $space-6;
+    font-size: 1rem;
+  }
+}
+
 // Le corrige EN HAUT, au-dessus des modules : c'est une decision qui porte sur la feuille
 // entiere, pas sur un module. En bas de la liste elle se lisait comme un reglage du
 // dernier module coche.
@@ -424,6 +465,15 @@ $bleu-fort: #5a7fb0;
     width: auto;
     max-width: none;
     margin: 0;
+  }
+
+  // Les reglages sortent du FLUX, et pas seulement de la vue. `visibility: hidden` les
+  // rend invisibles mais leur garde leur place : treize cartes et une barre collante
+  // reservaient plusieurs pages blanches avant la feuille. `display: none` est sans
+  // danger ici, contrairement au cas ci-dessus : ce bloc n'est pas un ancetre de la
+  // feuille, c'est son voisin.
+  .Impression__reglages {
+    display: none;
   }
 
   // Tout ce qui habille l'apercu a l'ecran doit disparaitre : une ombre, un fond, une
