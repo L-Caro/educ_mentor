@@ -6,12 +6,16 @@
 // l'imprimante respecte. Une feuille d'exercices a des contraintes physiques, pas des
 // contraintes d'ecran.
 //
-// A4 fait 210 x 297 mm. Avec 12 mm de marge, il reste 186 mm de large : deux colonnes de
-// 89 mm. Une addition posee a trois chiffres en occupe 40, une multiplication 7 x 8 en
+// A4 fait 210 x 297 mm. Avec 8 mm de marge, il reste 194 mm de large : deux colonnes de
+// 93 mm. Une addition posee a trois chiffres en occupe 40, une multiplication 7 x 8 en
 // occupe 25. C'est cette arithmetique qui doit gouverner, pas l'intuition.
+//
+// 8 mm et pas moins : sous cette valeur on entre dans la zone que beaucoup d'imprimantes
+// jet d'encre ne savent pas atteindre, et le bord de la feuille se retrouve rogne. Le
+// gain irait de toute facon a la marge, pas aux exercices.
 
-$marge-page: 12mm;
-$largeur-utile: 186mm;
+$marge-page: 8mm;
+$largeur-utile: 194mm;
 $encre: #1a1a1a;
 
 @page {
