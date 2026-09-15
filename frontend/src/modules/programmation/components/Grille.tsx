@@ -1,4 +1,4 @@
-import { ANGLE, type Theme } from '../themes';
+import { SOL_VILLAGE, type Theme } from '../themes';
 import { memeCase } from '../programmation.interprete';
 import type { Case, Etat, Niveau } from '../programmation.types';
 
@@ -30,6 +30,8 @@ export default function Grille({
     }
   }
 
+  const classeDessin = `Prog__dessin${theme.pixels ? ' Prog__dessin--pixels' : ''}`;
+
   const pourcent = (valeur: number, total: number) =>
     `${String((valeur * 100) / total)}%`;
 
@@ -45,20 +47,30 @@ export default function Grille({
         <div
           key={`${String(c.x)}-${String(c.y)}`}
           className="Prog__case"
-          style={{ background: pair ? theme.sol : theme.solAlterne }}
+          style={
+            theme.pixels
+              ? {
+                  // Deux tuiles d'herbe en damier : un aplat de vert donne un terrain de
+                  // sport, pas un pre. La variation suffit a faire un sol.
+                  backgroundImage: `url(${pair ? SOL_VILLAGE.pair : SOL_VILLAGE.impair})`,
+                  backgroundSize: '100% 100%',
+                  imageRendering: 'pixelated',
+                }
+              : { background: pair ? theme.sol : theme.solAlterne }
+          }
         >
           {mur && (
-            <svg viewBox="0 0 100 100" className="Prog__dessin">
+            <svg viewBox="0 0 100 100" className={classeDessin}>
               {theme.mur}
             </svg>
           )}
           {memeCase(c, niveau.but) && (
-            <svg viewBox="0 0 100 100" className="Prog__dessin Prog__but">
+            <svg viewBox="0 0 100 100" className={`${classeDessin} Prog__but`}>
               {theme.but}
             </svg>
           )}
           {etat.graines.some((graine) => memeCase(graine, c)) && (
-            <svg viewBox="0 0 100 100" className="Prog__dessin Prog__graine">
+            <svg viewBox="0 0 100 100" className={`${classeDessin} Prog__graine`}>
               {theme.graine}
             </svg>
           )}
@@ -67,7 +79,7 @@ export default function Grille({
 
       <svg
         viewBox="0 0 100 100"
-        className="Prog__personnage"
+        className={`Prog__personnage${theme.pixels ? ' Prog__personnage--pixels' : ''}`}
         style={{
           width: pourcent(1, niveau.colonnes),
           height: pourcent(1, niveau.lignes),
@@ -76,15 +88,9 @@ export default function Grille({
         }}
         aria-label="personnage"
       >
-        <g
-          style={{
-            transform: `rotate(${String(ANGLE[etat.direction])}deg)`,
-            transformOrigin: '50% 50%',
-            transition: 'transform 0.25s ease',
-          }}
-        >
-          {theme.personnage}
-        </g>
+        {/* Le theme rend le personnage DEJA oriente : un trace se contente d'un
+            pivotement, un sprite de trois quarts a quatre dessins. */}
+        {theme.personnage(etat.direction)}
       </svg>
     </div>
   );

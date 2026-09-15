@@ -1,4 +1,13 @@
 import type { ReactNode } from 'react';
+import herbeUrl from './assets/village/herbe.png';
+import herbeDeuxUrl from './assets/village/herbe-2.png';
+import arbreUrl from './assets/village/arbre.png';
+import champignonUrl from './assets/village/champignon.png';
+import cibleUrl from './assets/village/cible.png';
+import persoNordUrl from './assets/village/perso-nord.png';
+import persoEstUrl from './assets/village/perso-est.png';
+import persoSudUrl from './assets/village/perso-sud.png';
+import persoOuestUrl from './assets/village/perso-ouest.png';
 import type { Direction } from './programmation.types';
 
 /**
@@ -19,7 +28,7 @@ import type { Direction } from './programmation.types';
  * rechargement a chaud, ce que le lint refuse a juste titre.
  */
 
-export type ThemeKey = 'lapin' | 'abeille' | 'fusee' | 'robot';
+export type ThemeKey = 'lapin' | 'abeille' | 'fusee' | 'robot' | 'village';
 
 export interface Theme {
   cle: ThemeKey;
@@ -28,9 +37,18 @@ export interface Theme {
   sol: string;
   solAlterne: string;
   mur: ReactNode;
-  personnage: ReactNode;
+  /** Le personnage DEJA oriente.
+   *
+   * C'est une fonction de la direction, et non un dessin unique que la grille ferait
+   * pivoter. Un trace vu strictement de dessus se contente d'une rotation ; un
+   * personnage dessine de trois quarts, qu'on voit de face, de dos et de profil, a
+   * quatre images distinctes. Laisser le choix au theme permet aux deux de coexister. */
+  personnage: (direction: Direction) => ReactNode;
   but: ReactNode;
   graine: ReactNode;
+  /** Les images en pixels s'agrandissent au carre, sans lissage : sans cela un sprite de
+   * seize pixels etale sur cinq centimetres devient une bouillie floue. */
+  pixels?: boolean;
   /** Comment nommer le but dans les phrases du jeu. */
   nomBut: string;
 }
@@ -188,6 +206,37 @@ function meteore() {
   );
 }
 
+/** Un trace SVG, tourne vers la direction voulue. Les quatre orientations viennent d'une
+ * seule image : un dessin vu strictement de dessus n'a pas de face cachee. */
+function tourneSvg(trace: ReactNode) {
+  return (direction: Direction) => (
+    <g
+      style={{
+        transform: `rotate(${String(ANGLE[direction])}deg)`,
+        transformOrigin: '50% 50%',
+        transition: 'transform 0.25s ease',
+      }}
+    >
+      {trace}
+    </g>
+  );
+}
+
+/**
+ * Une image de tuile, posee dans le cadre de cent unites du plateau.
+ *
+ * `zoom` la fait deborder du cadre, centree. Les sprites de Kenney portent leur propre
+ * marge : a l'echelle exacte de la case, le personnage n'en occupait que six dixiemes et
+ * paraissait perdu au milieu de son herbe.
+ */
+function image(source: string, zoom = 1) {
+  const cote = 100 * zoom;
+  const bord = (100 - cote) / 2;
+  return (
+    <image href={source} x={bord} y={bord} width={cote} height={cote} />
+  );
+}
+
 export const THEMES: Theme[] = [
   {
     cle: 'lapin',
@@ -195,7 +244,7 @@ export const THEMES: Theme[] = [
     sol: '#dff0c8',
     solAlterne: '#d3e9b8',
     mur: rocher(),
-    personnage: lapin(),
+    personnage: tourneSvg(lapin()),
     but: carotte(),
     graine: fleur(),
     nomBut: 'la carotte',
@@ -206,7 +255,7 @@ export const THEMES: Theme[] = [
     sol: '#fdf3d0',
     solAlterne: '#f9ecc0',
     mur: rocher(),
-    personnage: abeille(),
+    personnage: tourneSvg(abeille()),
     but: ruche(),
     graine: fleur(),
     nomBut: 'la ruche',
@@ -217,7 +266,7 @@ export const THEMES: Theme[] = [
     sol: '#dfe6f5',
     solAlterne: '#d3dcf0',
     mur: meteore(),
-    personnage: fusee(),
+    personnage: tourneSvg(fusee()),
     but: planete(),
     graine: etoile(),
     nomBut: 'la planète',
@@ -228,12 +277,46 @@ export const THEMES: Theme[] = [
     sol: '#e6e9ec',
     solAlterne: '#dcdfe3',
     mur: rocher(),
-    personnage: robot(),
+    personnage: tourneSvg(robot()),
     but: pile(),
     graine: etoile(),
     nomBut: 'la pile',
   },
+  {
+    // Le theme en PIXELS, avec les sprites de Kenney (domaine public). Le personnage y a
+    // quatre dessins distincts, parce qu'il est vu de trois quarts : on voit son visage
+    // quand il descend et son dos quand il monte. Un simple pivotement l'aurait couche
+    // sur le cote.
+    cle: 'village',
+    label: 'Le village (pixels)',
+    sol: '#8cc153',
+    solAlterne: '#8cc153',
+    // Un arbre ORANGE sur de l'herbe verte. Le sapin vert du meme jeu de tuiles se
+    // fondait dans le sol : il n'en restait que le contour sombre, qu'on prenait pour une
+    // arche. Un obstacle doit se voir avant d'etre compris.
+    mur: image(arbreUrl),
+    personnage: (direction) =>
+      image(
+        {
+          nord: persoNordUrl,
+          est: persoEstUrl,
+          sud: persoSudUrl,
+          ouest: persoOuestUrl,
+        }[direction],
+        1.3,
+      ),
+    // Une cible, et non la maison du meme jeu de tuiles : celle-ci n'en montre que le
+    // toit, les maisons de Kenney tenant sur plusieurs cases. Un but qu'on prend pour un
+    // rocher ne dit pas ou aller.
+    but: image(cibleUrl, 1.15),
+    graine: image(champignonUrl),
+    nomBut: 'la cible',
+    pixels: true,
+  },
 ];
+
+/** Les deux tuiles d'herbe du theme en pixels, pour que le sol ne soit pas un aplat. */
+export const SOL_VILLAGE = { pair: herbeUrl, impair: herbeDeuxUrl };
 
 export function theme(cle: string): Theme {
   return THEMES.find((t) => t.cle === cle) ?? THEMES[0];
