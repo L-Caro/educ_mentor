@@ -13,6 +13,11 @@ interface Props {
    * meme endroit qu'un resultat se lit comme un score, et la feuille prend l'air d'un
    * controle. Le chevron ne dit rien d'autre que « ca commence ici ». */
   avecNumeros: boolean;
+  /** Retirer UN exercice, sans refaire la feuille. Absent, les boutons ne sont pas
+   * rendus : c'est ce qui permet de reutiliser ce composant pour un apercu fige. */
+  onRejouer?: (index: number) => void;
+  /** L'exercice en cours de retirage, pour que le bouton dise qu'il travaille. */
+  rejoue?: number | null;
 }
 
 /**
@@ -30,6 +35,13 @@ interface Props {
  *
  * Le corrige part sur sa propre page. L'enfant peut donc la detacher et se corriger seule
  * apres coup, sans l'avoir eue sous les yeux pendant qu'elle travaillait.
+ *
+ * ── Retirer un exercice a la fois ────────────────────────────────────────────────────
+ *
+ * Chaque exercice porte un bouton de retirage. Sur une feuille de quinze exercices, un
+ * seul ne convient pas : le refaire entierement changeait les quatorze autres, dont ceux
+ * qu'on venait de garder. Le bouton ne s'imprime pas, et il ne s'affiche qu'au survol :
+ * l'apercu doit montrer la feuille, pas une barre d'outils.
  */
 export default function FeuilleImprimable({
   items,
@@ -37,6 +49,8 @@ export default function FeuilleImprimable({
   titre,
   avecCorrige,
   avecNumeros,
+  onRejouer,
+  rejoue = null,
 }: Props) {
   const rendu = items.map((item, index) => ({
     item,
@@ -64,6 +78,18 @@ export default function FeuilleImprimable({
               {avecNumeros ? `${String(numero)}.` : '\u203a'}
             </span>
             <div>{exercice?.enonce(item.donnees)}</div>
+            {onRejouer && (
+              <button
+                type="button"
+                className="Feuille__rejouer"
+                title="Un autre exercice du même type"
+                aria-label={`Remplacer l'exercice ${String(numero)}`}
+                disabled={rejoue !== null}
+                onClick={() => onRejouer(numero - 1)}
+              >
+                {rejoue === numero - 1 ? '\u2026' : '\u21bb'}
+              </button>
+            )}
           </div>
         ))}
       </div>

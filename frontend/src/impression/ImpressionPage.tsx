@@ -23,6 +23,11 @@ const MAXIMUM_ITEMS = 60;
  * bouge et l'interrupteur aurait eu l'air casse. */
 const NOMBRE_PAR_DEFAUT = 4;
 
+/** Combien de candidats demander pour en remplacer UN. Le serveur ne dedoublonne qu'a
+ * l'interieur d'un appel : en n'en demandant qu'un, on retombait regulierement sur un
+ * exercice deja pose, et le bouton avait l'air de ne rien faire. */
+const CANDIDATS_PAR_RETIRAGE = 6;
+
 function dateDuJour(): string {
   return new Date().toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -91,8 +96,16 @@ export default function ImpressionPage() {
    * bouge, et on imprimait une feuille qui ne correspondait plus aux cases cochees. Rien
    * ne le disait : l'apercu a l'air a jour puisqu'il est la. */
   const [tiree, setTiree] = useState<string | null>(null);
+  /** L'exercice en cours de retirage, pour que son bouton dise qu'il travaille. */
+  const [rejoue, setRejoue] = useState<number | null>(null);
   const apercuRef = useRef<HTMLDivElement>(null);
   const [composer, { isLoading, isError }] = useComposerFeuilleMutation();
+  /** Une SECONDE instance de la mutation, pour le retirage d'un seul exercice.
+   *
+   * La meme aurait partage son `isLoading` avec la barre d'actions : cliquer le petit
+   * bouton d'un exercice faisait passer le bouton principal en « Preparation... » et le
+   * desactivait, comme si toute la feuille se refaisait. */
+  const [composerUn] = useComposerFeuilleMutation();
 
   const catalogue = useMemo(() => {
     const table = new Map<string, ExerciceImprimable>();
@@ -143,6 +156,52 @@ export default function ImpressionPage() {
   const perimee = items !== null && tiree !== JSON.stringify(lignes);
   /** Une feuille est la, et elle est a jour : il ne reste qu'a imprimer. */
   const pret = items !== null && !perimee;
+
+  /**
+   * Retire UN exercice, sans refaire la feuille.
+   *
+   * Sur une feuille de quinze exercices, un seul ne convient pas : le refaire entierement
+   * changeait les quatorze autres, dont ceux qu'on venait justement de garder.
+   *
+   * On demande plusieurs candidats en un appel, et on prend le premier qui n'est pas deja
+   * sur la feuille. Le serveur ne dedoublonne qu'a l'interieur d'un appel : sans cela,
+   * rejouer un exercice pouvait rendre exactement celui d'a cote, ou celui qu'on venait
+   * de remplacer, ce qui donne l'impression que le bouton ne fait rien.
+   */
+  async function rejouerUn(index: number) {
+    const item = items?.[index];
+    if (!item || rejoue !== null) return;
+
+    setRejoue(index);
+    try {
+      const candidats = await composerUn([
+        {
+          module: item.module,
+          exercices: [item.exercice],
+          nombre: CANDIDATS_PAR_RETIRAGE,
+          options: reglages[item.module],
+        },
+      ]).unwrap();
+
+      const dejaLa = new Set(
+        items.map((autre) => JSON.stringify(autre.donnees)),
+      );
+      const neuf = candidats.find(
+        (candidat) => !dejaLa.has(JSON.stringify(candidat.donnees)),
+      );
+      // Rien de neuf : le vivier est epuise (une seule table cochee, tout est deja sorti).
+      // On laisse la feuille telle quelle plutot que de reposer le meme exercice.
+      if (!neuf) return;
+
+      const suivants = [...items];
+      suivants[index] = neuf;
+      setItems(suivants);
+    } catch {
+      // Un retirage rate ne doit pas emporter la feuille : elle reste ce qu'elle etait.
+    } finally {
+      setRejoue(null);
+    }
+  }
 
   async function preparer() {
     if (lignes.length === 0) return;
@@ -404,6 +463,8 @@ export default function ImpressionPage() {
             titre={`Feuille du ${dateDuJour()}`}
             avecCorrige={avecCorrige}
             avecNumeros={avecNumeros}
+            onRejouer={(index) => void rejouerUn(index)}
+            rejoue={rejoue}
           />
         </div>
       )}

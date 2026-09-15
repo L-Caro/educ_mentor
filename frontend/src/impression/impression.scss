@@ -58,6 +58,13 @@ $encre: #1a1a1a;
     display: flex;
     gap: 2mm;
     font-size: 4mm;
+    // Ancre du bouton de retirage, qui se pose dans le coin de l'exercice.
+    position: relative;
+
+    &:hover .Feuille__rejouer,
+    .Feuille__rejouer:focus-visible {
+      opacity: 1;
+    }
 
     // Le contenu occupe toute la case, numero deduit. Sans ca il se reduisait a sa
     // largeur naturelle : les lignes de dictee, posees dans un item pleine largeur, ne
@@ -71,6 +78,32 @@ $encre: #1a1a1a;
 
   &__item--pleine {
     grid-column: 1 / -1;
+  }
+
+  // Retirer CET exercice, sans refaire la feuille. Invisible tant qu'on ne survole pas :
+  // l'apercu doit montrer la feuille telle qu'elle sortira, pas une barre d'outils.
+  &__rejouer {
+    position: absolute;
+    // DANS la case, pas dans la gouttiere. Depasse a droite, le bouton tombait a
+    // mi-chemin entre deux colonnes et on ne savait plus lequel des deux exercices il
+    // allait remplacer.
+    top: -1mm;
+    right: 0;
+    width: 7mm;
+    height: 7mm;
+    border: 1px solid var(--color-base-300);
+    border-radius: 50%;
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    font-size: 4mm;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+
+    &:disabled {
+      cursor: wait;
+    }
   }
 
   // La consigne d'un exercice qui en demande une (la dictee, les phrases a corriger).
@@ -478,6 +511,13 @@ $bleu-fort: #5a7fb0;
   .Feuille,
   .Feuille * {
     visibility: visible;
+  }
+
+  // Le bouton de retirage est DANS la feuille : sans cette regle il serait rendu visible
+  // par celle du dessus et sortirait sur le papier, un petit rond dans le coin de chaque
+  // exercice.
+  .Feuille__rejouer {
+    display: none;
   }
 
   // Pas de `position: absolute` ici : elle sort la feuille du flux, et la boite qui la
