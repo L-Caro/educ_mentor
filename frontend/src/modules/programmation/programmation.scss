@@ -69,30 +69,43 @@
     inset: 8%;
     width: 84%;
     height: 84%;
+  }
 
-    // Une tuile de seize pixels etalee sur cinq centimetres : sans cela le navigateur la
-    // lisse et elle devient une bouillie floue. Et les tuiles occupent TOUTE la case,
-    // contrairement aux traces : elles sont dessinees avec leur propre marge.
-    &--pixels {
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-    }
+  // Le motif du sol occupe TOUTE la case et s'efface un peu : c'est un decor, il ne doit
+  // pas concurrencer ce qu'on doit lire dessus.
+  &__motif {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.75;
   }
 
   // Le but pulse doucement : c'est le point d'arrivee, il doit se trouver d'un coup
   // d'oeil sur une grille de soixante-quatre cases.
+  // Le motif du sol passe DERRIERE tout le reste et s'efface un peu : c'est un decor,
+  // il ne doit pas concurrencer ce qu'on doit lire sur la case.
+  &__motif {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8;
+  }
+
+  // Le motif du sol occupe TOUTE la case et s'efface un peu : c'est un decor, il ne doit
+  // pas concurrencer ce qu'on doit lire dessus.
+  &__motif {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.75;
+  }
+
   &__but {
     animation: prog-respire 2.2s ease-in-out infinite;
   }
 
   // Le personnage GLISSE d'une case a l'autre. Un saut ne montrerait pas le chemin
   // parcouru, et c'est justement le chemin qu'on cherche a lui faire lire.
-  &__personnage--pixels {
-    image-rendering: pixelated;
-  }
-
   &__personnage {
     position: absolute;
     transition:

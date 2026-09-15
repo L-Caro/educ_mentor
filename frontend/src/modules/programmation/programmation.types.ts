@@ -65,14 +65,6 @@ export interface Instruction {
   sinon?: Instruction[];
 }
 
-/** Le bloc qu'on se fabrique : une suite d'ordres a laquelle on donne un nom, et qu'on
- * rappelle ensuite d'un seul geste. C'est la notion la plus puissante du module, et la
- * seule qui demande de PENSER une suite avant de s'en servir. */
-export interface Fonction {
-  /** Les ordres que le bloc contient. */
-  corps: Instruction[];
-}
-
 export interface Niveau {
   /** Le rang de l'etape : c'est ce qui est memorise entre deux venues. */
   etape: number;
