@@ -8,6 +8,7 @@ import { PRONOMS, type Pronom } from '../conjugaison/conjugaison.temps';
 import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
+import { HeureService } from '../heure/heure.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { maximum } from '../numeration/numeration.positions';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
@@ -41,6 +42,7 @@ export class ImpressionService {
     private readonly accordsService: AccordsService,
     private readonly grammaireService: GrammaireService,
     private readonly numerationService: NumerationService,
+    private readonly heureService: HeureService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -133,6 +135,11 @@ export class ImpressionService {
         return this.numerationEncadrer(ligne);
       case 'numeration/lettres':
         return this.numerationLettres(ligne);
+      case 'heure/lire':
+      case 'heure/dessiner':
+        return this.heureCadran(ligne);
+      case 'heure/durees':
+        return this.heureDurees(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -838,5 +845,116 @@ export class ImpressionService {
         indices: q.answer_indices,
       },
     }));
+  }
+
+  /**
+   * Les deux exercices du cadran : le lire, et le dessiner.
+   *
+   * Ils sont symetriques et tires du MEME vivier, comme le produit et le facteur manquant
+   * des tables : c'est le meme savoir, et seule la case laissee vide change. Lire un
+   * cadran, c'est traduire deux aiguilles en chiffres ; dessiner l'heure, c'est
+   * l'inverse, et c'est la que l'on voit si la petite aiguille a compris qu'elle avance
+   * entre deux nombres.
+   *
+   * « Dessine 3 h 45 » n'existe que sur le papier : a l'ecran, il faudrait faire tourner
+   * des aiguilles a la souris, ce qui mesurerait la souris.
+   *
+   * Le tirage est celui du module, sans generateur parallele. L'option `mode` choisit
+   * entre ses deux univers : `expression`, le cycle de douze heures aux minutes parlantes
+   * (et quart, moins le quart, et demie), et `digital`, les vingt-quatre heures a la
+   * minute pres.
+   */
+  private async heureCadran(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const mode =
+      ligne.options?.mode === 'digital' ? 'digital' : ('expression' as const);
+    const chiffres =
+      typeof ligne.options?.chiffres === 'string'
+        ? ligne.options.chiffres
+        : 'arabic';
+
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { answer_value: number }) => String(q.answer_value),
+      async () =>
+        (
+          await this.heureService.construireQuestions({
+            difficulty: 'hard',
+            numeral_type: chiffres,
+            question_mode: mode,
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        heure: q.hour,
+        minute: q.minute,
+        chiffres: q.numeral_type,
+        // Un cadran a douze heures, la journee en a vingt-quatre : rien ne distingue
+        // 15 h 20 de 3 h 20 sur le dessin. Le jeu regle cela par une pastille soleil ou
+        // lune, et la feuille doit la porter aussi, sinon le corrige donne tort a une
+        // reponse juste. En mode `expression` les heures vont de 1 a 12 : il n'y a rien
+        // a lever, et une pastille y serait arbitraire.
+        matin: mode === 'digital' ? q.hour < 12 : undefined,
+      },
+    }));
+  }
+
+  /**
+   * Les durees : d'une heure a l'autre, et d'une heure plus un temps.
+   *
+   * Aucun cadran, et c'est le propre de l'exercice : on ne lit plus une horloge, on
+   * calcule en base soixante. Les deux sens alternent au hasard parce qu'ils ne
+   * s'apprennent pas ensemble ; chercher l'heure d'arrivee, c'est une addition qui
+   * retient a soixante, chercher le temps ecoule, c'est une soustraction.
+   *
+   * Les durees franchissent presque toujours une heure pleine. C'est tout l'interet :
+   * « 9 h 10 plus 20 minutes » se fait sans rien savoir du temps.
+   */
+  private heureDurees(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const items: ItemImprime[] = [];
+    const vus = new Set<string>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      // De 7 h a 20 h : les heures d'une journee d'enfant, et jamais de passage a minuit.
+      const departMinutes =
+        (7 + Math.floor(Math.random() * 13)) * 60 +
+        Math.floor(Math.random() * 12) * 5;
+      const duree = (2 + Math.floor(Math.random() * 22)) * 5;
+      const finMinutes = departMinutes + duree;
+      if (finMinutes >= 23 * 60) continue;
+
+      const cle = `${String(departMinutes)}+${String(duree)}`;
+      if (vus.has(cle)) continue;
+      vus.add(cle);
+
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        // Le sens est tire ici et non au rendu : le corrige doit savoir ce qui est
+        // demande, et deux feuilles tirees deux fois doivent poser les memes questions.
+        donnees: {
+          sens: Math.random() < 0.5 ? 'fin' : 'ecart',
+          depart: this.enHeure(departMinutes),
+          fin: this.enHeure(finMinutes),
+          duree,
+        },
+      });
+    }
+    return Promise.resolve(items);
+  }
+
+  /** Minutes depuis minuit vers `9 h 05`. Les minutes gardent leur zero : `9 h 5` se lit
+   * mal, et c'est ainsi qu'elles s'ecrivent sur un reveil. */
+  private enHeure(minutes: number): string {
+    const heures = Math.floor(minutes / 60);
+    const reste = minutes % 60;
+    return `${String(heures)} h ${String(reste).padStart(2, '0')}`;
   }
 }

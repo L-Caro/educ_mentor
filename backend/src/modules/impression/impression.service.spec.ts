@@ -9,6 +9,7 @@ import { ConjugaisonService } from '../conjugaison/conjugaison.service';
 import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
+import { HeureService } from '../heure/heure.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -137,6 +138,28 @@ describe('ImpressionService', () => {
         { provide: ConjugaisonService, useValue: conjugaison },
         { provide: AccordsService, useValue: vide() },
         { provide: GrammaireService, useValue: vide() },
+        {
+          provide: HeureService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [
+                  {
+                    hour: 3,
+                    minute: 45,
+                    answer_value: 225,
+                    numeral_type: 'arabic',
+                    choices: [],
+                  },
+                ],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+            }),
+            startSession: jest.fn(),
+          },
+        },
         {
           provide: NumerationService,
           useValue: {
@@ -322,5 +345,38 @@ describe('ImpressionService', () => {
         formes: attendu,
       });
     }
+  });
+
+  it('ne fait JAMAIS passer une duree apres minuit', async () => {
+    // « De 23 h 40 a 0 h 20 » demanderait de compter a rebours sur un cycle qu'elle ne
+    // manipule pas encore. Le tirage doit rester dans la journee, pas seulement le plus
+    // souvent : c'est la borne du generateur qu'on verifie, pas sa chance.
+    const items = await service.composer([
+      { module: 'heure', exercices: ['durees'], nombre: 20 },
+    ]);
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      const [heures] = String(item.donnees.fin).split(' h ');
+      expect(Number(heures)).toBeLessThan(23);
+    }
+  });
+
+  it('ecrit les minutes d’une heure sur DEUX chiffres', async () => {
+    // « 9 h 5 » se lit mal, et ce n'est pas ce qu'affiche un reveil.
+    const items = await service.composer([
+      { module: 'heure', exercices: ['durees'], nombre: 15 },
+    ]);
+    for (const item of items) {
+      expect(String(item.donnees.depart)).toMatch(/^\d{1,2} h \d{2}$/);
+    }
+  });
+
+  it('tire le cadran chez le module, sans generateur parallele', async () => {
+    // Lire l'heure et la dessiner sont le meme savoir pris dans les deux sens : un second
+    // tirage a nous divergerait un jour de celui de l'ecran.
+    const items = await service.composer([
+      { module: 'heure', exercices: ['dessiner'], nombre: 1 },
+    ]);
+    expect(items[0].donnees).toMatchObject({ heure: 3, minute: 45 });
   });
 });

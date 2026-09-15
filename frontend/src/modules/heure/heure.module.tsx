@@ -1,4 +1,5 @@
 import { heureApi } from './heure.api.ts';
+import { heureImpression } from './heure.impression';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 import type { SetupOption } from 'src/types/game.types.ts';
@@ -34,6 +35,7 @@ export const heureModule: ModuleManifest = {
   adminRoutes: [
     { index: true, lazy: () => import('./HeureSettings.tsx').then((module) => ({ Component: module.default })) },
   ],
+  impression: heureImpression,
   progression: buildProgressionEntry({
     getEndpoint: heureApi.endpoints.getHeureProgression,
     resetEndpoint: heureApi.endpoints.resetHeureProgression,

@@ -49,6 +49,16 @@ export type OptionImprimable =
   | {
       cle: string;
       label: string;
+      /** Un seul choix parmi quelques-uns, quand ils s'EXCLUENT : un cadran est en
+       * chiffres arabes ou en chiffres romains, pas les deux a la fois. Une liste a
+       * cocher ne saurait pas dire ce que « les deux » veut dire. */
+      type: 'unique';
+      choix: ChoixImprimable[];
+      defaut: string;
+    }
+  | {
+      cle: string;
+      label: string;
       type: 'nombre';
       min: number;
       max: number;

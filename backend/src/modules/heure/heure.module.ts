@@ -14,5 +14,6 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   controllers: [HeureGameController, HeureAdminController],
   providers: [HeureService],
+  exports: [HeureService],
 })
 export class HeureModule {}

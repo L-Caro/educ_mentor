@@ -1,4 +1,17 @@
 import type { NumeralType } from 'src/modules/heure/heure.type';
+import {
+  ARABIC,
+  CX,
+  CY,
+  FACE_R,
+  NUM_R,
+  ROMAN,
+  TICK_H_IN,
+  TICK_M_IN,
+  TICK_OUT,
+  anglesAiguilles,
+  clockPoint,
+} from 'src/modules/heure/heure.cadran';
 
 interface ClockFaceProps {
   hour: number;     // 0-23
@@ -7,31 +20,10 @@ interface ClockFaceProps {
   mini?: boolean;   // masque le label matin/soir, utilisé dans les choix QCM expression
 }
 
-const ARABIC  = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
-const ROMAN   = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
-
-const CX = 100;
-const CY = 100;
-const FACE_R    = 89;
-const TICK_OUT  = 88;
-const TICK_H_IN = 77;   // tick d'heure (11px)
-const TICK_M_IN = 83;   // tick de minute (5px)
-const NUM_R     = 71;   // rayon des chiffres
-
-/** x/y d'un point à <radius> du centre pour un angle horaire en degrés (0° = 12h). */
-function clockPoint(radius: number, angleDeg: number) {
-  const rad = (angleDeg * Math.PI) / 180;
-  return {
-    x: CX + radius * Math.sin(rad),
-    y: CY - radius * Math.cos(rad),
-  };
-}
-
 export default function ClockFace({ hour, minute, numeralType, mini = false }: ClockFaceProps) {
   const isAM = hour < 12;
 
-  const minuteAngle = minute * 6;
-  const hourAngle   = (hour % 12) * 30 + minute * 0.5;
+  const { heure: hourAngle, minute: minuteAngle } = anglesAiguilles(hour, minute);
 
   const minuteTip  = clockPoint(67, minuteAngle);
   const minuteTail = clockPoint(-12, minuteAngle);

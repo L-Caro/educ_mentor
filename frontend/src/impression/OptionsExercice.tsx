@@ -11,9 +11,10 @@ interface Props {
 /**
  * Les reglages d'un exercice, sous son compteur.
  *
- * Deux formes seulement : une liste a cocher, ou un nombre. C'est assez pour tout ce que
- * les modules demandent (quelles tables, quelles notions, combien de formes), et s'en
- * tenir a deux evite que chaque module invente son propre formulaire.
+ * Trois formes seulement : une liste a cocher, un choix unique, ou un nombre. C'est assez
+ * pour tout ce que les modules demandent (quelles tables, quels chiffres au cadran,
+ * combien de formes), et s'en tenir a trois evite que chaque module invente son propre
+ * formulaire.
  *
  * Rien de coche vaut « pas de filtre » et non « rien » : c'est le comportement des
  * modules, qui tirent librement quand la liste est vide. Une case a cocher qui, decochee,
@@ -47,12 +48,36 @@ export default function OptionsExercice({ options, valeurs, onChange }: Props) {
               style={{ maxWidth: '6rem' }}
             />
           </div>
+        ) : option.type === 'unique' ? (
+          <div key={option.cle}>
+            <p className="GameSettings__hint">{option.label}</p>
+            <div className="GameSettings__denominations">
+              {option.choix.map((c) => (
+                <button
+                  key={c.valeur}
+                  type="button"
+                  className={`GameSettings__denomination${
+                    (valeurs[option.cle] ?? option.defaut) === c.valeur
+                      ? ' GameSettings__denomination--active'
+                      : ''
+                  }`}
+                  onClick={() =>
+                    onChange({ ...valeurs, [option.cle]: c.valeur })
+                  }
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+          </div>
         ) : (
           <ListeACocher
             key={option.cle}
             option={option}
             selection={(valeurs[option.cle] as string[]) ?? []}
-            onChange={(selection) => onChange({ ...valeurs, [option.cle]: selection })}
+            onChange={(selection) =>
+              onChange({ ...valeurs, [option.cle]: selection })
+            }
           />
         ),
       )}
@@ -69,7 +94,9 @@ function ListeACocher({
   selection: string[];
   onChange: (selection: string[]) => void;
 }) {
-  const [choix, setChoix] = useState<ChoixImprimable[] | null>(option.choix ?? null);
+  const [choix, setChoix] = useState<ChoixImprimable[] | null>(
+    option.choix ?? null,
+  );
 
   // Les listes chargees (notions ouvertes, temps actifs) viennent de l'administration :
   // elles ne sont connues qu'au moment ou on ouvre la page. En cas d'echec on affiche une
@@ -101,7 +128,9 @@ function ListeACocher({
             key={c.valeur}
             type="button"
             className={`GameSettings__denomination${
-              selection.includes(c.valeur) ? ' GameSettings__denomination--active' : ''
+              selection.includes(c.valeur)
+                ? ' GameSettings__denomination--active'
+                : ''
             }`}
             onClick={() =>
               onChange(

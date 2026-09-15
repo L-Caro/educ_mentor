@@ -44,7 +44,14 @@ export class HeureService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(dto: StartHeureSessionDto): Promise<HeureSessionResult> {
+  /** Engendrer les questions, et RIEN d'autre : aucune écriture en base.
+   *
+   * Séparé de `startSession` pour la feuille imprimée, qui emprunte le savoir-faire du
+   * module sans emprunter ses effets : le travail sur papier n'est pas mesuré. */
+  async construireQuestions(dto: StartHeureSessionDto): Promise<{
+    resultat: Omit<HeureSessionResult, 'session_id'>;
+    seance: Partial<HeureSession>;
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const isExpression = dto.question_mode === 'expression';
     // Expression mode : toujours 4 choix (la saisie libre n'a pas de sens)
@@ -70,20 +77,27 @@ export class HeureService {
       isExpression,
     );
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      numeral_type: numeralTypeSetting,
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
+      seance: {
+        difficulty,
+        numeral_type: numeralTypeSetting,
+        timer_seconds: timerSeconds,
+      },
+    };
+  }
+
+  async startSession(dto: StartHeureSessionDto): Promise<HeureSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(

@@ -1,0 +1,73 @@
+// ─── Le cadran sur le papier ─────────────────────────────────────────────────
+//
+// Tout est trace au STROKE. Un fond CSS ne s'imprime pas sans cocher « graphiques
+// d'arriere-plan » dans la boite de dialogue, que personne ne coche ; les `fill` et
+// `stroke` d'un SVG, eux, sont du contenu et sortent toujours.
+
+.Cadran {
+  &__svg {
+    display: block;
+    width: 34mm;
+    height: 34mm;
+  }
+
+  // Un cadran ne distingue pas 15 h 20 de 3 h 20 : sans cette mention, le corrige
+  // donnerait tort a une reponse juste.
+  &__moment {
+    margin: 0 0 1mm;
+    width: 34mm;
+    text-align: center;
+    font-size: 8pt;
+  }
+
+  &__face {
+    fill: none;
+    stroke: #000;
+    stroke-width: 2;
+  }
+
+  &__tick {
+    stroke: #000;
+    stroke-width: 0.8;
+    stroke-linecap: round;
+
+    &--heure {
+      stroke-width: 2.5;
+    }
+  }
+
+  &__chiffre {
+    fill: #000;
+    text-anchor: middle;
+    dominant-baseline: central;
+    font-weight: 700;
+  }
+
+  &__aiguille {
+    stroke: #000;
+    stroke-linecap: round;
+
+    // La petite aiguille est plus EPAISSE que la grande, pas plus fine : c'est le seul
+    // indice qui dit laquelle lire en premier quand les deux sont proches.
+    &--heure {
+      stroke-width: 6;
+    }
+
+    &--minute {
+      stroke-width: 3;
+    }
+  }
+
+  &__centre {
+    fill: #000;
+  }
+}
+
+// Le cadran nu et sa case : cote a cote, sinon la feuille se vide de moitie.
+.Heure {
+  &__dessiner {
+    display: flex;
+    align-items: center;
+    gap: 3mm;
+  }
+}
