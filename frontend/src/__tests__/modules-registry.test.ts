@@ -113,4 +113,24 @@ describe('registres de modules', () => {
     const orders = [...source.matchAll(/display_order: (\d+),/g)].map((m) => Number(m[1]));
     expect(orders.filter((o, i) => orders.indexOf(o) !== i)).toEqual([]);
   });
+
+  it('lit les choix du PRE-JEU dans le store, jamais dans l’adresse', () => {
+    // `ModulePreSetup` range les choix dans `gameSetup` puis navigue vers une route sans
+    // le moindre parametre. Un module qui les cherche dans l'URL recoit donc toujours ses
+    // valeurs par defaut, et rien ne le signale : le jeu se lance normalement, avec le
+    // mauvais decor et la mauvaise taille. C'est arrive au module de programmation, ou
+    // l'on jouait au lapin sur une grille de six quel que soit le choix.
+    const fautifs: string[] = [];
+    for (const { folder } of declaredModules()) {
+      const dossier = join(MODULES_DIR, folder);
+      for (const fichier of readdirSync(dossier)) {
+        if (!fichier.endsWith('.tsx')) continue;
+        const source = readFileSync(join(dossier, fichier), 'utf-8');
+        if (source.includes('useSearchParams')) {
+          fautifs.push(`${folder}/${fichier}`);
+        }
+      }
+    }
+    expect(fautifs).toEqual([]);
+  });
 });

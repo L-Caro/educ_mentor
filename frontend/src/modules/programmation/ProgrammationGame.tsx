@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useAppSelector } from 'src/hooks';
+import { selectModuleSetup } from 'src/store/slice/gameSetupSlice';
 import Button from 'src/components/common/Button';
 import Grille from './components/Grille';
 import Palette from './components/Palette';
@@ -27,6 +28,8 @@ import './programmation.scss';
  * programme derape est tout l'interet de le rejouer, et a cent millisecondes on ne voit
  * qu'un resultat. */
 const DUREE_PAS = 420;
+
+const MODULE_ID = 'programmation';
 
 /** Retire une instruction, ou qu'elle soit. */
 function sansInstruction(liste: Instruction[], id: string): Instruction[] {
@@ -93,10 +96,16 @@ function avecFois(liste: Instruction[], id: string, fois: number): Instruction[]
  * maitrise. Ce qui se retient, c'est jusqu'ou elle est allee.
  */
 export default function ProgrammationGame() {
-  const [params] = useSearchParams();
-  const parcours = (params.get('parcours') ?? 'enfant') as Parcours;
-  const cote = Number(params.get('grille') ?? '6');
-  const decor = theme(params.get('theme') ?? 'lapin');
+  // Les choix du pre-jeu viennent du STORE, pas de l'adresse. `ModulePreSetup` les
+  // range dans `gameSetup` puis navigue vers une route sans parametre : les lire dans
+  // l'URL renvoyait donc toujours les valeurs par defaut, et l'on jouait au lapin sur une
+  // grille de six quel que soit le theme et la taille choisis. Rien ne le signalait : le
+  // jeu se lancait normalement, avec le mauvais decor.
+  const setup = useAppSelector(selectModuleSetup(MODULE_ID)) ?? {};
+  const parcours = ((setup['parcours'] as string | undefined) ??
+    'enfant') as Parcours;
+  const cote = Number((setup['grille'] as string | undefined) ?? '6');
+  const decor = theme((setup['theme'] as string | undefined) ?? 'lapin');
 
   const { data: etats } = useGetProgrammationEtatQuery();
   const [enregistrer] = useEnregistrerReussiteMutation();
