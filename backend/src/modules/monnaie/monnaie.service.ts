@@ -53,9 +53,17 @@ export class MonnaieService {
 
   // ─── Session ──────────────────────────────────────────────────────────────
 
-  async startSession(
-    dto: StartMonnaieSessionDto,
-  ): Promise<MonnaieSessionResult> {
+  /** Engendrer les questions, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `startSession` pour la feuille imprimee, qui emprunte le savoir-faire du
+   * module sans emprunter ses effets : le travail sur papier n'est pas mesure. */
+  async construireQuestions(dto: StartMonnaieSessionDto): Promise<{
+    resultat: Omit<MonnaieSessionResult, 'session_id'>;
+    seance: Partial<MonnaieSession>;
+    /** Les valeurs OUVERTES par l'administration. La feuille en a besoin pour dessiner
+     * les pieces a entourer : elle ne doit pas en proposer une que le jeu n'ouvre pas. */
+    denominations: number[];
+  }> {
     const exerciseType: ExerciseType = VALID_EXERCISE_TYPES.includes(
       dto.exercise_type as ExerciseType,
     )
@@ -115,19 +123,22 @@ export class MonnaieService {
       choicesCount,
     );
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      exercise_type: exerciseType,
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: { questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited },
+      seance: { exercise_type: exerciseType, timer_seconds: timerSeconds },
+      denominations: activeDenominations,
+    };
+  }
+
+  async startSession(
+    dto: StartMonnaieSessionDto,
+  ): Promise<MonnaieSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(

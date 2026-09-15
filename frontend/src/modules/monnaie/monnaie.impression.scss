@@ -1,0 +1,39 @@
+// ─── Pieces et billets au trait ──────────────────────────────────────────────
+//
+// Une BORDURE, jamais un fond : Chrome n'imprime pas les arriere-plans sans que l'adulte
+// coche « graphiques d'arriere-plan », et personne ne le coche.
+
+.Piece {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0.4mm solid #000;
+  border-radius: 50%;
+  margin: 0 1mm 1mm 0;
+  vertical-align: middle;
+
+  &--billet {
+    width: 22mm;
+    height: 12mm;
+    border-radius: 1mm;
+    // Le billet a un cadre double, comme les vrais : c'est ce qui le distingue d'un rond
+    // ecrase quand on le regarde vite.
+    outline: 0.2mm solid #000;
+    outline-offset: -1.2mm;
+  }
+
+  &__valeur {
+    font-size: 7pt;
+    font-weight: 700;
+    line-height: 1;
+  }
+}
+
+.Monnaie {
+  &__palette {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 1mm;
+  }
+}

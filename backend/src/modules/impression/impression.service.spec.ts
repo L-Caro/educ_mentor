@@ -10,6 +10,7 @@ import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
 import { HeureService } from '../heure/heure.service';
+import { MonnaieService } from '../monnaie/monnaie.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -156,6 +157,23 @@ describe('ImpressionService', () => {
                 is_unlimited: false,
               },
               seance: {},
+            }),
+            startSession: jest.fn(),
+          },
+        },
+        {
+          provide: MonnaieService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [
+                  { type: 'rendre', price: 340, payment: 500, answer: 160, choices: [] },
+                ],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+              denominations: [10, 20, 50, 100, 200],
             }),
             startSession: jest.fn(),
           },
@@ -378,5 +396,41 @@ describe('ImpressionService', () => {
       { module: 'heure', exercices: ['dessiner'], nombre: 1 },
     ]);
     expect(items[0].donnees).toMatchObject({ heure: 3, minute: 45 });
+  });
+
+  it('ne propose a entourer QUE des pieces ouvertes par l’administration', async () => {
+    // Faire entourer un billet de cinquante alors que le jeu s'arrete a dix
+    // contournerait le seul reglage qui decide de ce que l'enfant voit, exactement comme
+    // le ferait le peage.
+    const ouvertes = [10, 20, 50, 100, 200];
+    const items = await service.composer([
+      { module: 'monnaie', exercices: ['entourer'], nombre: 8 },
+    ]);
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      for (const piece of item.donnees.palette as number[]) {
+        expect(ouvertes).toContain(piece);
+      }
+    }
+  });
+
+  it('batit la cible A PARTIR des pieces, pour qu’elle soit toujours atteignable', async () => {
+    // Un montant tire au hasard puis decompose peut n'etre atteint par aucun
+    // sous-ensemble de la palette : l'exercice serait insoluble sans que rien ne le dise.
+    const items = await service.composer([
+      { module: 'monnaie', exercices: ['entourer'], nombre: 8 },
+    ]);
+    for (const item of items) {
+      const solution = item.donnees.solution as number[];
+      const somme = solution.reduce((a, b) => a + b, 0);
+      expect(somme).toBe(item.donnees.cible);
+      // Chaque piece de la solution doit exister dans la palette a entourer.
+      const reste = [...(item.donnees.palette as number[])];
+      for (const piece of solution) {
+        const ou = reste.indexOf(piece);
+        expect(ou).toBeGreaterThanOrEqual(0);
+        reste.splice(ou, 1);
+      }
+    }
   });
 });

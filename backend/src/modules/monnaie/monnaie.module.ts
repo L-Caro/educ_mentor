@@ -14,5 +14,6 @@ import { SettingsModule } from '../settings/settings.module';
   ],
   controllers: [MonnaieGameController, MonnaieAdminController],
   providers: [MonnaieService],
+  exports: [MonnaieService],
 })
 export class MonnaieModule {}

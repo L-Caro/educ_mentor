@@ -1,3 +1,4 @@
+import { monnaieImpression } from './monnaie.impression';
 import { monnaieApi } from './monnaie.api.ts';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
@@ -9,9 +10,24 @@ const MONNAIE_SETUP_OPTIONS: SetupOption[] = [
     type: 'single',
     label: 'Quel exercice veux-tu faire ?',
     choices: [
-      { value: 'reconnaitre', icon: '👀', label: 'Reconnaître', description: 'Compte les pièces et les billets' },
-      { value: 'total', icon: '🛒', label: "Total d'achat", description: 'Calcule le prix de tous les articles' },
-      { value: 'rendre', icon: '💸', label: 'Rendre la monnaie', description: "Calcule ce qu'on te rend" },
+      {
+        value: 'reconnaitre',
+        icon: '👀',
+        label: 'Reconnaître',
+        description: 'Compte les pièces et les billets',
+      },
+      {
+        value: 'total',
+        icon: '🛒',
+        label: "Total d'achat",
+        description: 'Calcule le prix de tous les articles',
+      },
+      {
+        value: 'rendre',
+        icon: '💸',
+        label: 'Rendre la monnaie',
+        description: "Calcule ce qu'on te rend",
+      },
     ],
   },
 ];
@@ -20,11 +36,19 @@ export const monnaieModule: ModuleManifest = {
   id: 'monnaie',
   category: 'maths',
   setupOptions: MONNAIE_SETUP_OPTIONS,
-  loadGameSpec: () => import('./monnaie.game.tsx').then((module) => module.monnaieGameSpec),
+  loadGameSpec: () =>
+    import('./monnaie.game.tsx').then((module) => module.monnaieGameSpec),
   adminTabs: [{ to: '/admin/monnaie', label: 'Paramètres', end: true }],
   adminRoutes: [
-    { index: true, lazy: () => import('./MonnaieSettings.tsx').then((module) => ({ Component: module.default })) },
+    {
+      index: true,
+      lazy: () =>
+        import('./MonnaieSettings.tsx').then((module) => ({
+          Component: module.default,
+        })),
+    },
   ],
+  impression: monnaieImpression,
   progression: buildProgressionEntry({
     getEndpoint: monnaieApi.endpoints.getMonnaieProgression,
     resetEndpoint: monnaieApi.endpoints.resetMonnaieProgression,

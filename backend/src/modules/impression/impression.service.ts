@@ -9,6 +9,7 @@ import { AccordsService } from '../accords/accords.service';
 import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
 import { HeureService } from '../heure/heure.service';
+import { MonnaieService } from '../monnaie/monnaie.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { maximum } from '../numeration/numeration.positions';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
@@ -43,6 +44,7 @@ export class ImpressionService {
     private readonly grammaireService: GrammaireService,
     private readonly numerationService: NumerationService,
     private readonly heureService: HeureService,
+    private readonly monnaieService: MonnaieService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -140,6 +142,12 @@ export class ImpressionService {
         return this.heureCadran(ligne);
       case 'heure/durees':
         return this.heureDurees(ligne);
+      case 'monnaie/reconnaitre':
+      case 'monnaie/total':
+      case 'monnaie/rendre':
+        return this.monnaieQuestion(ligne);
+      case 'monnaie/entourer':
+        return this.monnaieEntourer(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -956,5 +964,97 @@ export class ImpressionService {
     const heures = Math.floor(minutes / 60);
     const reste = minutes % 60;
     return `${String(heures)} h ${String(reste).padStart(2, '0')}`;
+  }
+
+  /**
+   * Les trois exercices du jeu, tels quels : compter des pieces, additionner des prix,
+   * rendre la monnaie.
+   *
+   * Le type demande est passe au module, qui ne sait engendrer qu'une sorte a la fois :
+   * contrairement aux tables, ces trois-la ne sortent pas du meme vivier. Compter ce
+   * qu'on a en main, faire un total et calculer un reste sont trois calculs differents.
+   */
+  private async monnaieQuestion(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const type = ligne.exercices[0];
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { answer: number; coins?: number[]; prices?: number[]; price?: number }) =>
+        `${String(q.answer)}:${(q.coins ?? q.prices ?? [q.price ?? 0]).join(',')}`,
+      async () =>
+        (
+          await this.monnaieService.construireQuestions({
+            exercise_type: type,
+            difficulty: 'hard',
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: type,
+      donnees: {
+        pieces: q.coins,
+        prix: type === 'rendre' ? q.price : q.prices,
+        paye: q.payment,
+        reponse: q.answer,
+      },
+    }));
+  }
+
+  /**
+   * Entourer les pieces qui font le compte. N'existe que sur le papier.
+   *
+   * A l'ecran on tape un nombre, et la question devient un calcul ; sur la feuille, elle
+   * redevient ce qu'elle est au magasin : choisir dans ce qu'on a. C'est la meme raison
+   * qui fait exister « dessine les aiguilles ».
+   *
+   * La palette ne contient que des valeurs OUVERTES par l'administration : proposer
+   * d'entourer un billet de cinquante alors que le jeu s'arrete a dix contournerait le
+   * seul reglage qui decide de ce que l'enfant voit.
+   */
+  private async monnaieEntourer(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const { denominations } = await this.monnaieService.construireQuestions({
+      exercise_type: 'reconnaitre',
+      difficulty: 'hard',
+    });
+    if (denominations.length === 0) return [];
+
+    const items: ItemImprime[] = [];
+    const vus = new Set<number>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      // La cible est BATIE a partir des pieces, jamais tiree puis decomposee : un montant
+      // pris au hasard peut n'etre atteignable par aucun sous-ensemble de la palette, et
+      // l'exercice serait alors insoluble sans que rien ne le signale.
+      const solution: number[] = [];
+      const combien = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < combien; i++) {
+        solution.push(
+          denominations[Math.floor(Math.random() * denominations.length)],
+        );
+      }
+      const cible = solution.reduce((somme, piece) => somme + piece, 0);
+      if (vus.has(cible)) continue;
+      vus.add(cible);
+
+      // Les intrus sont melanges a la solution : une palette ou les bonnes pieces sont
+      // groupees se resout sans compter.
+      const palette = [...solution];
+      for (const valeur of denominations) {
+        if (valeur <= cible) palette.push(valeur);
+      }
+      palette.sort(() => Math.random() - 0.5);
+
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: { cible, palette, solution: [...solution].sort((a, b) => b - a) },
+      });
+    }
+    return items;
   }
 }
