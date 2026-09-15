@@ -1,5 +1,6 @@
 import store from 'src/store';
 import { conjugaisonApi } from './conjugaison.api.ts';
+import { conjugaisonImpression } from './conjugaison.impression';
 import type { ModuleManifest } from 'src/types/modules.types.ts';
 import type { SetupChoice, SetupOption } from 'src/types/game.types.ts';
 import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
@@ -78,4 +79,5 @@ export const conjugaisonModule: ModuleManifest = {
     getEndpoint: conjugaisonApi.endpoints.getConjugaisonProgression,
     resetEndpoint: conjugaisonApi.endpoints.resetConjugaisonProgression,
   }),
+  impression: conjugaisonImpression,
 };

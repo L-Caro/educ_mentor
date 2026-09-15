@@ -1,0 +1,11 @@
+// La phrase imprimee. Le mot vise est souligne : la consigne parle du « mot souligne »,
+// sans le trait elle ne designe rien.
+.PhraseImprimee {
+  font-size: 4mm;
+  line-height: 6mm;
+
+  &__cible {
+    text-decoration: underline;
+    text-underline-offset: 1mm;
+  }
+}

@@ -107,6 +107,24 @@ $encre: #1a1a1a;
   border-bottom: 0.3mm solid currentColor;
 }
 
+// Le petit tableau d'une conjugaison. Compact : a six lignes il occupe deja un quart de
+// colonne, et c'est la limite que Lionel a posee.
+.Conjugaison {
+  border-collapse: collapse;
+  font-size: 4mm;
+
+  td {
+    padding: 0.8mm 0;
+    vertical-align: bottom;
+  }
+
+  &__pronom {
+    padding-right: 2mm;
+    text-align: right;
+    white-space: nowrap;
+  }
+}
+
 // ─── Les trames ───────────────────────────────────────────────────────────────
 //
 // Des BORDURES et non des fonds : Chrome n'imprime pas les fonds tant que « Graphiques

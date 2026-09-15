@@ -3,6 +3,10 @@ import { TablesService } from '../tables/tables.service';
 import { CalculService } from '../calcul/calcul.service';
 import { PoseService } from '../pose/pose.service';
 import { DicteeService } from '../dictee/dictee.service';
+import { ConjugaisonService } from '../conjugaison/conjugaison.service';
+import { PRONOMS, type Pronom } from '../conjugaison/conjugaison.temps';
+import { AccordsService } from '../accords/accords.service';
+import { GrammaireService } from '../grammaire/grammaire.service';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
 import {
   MAXIMUM_ITEMS,
@@ -30,6 +34,9 @@ export class ImpressionService {
     private readonly calculService: CalculService,
     private readonly poseService: PoseService,
     private readonly dicteeService: DicteeService,
+    private readonly conjugaisonService: ConjugaisonService,
+    private readonly accordsService: AccordsService,
+    private readonly grammaireService: GrammaireService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -57,6 +64,12 @@ export class ImpressionService {
         return this.poseOperation(ligne);
       case 'dictee/dictee':
         return this.dicteeMots(ligne);
+      case 'conjugaison/forme':
+        return this.conjugaisonForme(ligne);
+      case 'accords/accord':
+        return this.accordsAccord(ligne);
+      case 'grammaire/analyse':
+        return this.grammaireAnalyse(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercice}`,
@@ -204,5 +217,130 @@ export class ImpressionService {
         },
       },
     ];
+  }
+
+  /**
+   * Les pronoms qu'on demande quand on n'en demande pas six.
+   *
+   * L'ordre n'est pas celui du tableau mais celui de l'UTILITE : `je` porte la premiere
+   * personne, `nous` la terminaison la plus irreguliere, `ils` celle qu'on oublie. Une
+   * conjugaison a trois formes dans cet ordre fait travailler l'essentiel ; les trois
+   * premieres du tableau (je, tu, il) se ressemblent trop pour apprendre quoi que ce soit.
+   */
+  private static readonly PRONOMS_UTILES: Pronom[] = [
+    'je',
+    'nous',
+    'ils',
+    'tu',
+    'il',
+    'vous',
+  ];
+
+  private async conjugaisonForme(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const formes = Math.min(
+      6,
+      Math.max(1, Number(ligne.options?.formes ?? 1) || 1),
+    );
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { infinitif: string; tense: string }) => `${q.infinitif}|${q.tense}`,
+      async () =>
+        (
+          await this.conjugaisonService.construireQuestions({
+            difficulty: 'hard',
+            question_direction: 'forward',
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => {
+      // On garde l'ordre du tableau pour l'affichage, meme quand la selection suit
+      // l'ordre d'utilite : une conjugaison qui commence par `nous` se lit mal.
+      const choisis = ImpressionService.PRONOMS_UTILES.slice(0, formes);
+      const ordonnes = PRONOMS.filter((p) => choisis.includes(p));
+      return {
+        module: ligne.module,
+        exercice: ligne.exercice,
+        donnees: {
+          infinitif: q.infinitif,
+          temps: q.tense,
+          lignes: ordonnes.map((pronom) => ({
+            pronom,
+            reponse: q.forms[pronom],
+          })),
+        },
+      };
+    });
+  }
+
+  private async accordsAccord(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const types = Array.isArray(ligne.options?.types)
+      ? (ligne.options.types as string[])
+      : undefined;
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.accordsService.construireQuestions({
+            difficulty: 'hard',
+            question_types: types as never,
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercice,
+      donnees: {
+        consigne: q.display,
+        depart: q.depart,
+        avant: q.avant,
+        apres: q.apres,
+        indice: q.indice,
+        reponse: q.answer,
+      },
+    }));
+  }
+
+  /**
+   * La grammaire est le module qui gagne le plus au papier.
+   *
+   * Ses questions de selection - « touche les verbes » - deviennent « souligne les
+   * verbes », qui est l'exercice scolaire d'origine et se fait mieux au crayon. On
+   * transmet donc la phrase entiere et les indices attendus, sans distinguer le type :
+   * c'est la consigne du module qui dit quoi faire, et elle est deja redigee.
+   */
+  private async grammaireAnalyse(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const types = Array.isArray(ligne.options?.types)
+      ? (ligne.options.types as string[])
+      : undefined;
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.grammaireService.construireQuestions({
+            difficulty: 'hard',
+            question_types: types as never,
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercice,
+      donnees: {
+        consigne: q.display,
+        mots: q.mots,
+        cible: q.cible,
+        reponse: q.answer,
+        indices: q.answer_indices,
+      },
+    }));
   }
 }

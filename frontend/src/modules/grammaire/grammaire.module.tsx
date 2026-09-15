@@ -1,3 +1,4 @@
+import { grammaireImpression } from './grammaire.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import { grammaireApi } from './grammaire.api';
 import { GRAMMAIRE_SETUP_OPTIONS } from './grammaire.setup';
@@ -23,4 +24,5 @@ export const grammaireModule: ModuleManifest = {
     getEndpoint: grammaireApi.endpoints.getGrammaireProgression,
     resetEndpoint: grammaireApi.endpoints.resetGrammaireProgression,
   }),
+  impression: grammaireImpression,
 };

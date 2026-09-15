@@ -5,6 +5,9 @@ import { TablesService } from '../tables/tables.service';
 import { CalculService } from '../calcul/calcul.service';
 import { PoseService } from '../pose/pose.service';
 import { DicteeService } from '../dictee/dictee.service';
+import { ConjugaisonService } from '../conjugaison/conjugaison.service';
+import { AccordsService } from '../accords/accords.service';
+import { GrammaireService } from '../grammaire/grammaire.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -83,6 +86,46 @@ describe('ImpressionService', () => {
       startSession: jest.fn(),
     };
 
+    const conjugaison = {
+      construireQuestions: jest.fn().mockResolvedValue({
+        resultat: {
+          questions: [
+            {
+              infinitif: 'chanter',
+              tense: 'présent',
+              pronoun: 'je',
+              conjugated: 'chante',
+              groupe: '1',
+              direction: 'forward',
+              choices: [],
+              forms: {
+                je: 'chante',
+                tu: 'chantes',
+                il: 'chante',
+                elle: 'chante',
+                on: 'chante',
+                nous: 'chantons',
+                vous: 'chantez',
+                ils: 'chantent',
+                elles: 'chantent',
+              },
+            },
+          ],
+          timer_seconds: 0,
+          is_unlimited: false,
+        },
+        seance: {},
+      }),
+      startSession: jest.fn(),
+    };
+    const vide = () => ({
+      construireQuestions: jest.fn().mockResolvedValue({
+        resultat: { questions: [], timer_seconds: 0, is_unlimited: false },
+        seance: {},
+      }),
+      startSession: jest.fn(),
+    });
+
     const moduleRef = await Test.createTestingModule({
       providers: [
         ImpressionService,
@@ -90,6 +133,9 @@ describe('ImpressionService', () => {
         { provide: CalculService, useValue: calcul },
         { provide: PoseService, useValue: pose },
         { provide: DicteeService, useValue: dictee },
+        { provide: ConjugaisonService, useValue: conjugaison },
+        { provide: AccordsService, useValue: vide() },
+        { provide: GrammaireService, useValue: vide() },
       ],
     }).compile();
     service = moduleRef.get(ImpressionService);
@@ -202,5 +248,63 @@ describe('ImpressionService', () => {
     ]);
     expect(items[0].donnees).not.toHaveProperty('retenues');
     expect(items[0].donnees.operandes).toEqual([247, 138]);
+  });
+
+  it('sort les pronoms les plus INSTRUCTIFS quand on en demande moins de six', async () => {
+    // `je`, `tu` et `il` se ressemblent trop pour apprendre quoi que ce soit. A trois
+    // formes, on veut `je`, `nous` et `ils` : la premiere personne, la terminaison la
+    // plus irreguliere, et celle qu'on oublie.
+    const items = await service.composer([
+      {
+        module: 'conjugaison',
+        exercice: 'forme',
+        nombre: 1,
+        options: { formes: 3 },
+      },
+    ]);
+    const lignes = items[0].donnees.lignes as { pronom: string }[];
+    expect(lignes.map((l) => l.pronom)).toEqual(['je', 'nous', 'ils']);
+  });
+
+  it('garde l’ordre du TABLEAU pour l’affichage, pas l’ordre d’utilite', async () => {
+    // Une conjugaison qui commencerait par `nous` se lit mal.
+    const items = await service.composer([
+      {
+        module: 'conjugaison',
+        exercice: 'forme',
+        nombre: 1,
+        options: { formes: 6 },
+      },
+    ]);
+    const lignes = items[0].donnees.lignes as { pronom: string }[];
+    expect(lignes.map((l) => l.pronom)).toEqual([
+      'je',
+      'tu',
+      'il',
+      'nous',
+      'vous',
+      'ils',
+    ]);
+  });
+
+  it('borne le nombre de formes entre une et six', async () => {
+    for (const [demande, attendu] of [
+      [0, 1],
+      [9, 6],
+    ] as const) {
+      const items = await service.composer([
+        {
+          module: 'conjugaison',
+          exercice: 'forme',
+          nombre: 1,
+          options: { formes: demande },
+        },
+      ]);
+      const lignes = items[0].donnees.lignes as unknown[];
+      expect({ demande, formes: lignes.length }).toEqual({
+        demande,
+        formes: attendu,
+      });
+    }
   });
 });

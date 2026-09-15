@@ -1,3 +1,4 @@
+import { accordsImpression } from './accords.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import { accordsApi } from './accords.api';
 import { ACCORDS_SETUP_OPTIONS } from './accords.setup';
@@ -23,4 +24,5 @@ export const accordsModule: ModuleManifest = {
     getEndpoint: accordsApi.endpoints.getAccordsProgression,
     resetEndpoint: accordsApi.endpoints.resetAccordsProgression,
   }),
+  impression: accordsImpression,
 };
