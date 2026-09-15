@@ -289,8 +289,16 @@ function tracerMotif(
   longueur: number,
 ): { chemin: Case[]; directions: Direction[] } | null {
   for (let essai = 0; essai < 40; essai++) {
-    const cote = 2 + Math.floor(Math.random() * 3);
-    const tours = Math.max(2, Math.round(longueur / cote));
+    // Au plus QUATRE segments : au cinquieme, un motif qui tourne toujours du meme cote
+    // revient sur son point de depart et se recoupe. C'est ce qui faisait echouer l'etape
+    // du motif des que la grille grandissait, la longueur demandee augmentant avec elle :
+    // on cherchait neuf tours la ou un carre n'en a que quatre. La longueur se gagne donc
+    // sur le COTE du motif, pas sur le nombre de tours.
+    const tours = 2 + Math.floor(Math.random() * 3);
+    const cote = Math.max(
+      2,
+      Math.min(colonnes - 1, Math.round(longueur / tours)),
+    );
     const sens = Math.random() < 0.5 ? 'droite' : 'gauche';
     let direction = TOUTES[Math.floor(Math.random() * TOUTES.length)];
 
@@ -437,12 +445,17 @@ export function engendrerNiveau(
     // calcul, l'etape trois ne produisait aucun niveau en cinq sur cinq, et l'enfant y
     // restait bloquee sans autre explication qu'un message lui demandant d'agrandir la
     // grille : une facon de dire que le jeu ne sait pas faire ce qu'il propose.
+    // Les longueurs des etapes sont donnees pour une grille de huit : sur vingt, le meme
+    // chemin de dix pas laisserait le but a un coin d'un terrain quatre fois plus grand,
+    // et les trois quarts de la grille ne serviraient a rien. Elles suivent donc la
+    // taille.
+    const echelle = cote / 8;
     const tenable = Math.max(
       2,
       Math.min(cote * cote - 1, (etape.virages + 1) * (cote - 1)),
     );
-    const bas = Math.min(etape.pas[0], tenable);
-    const haut = Math.min(etape.pas[1], tenable);
+    const bas = Math.min(Math.round(etape.pas[0] * echelle), tenable);
+    const haut = Math.min(Math.round(etape.pas[1] * echelle), tenable);
     const longueur = bas + Math.floor(Math.random() * (haut - bas + 1));
     const trace = etape.motif
       ? tracerMotif(cote, cote, depart, longueur)
@@ -462,12 +475,15 @@ export function engendrerNiveau(
         if (!surLeChemin({ x, y })) libres.push({ x, y });
       }
     }
-    const murs = melanger(libres).slice(0, etape.murs);
+    const murs = melanger(libres).slice(0, Math.round(etape.murs * echelle));
 
     // Les graines se posent SUR le chemin, jamais sur le but : ramasser et arriver au
     // meme instant demande de comprendre deux choses a la fois.
     const interieur = chemin.slice(1, -1);
-    const graines = melanger(interieur).slice(0, etape.graines);
+    const graines = melanger(interieur).slice(
+      0,
+      Math.round(etape.graines * echelle),
+    );
 
     const directionDepart: Direction =
       parcours === 'robot' ? directions[0] : 'est';

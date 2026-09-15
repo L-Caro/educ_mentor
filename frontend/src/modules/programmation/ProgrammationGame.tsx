@@ -13,7 +13,7 @@ import {
 } from './programmation.interprete';
 import { ETAPES, bloc, engendrerNiveau } from './programmation.niveaux';
 import { useEnregistrerReussiteMutation, useGetProgrammationEtatQuery } from './programmation.api';
-import { theme } from './themes';
+import { but as trouverBut, personnage, sol as trouverSol } from './themes';
 import {
   BLOCS_A_CORPS,
   type Etat,
@@ -105,7 +105,9 @@ export default function ProgrammationGame() {
   const parcours = ((setup['parcours'] as string | undefined) ??
     'enfant') as Parcours;
   const cote = Number((setup['grille'] as string | undefined) ?? '6');
-  const decor = theme((setup['theme'] as string | undefined) ?? 'lapin');
+  const perso = personnage((setup['personnage'] as string | undefined) ?? 'lapin');
+  const objectif = trouverBut((setup['but'] as string | undefined) ?? 'carotte');
+  const terrain = trouverSol((setup['sol'] as string | undefined) ?? 'pre');
 
   const { data: etats } = useGetProgrammationEtatQuery();
   const [enregistrer] = useEnregistrerReussiteMutation();
@@ -257,7 +259,13 @@ export default function ProgrammationGame() {
       </div>
 
       <div className="Prog__jeu">
-        <Grille niveau={niveau} etat={etat} theme={decor} />
+        <Grille
+          niveau={niveau}
+          etat={etat}
+          perso={perso}
+          cible={objectif}
+          terrain={terrain}
+        />
 
         <div className="Prog__cote">
           <Palette blocs={niveau.blocs} surAjout={ajouter} bloque={joue} />
@@ -345,7 +353,7 @@ export default function ProgrammationGame() {
 
           {issue === 'gagne' && (
             <div className="Prog__issue Prog__issue--gagne">
-              <p>Gagné ! Tu as atteint {decor.nomBut}.</p>
+              <p>Gagné ! Tu as atteint {objectif.nom}.</p>
               <div className="Prog__actions">
                 {/* L'etape suivante ne s'ouvre qu'apres le nombre de reussites voulu.
                     Passer des le premier niveau faisait traverser tout le module en dix
@@ -383,7 +391,7 @@ export default function ProgrammationGame() {
                       ? 'Le programme tourne sans fin.'
                       : etat.graines.length > 0
                         ? 'Il reste des choses à ramasser.'
-                        : `Il n’est pas arrivé jusqu’à ${decor.nomBut}.`}
+                        : `Il n’est pas arrivé jusqu’à ${objectif.nom}.`}
               </p>
               <p className="Prog__astuce">
                 Regarde où il s’est arrêté, puis corrige ton programme.

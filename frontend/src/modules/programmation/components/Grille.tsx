@@ -1,4 +1,4 @@
-import { SOL_VILLAGE, type Theme } from '../themes';
+import { ANGLE, type But, type Personnage, type Sol } from '../themes';
 import { memeCase } from '../programmation.interprete';
 import type { Case, Etat, Niveau } from '../programmation.types';
 
@@ -13,11 +13,15 @@ import type { Case, Etat, Niveau } from '../programmation.types';
 export default function Grille({
   niveau,
   etat,
-  theme,
+  perso,
+  cible,
+  terrain,
 }: {
   niveau: Niveau;
   etat: Etat;
-  theme: Theme;
+  perso: Personnage;
+  cible: But;
+  terrain: Sol;
 }) {
   const cases: { c: Case; mur: boolean; pair: boolean }[] = [];
   for (let y = 0; y < niveau.lignes; y++) {
@@ -29,8 +33,6 @@ export default function Grille({
       });
     }
   }
-
-  const classeDessin = `Prog__dessin${theme.pixels ? ' Prog__dessin--pixels' : ''}`;
 
   const pourcent = (valeur: number, total: number) =>
     `${String((valeur * 100) / total)}%`;
@@ -47,31 +49,28 @@ export default function Grille({
         <div
           key={`${String(c.x)}-${String(c.y)}`}
           className="Prog__case"
-          style={
-            theme.pixels
-              ? {
-                  // Deux tuiles d'herbe en damier : un aplat de vert donne un terrain de
-                  // sport, pas un pre. La variation suffit a faire un sol.
-                  backgroundImage: `url(${pair ? SOL_VILLAGE.pair : SOL_VILLAGE.impair})`,
-                  backgroundSize: '100% 100%',
-                  imageRendering: 'pixelated',
-                }
-              : { background: pair ? theme.sol : theme.solAlterne }
-          }
+          style={{ background: pair ? terrain.fond : terrain.fondAlterne }}
         >
+          {/* Le motif du sol, seme une case sur deux : sur toutes, il ferait un tapis
+              charge qui concurrence ce qu'on doit y voir. */}
+          {pair && !mur && (
+            <svg viewBox="0 0 100 100" className="Prog__dessin Prog__motif">
+              {terrain.motif}
+            </svg>
+          )}
           {mur && (
-            <svg viewBox="0 0 100 100" className={classeDessin}>
-              {theme.mur}
+            <svg viewBox="0 0 100 100" className="Prog__dessin">
+              {terrain.obstacle}
             </svg>
           )}
           {memeCase(c, niveau.but) && (
-            <svg viewBox="0 0 100 100" className={`${classeDessin} Prog__but`}>
-              {theme.but}
+            <svg viewBox="0 0 100 100" className="Prog__dessin Prog__but">
+              {cible.trace}
             </svg>
           )}
           {etat.graines.some((graine) => memeCase(graine, c)) && (
-            <svg viewBox="0 0 100 100" className={`${classeDessin} Prog__graine`}>
-              {theme.graine}
+            <svg viewBox="0 0 100 100" className="Prog__dessin Prog__graine">
+              {terrain.graine}
             </svg>
           )}
         </div>
@@ -79,7 +78,7 @@ export default function Grille({
 
       <svg
         viewBox="0 0 100 100"
-        className={`Prog__personnage${theme.pixels ? ' Prog__personnage--pixels' : ''}`}
+        className="Prog__personnage"
         style={{
           width: pourcent(1, niveau.colonnes),
           height: pourcent(1, niveau.lignes),
@@ -88,9 +87,19 @@ export default function Grille({
         }}
         aria-label="personnage"
       >
-        {/* Le theme rend le personnage DEJA oriente : un trace se contente d'un
-            pivotement, un sprite de trois quarts a quatre dessins. */}
-        {theme.personnage(etat.direction)}
+        {/* Tous les traces regardent vers l'est : une rotation suffit a les orienter, et
+            c'est le personnage LUI-MEME qui tourne. Un repere pose a cote finirait par
+            contredire le dessin, ce qui est fatal dans un jeu dont le sujet est la
+            direction. */}
+        <g
+          style={{
+            transform: `rotate(${String(ANGLE[etat.direction])}deg)`,
+            transformOrigin: '50% 50%',
+            transition: 'transform 0.25s ease',
+          }}
+        >
+          {perso.trace}
+        </g>
       </svg>
     </div>
   );

@@ -49,7 +49,10 @@
     position: relative;
     display: grid;
     width: 100%;
-    max-width: 34rem;
+    // Le plateau prend toute la place offerte. A vingt cases de cote, une largeur de
+    // trente-quatre rem donnait des cases de dix-sept pixels : le personnage y devenait
+    // une tache, et l'on ne distinguait plus un cactus d'un rocher.
+    max-width: min(92vw, 48rem);
     margin: 0 auto;
     border: 3px solid var(--color-base-content);
     border-radius: v.$border-radius-2;

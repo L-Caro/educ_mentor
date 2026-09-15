@@ -1,94 +1,98 @@
 import type { ReactNode } from 'react';
-import herbeUrl from './assets/village/herbe.png';
-import herbeDeuxUrl from './assets/village/herbe-2.png';
-import arbreUrl from './assets/village/arbre.png';
-import champignonUrl from './assets/village/champignon.png';
-import cibleUrl from './assets/village/cible.png';
-import lapinKUrl from './assets/animaux/lapin.png';
-import pandaUrl from './assets/animaux/panda.png';
-import persoNordUrl from './assets/village/perso-nord.png';
-import persoEstUrl from './assets/village/perso-est.png';
-import persoSudUrl from './assets/village/perso-sud.png';
-import persoOuestUrl from './assets/village/perso-ouest.png';
 import type { Direction } from './programmation.types';
 
 /**
- * Les themes : un decor, un personnage, un but, une chose a ramasser.
+ * Les trois catalogues : qui joue, ou l'on va, et sur quoi l'on marche.
  *
- * Dessines en SVG, dans le style du reste du projet : contour noir epais, aplats vifs,
- * comme les sprites du snake. Un trace reste net a toute taille, ce qui compte ici
- * puisque la grille va de cinq a huit cases de cote, et il n'entraine aucune licence a
- * suivre dans `ATTRIBUTIONS.md`.
+ * Trois listes INDEPENDANTES plutot qu'un theme d'un bloc. Un theme fige des accords
+ * qu'on n'a pas choisis : on aimait le lapin mais pas la banquise, et il fallait prendre
+ * les deux. Separes, huit personnages, huit buts et six sols font des centaines de
+ * combinaisons, et c'est elle qui compose la sienne.
  *
- * Le personnage est dessine tourne vers l'EST, et une rotation CSS l'oriente. Quatre
- * dessins separes divergeraient a la premiere retouche, et il faudrait les refaire pour
- * chaque theme.
+ * ── Tout est dessine ici, et tout TOURNE ─────────────────────────────────────────────
  *
- * Les traces sont des FONCTIONS qui rendent du JSX, nommees en minuscule, et non des
- * composants. C'est la convention de `catalogue-formes.tsx`, et elle n'est pas
- * cosmetique : un fichier qui definit des composants et exporte aussi autre chose perd le
- * rechargement a chaud, ce que le lint refuse a juste titre.
+ * Chaque personnage est vu strictement DE DESSUS, avec un avant reconnaissable : un
+ * museau, une proue, un nez. C'est ce qui permet a une simple rotation de dire ou il va.
+ *
+ * L'essai precedent utilisait de belles tetes vues de face, qu'aucune rotation ne pouvait
+ * orienter : il avait fallu poser une fleche a cote, et l'on se retrouvait avec un
+ * personnage qui regarde a droite pendant qu'une fleche annonce la gauche. Dans un jeu
+ * dont le sujet EST la direction, deux indications contradictoires ne sont pas un detail
+ * de style : c'est l'exercice qu'on rend impossible.
  */
 
-export type ThemeKey =
-  | 'lapin'
-  | 'abeille'
-  | 'fusee'
-  | 'robot'
-  | 'village'
-  | 'animaux';
-
-export interface Theme {
-  cle: ThemeKey;
-  label: string;
-  /** Ce qu'on voit sur la tuile de fond. */
-  sol: string;
-  solAlterne: string;
-  mur: ReactNode;
-  /** Le personnage DEJA oriente.
-   *
-   * C'est une fonction de la direction, et non un dessin unique que la grille ferait
-   * pivoter. Un trace vu strictement de dessus se contente d'une rotation ; un
-   * personnage dessine de trois quarts, qu'on voit de face, de dos et de profil, a
-   * quatre images distinctes. Laisser le choix au theme permet aux deux de coexister. */
-  personnage: (direction: Direction) => ReactNode;
-  but: ReactNode;
-  graine: ReactNode;
-  /** Les images en pixels s'agrandissent au carre, sans lissage : sans cela un sprite de
-   * seize pixels etale sur cinq centimetres devient une bouillie floue. */
-  pixels?: boolean;
-  /** Comment nommer le but dans les phrases du jeu. */
-  nomBut: string;
-}
-
-const TRAIT = {
+const T = {
   stroke: '#1a1a1a',
   strokeWidth: 3,
   strokeLinejoin: 'round' as const,
   strokeLinecap: 'round' as const,
 };
+const F = { ...T, strokeWidth: 2.2 };
 
-/**
- * Le lapin, vu de dessus, tourne vers la droite.
- *
- * Les oreilles se dessinent APRES le corps. Posees avant, le corps les recouvrait et il
- * n'en restait que les pointes : le lapin etait une patate blanche, et c'est exactement
- * ce qu'on avait a l'ecran. L'interieur rose ne sert pas qu'a faire joli, il detache les
- * oreilles d'un pelage qui est de la meme couleur qu'elles.
- */
+// ─── Personnages, tous tournes vers l'EST ────────────────────────────────────
+
 function lapin() {
   return (
     <g>
-      <circle cx="26" cy="50" r="8" fill="#ffffff" {...TRAIT} />
-      <ellipse cx="48" cy="50" rx="25" ry="19" fill="#ffffff" {...TRAIT} />
-      <ellipse cx="44" cy="30" rx="6" ry="16" fill="#ffffff" {...TRAIT} transform="rotate(18 44 30)" />
+      <circle cx="24" cy="50" r="8" fill="#fff" {...T} />
+      <ellipse cx="48" cy="50" rx="25" ry="19" fill="#fff" {...T} />
+      <ellipse cx="44" cy="30" rx="6" ry="16" fill="#fff" {...T} transform="rotate(18 44 30)" />
       <ellipse cx="44" cy="30" rx="2.5" ry="10" fill="#f5a3b3" transform="rotate(18 44 30)" />
-      <ellipse cx="44" cy="70" rx="6" ry="16" fill="#ffffff" {...TRAIT} transform="rotate(-18 44 70)" />
+      <ellipse cx="44" cy="70" rx="6" ry="16" fill="#fff" {...T} transform="rotate(-18 44 70)" />
       <ellipse cx="44" cy="70" rx="2.5" ry="10" fill="#f5a3b3" transform="rotate(-18 44 70)" />
-      <ellipse cx="68" cy="50" rx="13" ry="12" fill="#ffffff" {...TRAIT} />
+      <ellipse cx="68" cy="50" rx="13" ry="12" fill="#fff" {...T} />
       <circle cx="70" cy="44" r="3" fill="#1a1a1a" />
       <circle cx="70" cy="56" r="3" fill="#1a1a1a" />
-      <ellipse cx="80" cy="50" rx="4.5" ry="3.5" fill="#f5a3b3" {...TRAIT} strokeWidth={2} />
+      <ellipse cx="80" cy="50" rx="4.5" ry="3.5" fill="#f5a3b3" {...F} />
+    </g>
+  );
+}
+
+function chat() {
+  return (
+    <g>
+      <path d="M22 50 q-12 -10 -8 -18 q10 0 14 10" fill="#f0a04b" {...F} />
+      <ellipse cx="46" cy="50" rx="24" ry="18" fill="#f0a04b" {...T} />
+      <path d="M58 36 l-2 -14 12 8 z" fill="#f0a04b" {...F} />
+      <path d="M58 64 l-2 14 12 -8 z" fill="#f0a04b" {...F} />
+      <circle cx="70" cy="50" r="13" fill="#f7b968" {...T} />
+      <circle cx="72" cy="45" r="2.8" fill="#1a1a1a" />
+      <circle cx="72" cy="55" r="2.8" fill="#1a1a1a" />
+      <path d="M81 50 l-4 -3 -4 3 z" fill="#e0685f" {...F} />
+    </g>
+  );
+}
+
+function tortue() {
+  return (
+    <g>
+      <ellipse cx="30" cy="36" rx="7" ry="5" fill="#8fbf6a" {...F} />
+      <ellipse cx="30" cy="64" rx="7" ry="5" fill="#8fbf6a" {...F} />
+      <ellipse cx="62" cy="34" rx="7" ry="5" fill="#8fbf6a" {...F} />
+      <ellipse cx="62" cy="66" rx="7" ry="5" fill="#8fbf6a" {...F} />
+      <circle cx="48" cy="50" r="24" fill="#6aa84f" {...T} />
+      <circle cx="48" cy="50" r="13" fill="#8fbf6a" {...F} />
+      <path d="M48 27 v10 M48 63 v10 M25 50 h10 M61 50 h10" {...F} />
+      <circle cx="78" cy="50" r="10" fill="#8fbf6a" {...T} />
+      <circle cx="81" cy="46" r="2.5" fill="#1a1a1a" />
+      <circle cx="81" cy="54" r="2.5" fill="#1a1a1a" />
+    </g>
+  );
+}
+
+function coccinelle() {
+  return (
+    <g>
+      <path d="M40 30 l-10 -12 M40 70 l-10 12" {...F} />
+      <ellipse cx="50" cy="50" rx="27" ry="22" fill="#d94f3d" {...T} />
+      <path d="M50 28 v44" {...T} />
+      <circle cx="40" cy="38" r="5" fill="#1a1a1a" />
+      <circle cx="40" cy="62" r="5" fill="#1a1a1a" />
+      <circle cx="58" cy="40" r="4" fill="#1a1a1a" />
+      <circle cx="58" cy="60" r="4" fill="#1a1a1a" />
+      <path d="M72 50 a14 14 0 0 0 -14 -14 h0 a14 14 0 0 0 0 28 h0 a14 14 0 0 0 14 -14 z" fill="#1a1a1a" {...T} />
+      <circle cx="70" cy="44" r="2.5" fill="#fff" />
+      <circle cx="70" cy="56" r="2.5" fill="#fff" />
     </g>
   );
 }
@@ -96,14 +100,14 @@ function lapin() {
 function abeille() {
   return (
     <g>
-      <ellipse cx="38" cy="36" rx="14" ry="9" fill="#dff1fb" {...TRAIT} strokeWidth={2.5} transform="rotate(-20 38 36)" />
-      <ellipse cx="38" cy="64" rx="14" ry="9" fill="#dff1fb" {...TRAIT} strokeWidth={2.5} transform="rotate(20 38 64)" />
-      <ellipse cx="50" cy="50" rx="27" ry="19" fill="#f7c948" {...TRAIT} />
-      <path d="M44 32 v36" {...TRAIT} strokeWidth={7} />
-      <path d="M58 33 v34" {...TRAIT} strokeWidth={7} />
+      <ellipse cx="38" cy="34" rx="14" ry="9" fill="#dff1fb" {...F} transform="rotate(-20 38 34)" />
+      <ellipse cx="38" cy="66" rx="14" ry="9" fill="#dff1fb" {...F} transform="rotate(20 38 66)" />
+      <ellipse cx="50" cy="50" rx="27" ry="19" fill="#f7c948" {...T} />
+      <path d="M44 32 v36" {...T} strokeWidth={7} />
+      <path d="M58 33 v34" {...T} strokeWidth={7} />
       <circle cx="70" cy="44" r="3.5" fill="#1a1a1a" />
       <circle cx="70" cy="56" r="3.5" fill="#1a1a1a" />
-      <path d="M24 44 l-9 -8 M24 56 l-9 8" {...TRAIT} strokeWidth={2.5} />
+      <path d="M24 44 l-9 -8 M24 56 l-9 8" {...F} />
     </g>
   );
 }
@@ -111,47 +115,123 @@ function abeille() {
 function fusee() {
   return (
     <g>
-      <path d="M22 34 l14 16 -14 16 z" fill="#e8613c" {...TRAIT} />
-      <path d="M22 40 h44 a22 10 0 0 1 0 20 h-44 a18 12 0 0 1 0 -20 z" fill="#f2f4f7" {...TRAIT} />
-      <circle cx="62" cy="50" r="7" fill="#7fc4e8" {...TRAIT} strokeWidth={2.5} />
-      <path d="M34 40 v20" {...TRAIT} strokeWidth={2.5} />
+      <path d="M22 34 l14 16 -14 16 z" fill="#e8613c" {...T} />
+      <path d="M22 40 h44 a22 10 0 0 1 0 20 h-44 a18 12 0 0 1 0 -20 z" fill="#f2f4f7" {...T} />
+      <circle cx="62" cy="50" r="7" fill="#7fc4e8" {...F} />
+      <path d="M34 40 v20" {...F} />
     </g>
   );
 }
 
-function robot() {
+function voiture() {
   return (
     <g>
-      <path d="M50 22 v8" {...TRAIT} strokeWidth={3} />
-      <circle cx="50" cy="20" r="5" fill="#e8613c" {...TRAIT} strokeWidth={2.5} />
-      <rect x="24" y="30" width="20" height="40" rx="5" fill="#8a949f" {...TRAIT} />
-      <rect x="30" y="30" width="44" height="40" rx="9" fill="#7fc4e8" {...TRAIT} />
-      <rect x="56" y="38" width="22" height="24" rx="6" fill="#f2f4f7" {...TRAIT} strokeWidth={2.5} />
-      <circle cx="66" cy="44" r="3.5" fill="#1a1a1a" />
-      <circle cx="66" cy="56" r="3.5" fill="#1a1a1a" />
-      <path d="M78 50 h8" {...TRAIT} strokeWidth={5} />
-      <path d="M34 38 h12 M34 62 h12" {...TRAIT} strokeWidth={2.5} />
+      <rect x="26" y="26" width="14" height="10" rx="3" fill="#3b3b3b" {...F} />
+      <rect x="26" y="64" width="14" height="10" rx="3" fill="#3b3b3b" {...F} />
+      <rect x="58" y="26" width="14" height="10" rx="3" fill="#3b3b3b" {...F} />
+      <rect x="58" y="64" width="14" height="10" rx="3" fill="#3b3b3b" {...F} />
+      <rect x="20" y="32" width="60" height="36" rx="12" fill="#4a90d9" {...T} />
+      <path d="M42 36 h20 a8 8 0 0 1 0 28 h-20 z" fill="#cfe6f7" {...F} />
+      <circle cx="76" cy="40" r="3.5" fill="#f7e59b" {...F} />
+      <circle cx="76" cy="60" r="3.5" fill="#f7e59b" {...F} />
     </g>
   );
 }
+
+function bateau() {
+  return (
+    <g>
+      <path d="M20 32 h34 l26 18 -26 18 h-34 a10 18 0 0 1 0 -36 z" fill="#f2f4f7" {...T} />
+      <rect x="30" y="40" width="22" height="20" rx="4" fill="#e8613c" {...F} />
+      <circle cx="41" cy="50" r="4" fill="#7fc4e8" {...F} />
+    </g>
+  );
+}
+
+export interface Personnage {
+  cle: string;
+  label: string;
+  trace: ReactNode;
+}
+
+export const PERSONNAGES: Personnage[] = [
+  { cle: 'lapin', label: 'Le lapin', trace: lapin() },
+  { cle: 'chat', label: 'Le chat', trace: chat() },
+  { cle: 'tortue', label: 'La tortue', trace: tortue() },
+  { cle: 'coccinelle', label: 'La coccinelle', trace: coccinelle() },
+  { cle: 'abeille', label: 'L’abeille', trace: abeille() },
+  { cle: 'fusee', label: 'La fusée', trace: fusee() },
+  { cle: 'voiture', label: 'La voiture', trace: voiture() },
+  { cle: 'bateau', label: 'Le bateau', trace: bateau() },
+];
+
+/** L'angle a appliquer : tous les traces regardent vers l'EST. */
+export const ANGLE: Record<Direction, number> = {
+  est: 0,
+  sud: 90,
+  ouest: 180,
+  nord: 270,
+};
+
+// ─── Buts ────────────────────────────────────────────────────────────────────
 
 function carotte() {
   return (
     <g>
-      <path d="M50 78 l-11 -34 h22 z" fill="#ef8c3a" {...TRAIT} />
-      <path d="M50 44 q-14 -14 -4 -22 q8 -2 10 10" fill="#5fae4e" {...TRAIT} strokeWidth={2.5} />
-      <path d="M52 44 q14 -12 6 -22 q-9 0 -10 12" fill="#5fae4e" {...TRAIT} strokeWidth={2.5} />
+      <path d="M50 80 l-12 -36 h24 z" fill="#ef8c3a" {...T} />
+      <path d="M50 44 q-15 -15 -4 -24 q9 -2 11 11" fill="#5fae4e" {...F} />
+      <path d="M53 44 q15 -13 6 -24 q-10 0 -11 13" fill="#5fae4e" {...F} />
     </g>
   );
 }
 
-function fleur() {
+function maison() {
   return (
     <g>
-      {[0, 72, 144, 216, 288].map((angle) => (
-        <ellipse key={angle} cx="50" cy="32" rx="9" ry="14" fill="#f09ec4" {...TRAIT} strokeWidth={2.5} transform={`rotate(${String(angle)} 50 50)`} />
-      ))}
-      <circle cx="50" cy="50" r="10" fill="#f7c948" {...TRAIT} strokeWidth={2.5} />
+      <path d="M18 52 L50 24 L82 52 z" fill="#d94f3d" {...T} />
+      <rect x="28" y="50" width="44" height="30" fill="#f6e0c0" {...T} />
+      <rect x="43" y="60" width="14" height="20" fill="#9a6b3f" {...F} />
+    </g>
+  );
+}
+
+function coffre() {
+  return (
+    <g>
+      <path d="M22 48 a28 22 0 0 1 56 0 z" fill="#c98b4b" {...T} />
+      <rect x="22" y="48" width="56" height="28" rx="3" fill="#a9703a" {...T} />
+      <rect x="44" y="44" width="12" height="16" rx="2" fill="#f7c948" {...F} />
+    </g>
+  );
+}
+
+function drapeau() {
+  return (
+    <g>
+      <path d="M32 82 v-60" {...T} strokeWidth={5} />
+      <path d="M34 26 l36 10 -36 10 z" fill="#d94f3d" {...T} />
+    </g>
+  );
+}
+
+function gateau() {
+  return (
+    <g>
+      <path d="M50 16 v10" {...F} />
+      <circle cx="50" cy="14" r="4" fill="#f7c948" {...F} />
+      <rect x="24" y="40" width="52" height="16" rx="4" fill="#f5c6d6" {...T} />
+      <rect x="24" y="54" width="52" height="24" rx="4" fill="#c98b4b" {...T} />
+    </g>
+  );
+}
+
+function poisson() {
+  return (
+    <g>
+      <path d="M74 50 l16 -14 v28 z" fill="#f0a04b" {...T} />
+      <ellipse cx="46" cy="50" rx="28" ry="18" fill="#f7b968" {...T} />
+      <circle cx="30" cy="45" r="3.5" fill="#1a1a1a" />
+      <path d="M50 36 q10 14 0 28" fill="none" {...F} />
     </g>
   );
 }
@@ -159,38 +239,9 @@ function fleur() {
 function etoile() {
   return (
     <path
-      d="M50 18 l10 22 24 3 -17 17 4 24 -21 -11 -21 11 4 -24 -17 -17 24 -3 z"
+      d="M50 16 l11 24 26 3 -19 18 5 26 -23 -12 -23 12 5 -26 -19 -18 26 -3 z"
       fill="#f7c948"
-      {...TRAIT}
-    />
-  );
-}
-
-function planete() {
-  return (
-    <g>
-      <circle cx="50" cy="50" r="22" fill="#8e7ae0" {...TRAIT} />
-      <ellipse cx="50" cy="50" rx="34" ry="10" fill="none" {...TRAIT} strokeWidth={4} transform="rotate(-18 50 50)" />
-    </g>
-  );
-}
-
-function pile() {
-  return (
-    <g>
-      <rect x="34" y="26" width="32" height="48" rx="5" fill="#7fc98a" {...TRAIT} />
-      <rect x="44" y="18" width="12" height="9" rx="2" fill="#7fc98a" {...TRAIT} strokeWidth={2.5} />
-      <path d="M52 36 l-10 16 h9 l-3 12 12 -18 h-9 z" fill="#f7c948" {...TRAIT} strokeWidth={2} />
-    </g>
-  );
-}
-
-function rocher() {
-  return (
-    <path
-      d="M18 76 l8 -30 16 -12 22 4 14 20 -4 18 z"
-      fill="#9aa3ad"
-      {...TRAIT}
+      {...T}
     />
   );
 }
@@ -198,193 +249,197 @@ function rocher() {
 function ruche() {
   return (
     <g>
-      <rect x="20" y="30" width="60" height="46" rx="10" fill="#c99a5b" {...TRAIT} />
-      <path d="M22 46 h56 M22 60 h56" {...TRAIT} strokeWidth={2.5} />
+      <rect x="20" y="28" width="60" height="48" rx="12" fill="#c99a5b" {...T} />
+      <path d="M22 46 h56 M22 60 h56" {...F} />
+      <circle cx="50" cy="68" r="5" fill="#8a5f34" {...F} />
     </g>
   );
 }
 
+export interface But {
+  cle: string;
+  label: string;
+  /** Comment le nommer dans les phrases du jeu. */
+  nom: string;
+  trace: ReactNode;
+}
+
+export const BUTS: But[] = [
+  { cle: 'carotte', label: 'Une carotte', nom: 'la carotte', trace: carotte() },
+  { cle: 'maison', label: 'Une maison', nom: 'la maison', trace: maison() },
+  { cle: 'coffre', label: 'Un trésor', nom: 'le trésor', trace: coffre() },
+  { cle: 'drapeau', label: 'Un drapeau', nom: 'le drapeau', trace: drapeau() },
+  { cle: 'gateau', label: 'Un gâteau', nom: 'le gâteau', trace: gateau() },
+  { cle: 'poisson', label: 'Un poisson', nom: 'le poisson', trace: poisson() },
+  { cle: 'etoile', label: 'Une étoile', nom: 'l’étoile', trace: etoile() },
+  { cle: 'ruche', label: 'Une ruche', nom: 'la ruche', trace: ruche() },
+];
+
+// ─── Sols : la couleur, le motif, l'obstacle, ce qu'on ramasse ───────────────
+
+function touffe(c: string) {
+  return <path d="M30 76 l6 -16 5 16 M56 80 l7 -18 6 18" fill="none" stroke={c} strokeWidth={5} strokeLinecap="round" />;
+}
+function cailloux(c: string) {
+  return (
+    <g fill={c}>
+      <ellipse cx="32" cy="70" rx="9" ry="5" />
+      <ellipse cx="66" cy="34" rx="7" ry="4" />
+    </g>
+  );
+}
+function vagues(c: string) {
+  return <path d="M18 62 q10 -8 20 0 t20 0 t20 0" fill="none" stroke={c} strokeWidth={5} strokeLinecap="round" />;
+}
+function etincelles(c: string) {
+  return (
+    <g fill={c}>
+      <circle cx="30" cy="34" r="3.5" />
+      <circle cx="68" cy="66" r="2.5" />
+      <circle cx="54" cy="24" r="2" />
+    </g>
+  );
+}
+
+function rocher() {
+  return <path d="M16 78 l8 -32 17 -13 23 4 15 21 -4 20 z" fill="#9aa3ad" {...T} />;
+}
+function buisson() {
+  return (
+    <g>
+      <circle cx="36" cy="60" r="19" fill="#4f9440" {...T} />
+      <circle cx="63" cy="57" r="21" fill="#5fae4e" {...T} />
+    </g>
+  );
+}
+function glacon() {
+  return <path d="M24 76 l14 -38 14 -14 16 16 12 36 z" fill="#bfe4f5" {...T} />;
+}
+function cactus() {
+  return (
+    <g>
+      <rect x="42" y="30" width="16" height="50" rx="8" fill="#5fae4e" {...T} />
+      <path d="M42 50 h-12 v-12" fill="none" {...T} />
+      <path d="M58 60 h12 v-14" fill="none" {...T} />
+    </g>
+  );
+}
 function meteore() {
   return (
     <g>
-      <circle cx="50" cy="52" r="24" fill="#6b6f76" {...TRAIT} />
+      <circle cx="50" cy="52" r="24" fill="#6b6f76" {...T} />
       <circle cx="42" cy="46" r="5" fill="#4e535a" />
       <circle cx="59" cy="59" r="6" fill="#4e535a" />
     </g>
   );
 }
 
-/** Un trace SVG, tourne vers la direction voulue. Les quatre orientations viennent d'une
- * seule image : un dessin vu strictement de dessus n'a pas de face cachee. */
-function tourneSvg(trace: ReactNode) {
-  return (direction: Direction) => (
-    <g
-      style={{
-        transform: `rotate(${String(ANGLE[direction])}deg)`,
-        transformOrigin: '50% 50%',
-        transition: 'transform 0.25s ease',
-      }}
-    >
-      {trace}
-    </g>
-  );
-}
-
-/**
- * Une image de tuile, posee dans le cadre de cent unites du plateau.
- *
- * `zoom` la fait deborder du cadre, centree. Les sprites de Kenney portent leur propre
- * marge : a l'echelle exacte de la case, le personnage n'en occupait que six dixiemes et
- * paraissait perdu au milieu de son herbe.
- */
-function image(source: string, zoom = 1) {
-  const cote = 100 * zoom;
-  const bord = (100 - cote) / 2;
+function fleur(petale: string) {
   return (
-    <image href={source} x={bord} y={bord} width={cote} height={cote} />
+    <g>
+      {[0, 72, 144, 216, 288].map((a) => (
+        <ellipse key={a} cx="50" cy="32" rx="9" ry="14" fill={petale} {...F} transform={`rotate(${String(a)} 50 50)`} />
+      ))}
+      <circle cx="50" cy="50" r="10" fill="#f7c948" {...F} />
+    </g>
   );
 }
-
-/**
- * Un animal vu de FACE, avec un museau qui indique la route.
- *
- * Les tetes du jeu de tuiles « Animal Pack » sont dessinees de face : elles n'ont ni dos
- * ni profil, et les faire pivoter ferait rouler la tete sur le cote. Le sens de marche
- * est donc porte par un repere pose devant elles, qui tourne seul.
- *
- * Ce repere n'est pas un pis-aller : dans le parcours « avance et tourne », savoir ou
- * regarde le personnage est le coeur de l'exercice, et une fleche franche le dit mieux
- * qu'un museau qu'il faut interpreter.
- */
-function animalOriente(source: string) {
-  return (direction: Direction) => (
-    <g
-      style={{
-        transform: `rotate(${String(ANGLE[direction])}deg)`,
-        transformOrigin: '50% 50%',
-        transition: 'transform 0.25s ease',
-      }}
-    >
-      {/* La fleche tourne, la tete non : elle est contre-tournee pour rester droite. */}
-      <polygon points="99,50 79,39 79,61" fill="#e8613c" stroke="#1a1a1a" strokeWidth={3} strokeLinejoin="round" />
-      <g
-        style={{
-          transform: `rotate(${String(-ANGLE[direction])}deg)`,
-          transformOrigin: '50% 50%',
-        }}
-      >
-        {/* La tete laisse la place a la fleche : a pleine largeur, celle-ci passait
-            derriere elle et l'on ne voyait plus ou regardait le personnage. */}
-        <image href={source} x="4" y="10" width="72" height="80" />
-      </g>
+function coquillage() {
+  return (
+    <g>
+      <path d="M50 74 a26 26 0 0 1 -26 -26 h52 a26 26 0 0 1 -26 26 z" fill="#f7d9c4" {...T} />
+      <path d="M50 74 v-26 M36 60 l14 -12 M64 60 l-14 -12" fill="none" {...F} />
+    </g>
+  );
+}
+function cristal() {
+  return <path d="M50 22 l16 22 -16 32 -16 -32 z" fill="#9fdcf5" {...T} />;
+}
+function gland() {
+  return (
+    <g>
+      <ellipse cx="50" cy="58" rx="16" ry="20" fill="#c98b4b" {...T} />
+      <path d="M32 44 a18 10 0 0 1 36 0 z" fill="#8a5f34" {...T} />
     </g>
   );
 }
 
-export const THEMES: Theme[] = [
+export interface Sol {
+  cle: string;
+  label: string;
+  fond: string;
+  fondAlterne: string;
+  /** Le motif seme sur la case. Ce qui distingue vraiment deux terrains : deux aplats de
+   * couleur font deux echiquiers, pas deux paysages. */
+  motif: ReactNode;
+  obstacle: ReactNode;
+  /** Ce qu'on trouve par terre depend du terrain, pas du personnage. */
+  graine: ReactNode;
+}
+
+export const SOLS: Sol[] = [
   {
-    cle: 'lapin',
-    label: 'Le lapin et la carotte',
-    sol: '#dff0c8',
-    solAlterne: '#d3e9b8',
-    mur: rocher(),
-    personnage: tourneSvg(lapin()),
-    but: carotte(),
-    graine: fleur(),
-    nomBut: 'la carotte',
+    cle: 'pre',
+    label: 'Un pré',
+    fond: '#dff0c8',
+    fondAlterne: '#d3e9b8',
+    motif: touffe('#a9cf86'),
+    obstacle: rocher(),
+    graine: fleur('#f09ec4'),
   },
   {
-    cle: 'abeille',
-    label: 'L’abeille et la ruche',
-    sol: '#fdf3d0',
-    solAlterne: '#f9ecc0',
-    mur: rocher(),
-    personnage: tourneSvg(abeille()),
-    but: ruche(),
-    graine: fleur(),
-    nomBut: 'la ruche',
+    cle: 'foret',
+    label: 'Une forêt',
+    fond: '#c9e2b4',
+    fondAlterne: '#bdd9a6',
+    motif: touffe('#8ab36a'),
+    obstacle: buisson(),
+    graine: gland(),
   },
   {
-    cle: 'fusee',
-    label: 'La fusée et la planète',
-    sol: '#dfe6f5',
-    solAlterne: '#d3dcf0',
-    mur: meteore(),
-    personnage: tourneSvg(fusee()),
-    but: planete(),
+    cle: 'plage',
+    label: 'Une plage',
+    fond: '#f7e7c4',
+    fondAlterne: '#f1dfb4',
+    motif: cailloux('#e0cba0'),
+    obstacle: rocher(),
+    graine: coquillage(),
+  },
+  {
+    cle: 'desert',
+    label: 'Un désert',
+    fond: '#f6d9a8',
+    fondAlterne: '#efcf98',
+    motif: cailloux('#dbb87f'),
+    obstacle: cactus(),
+    graine: fleur('#f2a65a'),
+  },
+  {
+    cle: 'banquise',
+    label: 'La banquise',
+    fond: '#dcecf7',
+    fondAlterne: '#cfe4f2',
+    motif: vagues('#bcd9ec'),
+    obstacle: glacon(),
+    graine: cristal(),
+  },
+  {
+    cle: 'espace',
+    label: 'L’espace',
+    fond: '#2f3550',
+    fondAlterne: '#363c59',
+    motif: etincelles('#8a92bd'),
+    obstacle: meteore(),
     graine: etoile(),
-    nomBut: 'la planète',
-  },
-  {
-    cle: 'robot',
-    label: 'Le robot et sa pile',
-    sol: '#e6e9ec',
-    solAlterne: '#dcdfe3',
-    mur: rocher(),
-    personnage: tourneSvg(robot()),
-    but: pile(),
-    graine: etoile(),
-    nomBut: 'la pile',
-  },
-  {
-    // Le theme en PIXELS, avec les sprites de Kenney (domaine public). Le personnage y a
-    // quatre dessins distincts, parce qu'il est vu de trois quarts : on voit son visage
-    // quand il descend et son dos quand il monte. Un simple pivotement l'aurait couche
-    // sur le cote.
-    cle: 'village',
-    label: 'Le village (pixels)',
-    sol: '#8cc153',
-    solAlterne: '#8cc153',
-    // Un arbre ORANGE sur de l'herbe verte. Le sapin vert du meme jeu de tuiles se
-    // fondait dans le sol : il n'en restait que le contour sombre, qu'on prenait pour une
-    // arche. Un obstacle doit se voir avant d'etre compris.
-    mur: image(arbreUrl),
-    personnage: (direction) =>
-      image(
-        {
-          nord: persoNordUrl,
-          est: persoEstUrl,
-          sud: persoSudUrl,
-          ouest: persoOuestUrl,
-        }[direction],
-        1.3,
-      ),
-    // Une cible, et non la maison du meme jeu de tuiles : celle-ci n'en montre que le
-    // toit, les maisons de Kenney tenant sur plusieurs cases. Un but qu'on prend pour un
-    // rocher ne dit pas ou aller.
-    but: image(cibleUrl, 1.15),
-    graine: image(champignonUrl),
-    nomBut: 'la cible',
-    pixels: true,
-  },
-  {
-    cle: 'animaux',
-    label: 'Le lapin et son ami',
-    sol: '#dff0c8',
-    solAlterne: '#d3e9b8',
-    mur: rocher(),
-    personnage: animalOriente(lapinKUrl),
-    // Rejoindre quelqu'un plutot que ramasser un objet : c'est le meme trajet, et un but
-    // qui a un visage se cherche plus volontiers qu'une case.
-    but: <image href={pandaUrl} x="10" y="6" width="80" height="88" />,
-    // Une fleur a ramasser, et non un animal : on ne ramasse pas un cochon, et la
-    // consigne « ramasse tout avant d'arriver » deviendrait inquietante.
-    graine: fleur(),
-    nomBut: 'le panda',
   },
 ];
 
-/** Les deux tuiles d'herbe du theme en pixels, pour que le sol ne soit pas un aplat. */
-export const SOL_VILLAGE = { pair: herbeUrl, impair: herbeDeuxUrl };
-
-export function theme(cle: string): Theme {
-  return THEMES.find((t) => t.cle === cle) ?? THEMES[0];
+export function personnage(cle: string): Personnage {
+  return PERSONNAGES.find((p) => p.cle === cle) ?? PERSONNAGES[0];
 }
-
-/** L'angle a appliquer au personnage, qui est dessine vers l'EST. */
-export const ANGLE: Record<Direction, number> = {
-  est: 0,
-  sud: 90,
-  ouest: 180,
-  nord: 270,
-};
+export function but(cle: string): But {
+  return BUTS.find((b) => b.cle === cle) ?? BUTS[0];
+}
+export function sol(cle: string): Sol {
+  return SOLS.find((s) => s.cle === cle) ?? SOLS[0];
+}

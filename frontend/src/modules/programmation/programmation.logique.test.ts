@@ -15,7 +15,7 @@ import { PARCOURS, type Niveau } from './programmation.types';
 
 /** Les tailles que le pre-jeu propose. Le generateur doit tenir sur toutes : c'est la
  * petite grille qui casse, jamais la grande. */
-const COTES = [5, 6, 7, 8];
+const COTES = [8, 12, 16, 20];
 
 describe('le generateur', () => {
   it('rend des niveaux SOLUBLES, sur toutes les tailles et les deux parcours', () => {

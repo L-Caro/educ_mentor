@@ -1,6 +1,6 @@
 import type { ModuleManifest } from 'src/types/modules.types';
 import ProgrammationGame from './ProgrammationGame';
-import { THEMES } from './themes';
+import { BUTS, PERSONNAGES, SOLS } from './themes';
 
 /**
  * Programmer un deplacement.
@@ -35,20 +35,32 @@ export const programmationModule: ModuleManifest = {
       ],
     },
     {
-      key: 'theme',
+      key: 'personnage',
       type: 'single',
       label: 'Qui joue',
-      choices: THEMES.map((t) => ({ value: t.cle, label: t.label })),
+      choices: PERSONNAGES.map((p) => ({ value: p.cle, label: p.label })),
+    },
+    {
+      key: 'but',
+      type: 'single',
+      label: 'Ce qu’il faut atteindre',
+      choices: BUTS.map((b) => ({ value: b.cle, label: b.label })),
+    },
+    {
+      key: 'sol',
+      type: 'single',
+      label: 'Où l’on joue',
+      choices: SOLS.map((s) => ({ value: s.cle, label: s.label })),
     },
     {
       key: 'grille',
       type: 'single',
       label: 'Taille du terrain',
       choices: [
-        { value: '5', label: '5 sur 5' },
-        { value: '6', label: '6 sur 6' },
-        { value: '7', label: '7 sur 7' },
         { value: '8', label: '8 sur 8' },
+        { value: '12', label: '12 sur 12' },
+        { value: '16', label: '16 sur 16' },
+        { value: '20', label: '20 sur 20' },
       ],
     },
   ],
