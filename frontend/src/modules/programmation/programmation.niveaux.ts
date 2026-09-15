@@ -49,7 +49,18 @@ export interface Etape {
   pas: [number, number];
   /** Combien de virages au plus : zero donne une ligne droite. */
   virages: number;
+  /** Combien de rochers SEMES, quand le terrain reste ouvert. */
   murs: number;
+  /** Quelle part du terrain hors chemin est MUREE, de zero a un.
+   *
+   * C'est ce qui separe une plaine d'un couloir. Des rochers semes au hasard ne ferment
+   * rien : il reste toujours mille facons d'aller au but, et l'enfant avance a peu pres
+   * dans la bonne direction jusqu'a tomber dessus. En murant une proportion du reste, le
+   * chemin devient le passage, et chaque ordre compte.
+   *
+   * Le chemin, lui, n'est jamais touche : les murs se posent sur les cases qu'il
+   * n'emprunte pas, donc le niveau reste soluble quelle que soit la fermeture. */
+  fermeture: number;
   graines: number;
   /** Les blocs ajoutes a ceux du deplacement. */
   blocsEnPlus: SorteBloc[];
@@ -72,6 +83,7 @@ export const ETAPES: Etape[] = [
     pas: [2, 4],
     virages: 0,
     murs: 0,
+    fermeture: 0,
     graines: 0,
     blocsEnPlus: [],
   },
@@ -83,6 +95,7 @@ export const ETAPES: Etape[] = [
     pas: [4, 6],
     virages: 2,
     murs: 5,
+    fermeture: 0.15,
     graines: 0,
     blocsEnPlus: [],
   },
@@ -94,6 +107,7 @@ export const ETAPES: Etape[] = [
     pas: [7, 10],
     virages: 1,
     murs: 7,
+    fermeture: 0.3,
     graines: 0,
     blocsEnPlus: ['repeter'],
     bride: true,
@@ -106,6 +120,7 @@ export const ETAPES: Etape[] = [
     pas: [6, 9],
     virages: 2,
     murs: 7,
+    fermeture: 0.4,
     graines: 2,
     blocsEnPlus: ['repeter', 'ramasser'],
   },
@@ -117,6 +132,7 @@ export const ETAPES: Etape[] = [
     pas: [8, 12],
     virages: 2,
     murs: 7,
+    fermeture: 0.5,
     graines: 3,
     blocsEnPlus: ['repeter', 'ramasser', 'si_graine'],
     bride: true,
@@ -129,6 +145,7 @@ export const ETAPES: Etape[] = [
     pas: [8, 12],
     virages: 4,
     murs: 9,
+    fermeture: 0.62,
     graines: 2,
     blocsEnPlus: ['repeter', 'ramasser', 'si_graine', 'si_mur'],
     bride: true,
@@ -141,6 +158,7 @@ export const ETAPES: Etape[] = [
     pas: [9, 12],
     virages: 3,
     murs: 6,
+    fermeture: 0.5,
     graines: 0,
     blocsEnPlus: ['repeter'],
     bride: true,
@@ -154,6 +172,7 @@ export const ETAPES: Etape[] = [
     pas: [8, 12],
     virages: 2,
     murs: 7,
+    fermeture: 0.7,
     graines: 3,
     blocsEnPlus: ['repeter', 'ramasser', 'si_graine', 'si_mur'],
     bride: true,
@@ -166,6 +185,7 @@ export const ETAPES: Etape[] = [
     pas: [9, 12],
     virages: 3,
     murs: 6,
+    fermeture: 0.6,
     graines: 0,
     blocsEnPlus: ['repeter', 'appel'],
     bride: true,
@@ -180,6 +200,7 @@ export const ETAPES: Etape[] = [
     pas: [8, 13],
     virages: 3,
     murs: 8,
+    fermeture: 0.78,
     graines: 2,
     blocsEnPlus: ['repeter', 'ramasser', 'si_graine', 'si_mur', 'tant_que'],
     bride: true,
@@ -434,6 +455,10 @@ export function engendrerNiveau(
   etape: Etape,
   cote: number,
   parcours: Parcours,
+  /** Le resserrement dans l'etape, de zero a un : les niveaux suivants d'une meme etape
+   * ferment un peu plus que le premier. Trois niveaux identiques a la suite ne font pas
+   * progresser, ils font patienter. */
+  serrage = 0,
 ): Niveau | null {
   for (let essai = 0; essai < 60; essai++) {
     const depart: Case = {
@@ -479,10 +504,14 @@ export function engendrerNiveau(
     // font un terrain accidente ; les memes multiplies par deux et demi, soit dix sur
     // quatre cents cases, font une plaine ou l'on passe partout. La densite est ce qui
     // rend un detour necessaire, et elle se mesure au carre.
-    const murs = melanger(libres).slice(
-      0,
-      Math.round(etape.murs * echelle * echelle),
-    );
+    // Deux facons de poser les murs, et c'est la fermeture qui tranche. A zero, on SEME
+    // quelques rochers : un decor, sur un terrain ou tout reste possible. Au-dela, on MURE
+    // une proportion de ce qui n'est pas le chemin, et le terrain devient un couloir.
+    const fermeture = Math.min(0.88, etape.fermeture + serrage * 0.12);
+    const murs =
+      fermeture <= 0
+        ? melanger(libres).slice(0, Math.round(etape.murs * echelle * echelle))
+        : melanger(libres).slice(0, Math.round(libres.length * fermeture));
 
     // Les graines se posent SUR le chemin, jamais sur le but : ramasser et arriver au
     // meme instant demande de comprendre deux choses a la fois.

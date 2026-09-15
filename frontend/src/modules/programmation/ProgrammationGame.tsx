@@ -141,10 +141,18 @@ export default function ProgrammationGame() {
   // un rendu de plus a chaque changement, et surtout un instant ou l'ecran montre le
   // niveau precedent avec les commandes du suivant.
   const niveau = useMemo(
-    () => engendrerNiveau(ETAPES[rang], cote, parcours),
+    // Le terrain se RESSERRE au fil des reussites de l'etape : trois niveaux identiques
+    // a la suite ne font pas progresser, ils font patienter.
+    () =>
+      engendrerNiveau(
+        ETAPES[rang],
+        cote,
+        parcours,
+        Math.min(1, faits / Math.max(1, ETAPES[rang].reussites)),
+      ),
     // La graine ne sert qu'a forcer un nouveau tirage : elle n'est lue nulle part.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [rang, cote, parcours, graine],
+    [rang, cote, parcours, graine, faits],
   );
 
   const [etat, setEtat] = useState<Etat | null>(null);
