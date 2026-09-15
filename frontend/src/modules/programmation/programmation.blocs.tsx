@@ -31,4 +31,6 @@ export const MODELES: Record<SorteBloc, Modele> = {
   repeter: { signe: '↻', mot: 'répète', famille: 'structure' },
   si_graine: { signe: '?', mot: 'si je vois', famille: 'structure' },
   si_mur: { signe: '?', mot: 'si ça bloque', famille: 'structure' },
+  tant_que: { signe: '∞', mot: 'jusqu’au but', famille: 'structure' },
+  appel: { signe: '★', mot: 'mon bloc', famille: 'structure' },
 };

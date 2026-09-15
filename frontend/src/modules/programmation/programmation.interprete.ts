@@ -61,7 +61,14 @@ const MAXIMUM_PAS = 500;
  * programme lentement devant elle : voir le personnage entrer dans le mur au quatrieme
  * ordre apprend ou corriger, alors qu'un « perdu » n'apprend rien.
  */
-export function executer(niveau: Niveau, programme: Instruction[]): Etat[] {
+export function executer(
+  niveau: Niveau,
+  programme: Instruction[],
+  /** Le contenu du bloc que l'enfant s'est fabrique. Un appel le deroule ici meme : pas
+   * de pile, pas de recursion. C'est volontaire, un bloc qui s'appelle lui-meme est une
+   * notion d'apres, et sa seule presence ferait tourner le jeu sans fin. */
+  fonction: Instruction[] = [],
+): Etat[] {
   const etats: Etat[] = [];
   let etat: Etat = {
     position: { ...niveau.depart },
@@ -150,9 +157,13 @@ export function executer(niveau: Niveau, programme: Instruction[]): Etat[] {
         }
 
         case 'si_graine':
-          if (etat.graines.some((graine) => memeCase(graine, etat.position))) {
-            derouler(instruction.corps ?? []);
-          }
+          // Le `sinon` est deroule quand la condition est fausse. Sans lui, il faudrait
+          // deux conditions contraires pour dire une seule chose.
+          derouler(
+            etat.graines.some((graine) => memeCase(graine, etat.position))
+              ? (instruction.corps ?? [])
+              : (instruction.sinon ?? []),
+          );
           break;
 
         case 'si_mur': {
@@ -160,11 +171,41 @@ export function executer(niveau: Niveau, programme: Instruction[]): Etat[] {
             x: etat.position.x + PAS[etat.direction].x,
             y: etat.position.y + PAS[etat.direction].y,
           };
-          if (dehors(devant) || estMur(devant)) {
+          derouler(
+            dehors(devant) || estMur(devant)
+              ? (instruction.corps ?? [])
+              : (instruction.sinon ?? []),
+          );
+          break;
+        }
+
+        case 'tant_que': {
+          // Jusqu'au but, et pas « tant que c'est vrai » : la condition d'arret est la
+          // meme que celle de la victoire, donc elle se voit sur le plateau. Une
+          // condition abstraite demanderait d'abord de comprendre ce qu'est une
+          // condition, ce que l'etape precedente vient seulement d'introduire.
+          let tours = 0;
+          while (
+            !arrete &&
+            !memeCase(etat.position, niveau.but) &&
+            tours < MAXIMUM_PAS
+          ) {
+            tours++;
+            const avant = pas;
             derouler(instruction.corps ?? []);
+            // Un corps qui ne consomme aucun pas bouclerait pour toujours : on l'arrete
+            // comme une repetition sans fin, avec le meme message.
+            if (pas === avant) {
+              poser({ ...etat, incident: 'trop_long' });
+              break;
+            }
           }
           break;
         }
+
+        case 'appel':
+          derouler(fonction);
+          break;
       }
     }
   }

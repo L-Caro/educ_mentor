@@ -247,6 +247,29 @@
     }
   }
 
+  // Le bloc qu'on se fabrique, et le programme : deux files, et il faut voir laquelle on
+  // remplit. Le cadre colore dit celle qui recoit les ordres.
+  &__fonction {
+    border: 2px dashed transparent;
+    border-radius: v.$border-radius-2;
+    padding: v.$space-1;
+
+    &--ouvert {
+      border-color: var(--color-primary);
+    }
+  }
+
+  &__etiquette {
+    margin: 0 0 v.$space-1;
+    font-size: v.$font-size-sm;
+    font-weight: 700;
+    opacity: 0.7;
+  }
+
+  &__dedans--sinon {
+    border-style: dotted;
+  }
+
   &__vide {
     margin: 0;
     font-size: v.$font-size-sm;

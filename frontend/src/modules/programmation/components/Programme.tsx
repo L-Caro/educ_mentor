@@ -1,5 +1,9 @@
 import { MODELES } from '../programmation.blocs';
-import { BLOCS_A_CORPS, type Instruction } from '../programmation.types';
+import {
+  BLOCS_A_CORPS,
+  BLOCS_A_SINON,
+  type Instruction,
+} from '../programmation.types';
 
 /**
  * La file d'ordres, telle qu'elle sera executee.
@@ -18,19 +22,26 @@ import { BLOCS_A_CORPS, type Instruction } from '../programmation.types';
  * a comprendre, et elle se voit.
  */
 export default function Programme({
+  titre,
   programme,
   cible,
   surRetrait,
   surCible,
   surFois,
+  branche,
+  surBranche,
   rangActif,
 }: {
+  titre: string;
   programme: Instruction[];
   /** L'identite du bloc dont le dedans est ouvert, `null` pour la racine. */
   cible: string | null;
   surRetrait: (id: string) => void;
   surCible: (id: string | null) => void;
   surFois: (id: string, fois: number) => void;
+  /** Le second corps d'une condition. `null` designe le corps principal. */
+  branche: 'corps' | 'sinon';
+  surBranche: (branche: 'corps' | 'sinon') => void;
   /** Le bloc en cours d'execution, pour le suivre du regard pendant que ca tourne. */
   rangActif: string | null;
 }) {
@@ -82,7 +93,9 @@ export default function Programme({
             // repandait sous la grille. Le bouton reste, mais comme etiquette a cote.
             <div
               className={`Prog__dedans${
-                cible === instruction.id ? ' Prog__dedans--ouvert' : ''
+                cible === instruction.id && branche === 'corps'
+                  ? ' Prog__dedans--ouvert'
+                  : ''
               }`}
             >
               <ul className="Prog__liste">
@@ -91,14 +104,44 @@ export default function Programme({
               <button
                 type="button"
                 className="Prog__ouvrir"
-                onClick={() =>
-                  surCible(cible === instruction.id ? null : instruction.id)
-                }
+                onClick={() => {
+                  surCible(instruction.id);
+                  surBranche('corps');
+                }}
               >
-                {cible === instruction.id
+                {cible === instruction.id && branche === 'corps'
                   ? '\u2713 on remplit ici'
                   : (instruction.corps ?? []).length === 0
                     ? '+ touche pour remplir'
+                    : '+ ajouter ici'}
+              </button>
+            </div>
+          )}
+
+          {BLOCS_A_SINON.includes(instruction.sorte) && (
+            <div
+              className={`Prog__dedans Prog__dedans--sinon${
+                cible === instruction.id && branche === 'sinon'
+                  ? ' Prog__dedans--ouvert'
+                  : ''
+              }`}
+            >
+              <p className="Prog__etiquette">sinon</p>
+              <ul className="Prog__liste">
+                {rendre(instruction.sinon ?? [], profondeur + 1)}
+              </ul>
+              <button
+                type="button"
+                className="Prog__ouvrir"
+                onClick={() => {
+                  surCible(instruction.id);
+                  surBranche('sinon');
+                }}
+              >
+                {cible === instruction.id && branche === 'sinon'
+                  ? '\u2713 on remplit ici'
+                  : (instruction.sinon ?? []).length === 0
+                    ? '+ sinon, rien'
                     : '+ ajouter ici'}
               </button>
             </div>
@@ -110,7 +153,7 @@ export default function Programme({
 
   return (
     <div className="Prog__programme">
-      <p className="Prog__titre">Ton programme</p>
+      <p className="Prog__titre">{titre}</p>
       {programme.length === 0 ? (
         <p className="Prog__vide">Touche les ordres pour les ajouter.</p>
       ) : (

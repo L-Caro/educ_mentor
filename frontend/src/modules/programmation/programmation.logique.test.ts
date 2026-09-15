@@ -5,7 +5,12 @@ import {
   reussi,
   tourner,
 } from './programmation.interprete';
-import { ETAPES, bloc, engendrerNiveau } from './programmation.niveaux';
+import {
+  ETAPES,
+  bloc,
+  compacter,
+  engendrerNiveau,
+} from './programmation.niveaux';
 import { PARCOURS, type Niveau } from './programmation.types';
 
 /** Les tailles que le pre-jeu propose. Le generateur doit tenir sur toutes : c'est la
@@ -72,6 +77,32 @@ describe('le generateur', () => {
       'aller_sud',
       'aller_ouest',
     ]);
+  });
+
+  it('laisse TOUJOURS une solution qui tient dans la bride', () => {
+    // Le danger d'une bride : la rendre impossible. Un enfant bloque sur un niveau que
+    // rien ne permet de finir ne peut pas le savoir, et personne ne le decouvrirait avant
+    // lui. On verifie donc, sur tout l'eventail, que la solution factorisee passe la
+    // bride ET resout le niveau.
+    const fautifs: string[] = [];
+    for (const parcours of PARCOURS) {
+      for (const cote of COTES) {
+        for (const etape of ETAPES) {
+          for (let essai = 0; essai < 8; essai++) {
+            const niveau = engendrerNiveau(etape, cote, parcours);
+            if (!niveau?.maximumBlocs) continue;
+            const compacte = compacter(niveau.solution);
+            if (compterBlocs(compacte) > niveau.maximumBlocs) {
+              fautifs.push(`bride ${parcours} ${String(cote)} e${String(etape.rang)}`);
+            }
+            if (!reussi(niveau, executer(niveau, compacte))) {
+              fautifs.push(`factorisation fausse e${String(etape.rang)}`);
+            }
+          }
+        }
+      }
+    }
+    expect(fautifs).toEqual([]);
   });
 
   it('bride assez pour rendre la repetition NECESSAIRE', () => {

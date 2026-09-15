@@ -32,27 +32,40 @@ const DUREE_PAS = 420;
 function sansInstruction(liste: Instruction[], id: string): Instruction[] {
   return liste
     .filter((instruction) => instruction.id !== id)
-    .map((instruction) =>
-      instruction.corps
-        ? { ...instruction, corps: sansInstruction(instruction.corps, id) }
-        : instruction,
-    );
+    .map((instruction) => ({
+      ...instruction,
+      corps: instruction.corps
+        ? sansInstruction(instruction.corps, id)
+        : instruction.corps,
+      sinon: instruction.sinon
+        ? sansInstruction(instruction.sinon, id)
+        : instruction.sinon,
+    }));
 }
 
 /** Ajoute une instruction, a la racine ou dans le corps designe. */
 function avecInstruction(
   liste: Instruction[],
   cible: string | null,
+  branche: 'corps' | 'sinon',
   neuve: Instruction,
 ): Instruction[] {
   if (cible === null) return [...liste, neuve];
   return liste.map((instruction) => {
     if (instruction.id === cible) {
-      return { ...instruction, corps: [...(instruction.corps ?? []), neuve] };
+      return branche === 'sinon'
+        ? { ...instruction, sinon: [...(instruction.sinon ?? []), neuve] }
+        : { ...instruction, corps: [...(instruction.corps ?? []), neuve] };
     }
-    return instruction.corps
-      ? { ...instruction, corps: avecInstruction(instruction.corps, cible, neuve) }
-      : instruction;
+    return {
+      ...instruction,
+      corps: instruction.corps
+        ? avecInstruction(instruction.corps, cible, branche, neuve)
+        : instruction.corps,
+      sinon: instruction.sinon
+        ? avecInstruction(instruction.sinon, cible, branche, neuve)
+        : instruction.sinon,
+    };
   });
 }
 
@@ -60,9 +73,15 @@ function avecFois(liste: Instruction[], id: string, fois: number): Instruction[]
   return liste.map((instruction) =>
     instruction.id === id
       ? { ...instruction, fois }
-      : instruction.corps
-        ? { ...instruction, corps: avecFois(instruction.corps, id, fois) }
-        : instruction,
+      : {
+          ...instruction,
+          corps: instruction.corps
+            ? avecFois(instruction.corps, id, fois)
+            : instruction.corps,
+          sinon: instruction.sinon
+            ? avecFois(instruction.sinon, id, fois)
+            : instruction.sinon,
+        },
   );
 }
 
@@ -90,6 +109,15 @@ export default function ProgrammationGame() {
   const [graine, setGraine] = useState(0);
   const [programme, setProgramme] = useState<Instruction[]>([]);
   const [cible, setCible] = useState<string | null>(null);
+  /** Dans quelle branche d'une condition on ajoute : ce qu'on fait si c'est vrai, ou le
+   * `sinon`. */
+  const [branche, setBranche] = useState<'corps' | 'sinon'>('corps');
+  /** Le bloc que l'enfant se fabrique. Une seconde file, a part, qu'un `appel` deroule. */
+  const [fonction, setFonction] = useState<Instruction[]>([]);
+  /** Combien de niveaux de l'etape courante sont deja reussis. */
+  const [faits, setFaits] = useState(0);
+  /** Vrai quand c'est le bloc personnel qu'on remplit, et non le programme. */
+  const [dansFonction, setDansFonction] = useState(false);
   const [joue, setJoue] = useState(false);
   const [issue, setIssue] = useState<'gagne' | 'rate' | null>(null);
   const minuteur = useRef<number | null>(null);
@@ -127,7 +155,10 @@ export default function ProgrammationGame() {
         : null,
     );
     setProgramme([]);
+    setFonction([]);
     setCible(null);
+    setBranche('corps');
+    setDansFonction(false);
     setIssue(null);
     setJoue(false);
   }
@@ -144,16 +175,35 @@ export default function ProgrammationGame() {
     compterBlocs(programme) > niveau.maximumBlocs;
 
   function ajouter(sorte: SorteBloc) {
-    const neuve = bloc(sorte, BLOCS_A_CORPS.includes(sorte) ? { fois: 3, corps: [] } : {});
-    setProgramme((precedent) => avecInstruction(precedent, cible, neuve));
+    const neuve = bloc(
+      sorte,
+      BLOCS_A_CORPS.includes(sorte) ? { fois: 3, corps: [] } : {},
+    );
+    const poseur = (precedent: Instruction[]) =>
+      avecInstruction(precedent, cible, branche, neuve);
+    if (dansFonction) setFonction(poseur);
+    else setProgramme(poseur);
     // Ouvrir tout de suite le dedans d'un bloc qu'on vient de poser : c'est ce qu'on veut
     // faire ensuite neuf fois sur dix, et le chercher casse l'elan.
-    if (BLOCS_A_CORPS.includes(sorte)) setCible(neuve.id);
+    if (BLOCS_A_CORPS.includes(sorte)) {
+      setCible(neuve.id);
+      setBranche('corps');
+    }
+  }
+
+  function retirer(id: string) {
+    setProgramme((precedent) => sansInstruction(precedent, id));
+    setFonction((precedent) => sansInstruction(precedent, id));
+  }
+
+  function changerFois(id: string, fois: number) {
+    setProgramme((precedent) => avecFois(precedent, id, fois));
+    setFonction((precedent) => avecFois(precedent, id, fois));
   }
 
   function lancer() {
     if (!niveau || programme.length === 0) return;
-    const trace = executer(niveau, programme);
+    const trace = executer(niveau, programme, fonction);
     setJoue(true);
     setIssue(null);
 
@@ -167,6 +217,7 @@ export default function ProgrammationGame() {
         setIssue(gagne ? 'gagne' : 'rate');
         setJoue(false);
         if (gagne) {
+          setFaits((precedent) => precedent + 1);
           void enregistrer({ parcours, etape: niveau.etape });
         }
       }
@@ -189,7 +240,9 @@ export default function ProgrammationGame() {
     <div className="Prog">
       <div className="Prog__entete">
         <p className="Prog__etape">
-          Étape {String(etape.rang)} sur {String(ETAPES.length)} · {etape.titre}
+          Étape {String(etape.rang)} sur {String(ETAPES.length)} · {etape.titre} ·{' '}
+          {String(Math.min(faits, etape.reussites))} réussi
+          {faits > 1 ? 's' : ''} sur {String(etape.reussites)}
         </p>
         <p className="Prog__consigne">{etape.consigne}</p>
       </div>
@@ -200,18 +253,65 @@ export default function ProgrammationGame() {
         <div className="Prog__cote">
           <Palette blocs={niveau.blocs} surAjout={ajouter} bloque={joue} />
 
-          <Programme
-            programme={programme}
-            cible={cible}
-            rangActif={null}
-            surRetrait={(id) =>
-              setProgramme((precedent) => sansInstruction(precedent, id))
+          {niveau.avecFonction && (
+            <div
+              className={`Prog__fonction${dansFonction ? ' Prog__fonction--ouvert' : ''}`}
+            >
+              <Programme
+                titre="Ton bloc à toi"
+                programme={fonction}
+                cible={cible}
+                branche={branche}
+                rangActif={null}
+                surRetrait={retirer}
+                surCible={setCible}
+                surBranche={setBranche}
+                surFois={changerFois}
+              />
+              <button
+                type="button"
+                className="Prog__ouvrir"
+                onClick={() => {
+                  setDansFonction(true);
+                  setCible(null);
+                }}
+              >
+                {dansFonction ? '✓ on remplit le bloc' : '+ remplir mon bloc'}
+              </button>
+            </div>
+          )}
+
+          <div
+            className={
+              niveau.avecFonction && !dansFonction
+                ? 'Prog__fonction Prog__fonction--ouvert'
+                : undefined
             }
-            surCible={setCible}
-            surFois={(id, fois) =>
-              setProgramme((precedent) => avecFois(precedent, id, fois))
-            }
-          />
+          >
+            <Programme
+              titre="Ton programme"
+              programme={programme}
+              cible={cible}
+              branche={branche}
+              rangActif={null}
+              surRetrait={retirer}
+              surCible={setCible}
+              surBranche={setBranche}
+              surFois={changerFois}
+            />
+            {niveau.avecFonction && (
+              <button
+                type="button"
+                className="Prog__ouvrir"
+                onClick={() => {
+                  setDansFonction(false);
+                  setCible(null);
+                }}
+              >
+                {dansFonction ? '+ revenir au programme' : '✓ on remplit le programme'}
+              </button>
+            )}
+          </div>
 
           {niveau.maximumBlocs !== undefined && (
             <p className={`Prog__bride${trop ? ' Prog__bride--trop' : ''}`}>
@@ -238,9 +338,22 @@ export default function ProgrammationGame() {
             <div className="Prog__issue Prog__issue--gagne">
               <p>Gagné ! Tu as atteint {decor.nomBut}.</p>
               <div className="Prog__actions">
-                {!dernier && (
-                  <Button variant="primary" onClick={() => setChoisi(rang + 1)}>
+                {/* L'etape suivante ne s'ouvre qu'apres le nombre de reussites voulu.
+                    Passer des le premier niveau faisait traverser tout le module en dix
+                    coups : on avait fait le tour avant d'avoir rien installe. */}
+                {faits >= etape.reussites && !dernier ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      setChoisi(rang + 1);
+                      setFaits(0);
+                    }}
+                  >
                     Étape suivante
+                  </Button>
+                ) : (
+                  <Button variant="primary" onClick={() => setGraine(graine + 1)}>
+                    Encore un
                   </Button>
                 )}
                 <Button variant="outline" onClick={() => setGraine(graine + 1)}>

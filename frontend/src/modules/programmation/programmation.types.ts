@@ -30,10 +30,20 @@ export type SorteBloc =
   | 'ramasser'
   | 'repeter'
   | 'si_graine'
-  | 'si_mur';
+  | 'si_mur'
+  | 'tant_que'
+  | 'appel';
 
 /** Les blocs qui portent un CORPS : d'autres instructions a l'interieur. */
-export const BLOCS_A_CORPS: SorteBloc[] = ['repeter', 'si_graine', 'si_mur'];
+export const BLOCS_A_CORPS: SorteBloc[] = [
+  'repeter',
+  'si_graine',
+  'si_mur',
+  'tant_que',
+];
+
+/** Les blocs qui portent un SINON, c'est-a-dire un second corps. */
+export const BLOCS_A_SINON: SorteBloc[] = ['si_graine', 'si_mur'];
 
 export interface Case {
   x: number;
@@ -48,8 +58,19 @@ export interface Instruction {
   sorte: SorteBloc;
   /** `repeter` seulement. */
   fois?: number;
-  /** `repeter`, `si_graine` et `si_mur`. */
+  /** `repeter`, `si_graine`, `si_mur` et `tant_que`. */
   corps?: Instruction[];
+  /** Ce qu'on fait QUAND CE N'EST PAS le cas. Le `sinon` d'une condition : sans lui, il
+   * faut deux conditions contraires pour dire une seule chose. */
+  sinon?: Instruction[];
+}
+
+/** Le bloc qu'on se fabrique : une suite d'ordres a laquelle on donne un nom, et qu'on
+ * rappelle ensuite d'un seul geste. C'est la notion la plus puissante du module, et la
+ * seule qui demande de PENSER une suite avant de s'en servir. */
+export interface Fonction {
+  /** Les ordres que le bloc contient. */
+  corps: Instruction[];
 }
 
 export interface Niveau {
@@ -71,6 +92,8 @@ export interface Niveau {
   /** Un programme qui resout le niveau. Il n'est jamais montre a l'enfant : il est la
    * preuve que le niveau EST soluble, verifiee a l'engendrement (voir le generateur). */
   solution: Instruction[];
+  /** Le niveau donne-t-il acces au bloc qu'on se fabrique ? */
+  avecFonction?: boolean;
   /** Au-dela, le programme est refuse : c'est ce qui rend la repetition necessaire
    * plutot que facultative. Absent, pas de limite. */
   maximumBlocs?: number;
