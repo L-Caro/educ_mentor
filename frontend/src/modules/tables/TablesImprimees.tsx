@@ -79,7 +79,13 @@ export function TableComplete({
               <td>
                 {String(d.table)} × {ligne.facteur} =
               </td>
-              <td>{memo ? <strong>{ligne.produit}</strong> : <Blanc largeurMm={14} />}</td>
+              <td>
+                {memo ? (
+                  <strong>{ligne.produit}</strong>
+                ) : (
+                  <Blanc largeurMm={14} />
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

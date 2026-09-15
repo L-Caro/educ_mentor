@@ -5,6 +5,7 @@ import {
   Suite,
   TableComplete,
 } from './TablesImprimees';
+import TableauPythagore from './TableauPythagore';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 
 /**
@@ -66,12 +67,64 @@ export const tablesImpression: FournisseurImpression = {
       // Elle est deja remplie : rien a corriger.
       reponse: () => '(memo)',
     },
+    {
+      // N'existe que sur le papier : a l'ecran il faudrait cent champs de saisie.
+      cle: 'pythagore',
+      label: 'Table de Pythagore à trous',
+      largeur: 'pleine',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">Complète les cases vides.</p>
+          <TableauPythagore d={d} />
+        </div>
+      ),
+      // La grille REMPLIE plutot qu'une liste de produits : une trentaine de « 7x8=56 »
+      // a la file ne se relit pas, alors qu'on corrige une grille en la superposant du
+      // regard a celle qu'on vient de remplir.
+      reponse: (d) => <TableauPythagore d={d} memo />,
+    },
   ],
   options: [
+    {
+      cle: 'jusqua',
+      label: 'La table de Pythagore va jusqu’à',
+      type: 'nombre',
+      pour: ['pythagore'],
+      min: 5,
+      max: 12,
+      defaut: 10,
+    },
+    {
+      cle: 'trous',
+      label: 'Les cases à trouer',
+      type: 'grille',
+      pour: ['pythagore'],
+      cote: (valeurs) => Number(valeurs.jusqua ?? 10),
+      contenu: (ligne, colonne) => String(ligne * colonne),
+    },
+    {
+      cle: 'combien',
+      label: 'Combien de trous, quand aucune case n’est choisie',
+      type: 'nombre',
+      pour: ['pythagore'],
+      min: 1,
+      max: 60,
+      defaut: 15,
+    },
     {
       cle: 'tables',
       label: 'Quelles tables',
       type: 'multi',
+      // La table de Pythagore les contient TOUTES par construction : ce reglage n'a rien
+      // a y dire.
+      pour: [
+        'produit',
+        'facteur_manquant',
+        'decomposition',
+        'suite',
+        'table_complete',
+        'table_memo',
+      ],
       // Statique, et pour longtemps : les tables vont de 0 a 10.
       choix: Array.from({ length: 11 }, (_, n) => ({
         valeur: String(n),

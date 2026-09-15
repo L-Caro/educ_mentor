@@ -37,11 +37,19 @@ export interface ChoixImprimable {
   label: string;
 }
 
+/** Les types d'exercices auxquels un reglage s'applique. Absent, il vaut pour tous.
+ *
+ * Les tables en ont besoin : « jusqu'ou va la table de Pythagore » n'a aucun sens quand on
+ * imprime des `7 x 8 = ...`, et l'afficher quand meme obligerait l'adulte a decider de
+ * quelque chose qui ne le concerne pas. */
+export type PourExercices = string[];
+
 export type OptionImprimable =
   | {
       cle: string;
       label: string;
       type: 'multi';
+      pour?: PourExercices;
       choix?: ChoixImprimable[];
       charger?: () => Promise<ChoixImprimable[]>;
       /** Rien de coche = pas de filtre, le module choisit librement. */
@@ -53,6 +61,7 @@ export type OptionImprimable =
        * chiffres arabes ou en chiffres romains, pas les deux a la fois. Une liste a
        * cocher ne saurait pas dire ce que « les deux » veut dire. */
       type: 'unique';
+      pour?: PourExercices;
       choix?: ChoixImprimable[];
       charger?: () => Promise<ChoixImprimable[]>;
       /** Rien de choisi = le module decide, comme pour `multi`. Une liste chargee n'a
@@ -63,7 +72,24 @@ export type OptionImprimable =
   | {
       cle: string;
       label: string;
+      /** Une grille de cases a designer une par une, pour les reglages qui portent sur un
+       * EMPLACEMENT et non sur une liste : les trous d'une table de Pythagore. Une liste
+       * a cocher de cent entrees dirait la meme chose et ne se lirait pas.
+       *
+       * La valeur est une liste de `"ligne,colonne"`, indexee a partir de 1. */
+      type: 'grille';
+      pour?: PourExercices;
+      /** Le cote de la grille, lu dans les autres reglages du module quand il en depend
+       * (la table de Pythagore va « jusqua » ce que l'adulte a choisi). */
+      cote: (valeurs: Record<string, unknown>) => number;
+      /** L'etiquette d'une case, pour que l'adulte voie ce qu'il troue. */
+      contenu: (ligne: number, colonne: number) => string;
+    }
+  | {
+      cle: string;
+      label: string;
       type: 'nombre';
+      pour?: PourExercices;
       min: number;
       max: number;
       defaut: number;

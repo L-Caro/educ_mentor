@@ -3,9 +3,18 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { MODULES } from 'src/modules.manifest';
 
-const SCSS = readFileSync(join(__dirname, '../impression/impression.scss'), 'utf-8');
-const TRAMES = readFileSync(join(__dirname, '../impression/trames.tsx'), 'utf-8');
-const PAGE = readFileSync(join(__dirname, '../impression/ImpressionPage.tsx'), 'utf-8');
+const SCSS = readFileSync(
+  join(__dirname, '../impression/impression.scss'),
+  'utf-8',
+);
+const TRAMES = readFileSync(
+  join(__dirname, '../impression/trames.tsx'),
+  'utf-8',
+);
+const PAGE = readFileSync(
+  join(__dirname, '../impression/ImpressionPage.tsx'),
+  'utf-8',
+);
 
 const fournisseurs = MODULES.filter((m) => m.impression);
 
@@ -13,7 +22,11 @@ describe('le catalogue imprimable', () => {
   it('ne declare que des exercices complets', () => {
     for (const module of fournisseurs) {
       for (const exercice of module.impression!.exercices) {
-        expect({ module: module.id, cle: exercice.cle, ok: exercice.label.length > 0 }).toEqual({
+        expect({
+          module: module.id,
+          cle: exercice.cle,
+          ok: exercice.label.length > 0,
+        }).toEqual({
           module: module.id,
           cle: exercice.cle,
           ok: true,
@@ -36,7 +49,10 @@ describe('le catalogue imprimable', () => {
   it('n’apparait pas chez les modules qui n’ont rien a imprimer', () => {
     // Un jeu n'a pas de feuille d'exercices. Absent = absent de la page de composition.
     for (const id of ['morpion', 'puissance4', 'mahjong', 'memory', 'snake']) {
-      expect({ id, imprimable: !!MODULES.find((m) => m.id === id)?.impression }).toEqual({
+      expect({
+        id,
+        imprimable: !!MODULES.find((m) => m.id === id)?.impression,
+      }).toEqual({
         id,
         imprimable: false,
       });
@@ -50,10 +66,13 @@ describe('les reglages par exercice', () => {
     // de grammaire toutes les notions ouvertes. C'est utilisable, mais ca ne permet pas
     // de travailler ce qu'on VEUT travailler, qui est le seul interet d'une feuille faite
     // a la main plutot que tiree au hasard.
-    // Les reglages portent sur le CONTENU et valent pour tous les types du module : les
-    // tables a travailler sont les memes qu'on demande un produit ou une suite.
+    // Les reglages portent sur le CONTENU. La plupart valent pour tous les types du
+    // module : les tables a travailler sont les memes qu'on demande un produit ou une
+    // suite. Quelques-uns ne concernent qu'un type, et portent alors un `pour` : « jusqu'ou
+    // va la table de Pythagore » n'a rien a dire quand on imprime des `7 x 8 = ...`, et la
+    // page de composition les masque.
     const attendus: Record<string, string[]> = {
-      tables: ['tables'],
+      tables: ['tables', 'jusqua', 'trous', 'combien'],
       'calcul-mental': ['types'],
       conjugaison: ['formes', 'verbes', 'tenses'],
       accords: ['types'],
@@ -68,9 +87,29 @@ describe('les reglages par exercice', () => {
     }
   });
 
+  it('ne restreint un reglage qu’a des types QUI EXISTENT', () => {
+    // Un `pour` qui nomme un type disparu masquerait le reglage pour toujours, sans rien
+    // signaler : la case ne s'afficherait simplement jamais, et on chercherait la panne
+    // dans le rendu.
+    const fautifs: string[] = [];
+    for (const module of MODULES) {
+      const cles = new Set(
+        module.impression?.exercices.map((exercice) => exercice.cle) ?? [],
+      );
+      for (const option of module.impression?.options ?? []) {
+        for (const cible of option.pour ?? []) {
+          if (!cles.has(cible))
+            fautifs.push(`${module.id}/${option.cle} → ${cible}`);
+        }
+      }
+    }
+    expect(fautifs).toEqual([]);
+  });
+
   it('borne le nombre de formes d’une conjugaison entre une et six', () => {
-    const formes = MODULES.find((m) => m.id === 'conjugaison')
-      ?.impression?.options?.find((o) => o.cle === 'formes');
+    const formes = MODULES.find(
+      (m) => m.id === 'conjugaison',
+    )?.impression?.options?.find((o) => o.cle === 'formes');
     expect(formes).toMatchObject({ type: 'nombre', min: 1, max: 6 });
   });
 
@@ -120,7 +159,10 @@ describe('la feuille est un objet PHYSIQUE', () => {
     // `repeating-linear-gradient` : la feuille serait sortie vierge, et l'enfant aurait
     // eu une page blanche numerotee. Une bordure fait partie du contenu et s'imprime
     // toujours.
-    const trames = SCSS.slice(SCSS.indexOf('.Seyes {'), SCSS.indexOf('.LignesEcriture'));
+    const trames = SCSS.slice(
+      SCSS.indexOf('.Seyes {'),
+      SCSS.indexOf('.LignesEcriture'),
+    );
     expect(trames).not.toMatch(/background/);
     expect(trames).toMatch(/border-bottom: 0\.15mm solid/);
   });
@@ -143,7 +185,9 @@ describe('la feuille est un objet PHYSIQUE', () => {
     // qu'on dise plus bas.
     const bloc = SCSS.slice(SCSS.indexOf('@media print'));
     expect(bloc).toMatch(/body \* \{\s*visibility: hidden/);
-    expect(bloc).toMatch(/\.Feuille,\s*\n\s*\.Feuille \* \{\s*visibility: visible/);
+    expect(bloc).toMatch(
+      /\.Feuille,\s*\n\s*\.Feuille \* \{\s*visibility: visible/,
+    );
   });
 });
 
@@ -151,7 +195,10 @@ describe('ou vit la composition', () => {
   it('est dans l’administration, pas sur l’ecran de l’enfant', () => {
     // Imprimer demande une imprimante, du papier, et de decider ce qu'on fait
     // travailler. A sept ans elle ne fait rien de tout ca.
-    const routeur = readFileSync(join(__dirname, '../routes/router.tsx'), 'utf-8');
+    const routeur = readFileSync(
+      join(__dirname, '../routes/router.tsx'),
+      'utf-8',
+    );
     expect(routeur).toMatch(/path: 'impression'/);
     const blocAdmin = routeur.slice(routeur.indexOf("path: '/admin'"));
     expect(blocAdmin).toMatch(/path: 'impression'/);
@@ -160,7 +207,10 @@ describe('ou vit la composition', () => {
   it('retire deux feuilles DIFFERENTES a deux preparations', () => {
     // Pas de memorisation des compositions, et surtout pas de cache : la meme demande
     // doit donner d'autres exercices. D'ou une mutation et non une requete.
-    const api = readFileSync(join(__dirname, '../impression/impression.api.ts'), 'utf-8');
+    const api = readFileSync(
+      join(__dirname, '../impression/impression.api.ts'),
+      'utf-8',
+    );
     expect(api).toMatch(/builder\.mutation/);
     expect(PAGE).toMatch(/useComposerFeuilleMutation/);
   });

@@ -33,7 +33,7 @@ export const lectureImpression: FournisseurImpression = {
         <span>
           {(d.reponses as string[])
             .map((reponse, i) => `${String(i + 1)}. ${reponse}`)
-            .join(' — ')}
+            .join(' · ')}
         </span>
       ),
     },

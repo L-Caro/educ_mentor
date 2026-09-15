@@ -8,10 +8,17 @@ export const tablesModule: ModuleManifest = {
   id: 'tables',
   category: 'maths',
   setupOptions: TABLES_SETUP_OPTIONS,
-  loadGameSpec: () => import('./tables.game.tsx').then((module) => module.tablesGameSpec),
+  loadGameSpec: () =>
+    import('./tables.game.tsx').then((module) => module.tablesGameSpec),
   adminTabs: [{ to: '/admin/tables', label: 'Paramètres', end: true }],
   adminRoutes: [
-    { index: true, lazy: () => import('./TablesSettings.tsx').then((module) => ({ Component: module.default })) },
+    {
+      index: true,
+      lazy: () =>
+        import('./TablesSettings.tsx').then((module) => ({
+          Component: module.default,
+        })),
+    },
   ],
   progression: buildProgressionEntry({
     getEndpoint: tablesApi.endpoints.getTablesProgression,

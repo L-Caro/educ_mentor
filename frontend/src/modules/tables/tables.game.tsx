@@ -1,4 +1,7 @@
-import type { TablesQuestion, TablesSessionResponse } from "src/modules/tables/tables.type.ts";
+import type {
+  TablesQuestion,
+  TablesSessionResponse,
+} from 'src/modules/tables/tables.type.ts';
 import store from 'src/store';
 import { tablesApi } from './tables.api.ts';
 import GamePrompt from 'src/components/game/engine/GamePrompt.tsx';
@@ -6,13 +9,22 @@ import type { GameModuleSpec } from 'src/types/game.types.ts';
 import TableRappel from './TableRappel.tsx';
 import './tables.scss';
 
-export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestion> = {
+export const tablesGameSpec: GameModuleSpec<
+  TablesSessionResponse,
+  TablesQuestion
+> = {
   loadSession: (setup) => {
-    const tables = ((setup.tables as string[] | undefined) ?? []).map(Number).filter((value) => !isNaN(value));
-    return store.dispatch(tablesApi.endpoints.startTablesSession.initiate({
-      selectedTables: tables,
-      difficulty: setup.difficulty as string | undefined,
-    })).unwrap();
+    const tables = ((setup.tables as string[] | undefined) ?? [])
+      .map(Number)
+      .filter((value) => !isNaN(value));
+    return store
+      .dispatch(
+        tablesApi.endpoints.startTablesSession.initiate({
+          selectedTables: tables,
+          difficulty: setup.difficulty as string | undefined,
+        }),
+      )
+      .unwrap();
   },
 
   renderPrompt: (question) => (
@@ -24,13 +36,18 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
   ),
 
   qcm: {
-    getChoices: (question) => question.choices.map((choice) => ({ key: String(choice), label: choice })),
+    getChoices: (question) =>
+      question.choices.map((choice) => ({
+        key: String(choice),
+        label: choice,
+      })),
     correctKey: (question) => String(question.answer),
   },
 
   free: {
     parse: (raw) => parseInt(raw.trim(), 10),
-    isCorrect: (question, given) => typeof given === 'number' && !isNaN(given) && given === question.answer,
+    isCorrect: (question, given) =>
+      typeof given === 'number' && !isNaN(given) && given === question.answer,
     inputProps: { numeric: true, maxLength: 3, placeholder: '?' },
   },
 
@@ -45,31 +62,46 @@ export const tablesGameSpec: GameModuleSpec<TablesSessionResponse, TablesQuestio
    * Fonction pure : réutilisable telle quelle par le futur mode « école ».
    */
   fiche: (question) => {
-    const [petit, grand] = question.display_a <= question.display_b
-      ? [question.display_a, question.display_b]
-      : [question.display_b, question.display_a];
+    const [petit, grand] =
+      question.display_a <= question.display_b
+        ? [question.display_a, question.display_b]
+        : [question.display_b, question.display_a];
 
     return {
       titre: `${question.display_a} × ${question.display_b}`,
       idee: `${petit} × ${grand} et ${grand} × ${petit} donnent le même résultat. Tu peux réciter celle que tu connais le mieux.`,
       regle: `${petit} × ${grand} = ${question.answer}`,
       exemple: <TableRappel table={petit} highlight={grand} />,
-      piege: petit === 0 || grand === 0
-        ? 'Multiplier par 0 donne toujours 0.'
-        : petit === 1
-          ? 'Multiplier par 1 ne change rien.'
-          : undefined,
+      piege:
+        petit === 0 || grand === 0
+          ? 'Multiplier par 0 donne toujours 0.'
+          : petit === 1
+            ? 'Multiplier par 1 ne change rien.'
+            : undefined,
     };
   },
 
   recordAnswer: (sessionId, question, correct) =>
-    store.dispatch(tablesApi.endpoints.recordTablesAnswer.initiate({
-      sessionId, factorA: question.display_a, factorB: question.display_b, isCorrect: correct,
-    })).unwrap(),
+    store
+      .dispatch(
+        tablesApi.endpoints.recordTablesAnswer.initiate({
+          sessionId,
+          factorA: question.display_a,
+          factorB: question.display_b,
+          isCorrect: correct,
+        }),
+      )
+      .unwrap(),
   completeSession: (sessionId, correctAnswers, totalQuestions) =>
-    store.dispatch(tablesApi.endpoints.completeTablesSession.initiate({
-      sessionId, correctAnswers, totalQuestions,
-    })).unwrap(),
+    store
+      .dispatch(
+        tablesApi.endpoints.completeTablesSession.initiate({
+          sessionId,
+          correctAnswers,
+          totalQuestions,
+        }),
+      )
+      .unwrap(),
   buildResultEntry: (question, given, correct, timeout) => {
     const value = given == null ? null : Number(given);
     return {

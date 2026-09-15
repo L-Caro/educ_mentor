@@ -260,6 +260,7 @@ export default function ImpressionPage() {
                       <OptionsExercice
                         options={f.options}
                         valeurs={reglages[f.id] ?? {}}
+                        coches={coches}
                         onChange={(valeurs) =>
                           setReglages((precedent) => ({
                             ...precedent,

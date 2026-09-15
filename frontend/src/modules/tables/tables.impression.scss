@@ -11,3 +11,58 @@
     white-space: nowrap;
   }
 }
+
+// ─── La table de Pythagore ───────────────────────────────────────────────────
+//
+// Des BORDURES, jamais des fonds. Le modele en ligne colorie chaque case ; a l'impression
+// un fond CSS ne sort pas tant que « graphiques d'arriere-plan » n'est pas coche, et
+// cette case est decochee par defaut. Ce que la couleur montrait, le trait le rend.
+
+.Pythagore {
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+  margin-top: 1mm;
+
+  th,
+  td {
+    width: 11mm;
+    height: 8mm;
+    border: 0.15mm solid #000;
+    text-align: center;
+    font-size: 9pt;
+  }
+
+  // Un filet epais sous et a droite de l'en-tete : c'est lui qui dit ou commence la table
+  // et ou sont les facteurs. La couleur du modele ne servait qu'a cela.
+  //
+  // Selecteurs qualifies par `th` et `td`. Sans cela la regle generique ci-dessus est
+  // PLUS specifique (une classe et un element contre une classe seule) et remettait
+  // toutes ces epaisseurs a 0,15 mm : la grille sortait uniformement quadrillee, sans
+  // en-tete ni diagonale, et rien dans le fichier ne le laissait voir.
+  th#{&}__coin,
+  th#{&}__entete {
+    font-weight: 700;
+    border-bottom-width: 0.45mm;
+  }
+
+  th#{&}__entete--ligne {
+    border-bottom-width: 0.15mm;
+    border-right-width: 0.45mm;
+  }
+
+  th#{&}__coin {
+    border-right-width: 0.45mm;
+  }
+
+  // ── Pas de mise en valeur de la diagonale des carres ──────────────────────────────
+  //
+  // Elle a ete essayee deux fois et abandonnee. Une bordure epaisse ne tient pas en
+  // `border-collapse: collapse` : les bords sont mis en commun entre voisines, et
+  // epaissir celui d'une case tirait un trait sur toute la rangee, ce qui coupait la
+  // table en deux au lieu de designer une case. Un `outline` echappe bien a cette mise en
+  // commun, mais Chrome le rogne a l'impression : chaque carre ne sortait qu'a moitie
+  // encadre, deux cotes sur quatre, et de facon differente d'une case a l'autre.
+  //
+  // Un repere a moitie trace est pire qu'aucun : il attire l'oeil sur un defaut. La
+  // grille se lit tres bien sans, l'en-tete suffit a s'y retrouver.
+}

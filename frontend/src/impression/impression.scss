@@ -320,6 +320,60 @@ $bleu-fort: #5a7fb0;
   opacity: 0.6;
 }
 
+// La grille des trous a designer. Petite : c'est un reglage, pas la feuille. Les cases
+// portent leur produit pour qu'on voie ce qu'on troue, et non un damier muet.
+.Grille {
+  display: grid;
+  grid-template-columns: repeat(var(--cote), 2.1rem);
+  gap: 2px;
+  margin: $space-3 0;
+  // Sans cela, un glisser sur les cases fait defiler la page sur un ecran tactile au lieu
+  // de trouer une ligne.
+  touch-action: none;
+  user-select: none;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+
+  &__case,
+  &__entete,
+  &__coin {
+    height: 1.7rem;
+    border: 1px solid var(--color-base-300);
+    border-radius: 3px;
+    background: var(--color-base-100);
+    color: var(--color-base-content);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  // Les en-tetes troue la rangee ou la colonne entiere : « la table de 3 » est la facon
+  // dont on pense une table de Pythagore.
+  &__entete,
+  &__coin {
+    font-weight: 700;
+    background: var(--color-base-200);
+  }
+
+  &__coin {
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__case {
+    &--troue {
+      background: var(--color-primary);
+      color: var(--color-primary-content);
+      border-color: var(--color-primary);
+      font-weight: 700;
+    }
+  }
+}
+
 // Les reglages d'un exercice, sous son compteur. Decales et plus discrets : ils
 // dependent de lui, et l'oeil doit pouvoir les sauter quand on compose vite.
 .Impression__options {

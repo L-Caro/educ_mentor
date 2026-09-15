@@ -122,6 +122,8 @@ export class ImpressionService {
       case 'tables/table_complete':
       case 'tables/table_memo':
         return this.tablesCompletes(ligne);
+      case 'tables/pythagore':
+        return this.tablesPythagore(ligne);
       case 'calcul-mental/operation':
         return this.calculOperation(ligne);
       case 'calcul-mental/vrai_faux':
@@ -1520,5 +1522,85 @@ export class ImpressionService {
         })),
       },
     }));
+  }
+
+  /**
+   * La table de Pythagore, avec des trous. N'existe que sur le papier.
+   *
+   * Ce n'est pas un exercice de plus, c'est un AUTRE regard sur ce que les autres
+   * travaillent ligne par ligne : la table entiere d'un coup, ou l'on voit que 6 x 8 et
+   * 8 x 6 sont la meme case lue dans deux sens, et ou la diagonale des carres saute aux
+   * yeux. A l'ecran il faudrait cent champs de saisie ; sur le papier c'est une grille
+   * qu'on remplit au crayon.
+   *
+   * UNE seule par feuille, quel que soit le nombre demande, comme la dictee : c'est un
+   * bloc, pas un exercice parmi d'autres, et deux grilles aux memes trous seraient deux
+   * fois la meme page.
+   *
+   * Les trous sont CHOISIS par l'adulte, case par case. A defaut, on en tire au hasard :
+   * cliquer trente cases a chaque feuille serait plus penible que de composer la feuille
+   * entiere, et l'interet d'une grille trouee ne tient pas a l'emplacement exact des
+   * trous.
+   */
+  private tablesPythagore(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const jusqua = Math.min(
+      12,
+      Math.max(5, Number(ligne.options?.jusqua ?? 10) || 10),
+    );
+
+    const choisis = Array.isArray(ligne.options?.trous)
+      ? (ligne.options.trous as unknown[])
+          .map(String)
+          .map((paire) => paire.split(',').map(Number))
+          .filter(
+            ([l, c]) =>
+              Number.isInteger(l) &&
+              Number.isInteger(c) &&
+              l >= 1 &&
+              l <= jusqua &&
+              c >= 1 &&
+              c <= jusqua,
+          )
+      : [];
+
+    const trous =
+      choisis.length > 0 ? choisis : this.trousAuHasard(jusqua, ligne);
+
+    return Promise.resolve([
+      {
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          jusqua,
+          trous: trous.map(([l, c]) => `${String(l)},${String(c)}`),
+          // Le corrige donne les produits manquants dans l'ordre de lecture : on relit la
+          // grille ligne par ligne, pas case par case au hasard.
+          reponse: [...trous]
+            .sort((a, b) => a[0] - b[0] || a[1] - b[1])
+            .map(([l, c]) => `${String(l)}x${String(c)}=${String(l * c)}`),
+        },
+      },
+    ]);
+  }
+
+  /** Des trous tires au hasard, sans doublon. Bornes a la moitie de la grille : au-dela
+   * ce n'est plus une table trouee mais une table vide, qui est l'exercice d'a cote. */
+  private trousAuHasard(jusqua: number, ligne: LigneComposition): number[][] {
+    const cases = jusqua * jusqua;
+    const voulus = Math.min(
+      Math.floor(cases / 2),
+      Math.max(1, Number(ligne.options?.combien ?? 15) || 15),
+    );
+    const vus = new Set<string>();
+    const trous: number[][] = [];
+    for (let essai = 0; essai < cases * 10 && trous.length < voulus; essai++) {
+      const l = 1 + Math.floor(Math.random() * jusqua);
+      const c = 1 + Math.floor(Math.random() * jusqua);
+      const cle = `${String(l)},${String(c)}`;
+      if (vus.has(cle)) continue;
+      vus.add(cle);
+      trous.push([l, c]);
+    }
+    return trous;
   }
 }
