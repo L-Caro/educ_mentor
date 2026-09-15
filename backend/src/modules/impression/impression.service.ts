@@ -10,6 +10,8 @@ import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
 import { HeureService } from '../heure/heure.service';
 import { MonnaieService } from '../monnaie/monnaie.service';
+import { GeometrieService } from '../geometrie/geometrie.service';
+import type { QuestionType } from '../geometrie/geometrie.logic';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { maximum } from '../numeration/numeration.positions';
 import type { StartDicteeSessionDto } from '../dictee/dto/dictee.dto';
@@ -18,6 +20,13 @@ import {
   type ItemImprime,
   type LigneComposition,
 } from './impression.types';
+
+/**
+ * Les figures dont les sommets tombent sur les carreaux, et donc qu'on peut demander de
+ * tracer a la regle. Un pentagone regulier sur un quadrillage de cinq millimetres n'est
+ * pas un exercice de CE1 mais une construction au compas.
+ */
+const TRACABLES_SUR_CARREAUX = ['carre', 'rectangle', 'triangleRectangle'];
 
 /**
  * Compose une feuille d'exercices en puisant chez les modules.
@@ -45,6 +54,7 @@ export class ImpressionService {
     private readonly numerationService: NumerationService,
     private readonly heureService: HeureService,
     private readonly monnaieService: MonnaieService,
+    private readonly geometrieService: GeometrieService,
   ) {}
 
   async composer(lignes: LigneComposition[]): Promise<ItemImprime[]> {
@@ -148,6 +158,13 @@ export class ImpressionService {
         return this.monnaieQuestion(ligne);
       case 'monnaie/entourer':
         return this.monnaieEntourer(ligne);
+      case 'geometrie/nommer':
+      case 'geometrie/cotes_sommets':
+      case 'geometrie/angle_droit':
+      case 'geometrie/proprietes':
+        return this.geometrieQuestion(ligne);
+      case 'geometrie/tracer':
+        return this.geometrieTracer(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -1053,6 +1070,104 @@ export class ImpressionService {
         module: ligne.module,
         exercice: ligne.exercices[0],
         donnees: { cible, palette, solution: [...solution].sort((a, b) => b - a) },
+      });
+    }
+    return items;
+  }
+
+  /**
+   * Les questions du module : nommer une figure, compter ses cotes, reperer un angle
+   * droit, comparer deux figures.
+   *
+   * `nommer` couvre les deux types du jeu, `nom_figure` et `nom_solide`. La distinction
+   * lui sert a regler la difficulte ; sur une feuille, nommer un carre et nommer un cube
+   * sont la meme consigne ecrite au meme endroit, et deux cases a cocher pour cela
+   * n'apprendraient rien a l'adulte qui compose.
+   */
+  private async geometrieQuestion(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const types: QuestionType[] =
+      ligne.exercices[0] === 'nommer'
+        ? ['nom_figure', 'nom_solide']
+        : [ligne.exercices[0] as QuestionType];
+
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.geometrieService.construireQuestions({
+            difficulty: 'hard',
+            question_types: types,
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        consigne: q.display,
+        figure: q.shape,
+        figureB: q.shapeB,
+        reponse: q.answer,
+      },
+    }));
+  }
+
+  /**
+   * Tracer une figure sur des carreaux. N'existe que sur le papier.
+   *
+   * C'est le seul exercice de geometrie qui demande une regle et un crayon, et c'est
+   * aussi celui que l'ecole fait le plus : reconnaitre un carre et savoir en tracer un
+   * sont deux choses, et la seconde ne se mesure pas a la souris.
+   *
+   * Seules les figures dont les sommets tombent sur les carreaux sont proposees. Un
+   * pentagone regulier a tracer sur un quadrillage de cinq millimetres n'est pas un
+   * exercice de CE1, c'est un exercice de construction au compas.
+   */
+  private async geometrieTracer(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const { figures } = await this.geometrieService.construireQuestions({
+      difficulty: 'hard',
+    });
+    const tracables = figures
+      .map((figure) => figure.key)
+      .filter((cle) => TRACABLES_SUR_CARREAUX.includes(cle));
+    if (tracables.length === 0) return [];
+
+    const items: ItemImprime[] = [];
+    const vus = new Set<string>();
+
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && items.length < ligne.nombre;
+      essai++
+    ) {
+      const figure = tracables[Math.floor(Math.random() * tracables.length)];
+      // Entre trois et huit carreaux : en dessous le trace ne se voit pas, au-dessus il
+      // ne tient plus dans une demi-largeur de feuille.
+      const largeur = 3 + Math.floor(Math.random() * 6);
+      const hauteur =
+        figure === 'carre' ? largeur : 3 + Math.floor(Math.random() * 6);
+      if (figure !== 'carre' && hauteur === largeur) continue;
+
+      const cle = `${figure}:${String(largeur)}x${String(hauteur)}`;
+      if (vus.has(cle)) continue;
+      vus.add(cle);
+
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          figure,
+          largeur,
+          hauteur,
+          // Le quadrillage est plus grand que la figure : un trace cale contre le bord
+          // du cadre ne laisse pas la place de se tromper puis de recommencer.
+          colonnes: largeur + 3,
+          lignes: hauteur + 2,
+        },
       });
     }
     return items;

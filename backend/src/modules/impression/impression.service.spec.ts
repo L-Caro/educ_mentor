@@ -11,6 +11,7 @@ import { GrammaireService } from '../grammaire/grammaire.service';
 import { NumerationService } from '../numeration/numeration.service';
 import { HeureService } from '../heure/heure.service';
 import { MonnaieService } from '../monnaie/monnaie.service';
+import { GeometrieService } from '../geometrie/geometrie.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 
 describe('ImpressionService', () => {
@@ -174,6 +175,37 @@ describe('ImpressionService', () => {
               },
               seance: {},
               denominations: [10, 20, 50, 100, 200],
+            }),
+            startSession: jest.fn(),
+          },
+        },
+        {
+          provide: GeometrieService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [
+                  {
+                    item_key: 'nom_figure:carre',
+                    type: 'nom_figure',
+                    skill_key: 'carre',
+                    display: 'Quelle est cette figure ?',
+                    shape: 'carre',
+                    shapeB: null,
+                    choices: [],
+                    answer: 'carré',
+                  },
+                ],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+              figures: [
+                { key: 'carre' },
+                { key: 'rectangle' },
+                { key: 'pentagone' },
+                { key: 'cercle' },
+              ],
             }),
             startSession: jest.fn(),
           },
@@ -431,6 +463,49 @@ describe('ImpressionService', () => {
         expect(ou).toBeGreaterThanOrEqual(0);
         reste.splice(ou, 1);
       }
+    }
+  });
+
+  it('ne fait tracer que des figures dont les sommets tombent sur les CARREAUX', async () => {
+    // Un pentagone regulier sur un quadrillage de cinq millimetres n'est pas un exercice
+    // de CE1, c'est une construction au compas. Le cercle non plus.
+    const items = await service.composer([
+      { module: 'geometrie', exercices: ['tracer'], nombre: 10 },
+    ]);
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      expect(['carre', 'rectangle', 'triangleRectangle']).toContain(
+        item.donnees.figure,
+      );
+    }
+  });
+
+  it('laisse de la place AUTOUR du trace a faire', async () => {
+    // Un quadrillage cale sur la figure ne laisse pas la place de se tromper puis de
+    // recommencer, et un trace rate tient alors sur le bord de la feuille.
+    const items = await service.composer([
+      { module: 'geometrie', exercices: ['tracer'], nombre: 10 },
+    ]);
+    for (const item of items) {
+      expect(Number(item.donnees.colonnes)).toBeGreaterThan(
+        Number(item.donnees.largeur),
+      );
+      expect(Number(item.donnees.lignes)).toBeGreaterThan(
+        Number(item.donnees.hauteur),
+      );
+    }
+  });
+
+  it('donne un carre AUSSI haut que large, un rectangle jamais', async () => {
+    // Un « rectangle » de quatre sur quatre est un carre : la consigne et la reponse se
+    // contrediraient sur la meme feuille.
+    const items = await service.composer([
+      { module: 'geometrie', exercices: ['tracer'], nombre: 12 },
+    ]);
+    for (const item of items) {
+      const { figure, largeur, hauteur } = item.donnees as Record<string, unknown>;
+      if (figure === 'carre') expect(largeur).toBe(hauteur);
+      else expect(largeur).not.toBe(hauteur);
     }
   });
 });

@@ -54,9 +54,17 @@ export class GeometrieService {
 
   // ─── Jeu ──────────────────────────────────────────────────────────────────
 
-  async startSession(
-    dto: StartGeometrieSessionDto,
-  ): Promise<GeometrieSessionResult> {
+  /** Engendrer les questions, et RIEN d'autre : aucune ecriture en base.
+   *
+   * Separe de `startSession` pour la feuille imprimee, qui emprunte le savoir-faire du
+   * module sans emprunter ses effets : le travail sur papier n'est pas mesure. */
+  async construireQuestions(dto: StartGeometrieSessionDto): Promise<{
+    resultat: Omit<GeometrieSessionResult, 'session_id'>;
+    seance: Partial<GeometrieSession>;
+    /** Les figures OUVERTES par l'administration, dont l'exercice de trace a besoin :
+     * faire tracer un losange que le jeu n'a pas ouvert contournerait le reglage. */
+    figures: ShapeMeta[];
+  }> {
     const difficulty = normalizeDifficulty(dto.difficulty);
     const choicesCount = qcmChoiceCount(difficulty);
 
@@ -100,20 +108,26 @@ export class GeometrieService {
       shape_b_meta: question.shapeB ? getShape(question.shapeB) : null,
     }));
 
-    const session = this.sessionRepo.create({
-      id: randomUUID(),
-      difficulty,
-      question_types: types.join(','),
-      timer_seconds: timerSeconds,
-    });
+    return {
+      resultat: { questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited },
+      seance: {
+        difficulty,
+        question_types: types.join(','),
+        timer_seconds: timerSeconds,
+      },
+      figures: activeShapes,
+    };
+  }
+
+  async startSession(
+    dto: StartGeometrieSessionDto,
+  ): Promise<GeometrieSessionResult> {
+    const { resultat, seance } = await this.construireQuestions(dto);
+
+    const session = this.sessionRepo.create({ id: randomUUID(), ...seance });
     await this.sessionRepo.save(session);
 
-    return {
-      session_id: session.id,
-      questions,
-      timer_seconds: timerSeconds,
-      is_unlimited: isUnlimited,
-    };
+    return { session_id: session.id, ...resultat };
   }
 
   async recordAnswer(dto: RecordGeometrieAnswerDto): Promise<void> {

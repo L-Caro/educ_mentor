@@ -1,0 +1,33 @@
+// ─── Figures imprimees ───────────────────────────────────────────────────────
+
+.FigureImprimee {
+  display: block;
+  width: 24mm;
+  height: 25mm;
+  // `currentColor` dans le catalogue : sur la feuille, le texte est noir, donc le trace
+  // l'est aussi, sans avoir a reprendre chaque forme.
+  color: #000;
+  margin: 1mm 0;
+
+  // Les ANNOTATIONS du catalogue (le petit carre de l'angle droit, les marques de cotes
+  // egaux) sont tracees dans cette couleur d'accent. Sur la feuille elles donneraient la
+  // reponse : « y a-t-il un angle droit ? » sous une figure ou l'angle droit est deja
+  // marque n'est plus une question. Elles etaient deja invisibles faute de variable
+  // definie hors des fiches ; on l'ecrit, pour que definir cette variable ailleurs un
+  // jour ne vienne pas trahir les reponses.
+  --fiche-accent: transparent;
+
+  // Quelques traces du catalogue portent une annotation de cours (« la longueur », « le
+  // centre »). Elle designe ce que la fiche explique, pas ce que l'exercice demande, et
+  // sur une question de nom elle donnerait la reponse.
+  .Forme__note {
+    display: none;
+  }
+}
+
+.Geometrie {
+  &__paire {
+    display: flex;
+    gap: 4mm;
+  }
+}

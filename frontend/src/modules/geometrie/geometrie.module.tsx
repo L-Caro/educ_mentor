@@ -1,3 +1,4 @@
+import { geometrieImpression } from './geometrie.impression';
 import type { ModuleManifest } from 'src/types/modules.types';
 import { geometrieApi } from './geometrie.api';
 import { GEOMETRIE_SETUP_OPTIONS } from './geometrie.setup';
@@ -15,6 +16,7 @@ export const geometrieModule: ModuleManifest = {
       lazy: () => import('./admin/GeometrieSettings.tsx').then((m) => ({ Component: m.default })),
     },
   ],
+  impression: geometrieImpression,
   progression: buildProgressionEntry({
     getEndpoint: geometrieApi.endpoints.getGeometrieProgression,
     resetEndpoint: geometrieApi.endpoints.resetGeometrieProgression,

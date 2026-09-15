@@ -11,6 +11,7 @@ import { GrammaireModule } from '../grammaire/grammaire.module';
 import { NumerationModule } from '../numeration/numeration.module';
 import { HeureModule } from '../heure/heure.module';
 import { MonnaieModule } from '../monnaie/monnaie.module';
+import { GeometrieModule } from '../geometrie/geometrie.module';
 import { AuthModule } from '../auth/auth.module';
 
 /** Aucune entite, aucune migration : ce module ne possede rien. Il emprunte les
@@ -27,6 +28,7 @@ import { AuthModule } from '../auth/auth.module';
     NumerationModule,
     HeureModule,
     MonnaieModule,
+    GeometrieModule,
     AuthModule,
   ],
   controllers: [ImpressionController],

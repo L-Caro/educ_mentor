@@ -15,6 +15,7 @@ import { SettingsModule } from '../settings/settings.module';
     SettingsModule,
   ],
   providers: [GeometrieService],
+  exports: [GeometrieService],
   controllers: [GeometrieGameController, GeometrieAdminController],
 })
 export class GeometrieModule {}
