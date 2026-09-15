@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import Button from 'src/components/common/Button';
 import Spinner from 'src/components/common/Spinner';
+import Toggle from 'src/components/common/Toggle';
+import { useModuleMetaResolver } from 'src/hooks';
 import { MODULES } from 'src/modules.manifest';
 import FeuilleImprimable from './FeuilleImprimable';
 import { useComposerFeuilleMutation } from './impression.api';
@@ -15,6 +17,11 @@ import './impression.scss';
 /** Au-dela, ce n'est plus une feuille d'exercices, c'est une punition. Le serveur applique
  * la meme borne : celle-la protege l'API, celle-ci protege l'adulte de lui-meme. */
 const MAXIMUM_ITEMS = 60;
+
+/** Ce qu'un module sort quand on vient de l'activer, tant qu'on n'a rien regle. Une carte
+ * qu'on active doit peser sur la feuille tout de suite : a zero, le bouton n'aurait pas
+ * bouge et l'interrupteur aurait eu l'air casse. */
+const NOMBRE_PAR_DEFAUT = 4;
 
 function dateDuJour(): string {
   return new Date().toLocaleDateString('fr-FR', {
@@ -34,8 +41,18 @@ function dateDuJour(): string {
  *
  * Une seule page pour tout, plutot qu'un ecran de reglages puis un ecran d'apercu : on
  * regle, on regarde, on corrige, on imprime. Les reglages disparaissent a l'impression.
+ *
+ * ── Des cartes REPLIEES, une par module ──────────────────────────────────────────────
+ *
+ * Treize modules deplies d'un coup donnaient une page ou l'on ne trouvait plus rien,
+ * alors qu'on compose une feuille avec deux ou trois modules. Chaque carte porte donc un
+ * interrupteur, comme les modules du tableau de bord, et ne s'ouvre qu'une fois activee.
+ * L'interrupteur fait deux choses a la fois, et c'est voulu : il deplie la carte ET decide
+ * que le module entre dans la feuille. Un module qu'on ouvre sans vouloir l'imprimer
+ * n'existe pas.
  */
 export default function ImpressionPage() {
+  const getModuleMeta = useModuleMetaResolver();
   const fournisseurs = useMemo(
     () =>
       MODULES.filter((m) => m.impression).map((m) => ({
@@ -45,6 +62,10 @@ export default function ImpressionPage() {
     [],
   );
 
+  /** Les modules qui entrent dans la feuille. Distinct de la selection des types : on
+   * garde ce qui a ete coche quand on referme une carte, pour que la rouvrir rende ses
+   * reglages plutot que de repartir de rien. */
+  const [actifs, setActifs] = useState<Record<string, boolean>>({});
   /** Les types coches, par module. */
   const [selection, setSelection] = useState<Record<string, string[]>>({});
   /** Combien d'exercices par module, repartis entre les types coches. */
@@ -55,7 +76,7 @@ export default function ImpressionPage() {
   >({});
   const [avecCorrige, setAvecCorrige] = useState(true);
   const [items, setItems] = useState<ItemImprime[] | null>(null);
-  /** Les modules coches qui n'ont rien rendu. Ils ne sont plus une erreur (une dictee
+  /** Les modules actifs qui n'ont rien rendu. Ils ne sont plus une erreur (une dictee
    * manquante ne doit pas emporter les dix exercices de tables), mais ils doivent se
    * DIRE : sans cela, l'adulte coche la dictee, ne la voit pas sur la feuille, et n'a
    * aucun moyen de savoir que c'est parce qu'aucune n'est saisie. */
@@ -71,19 +92,35 @@ export default function ImpressionPage() {
     return table;
   }, [fournisseurs]);
 
-  const total = Object.entries(nombres).reduce(
-    (somme, [id, n]) => somme + ((selection[id]?.length ?? 0) > 0 ? n : 0),
-    0,
-  );
+  function compte(id: string): number {
+    if (!actifs[id] || (selection[id]?.length ?? 0) === 0) return 0;
+    return nombres[id] ?? 0;
+  }
+
+  const total = fournisseurs.reduce((somme, f) => somme + compte(f.id), 0);
+
+  /** Activer une carte la garnit si elle est vide : le premier type coche et un nombre
+   * par defaut. Sans cela l'interrupteur ouvrait une carte qui ne produisait rien. */
+  function basculer(id: string, exercices: ExerciceImprimable[]) {
+    const ouvert = !actifs[id];
+    setActifs((precedent) => ({ ...precedent, [id]: ouvert }));
+    if (!ouvert) return;
+    if ((selection[id]?.length ?? 0) === 0 && exercices.length > 0) {
+      setSelection((precedent) => ({ ...precedent, [id]: [exercices[0].cle] }));
+    }
+    if (!nombres[id]) {
+      setNombres((precedent) => ({ ...precedent, [id]: NOMBRE_PAR_DEFAUT }));
+    }
+  }
 
   async function preparer() {
-    const lignes: LigneComposition[] = Object.entries(selection)
-      .filter(([id, types]) => types.length > 0 && (nombres[id] ?? 0) > 0)
-      .map(([id, types]) => ({
-        module: id,
-        exercices: types,
-        nombre: nombres[id],
-        options: reglages[id],
+    const lignes: LigneComposition[] = fournisseurs
+      .filter((f) => compte(f.id) > 0)
+      .map((f) => ({
+        module: f.id,
+        exercices: selection[f.id],
+        nombre: nombres[f.id],
+        options: reglages[f.id],
       }));
     if (lignes.length === 0) return;
     try {
@@ -91,7 +128,9 @@ export default function ImpressionPage() {
       setItems(rendus);
       setMuets(
         lignes
-          .filter((ligne) => !rendus.some((item) => item.module === ligne.module))
+          .filter(
+            (ligne) => !rendus.some((item) => item.module === ligne.module),
+          )
           .map(
             (ligne) =>
               fournisseurs.find((f) => f.id === ligne.module)?.label ??
@@ -114,41 +153,74 @@ export default function ImpressionPage() {
           puisque le travail sur papier n&rsquo;est pas mesuré.
         </p>
 
+        {/* Le corrige porte sur la feuille entiere, pas sur un module : sa place est
+            au-dessus de la liste. En bas, il se lisait comme un reglage du dernier
+            module coche. */}
+        <label className="Impression__enTete">
+          <input
+            type="checkbox"
+            checked={avecCorrige}
+            onChange={(e) => setAvecCorrige(e.target.checked)}
+          />
+          Imprimer le corrigé, sur une page à part
+        </label>
+
         {fournisseurs.map((f) => {
           const coches = selection[f.id] ?? [];
+          const actif = actifs[f.id] ?? false;
+          const nombre = compte(f.id);
           return (
-            <div key={f.id} className="AdminCard GameSettings__card">
-              <p className="GameSettings__cardTitle">{f.label}</p>
-
-              {/* Les TYPES d'exercices. On en coche autant qu'on veut : le nombre demande
-                  se repartit entre eux, ce qui donne la variete sans avoir a faire
-                  l'arithmetique soi-meme. */}
-              <div className="GameSettings__denominations">
-                {f.exercices.map((exercice) => (
-                  <button
-                    key={exercice.cle}
-                    type="button"
-                    className={`GameSettings__denomination${
-                      coches.includes(exercice.cle)
-                        ? ' GameSettings__denomination--active'
-                        : ''
-                    }`}
-                    onClick={() =>
-                      setSelection((precedent) => ({
-                        ...precedent,
-                        [f.id]: coches.includes(exercice.cle)
-                          ? coches.filter((c) => c !== exercice.cle)
-                          : [...coches, exercice.cle],
-                      }))
-                    }
-                  >
-                    {exercice.label}
-                  </button>
-                ))}
+            <div
+              key={f.id}
+              className={`Impression__module${actif ? ' Impression__module--actif' : ''}`}
+            >
+              <div className="Impression__moduleEntete">
+                <div className="Impression__moduleInfo">
+                  <span className="Impression__moduleIcone">
+                    {getModuleMeta(f.id)?.icon}
+                  </span>
+                  <p className="Impression__moduleNom">{f.label}</p>
+                  {nombre > 0 && (
+                    <span className="Impression__moduleCompte">
+                      {nombre} exercice{nombre > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+                <Toggle
+                  checked={actif}
+                  onChange={() => basculer(f.id, f.exercices)}
+                />
               </div>
 
-              {coches.length > 0 && (
+              {actif && (
                 <>
+                  {/* Les TYPES d'exercices. On en coche autant qu'on veut : le nombre
+                      demande se repartit entre eux, ce qui donne la variete sans avoir a
+                      faire l'arithmetique soi-meme. */}
+                  <div className="GameSettings__denominations">
+                    {f.exercices.map((exercice) => (
+                      <button
+                        key={exercice.cle}
+                        type="button"
+                        className={`GameSettings__denomination${
+                          coches.includes(exercice.cle)
+                            ? ' GameSettings__denomination--active'
+                            : ''
+                        }`}
+                        onClick={() =>
+                          setSelection((precedent) => ({
+                            ...precedent,
+                            [f.id]: coches.includes(exercice.cle)
+                              ? coches.filter((c) => c !== exercice.cle)
+                              : [...coches, exercice.cle],
+                          }))
+                        }
+                      >
+                        {exercice.label}
+                      </button>
+                    ))}
+                  </div>
+
                   <div className="GameSettings__rangeRow">
                     <label
                       className="GameSettings__rangeLabel"
@@ -176,6 +248,13 @@ export default function ImpressionPage() {
                     />
                   </div>
 
+                  {coches.length === 0 && (
+                    <p className="GameSettings__hint">
+                      Coche au moins un type d&rsquo;exercice, sinon ce module
+                      ne sortira rien.
+                    </p>
+                  )}
+
                   {f.options && (
                     <OptionsExercice
                       options={f.options}
@@ -193,15 +272,6 @@ export default function ImpressionPage() {
             </div>
           );
         })}
-
-        <label className="GameSettings__toggleRow">
-          <input
-            type="checkbox"
-            checked={avecCorrige}
-            onChange={(e) => setAvecCorrige(e.target.checked)}
-          />
-          Imprimer le corrigé, sur une page à part
-        </label>
 
         <div className="Impression__actions">
           <Button

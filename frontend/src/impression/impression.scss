@@ -220,7 +220,73 @@ $bleu-fort: #5a7fb0;
 .Impression__reglages {
   display: flex;
   flex-direction: column;
-  gap: $space-5;
+  gap: $space-4;
+}
+
+// Le corrige EN HAUT, au-dessus des modules : c'est une decision qui porte sur la feuille
+// entiere, pas sur un module. En bas de la liste elle se lisait comme un reglage du
+// dernier module coche.
+.Impression__enTete {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding: $space-4 $space-5;
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
+  border-radius: $radius-sm;
+  cursor: pointer;
+}
+
+// Une carte par module, REPLIEE tant qu'elle n'est pas activee. Treize modules deplies
+// faisaient une page ou l'on ne trouvait plus rien : on compose une feuille avec deux ou
+// trois modules, pas avec treize.
+.Impression__module {
+  background: var(--color-base-100);
+  border: 1px solid var(--color-base-300);
+  border-radius: $radius-sm;
+  padding: $space-4 $space-5;
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+
+  // Activee, elle prend la couleur d'accent : d'un coup d'oeil sur la liste repliee on
+  // voit ce qui composera la feuille, sans avoir a deplier.
+  &--actif {
+    border-color: var(--color-primary);
+    box-shadow: var(--shadow-sm);
+  }
+}
+
+.Impression__moduleEntete {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-3;
+}
+
+.Impression__moduleInfo {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  min-width: 0;
+}
+
+.Impression__moduleIcone {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.Impression__moduleNom {
+  margin: 0;
+  font-weight: 600;
+}
+
+// Le compte, a cote du nom : sur une carte repliee il n'y aurait rien a voir, et sur une
+// carte depliee il redit ce que la feuille sortira.
+.Impression__moduleCompte {
+  font-size: $font-size-sm;
+  color: var(--color-base-content);
+  opacity: 0.6;
 }
 
 // Les reglages d'un exercice, sous son compteur. Decales et plus discrets : ils
@@ -278,18 +344,7 @@ $bleu-fort: #5a7fb0;
   // Tout ce qui habille l'apercu a l'ecran doit disparaitre : une ombre, un fond, une
   // marge interieure decalent la feuille sur la page ou mangent sa largeur utile.
   .Impression,
-  // Les reglages d'un exercice, sous son compteur. Decales et plus discrets : ils
-// dependent de lui, et l'oeil doit pouvoir les sauter quand on compose vite.
-.Impression__options {
-  display: flex;
-  flex-direction: column;
-  gap: $space-3;
-  margin: $space-3 0 $space-5 $space-6;
-  padding-left: $space-5;
-  border-left: 2px solid var(--color-base-300);
-}
-
-.Impression__apercu {
+  .Impression__apercu {
     display: block;
     padding: 0;
     margin: 0;
