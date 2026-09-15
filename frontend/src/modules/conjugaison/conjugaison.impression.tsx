@@ -31,7 +31,8 @@ export const conjugaisonImpression: FournisseurImpression = {
         return (
           <div>
             <p className="Feuille__consigne">
-              Conjugue « {String(donnees.infinitif)} » au {String(donnees.temps)}.
+              Conjugue « {String(donnees.infinitif)} » au{' '}
+              {String(donnees.temps)}.
             </p>
             <table className="Conjugaison">
               <tbody>
@@ -55,6 +56,25 @@ export const conjugaisonImpression: FournisseurImpression = {
           .join(', ')}`;
       },
     },
+    {
+      // Different du tableau a completer, meme si les deux tirent du meme verbe.
+      // Remplir un tableau, c'est derouler une serie qu'on recite ; transposer, c'est
+      // partir d'une forme pour en produire une autre, sans la serie pour s'appuyer.
+      cle: 'transposer',
+      label: 'Transposer une forme vers une autre personne',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">
+            {String(d.infinitif)} ({String(d.temps)})
+          </p>
+          <span>
+            {String(d.departPronom)} {String(d.departForme)} &rarr;{' '}
+            {String(d.ciblePronom)} <Blanc largeurMm={26} />
+          </span>
+        </div>
+      ),
+      reponse: (d) => `${String(d.ciblePronom)} ${String(d.reponse)}`,
+    },
   ],
   options: [
     {
@@ -71,7 +91,9 @@ export const conjugaisonImpression: FournisseurImpression = {
       type: 'multi',
       charger: async () => {
         const verbes = await store
-          .dispatch(conjugaisonApi.endpoints.getConjugaisonVerbs.initiate(undefined))
+          .dispatch(
+            conjugaisonApi.endpoints.getConjugaisonVerbs.initiate(undefined),
+          )
           .unwrap();
         return verbes.map((v) => ({ valeur: v.infinitif, label: v.infinitif }));
       },
@@ -82,7 +104,9 @@ export const conjugaisonImpression: FournisseurImpression = {
       type: 'multi',
       charger: async () => {
         const temps = await store
-          .dispatch(conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined))
+          .dispatch(
+            conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined),
+          )
           .unwrap();
         return temps.map((t) => ({ valeur: t.key, label: t.label }));
       },

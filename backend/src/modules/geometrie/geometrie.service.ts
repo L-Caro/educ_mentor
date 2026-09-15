@@ -109,7 +109,11 @@ export class GeometrieService {
     }));
 
     return {
-      resultat: { questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited },
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
       seance: {
         difficulty,
         question_types: types.join(','),

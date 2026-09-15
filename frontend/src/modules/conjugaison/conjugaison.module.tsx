@@ -11,7 +11,9 @@ import { buildProgressionEntry } from 'src/store/api/progressionEndpoints';
 async function loadTemps(): Promise<SetupChoice[]> {
   try {
     const temps = await store
-      .dispatch(conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined))
+      .dispatch(
+        conjugaisonApi.endpoints.getConjugaisonTemps.initiate(undefined),
+      )
       .unwrap();
     return temps.map((t) => ({
       value: t.key,
@@ -39,9 +41,9 @@ const CONJUGAISON_SETUP_OPTIONS: SetupOption[] = [
     label: 'Groupes de verbes',
     choices: [
       { value: 'auxiliaire', label: 'Auxiliaires', description: 'être, avoir' },
-      { value: '1',          label: '1er groupe',  description: 'chanter, jouer…' },
-      { value: '2',          label: '2ème groupe', description: 'finir, choisir…' },
-      { value: '3',          label: '3ème groupe', description: 'aller, faire…' },
+      { value: '1', label: '1er groupe', description: 'chanter, jouer…' },
+      { value: '2', label: '2ème groupe', description: 'finir, choisir…' },
+      { value: '3', label: '3ème groupe', description: 'aller, faire…' },
     ],
   },
   {
@@ -49,9 +51,24 @@ const CONJUGAISON_SETUP_OPTIONS: SetupOption[] = [
     type: 'single',
     label: 'Affichage des pronoms',
     choices: [
-      { value: 'personal',    icon: '💬', label: 'Je, Tu, Il…',         description: 'Pronoms personnels' },
-      { value: 'grammatical', icon: '🔤', label: '1ère pers. du sing.', description: 'Étiquettes grammaticales' },
-      { value: 'random',      icon: '🎲', label: 'Aléatoire',           description: 'Mix des deux' },
+      {
+        value: 'personal',
+        icon: '💬',
+        label: 'Je, Tu, Il…',
+        description: 'Pronoms personnels',
+      },
+      {
+        value: 'grammatical',
+        icon: '🔤',
+        label: '1ère pers. du sing.',
+        description: 'Étiquettes grammaticales',
+      },
+      {
+        value: 'random',
+        icon: '🎲',
+        label: 'Aléatoire',
+        description: 'Mix des deux',
+      },
     ],
   },
   {
@@ -59,9 +76,24 @@ const CONJUGAISON_SETUP_OPTIONS: SetupOption[] = [
     type: 'single',
     label: 'Sens de la question',
     choices: [
-      { value: 'forward', icon: '→', label: 'Infinitif → Conjugué', description: 'Conjuguer le verbe' },
-      { value: 'reverse', icon: '←', label: 'Conjugué → Infinitif', description: "Trouver l'infinitif" },
-      { value: 'random',  icon: '🎲', label: 'Aléatoire',           description: 'Mix des deux' },
+      {
+        value: 'forward',
+        icon: '→',
+        label: 'Infinitif → Conjugué',
+        description: 'Conjuguer le verbe',
+      },
+      {
+        value: 'reverse',
+        icon: '←',
+        label: 'Conjugué → Infinitif',
+        description: "Trouver l'infinitif",
+      },
+      {
+        value: 'random',
+        icon: '🎲',
+        label: 'Aléatoire',
+        description: 'Mix des deux',
+      },
     ],
   },
 ];
@@ -70,10 +102,17 @@ export const conjugaisonModule: ModuleManifest = {
   id: 'conjugaison',
   category: 'francais',
   setupOptions: CONJUGAISON_SETUP_OPTIONS,
-  loadGameSpec: () => import('./conjugaison.game.tsx').then((m) => m.conjugaisonGameSpec),
+  loadGameSpec: () =>
+    import('./conjugaison.game.tsx').then((m) => m.conjugaisonGameSpec),
   adminTabs: [{ to: '/admin/conjugaison', label: 'Paramètres', end: true }],
   adminRoutes: [
-    { index: true, lazy: () => import('./ConjugaisonSettings.tsx').then((m) => ({ Component: m.default })) },
+    {
+      index: true,
+      lazy: () =>
+        import('./ConjugaisonSettings.tsx').then((m) => ({
+          Component: m.default,
+        })),
+    },
   ],
   progression: buildProgressionEntry({
     getEndpoint: conjugaisonApi.endpoints.getConjugaisonProgression,

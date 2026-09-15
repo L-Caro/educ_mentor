@@ -34,7 +34,7 @@ const LECONS: Record<NotionKey, Lecon> = {
     regle: [
       'un chat, une table, le jardin.',
       'Je mets un ou une devant : ça marche.',
-      "Devant un verbe, ça ne marche pas : « un dort » ne se dit pas.",
+      'Devant un verbe, ça ne marche pas : « un dort » ne se dit pas.',
     ],
     piege:
       "Le même mot peut être un nom ici et un verbe ailleurs : la porte grince, mais elle porte une robe. C'est la phrase qui décide, jamais le mot seul.",
@@ -59,7 +59,7 @@ const LECONS: Record<NotionKey, Lecon> = {
       'Le chien aboie. Hier, le chien aboyait.',
     ],
     piege:
-      "Un verbe ne décrit pas toujours une action. être et avoir sont des verbes aussi : elle est contente, elle a froid.",
+      'Un verbe ne décrit pas toujours une action. être et avoir sont des verbes aussi : elle est contente, elle a froid.',
   },
   determinant: {
     titre: 'Le déterminant',

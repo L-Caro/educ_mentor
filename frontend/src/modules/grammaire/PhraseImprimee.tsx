@@ -26,7 +26,9 @@ export default function Phrase({
       {mots.map((mot, rang) => (
         <span key={rang}>
           {rang === 0 || mot.colle ? '' : ' '}
-          <span className={rang === cible ? 'PhraseImprimee__cible' : undefined}>
+          <span
+            className={rang === cible ? 'PhraseImprimee__cible' : undefined}
+          >
             {mot.mot}
           </span>
           {mot.apres}

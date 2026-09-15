@@ -23,7 +23,9 @@ export default function PhraseMarquee({
         <span key={index}>
           {index > 0 && !mot.colle ? ' ' : ''}
           {enAvant.has(index) ? (
-            <mark className={`PhraseMarquee__mot PhraseMarquee__mot--${variante}`}>
+            <mark
+              className={`PhraseMarquee__mot PhraseMarquee__mot--${variante}`}
+            >
               {mot.mot}
             </mark>
           ) : (

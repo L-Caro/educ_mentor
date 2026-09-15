@@ -124,14 +124,6 @@ describe('ImpressionService', () => {
       }),
       startSession: jest.fn(),
     };
-    const vide = () => ({
-      construireQuestions: jest.fn().mockResolvedValue({
-        resultat: { questions: [], timer_seconds: 0, is_unlimited: false },
-        seance: {},
-      }),
-      startSession: jest.fn(),
-    });
-
     const moduleRef = await Test.createTestingModule({
       providers: [
         ImpressionService,
@@ -140,8 +132,62 @@ describe('ImpressionService', () => {
         { provide: PoseService, useValue: pose },
         { provide: DicteeService, useValue: dictee },
         { provide: ConjugaisonService, useValue: conjugaison },
-        { provide: AccordsService, useValue: vide() },
-        { provide: GrammaireService, useValue: vide() },
+        {
+          provide: AccordsService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [
+                  {
+                    item_key: 'accord_gn_chat_petit_pluriel',
+                    type: 'accord_gn',
+                    skill_key: 'accord_gn',
+                    display: 'Écris tout le groupe nominal au pluriel.',
+                    depart: 'le petit chat',
+                    avant: '',
+                    apres: '',
+                    indice: null,
+                    choices: [],
+                    answer: 'les petits chats',
+                  },
+                ],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+            }),
+            startSession: jest.fn(),
+          },
+        },
+        {
+          provide: GrammaireService,
+          useValue: {
+            construireQuestions: jest.fn().mockResolvedValue({
+              resultat: {
+                questions: [],
+                timer_seconds: 0,
+                is_unlimited: false,
+              },
+              seance: {},
+            }),
+            construireTri: jest.fn().mockResolvedValue([
+              {
+                phrase: [
+                  { mot: 'Le', apres: '', colle: false, nature: 'determinant' },
+                  {
+                    mot: 'chat',
+                    apres: '',
+                    colle: false,
+                    nature: 'nom_commun',
+                  },
+                  { mot: 'dort', apres: '.', colle: false, nature: 'verbe' },
+                ],
+                natures: ['determinant', 'nom_commun', 'verbe', 'adjectif'],
+              },
+            ]),
+            startSession: jest.fn(),
+          },
+        },
         {
           provide: HeureService,
           useValue: {
@@ -170,7 +216,13 @@ describe('ImpressionService', () => {
             construireQuestions: jest.fn().mockResolvedValue({
               resultat: {
                 questions: [
-                  { type: 'rendre', price: 340, payment: 500, answer: 160, choices: [] },
+                  {
+                    type: 'rendre',
+                    price: 340,
+                    payment: 500,
+                    answer: 160,
+                    choices: [],
+                  },
                 ],
                 timer_seconds: 0,
                 is_unlimited: false,
@@ -540,7 +592,7 @@ describe('ImpressionService', () => {
       { module: 'geometrie', exercices: ['tracer'], nombre: 12 },
     ]);
     for (const item of items) {
-      const { figure, largeur, hauteur } = item.donnees as Record<string, unknown>;
+      const { figure, largeur, hauteur } = item.donnees;
       if (figure === 'carre') expect(largeur).toBe(hauteur);
       else expect(largeur).not.toBe(hauteur);
     }
@@ -564,5 +616,53 @@ describe('ImpressionService', () => {
     ]);
     expect(items[0].donnees.etapes).toBe(1);
     expect(items[0].donnees.solution).toEqual(['75 + 25 = 100']);
+  });
+
+  it('ne transpose jamais vers un pronom qui se conjugue PAREIL', async () => {
+    // « il » vers « elle » ne demande de changer rien du tout : le mot « transpose »
+    // perdrait son sens, et l'enfant recopierait.
+    const items = await service.composer([
+      { module: 'conjugaison', exercices: ['transposer'], nombre: 1 },
+    ]);
+    expect(items).toHaveLength(1);
+    expect(items[0].donnees.departForme).not.toBe(items[0].donnees.reponse);
+    expect(items[0].donnees.departPronom).not.toBe(
+      items[0].donnees.ciblePronom,
+    );
+  });
+
+  it('ne fausse JAMAIS le premier mot d’un groupe a corriger', async () => {
+    // Le determinant porte le nombre a lui seul : « le chats noirs » se repere sans lire
+    // la suite, et l'exercice ne demanderait plus de verifier l'accord.
+    for (let essai = 0; essai < 20; essai++) {
+      const items = await service.composer([
+        { module: 'accords', exercices: ['corriger'], nombre: 1 },
+      ]);
+      const fautif = String(items[0].donnees.fautif).split(' ');
+      expect(fautif[0]).toBe('les');
+      // Une seule marque changee : deux erreurs feraient un groupe ecrit au hasard.
+      const juste = String(items[0].donnees.reponse).split(' ');
+      const differences = fautif.filter((mot, i) => mot !== juste[i]);
+      expect(differences).toHaveLength(1);
+    }
+  });
+
+  it('garde les colonnes VIDES du tri : c’est une reponse aussi', async () => {
+    // Une phrase sans adjectif n'enleve pas la colonne des adjectifs. Constater qu'elle
+    // reste vide fait partie du tri.
+    const items = await service.composer([
+      { module: 'grammaire', exercices: ['trier'], nombre: 1 },
+    ]);
+    const reponse = items[0].donnees.reponse as {
+      nature: string;
+      mots: string[];
+    }[];
+    expect(reponse.map((c) => c.nature)).toEqual([
+      'determinant',
+      'nom_commun',
+      'verbe',
+      'adjectif',
+    ]);
+    expect(reponse.find((c) => c.nature === 'adjectif')?.mots).toEqual([]);
   });
 });

@@ -124,7 +124,11 @@ export class MonnaieService {
     );
 
     return {
-      resultat: { questions, timer_seconds: timerSeconds, is_unlimited: isUnlimited },
+      resultat: {
+        questions,
+        timer_seconds: timerSeconds,
+        is_unlimited: isUnlimited,
+      },
       seance: { exercise_type: exerciseType, timer_seconds: timerSeconds },
       denominations: activeDenominations,
     };

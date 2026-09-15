@@ -137,10 +137,18 @@ export class ImpressionService {
         return this.dicteeMots(ligne);
       case 'conjugaison/forme':
         return this.conjugaisonForme(ligne);
+      case 'conjugaison/transposer':
+        return this.conjugaisonTransposer(ligne);
       case 'accords/accord':
         return this.accordsAccord(ligne);
+      case 'accords/pluriel':
+        return this.accordsPluriel(ligne);
+      case 'accords/corriger':
+        return this.accordsCorriger(ligne);
       case 'grammaire/analyse':
         return this.grammaireAnalyse(ligne);
+      case 'grammaire/trier':
+        return this.grammaireTrier(ligne);
       case 'numeration/question':
         return this.numerationQuestion(ligne);
       case 'numeration/cubes':
@@ -999,11 +1007,18 @@ export class ImpressionService {
    * contrairement aux tables, ces trois-la ne sortent pas du meme vivier. Compter ce
    * qu'on a en main, faire un total et calculer un reste sont trois calculs differents.
    */
-  private async monnaieQuestion(ligne: LigneComposition): Promise<ItemImprime[]> {
+  private async monnaieQuestion(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
     const type = ligne.exercices[0];
     const questions = await this.tirer(
       ligne.nombre,
-      (q: { answer: number; coins?: number[]; prices?: number[]; price?: number }) =>
+      (q: {
+        answer: number;
+        coins?: number[];
+        prices?: number[];
+        price?: number;
+      }) =>
         `${String(q.answer)}:${(q.coins ?? q.prices ?? [q.price ?? 0]).join(',')}`,
       async () =>
         (
@@ -1037,7 +1052,9 @@ export class ImpressionService {
    * d'entourer un billet de cinquante alors que le jeu s'arrete a dix contournerait le
    * seul reglage qui decide de ce que l'enfant voit.
    */
-  private async monnaieEntourer(ligne: LigneComposition): Promise<ItemImprime[]> {
+  private async monnaieEntourer(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
     const { denominations } = await this.monnaieService.construireQuestions({
       exercise_type: 'reconnaitre',
       difficulty: 'hard',
@@ -1077,7 +1094,11 @@ export class ImpressionService {
       items.push({
         module: ligne.module,
         exercice: ligne.exercices[0],
-        donnees: { cible, palette, solution: [...solution].sort((a, b) => b - a) },
+        donnees: {
+          cible,
+          palette,
+          solution: [...solution].sort((a, b) => b - a),
+        },
       });
     }
     return items;
@@ -1135,7 +1156,9 @@ export class ImpressionService {
    * pentagone regulier a tracer sur un quadrillage de cinq millimetres n'est pas un
    * exercice de CE1, c'est un exercice de construction au compas.
    */
-  private async geometrieTracer(ligne: LigneComposition): Promise<ItemImprime[]> {
+  private async geometrieTracer(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
     const { figures } = await this.geometrieService.construireQuestions({
       difficulty: 'hard',
     });
@@ -1258,5 +1281,196 @@ export class ImpressionService {
         },
       },
     ];
+  }
+
+  /**
+   * Transposer : « je chante » vers « nous ... ».
+   *
+   * Different du tableau a completer, meme si les deux tirent du meme verbe. Remplir un
+   * tableau, c'est derouler une serie qu'on recite ; transposer, c'est partir d'une forme
+   * donnee pour en produire une autre, sans la serie pour s'appuyer. C'est l'exercice qui
+   * montre si les terminaisons sont sues ou seulement recitees dans l'ordre.
+   *
+   * Le depart et la cible ne sont jamais le meme pronom, et jamais deux pronoms qui se
+   * conjuguent pareil : `il` vers `elle` ne demande de changer rien du tout.
+   */
+  private async conjugaisonTransposer(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { infinitif: string; tense: string }) => `${q.infinitif}|${q.tense}`,
+      async () =>
+        (
+          await this.conjugaisonService.construireQuestions({
+            difficulty: 'hard',
+            question_direction: 'forward',
+            tenses: Array.isArray(ligne.options?.tenses)
+              ? (ligne.options.tenses as string[])
+              : undefined,
+            verbes: Array.isArray(ligne.options?.verbes)
+              ? (ligne.options.verbes as string[])
+              : undefined,
+          })
+        ).resultat.questions,
+    );
+
+    const items: ItemImprime[] = [];
+    for (const question of questions) {
+      const paire = this.paireDeTransposition(question.forms);
+      if (!paire) continue;
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          infinitif: question.infinitif,
+          temps: question.tense,
+          departPronom: paire.depart,
+          departForme: question.forms[paire.depart],
+          ciblePronom: paire.cible,
+          reponse: question.forms[paire.cible],
+        },
+      });
+    }
+    return items;
+  }
+
+  /** Deux pronoms dont les formes DIFFERENT. `il` vers `elle` ne demande de changer rien
+   * du tout, et « transpose » y perdrait son sens. */
+  private paireDeTransposition(
+    formes: Record<Pronom, string>,
+  ): { depart: Pronom; cible: Pronom } | null {
+    const melanges = [...PRONOMS].sort(() => Math.random() - 0.5);
+    for (const depart of melanges) {
+      for (const cible of melanges) {
+        if (depart !== cible && formes[depart] !== formes[cible]) {
+          return { depart, cible };
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Mettre tout un groupe nominal au pluriel, ou au singulier.
+   *
+   * C'est la notion `accord_gn` du module, qui fait deja exactement cela : « le petit
+   * chat noir » vers « les petits chats noirs ». Les deux sens sont gardes parce que
+   * c'est le meme savoir : savoir enlever les marques vaut savoir les poser, et l'enfant
+   * qui n'ecrit que des pluriels finit par ajouter des `s` partout.
+   */
+  private async accordsPluriel(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.accordsService.construireQuestions({
+            difficulty: 'hard',
+            question_types: ['accord_gn'],
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: { consigne: q.display, depart: q.depart, reponse: q.answer },
+    }));
+  }
+
+  /**
+   * Un groupe MAL accorde, a corriger. N'existe que sur le papier.
+   *
+   * Le pendant exact de l'operation posee fausse : au lieu de produire la bonne forme, on
+   * relit une forme donnee pour y trouver la faute. Ce n'est pas le meme geste, et c'est
+   * celui qu'on fait en se relisant, ce que l'ecran ne demande jamais.
+   */
+  private async accordsCorriger(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.accordsService.construireQuestions({
+            difficulty: 'hard',
+            question_types: ['accord_gn'],
+          })
+        ).resultat.questions,
+    );
+
+    const items: ItemImprime[] = [];
+    for (const question of questions) {
+      const fautif = this.fausserUnAccord(question.answer);
+      if (!fautif) continue;
+      items.push({
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: { fautif, reponse: question.answer },
+      });
+    }
+    return items;
+  }
+
+  /**
+   * Enleve ou ajoute UNE marque de pluriel, sur un seul mot.
+   *
+   * Jamais le premier mot : le determinant porte le nombre a lui seul, et « le chats
+   * noirs » se repere sans lire la suite. Jamais un mot en `-x` non plus : « chevaux »
+   * ampute donne « chevau », qui n'est pas une faute d'accord mais du charabia, et
+   * l'enfant corrigerait un mot qui n'existe pas au lieu d'une regle.
+   *
+   * Une seule marque changee : deux erreurs donneraient l'impression d'un groupe ecrit au
+   * hasard plutot que d'un accord rate.
+   */
+  private fausserUnAccord(texte: string): string | null {
+    const mots = texte.split(' ');
+    const candidats: number[] = [];
+    for (let i = 1; i < mots.length; i++) {
+      if (!mots[i].endsWith('x')) candidats.push(i);
+    }
+    if (candidats.length === 0) return null;
+
+    const rang = candidats[Math.floor(Math.random() * candidats.length)];
+    const mot = mots[rang];
+    mots[rang] = mot.endsWith('s') ? mot.slice(0, -1) : `${mot}s`;
+    const fautif = mots.join(' ');
+    return fautif === texte ? null : fautif;
+  }
+
+  /**
+   * Une phrase a trier par nature : un mot, une colonne. N'existe que sur le papier.
+   *
+   * A l'ecran la meme phrase se joue en touchant les mots un par un, une notion a la
+   * fois. Sur la feuille on recopie chaque mot dans la colonne qui lui revient, et le tri
+   * se voit d'un coup d'oeil : les colonnes vides sont une reponse elles aussi, ce que
+   * l'ecran ne montre jamais.
+   */
+  private async grammaireTrier(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const tris = await this.grammaireService.construireTri(ligne.nombre);
+    return tris.map((tri) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        mots: tri.phrase.map((mot) => ({
+          mot: mot.mot,
+          apres: mot.apres,
+          colle: mot.colle,
+        })),
+        colonnes: tri.natures,
+        reponse: tri.natures.map((nature) => ({
+          nature,
+          mots: tri.phrase
+            .filter((mot) => mot.nature === nature)
+            .map((mot) => mot.mot),
+        })),
+      },
+    }));
   }
 }

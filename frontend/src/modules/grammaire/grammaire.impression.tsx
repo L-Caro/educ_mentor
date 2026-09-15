@@ -1,6 +1,7 @@
 import store from 'src/store';
 import { grammaireApi } from './grammaire.api';
 import Phrase from './PhraseImprimee';
+import TriImprime from './TriImprime';
 import Blanc from 'src/impression/Blanc';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 import type { MotImprime } from './PhraseImprimee';
@@ -39,6 +40,30 @@ export const grammaireImpression: FournisseurImpression = {
       },
       reponse: (donnees) => String(donnees.reponse),
     },
+    {
+      // N'existe que sur le papier. A l'ecran on touche les mots un par un, une notion a
+      // la fois ; ici on recopie chaque mot dans sa colonne, et le tri se voit d'un coup
+      // d'oeil : les colonnes vides sont une reponse elles aussi.
+      cle: 'trier',
+      label: 'Trier les mots de la phrase par nature',
+      largeur: 'pleine',
+      enonce: (donnees) => (
+        <div>
+          <p className="Feuille__consigne">
+            Range chaque mot de la phrase dans sa colonne.
+          </p>
+          <TriImprime
+            mots={donnees.mots as MotImprime[]}
+            colonnes={donnees.colonnes as string[]}
+          />
+        </div>
+      ),
+      reponse: (donnees) =>
+        (donnees.reponse as { nature: string; mots: string[] }[])
+          .filter((colonne) => colonne.mots.length > 0)
+          .map((colonne) => `${colonne.nature} : ${colonne.mots.join(', ')}`)
+          .join(' ; '),
+    },
   ],
   options: [
     {
@@ -49,8 +74,18 @@ export const grammaireImpression: FournisseurImpression = {
       // reglage d'administration, exactement comme le ferait le peage.
       charger: async () => {
         const [catalogue, actives] = await Promise.all([
-          store.dispatch(grammaireApi.endpoints.getGrammaireNotions.initiate(undefined)).unwrap(),
-          store.dispatch(grammaireApi.endpoints.getGrammaireActiveNotions.initiate(undefined)).unwrap(),
+          store
+            .dispatch(
+              grammaireApi.endpoints.getGrammaireNotions.initiate(undefined),
+            )
+            .unwrap(),
+          store
+            .dispatch(
+              grammaireApi.endpoints.getGrammaireActiveNotions.initiate(
+                undefined,
+              ),
+            )
+            .unwrap(),
         ]);
         return catalogue
           .filter((notion) => actives.includes(notion.key))

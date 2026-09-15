@@ -9,6 +9,7 @@ import { isMastered, masteryScore } from '../../common/mastery';
 import { normalizeDifficulty } from '../../common/difficulty';
 import {
   DEFAULT_ACTIVE_NOTIONS,
+  NATURES,
   NOTIONS,
   getNotion,
   isNotionKey,
@@ -118,6 +119,52 @@ export class GrammaireService {
         timer_seconds: timerSeconds,
       },
     };
+  }
+
+  /**
+   * Une phrase a TRIER : ses mots, avec la nature de chacun.
+   *
+   * N'existe que sur le papier. A l'ecran, la meme phrase se joue en touchant les mots un
+   * par un, une notion a la fois ; sur la feuille, on recopie chaque mot dans la colonne
+   * qui lui revient, et le tri se voit d'un coup d'oeil, ce que l'ecran ne montre jamais.
+   *
+   * Les colonnes sont les natures OUVERTES en administration, et seules les phrases des
+   * classes ouvertes sont tirees : la feuille ne va pas plus loin que le jeu. `natures`
+   * est renvoye separement des mots parce que les colonnes doivent exister meme vides :
+   * une phrase sans adjectif n'enleve pas la colonne des adjectifs, elle la laisse vide,
+   * et c'est justement une reponse.
+   */
+  async construireTri(nombre: number): Promise<
+    {
+      phrase: { mot: string; apres: string; colle: boolean; nature: string }[];
+      natures: NotionKey[];
+    }[]
+  > {
+    const notionsActives = await this.getActiveNotionKeys();
+    const naturesOuvertes = NATURES.filter((nature) =>
+      notionsActives.includes(nature),
+    );
+    if (naturesOuvertes.length === 0) return [];
+
+    const classes = await this.getActiveClassKeys();
+    const eligibles = CORPUS.filter(
+      (phrase) =>
+        classes.includes(phrase.niveau) &&
+        // Une phrase dont aucun mot n'entre dans une colonne ouverte ne se trie pas.
+        phrase.mots.some((mot) => naturesOuvertes.includes(mot.nature)),
+    );
+    if (eligibles.length === 0) return [];
+
+    const melangees = [...eligibles].sort(() => Math.random() - 0.5);
+    return melangees.slice(0, nombre).map((phrase) => ({
+      phrase: phrase.mots.map((mot) => ({
+        mot: mot.mot,
+        apres: mot.apres,
+        colle: mot.colle,
+        nature: mot.nature,
+      })),
+      natures: naturesOuvertes,
+    }));
   }
 
   async startSession(

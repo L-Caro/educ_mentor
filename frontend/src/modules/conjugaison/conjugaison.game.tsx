@@ -1,7 +1,10 @@
 import store from 'src/store';
 import { conjugaisonApi } from './conjugaison.api.ts';
 import { sharedApi } from 'src/store/api/sharedApi.ts';
-import type { ConjugaisonQuestion, ConjugaisonSessionResponse } from './conjugaison.type.ts';
+import type {
+  ConjugaisonQuestion,
+  ConjugaisonSessionResponse,
+} from './conjugaison.type.ts';
 import type { GameModuleSpec } from 'src/types/game.types.ts';
 import ConjugaisonTable from './ConjugaisonTable.tsx';
 import { applyElision } from './elision.ts';
@@ -9,21 +12,21 @@ import './conjugaison.scss';
 
 // ─── État de session ──────────────────────────────────────────────────────────
 
-let _direction:      'forward' | 'reverse' | 'random' = 'forward';
+let _direction: 'forward' | 'reverse' | 'random' = 'forward';
 let _pronounDisplay: 'personal' | 'grammatical' | 'random' = 'personal';
 let _accentTolerance = false;
 
 // ─── Pronoms ──────────────────────────────────────────────────────────────────
 
 const GRAMMATICAL_LABELS: Record<string, string> = {
-  je:    '1ère personne du singulier',
-  tu:    '2ème personne du singulier',
-  il:    '3ème personne du singulier (il)',
-  elle:  '3ème personne du singulier (elle)',
-  on:    '3ème personne du singulier (on)',
-  nous:  '1ère personne du pluriel',
-  vous:  '2ème personne du pluriel',
-  ils:   '3ème personne du pluriel (ils)',
+  je: '1ère personne du singulier',
+  tu: '2ème personne du singulier',
+  il: '3ème personne du singulier (il)',
+  elle: '3ème personne du singulier (elle)',
+  on: '3ème personne du singulier (on)',
+  nous: '1ère personne du pluriel',
+  vous: '2ème personne du pluriel',
+  ils: '3ème personne du pluriel (ils)',
   elles: '3ème personne du pluriel (elles)',
 };
 
@@ -53,35 +56,47 @@ function normalize(s: string): string {
 
 /** L'idée clé dépend du groupe : c'est elle qui doit rester si tout le reste s'oublie. */
 const GROUP_IDEA: Record<string, string> = {
-  '1': "Tous les verbes en -er suivent le même modèle. Si tu en connais un, tu les connais tous.",
-  '2': "Les verbes en -ir du 2e groupe intercalent -iss- au pluriel : nous finissons.",
+  '1': 'Tous les verbes en -er suivent le même modèle. Si tu en connais un, tu les connais tous.',
+  '2': 'Les verbes en -ir du 2e groupe intercalent -iss- au pluriel : nous finissons.',
   '3': "Le 3e groupe ne suit pas de modèle régulier : ces verbes s'apprennent un par un.",
-  auxiliaire: "Avoir et être servent à construire tous les autres temps. On les connaît par cœur.",
+  auxiliaire:
+    'Avoir et être servent à construire tous les autres temps. On les connaît par cœur.',
   default: "Repère la terminaison : c'est elle qui change selon la personne.",
 };
 
 /** L'erreur classique du groupe, souvent la raison de la faute qui vient d'être commise. */
 const GROUP_TRAP: Record<string, string | undefined> = {
-  '1': "« aller » se termine par -er mais ne suit pas ce modèle.",
+  '1': '« aller » se termine par -er mais ne suit pas ce modèle.',
   '2': "Tous les verbes en -ir ne sont pas du 2e groupe : « venir » et « partir » n'en sont pas.",
-  auxiliaire: "« tu es » et « tu as » se prononcent presque pareil et ne s'écrivent pas pareil.",
+  auxiliaire:
+    "« tu es » et « tu as » se prononcent presque pareil et ne s'écrivent pas pareil.",
 };
 
-export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, ConjugaisonQuestion> = {
-
+export const conjugaisonGameSpec: GameModuleSpec<
+  ConjugaisonSessionResponse,
+  ConjugaisonQuestion
+> = {
   loadSession: async (setup) => {
-    _direction      = (setup.questionDirection as string || 'forward') as typeof _direction;
-    _pronounDisplay = (setup.pronounDisplay    as string || 'personal') as typeof _pronounDisplay;
+    _direction = ((setup.questionDirection as string) ||
+      'forward') as typeof _direction;
+    _pronounDisplay = ((setup.pronounDisplay as string) ||
+      'personal') as typeof _pronounDisplay;
 
-    const settings = await store.dispatch(sharedApi.endpoints.getSettings.initiate()).unwrap();
+    const settings = await store
+      .dispatch(sharedApi.endpoints.getSettings.initiate())
+      .unwrap();
     _accentTolerance = settings.accent_tolerance === 'true';
 
-    return store.dispatch(conjugaisonApi.endpoints.startConjugaisonSession.initiate({
-      difficulty:        setup.difficulty as string | undefined,
-      tenses:            setup.tenses    as string[] | undefined,
-      verbGroups:        setup.verbGroups as string[] | undefined,
-      questionDirection: _direction,
-    })).unwrap();
+    return store
+      .dispatch(
+        conjugaisonApi.endpoints.startConjugaisonSession.initiate({
+          difficulty: setup.difficulty as string | undefined,
+          tenses: setup.tenses as string[] | undefined,
+          verbGroups: setup.verbGroups as string[] | undefined,
+          questionDirection: _direction,
+        }),
+      )
+      .unwrap();
   },
 
   getQuestions: (session) => session.questions,
@@ -101,7 +116,9 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
     return (
       <div className="ConjugaisonPrompt">
         <p className="ConjugaisonPrompt__verb">{question.infinitif}</p>
-        <p className="ConjugaisonPrompt__pronoun">{displayPronoun(question.pronoun, seed)}</p>
+        <p className="ConjugaisonPrompt__pronoun">
+          {displayPronoun(question.pronoun, seed)}
+        </p>
         <p className="ConjugaisonPrompt__tense">{question.tense}</p>
       </div>
     );
@@ -111,18 +128,26 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
     getChoices: (question) =>
       question.choices.map((choice) => ({ key: choice, label: choice })),
     correctKey: (question) =>
-      question.direction === 'reverse' ? question.infinitif : question.conjugated,
+      question.direction === 'reverse'
+        ? question.infinitif
+        : question.conjugated,
     layout: 'list',
   },
 
   free: {
     parse: (raw) => {
       // Accepte "j'aime" et "aime" pour le mode forward (je + voyelle)
-      return raw.trim().toLowerCase().replace(/^j['']/, '');
+      return raw
+        .trim()
+        .toLowerCase()
+        .replace(/^j['']/, '');
     },
     isCorrect: (question, given) => {
       if (typeof given !== 'string' || !given) return false;
-      const target = question.direction === 'forward' ? question.conjugated : question.infinitif;
+      const target =
+        question.direction === 'forward'
+          ? question.conjugated
+          : question.infinitif;
       return normalize(given) === normalize(target);
     },
     get inputProps() {
@@ -149,21 +174,33 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
   fiche: (question) => ({
     titre: `${question.infinitif} · ${question.tense}`,
     idee: GROUP_IDEA[question.groupe] ?? GROUP_IDEA.default,
-    exemple: <ConjugaisonTable forms={question.forms} highlight={question.pronoun} />,
+    exemple: (
+      <ConjugaisonTable forms={question.forms} highlight={question.pronoun} />
+    ),
     piege: GROUP_TRAP[question.groupe],
   }),
 
   recordAnswer: (sessionId, question, correct) =>
-    store.dispatch(conjugaisonApi.endpoints.recordConjugaisonAnswer.initiate({
-      sessionId,
-      verbTense: `${question.infinitif}_${question.tense}`,
-      isCorrect: correct,
-    })).unwrap(),
+    store
+      .dispatch(
+        conjugaisonApi.endpoints.recordConjugaisonAnswer.initiate({
+          sessionId,
+          verbTense: `${question.infinitif}_${question.tense}`,
+          isCorrect: correct,
+        }),
+      )
+      .unwrap(),
 
   completeSession: (sessionId, correctAnswers, totalQuestions) =>
-    store.dispatch(conjugaisonApi.endpoints.completeConjugaisonSession.initiate({
-      sessionId, correctAnswers, totalQuestions,
-    })).unwrap(),
+    store
+      .dispatch(
+        conjugaisonApi.endpoints.completeConjugaisonSession.initiate({
+          sessionId,
+          correctAnswers,
+          totalQuestions,
+        }),
+      )
+      .unwrap(),
 
   buildResultEntry: (question, given, correct, timeout) => {
     const givenStr = typeof given === 'string' && given ? given : null;
@@ -171,16 +208,16 @@ export const conjugaisonGameSpec: GameModuleSpec<ConjugaisonSessionResponse, Con
 
     if (question.direction === 'forward') {
       return {
-        label:    `${question.infinitif} · ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
-        given:    givenStr ? applyElision(question.pronoun, givenStr) : null,
+        label: `${question.infinitif} · ${displayPronoun(question.pronoun, seed)} (${question.tense})`,
+        given: givenStr ? applyElision(question.pronoun, givenStr) : null,
         expected: applyElision(question.pronoun, question.conjugated),
         correct,
         timeout,
       };
     }
     return {
-      label:    `${applyElision(question.pronoun, question.conjugated)} (${question.tense})`,
-      given:    givenStr ?? null,
+      label: `${applyElision(question.pronoun, question.conjugated)} (${question.tense})`,
+      given: givenStr ?? null,
       expected: question.infinitif,
       correct,
       timeout,

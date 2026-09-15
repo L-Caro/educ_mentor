@@ -1,4 +1,7 @@
-import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
+import {
+  useGetSettingsQuery,
+  useUpdateSettingMutation,
+} from 'src/store/api/sharedApi.ts';
 import {
   useGetConjugaisonActiveTempsQuery,
   useGetConjugaisonTempsCatalogueQuery,
@@ -44,8 +47,9 @@ function TempsActifs() {
         {saving && <Spinner size="xs" />}
       </div>
       <p className="GameSettings__hint">
-        Les sept temps du CP au CM2 sont là. Ouvre-les au fil du programme : la classe
-        indiquée dit quand, mais rien n&rsquo;empêche d&rsquo;ouvrir plus tôt.
+        Les sept temps du CP au CM2 sont là. Ouvre-les au fil du programme : la
+        classe indiquée dit quand, mais rien n&rsquo;empêche d&rsquo;ouvrir plus
+        tôt.
       </p>
       <div className="GameSettings__denominations">
         {catalogue.map((temps) => (
@@ -72,8 +76,10 @@ function TempsActifs() {
 }
 
 export default function ConjugaisonSettings() {
-  const { data: verbs = [], isLoading: loadingVerbs } = useGetConjugaisonVerbsQuery();
-  const { data: settings = {}, isLoading: loadingSettings } = useGetSettingsQuery();
+  const { data: verbs = [], isLoading: loadingVerbs } =
+    useGetConjugaisonVerbsQuery();
+  const { data: settings = {}, isLoading: loadingSettings } =
+    useGetSettingsQuery();
   const [updateSetting, { isLoading: saving }] = useUpdateSettingMutation();
 
   if (loadingVerbs || loadingSettings) return <Spinner size="sm" />;
@@ -81,7 +87,12 @@ export default function ConjugaisonSettings() {
   const filterRaw = settings.conjugaison_verbs_filter ?? '';
   const allInfinitifs = verbs.map((v) => v.infinitif);
   const activeSet = filterRaw
-    ? new Set(filterRaw.split(',').map((v) => v.trim()).filter(Boolean))
+    ? new Set(
+        filterRaw
+          .split(',')
+          .map((v) => v.trim())
+          .filter(Boolean),
+      )
     : new Set(allInfinitifs);
 
   function saveFilter(next: Set<string>) {
@@ -101,13 +112,17 @@ export default function ConjugaisonSettings() {
 
   function selectGroup(groupe: string) {
     const next = new Set(activeSet);
-    verbs.filter((v) => v.groupe === groupe).forEach((v) => next.add(v.infinitif));
+    verbs
+      .filter((v) => v.groupe === groupe)
+      .forEach((v) => next.add(v.infinitif));
     saveFilter(next);
   }
 
   function deselectGroup(groupe: string) {
     const next = new Set(activeSet);
-    verbs.filter((v) => v.groupe === groupe).forEach((v) => next.delete(v.infinitif));
+    verbs
+      .filter((v) => v.groupe === groupe)
+      .forEach((v) => next.delete(v.infinitif));
     saveFilter(next);
   }
 
@@ -117,7 +132,8 @@ export default function ConjugaisonSettings() {
 
       <div className="GameSettings__header">
         <p className="GameSettings__hint">
-          Choisissez les verbes inclus dans les sessions. Tous les verbes sont actifs par défaut.
+          Choisissez les verbes inclus dans les sessions. Tous les verbes sont
+          actifs par défaut.
         </p>
         {saving && <Spinner size="xs" />}
       </div>
@@ -131,8 +147,12 @@ export default function ConjugaisonSettings() {
               <p className="GameSettings__cardTitle">{GROUP_LABELS[groupe]}</p>
 
               <div className="GroupActions">
-                <button type="button" onClick={() => selectGroup(groupe)}>Tous</button>
-                <button type="button" onClick={() => deselectGroup(groupe)}>Aucun</button>
+                <button type="button" onClick={() => selectGroup(groupe)}>
+                  Tous
+                </button>
+                <button type="button" onClick={() => deselectGroup(groupe)}>
+                  Aucun
+                </button>
               </div>
 
               <div className="ConjugaisonVerbGrid">
