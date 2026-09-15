@@ -1,7 +1,25 @@
 # Attributions
 
-Le thème « Le village (pixels) » réutilise des sprites externes, vérifiés le 2026-09-15.
-Les quatre autres thèmes sont dessinés dans `themes.tsx` et ne doivent rien à personne.
+Deux thèmes réutilisent des dessins externes, vérifiés le 2026-09-15. Les quatre autres
+sont dessinés dans `themes.tsx` et ne doivent rien à personne.
+
+Tout ce qui est repris ici est en **CC0**, domaine public : aucune autorisation, aucune
+attribution obligatoire, aucune restriction d'usage. Ce fichier existe pour savoir d'où
+vient un dessin qu'on n'a pas fait, et retrouver le paquet le jour où il en faut un de
+plus.
+
+## Têtes d'animaux (`assets/animaux/*.png`) : thème « Le lapin et son ami »
+
+**Source :** [Kenney](https://kenney.nl), paquet *Animal Pack*, dossier `PNG/Round (outline)`
+**Licence :** CC0 1.0.
+
+`lapin.png` (rabbit) et `panda.png` (panda), repris tels quels, 284 × 370 px.
+
+Ces têtes sont dessinées **de face** : elles n'ont ni dos ni profil, et les faire pivoter
+ferait rouler la tête sur le côté. Le sens de marche est donc porté par une flèche posée
+devant, qui tourne seule pendant que la tête reste droite. Ce n'est pas un pis-aller :
+dans le parcours « avance et tourne », savoir où regarde le personnage est le cœur de
+l'exercice, et une flèche franche le dit mieux qu'un museau qu'il faut interpréter.
 
 ## Sprites (`assets/village/*.png`)
 

@@ -4,6 +4,8 @@ import herbeDeuxUrl from './assets/village/herbe-2.png';
 import arbreUrl from './assets/village/arbre.png';
 import champignonUrl from './assets/village/champignon.png';
 import cibleUrl from './assets/village/cible.png';
+import lapinKUrl from './assets/animaux/lapin.png';
+import pandaUrl from './assets/animaux/panda.png';
 import persoNordUrl from './assets/village/perso-nord.png';
 import persoEstUrl from './assets/village/perso-est.png';
 import persoSudUrl from './assets/village/perso-sud.png';
@@ -28,7 +30,13 @@ import type { Direction } from './programmation.types';
  * rechargement a chaud, ce que le lint refuse a juste titre.
  */
 
-export type ThemeKey = 'lapin' | 'abeille' | 'fusee' | 'robot' | 'village';
+export type ThemeKey =
+  | 'lapin'
+  | 'abeille'
+  | 'fusee'
+  | 'robot'
+  | 'village'
+  | 'animaux';
 
 export interface Theme {
   cle: ThemeKey;
@@ -237,6 +245,42 @@ function image(source: string, zoom = 1) {
   );
 }
 
+/**
+ * Un animal vu de FACE, avec un museau qui indique la route.
+ *
+ * Les tetes du jeu de tuiles « Animal Pack » sont dessinees de face : elles n'ont ni dos
+ * ni profil, et les faire pivoter ferait rouler la tete sur le cote. Le sens de marche
+ * est donc porte par un repere pose devant elles, qui tourne seul.
+ *
+ * Ce repere n'est pas un pis-aller : dans le parcours « avance et tourne », savoir ou
+ * regarde le personnage est le coeur de l'exercice, et une fleche franche le dit mieux
+ * qu'un museau qu'il faut interpreter.
+ */
+function animalOriente(source: string) {
+  return (direction: Direction) => (
+    <g
+      style={{
+        transform: `rotate(${String(ANGLE[direction])}deg)`,
+        transformOrigin: '50% 50%',
+        transition: 'transform 0.25s ease',
+      }}
+    >
+      {/* La fleche tourne, la tete non : elle est contre-tournee pour rester droite. */}
+      <polygon points="99,50 79,39 79,61" fill="#e8613c" stroke="#1a1a1a" strokeWidth={3} strokeLinejoin="round" />
+      <g
+        style={{
+          transform: `rotate(${String(-ANGLE[direction])}deg)`,
+          transformOrigin: '50% 50%',
+        }}
+      >
+        {/* La tete laisse la place a la fleche : a pleine largeur, celle-ci passait
+            derriere elle et l'on ne voyait plus ou regardait le personnage. */}
+        <image href={source} x="4" y="10" width="72" height="80" />
+      </g>
+    </g>
+  );
+}
+
 export const THEMES: Theme[] = [
   {
     cle: 'lapin',
@@ -312,6 +356,21 @@ export const THEMES: Theme[] = [
     graine: image(champignonUrl),
     nomBut: 'la cible',
     pixels: true,
+  },
+  {
+    cle: 'animaux',
+    label: 'Le lapin et son ami',
+    sol: '#dff0c8',
+    solAlterne: '#d3e9b8',
+    mur: rocher(),
+    personnage: animalOriente(lapinKUrl),
+    // Rejoindre quelqu'un plutot que ramasser un objet : c'est le meme trajet, et un but
+    // qui a un visage se cherche plus volontiers qu'une case.
+    but: <image href={pandaUrl} x="10" y="6" width="80" height="88" />,
+    // Une fleur a ramasser, et non un animal : on ne ramasse pas un cochon, et la
+    // consigne « ramasse tout avant d'arriver » deviendrait inquietante.
+    graine: fleur(),
+    nomBut: 'le panda',
   },
 ];
 
