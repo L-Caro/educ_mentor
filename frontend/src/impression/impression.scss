@@ -534,6 +534,34 @@ $bleu-fort: #5a7fb0;
     margin: 0;
   }
 
+  // Tout l'habillage de l'application sort du FLUX, et pas seulement de la vue.
+  // `visibility: hidden` le rend invisible en lui GARDANT sa place : l'en-tete reservait
+  // quatre centimetres en haut de la PREMIERE page, et la barre laterale de
+  // l'administration sa largeur. Les pages suivantes etaient bonnes, ce qui rendait le
+  // defaut difficile a attribuer : il n'y a qu'un en-tete, et il ne pese que sur la
+  // premiere page.
+  header,
+  aside,
+  nav,
+  .AdminPage__sidebar,
+  .AdminPage__overlay {
+    display: none !important;
+  }
+
+  // La page d'administration dispose ses colonnes en grille : sans la remettre a plat,
+  // la feuille resterait dans celle de droite.
+  // `!important` assume : cette remise a plat doit gagner quel que soit l'ordre dans
+  // lequel les feuilles de style du paquet sont assemblees. La mise en page de
+  // l'administration est definie ailleurs, et un jour ou l'autre elle passerait apres.
+  .AdminPage {
+    display: block !important;
+    grid-template-columns: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
   // Les reglages sortent du FLUX, et pas seulement de la vue. `visibility: hidden` les
   // rend invisibles mais leur garde leur place : treize cartes et une barre collante
   // reservaient plusieurs pages blanches avant la feuille. `display: none` est sans

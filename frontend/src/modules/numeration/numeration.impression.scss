@@ -35,11 +35,14 @@
 
 // Les rangs d'une decomposition : une case, et son nom dessous.
 .Numeration {
+  // Les cases sont ECARTEES du nombre. Collees dessous, le nombre occupait la place ou
+  // il faut ecrire le premier rang : on lisait « 650 » et l'on n'avait plus de ligne pour
+  // repondre.
   &__rangs {
     display: flex;
     flex-wrap: wrap;
-    gap: 3mm;
-    margin-top: 1mm;
+    gap: 4mm;
+    margin-top: 5mm;
   }
 
   &__rang {
