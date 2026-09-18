@@ -5,6 +5,22 @@ import Blanc from 'src/impression/Blanc';
 import type { FournisseurImpression } from 'src/impression/impression.types';
 import './numeration.impression.scss';
 
+interface EcritureProposee {
+  texte: string;
+  juste: boolean;
+}
+
+interface CollectionProposee {
+  centaines: number;
+  dizaines: number;
+  unites: number;
+  juste: boolean;
+}
+
+/** Les collections se designent par une lettre, pour que le corrige puisse dire
+ * lesquelles barrer. */
+const LETTRES_DES_COLLECTIONS = ['A', 'B', 'C', 'D', 'E', 'F'];
+
 export const numerationImpression: FournisseurImpression = {
   label: 'Numération',
   exercices: [
@@ -48,9 +64,7 @@ export const numerationImpression: FournisseurImpression = {
         if (rangs.length !== valeurs.length) return String(d.reponse);
         // « 8 centaines, 2 unites » plutot que « 8:2 » : le corrige se lit, il ne se
         // decode pas.
-        return rangs
-          .map((nom, index) => `${valeurs[index]} ${nom}`)
-          .join(', ');
+        return rangs.map((nom, index) => `${valeurs[index]} ${nom}`).join(', ');
       },
     },
     {
@@ -73,13 +87,93 @@ export const numerationImpression: FournisseurImpression = {
       reponse: (d) => String(d.reponse),
     },
     {
+      cle: 'ecritures',
+      label: 'Barrer les écritures qui ne correspondent pas aux briques',
+      largeur: 'pleine',
+      enonce: (d) => {
+        const ecritures = d.ecritures as EcritureProposee[];
+        return (
+          <div>
+            <p className="Feuille__consigne">
+              Barre toutes les écritures qui ne correspondent pas à la
+              collection de carrés représentée.
+            </p>
+            <MaterielBase10
+              milliers={Number(d.milliers)}
+              centaines={Number(d.centaines)}
+              dizaines={Number(d.dizaines)}
+              unites={Number(d.unites)}
+            />
+            {/* Chaque ecriture dans sa case : c'est ce qu'on barre, et une case laisse la
+                place du trait. Des ecritures alignees en ligne se barrent les unes sur
+                les autres. */}
+            <span className="Numeration__ecritures">
+              {ecritures.map((ecriture) => (
+                <span key={ecriture.texte} className="Numeration__ecriture">
+                  {ecriture.texte}
+                </span>
+              ))}
+            </span>
+          </div>
+        );
+      },
+      reponse: (d) =>
+        `À barrer : ${(d.ecritures as EcritureProposee[])
+          .filter((ecriture) => !ecriture.juste)
+          .map((ecriture) => ecriture.texte)
+          .join(' ; ')}`,
+    },
+    {
+      cle: 'collections',
+      label:
+        'Barrer les collections de briques qui ne correspondent pas à l’écriture',
+      largeur: 'pleine',
+      enonce: (d) => {
+        const collections = d.collections as CollectionProposee[];
+        return (
+          <div>
+            <p className="Feuille__consigne">
+              Barre toutes les collections de carrés qui ne correspondent pas à
+              l’écriture.
+            </p>
+            <p className="Numeration__ecriture Numeration__ecriture--cible">
+              {String(d.ecriture)}
+            </p>
+            <div className="Numeration__collections">
+              {collections.map((collection, index) => (
+                <span key={index} className="Numeration__collection">
+                  <span className="Numeration__collectionLettre">
+                    {LETTRES_DES_COLLECTIONS[index]}
+                  </span>
+                  <MaterielBase10
+                    milliers={0}
+                    centaines={collection.centaines}
+                    dizaines={collection.dizaines}
+                    unites={collection.unites}
+                  />
+                </span>
+              ))}
+            </div>
+          </div>
+        );
+      },
+      reponse: (d) =>
+        `À barrer : ${(d.collections as CollectionProposee[])
+          .map((collection, index) => ({ collection, index }))
+          .filter(({ collection }) => !collection.juste)
+          .map(({ index }) => LETTRES_DES_COLLECTIONS[index])
+          .join(', ')}`,
+    },
+    {
       cle: 'ranger',
       label: 'Ranger cinq nombres dans l’ordre croissant',
       enonce: (d) => {
         const nombres = d.nombres as number[];
         return (
           <div>
-            <p className="Feuille__consigne">Range du plus petit au plus grand.</p>
+            <p className="Feuille__consigne">
+              Range du plus petit au plus grand.
+            </p>
             <p>{nombres.join(' · ')}</p>
             <Blanc largeurMm={60} />
           </div>
@@ -93,7 +187,8 @@ export const numerationImpression: FournisseurImpression = {
       enonce: (d) => (
         <div>
           <p className="Feuille__consigne">
-            Encadre entre deux {Number(d.pas) === 100 ? 'centaines' : 'dizaines'}.
+            Encadre entre deux{' '}
+            {Number(d.pas) === 100 ? 'centaines' : 'dizaines'}.
           </p>
           <span>
             <Blanc largeurMm={16} /> &lt; {String(d.valeur)} &lt;{' '}
@@ -101,7 +196,8 @@ export const numerationImpression: FournisseurImpression = {
           </span>
         </div>
       ),
-      reponse: (d) => `${String(d.avant)} < ${String(d.valeur)} < ${String(d.apres)}`,
+      reponse: (d) =>
+        `${String(d.avant)} < ${String(d.valeur)} < ${String(d.apres)}`,
     },
     {
       cle: 'lettres',
@@ -122,8 +218,7 @@ export const numerationImpression: FournisseurImpression = {
             </span>
           </div>
         ),
-      reponse: (d) =>
-        d.versLesLettres ? String(d.lettres) : String(d.valeur),
+      reponse: (d) => (d.versLesLettres ? String(d.lettres) : String(d.valeur)),
     },
   ],
   options: [
@@ -135,8 +230,20 @@ export const numerationImpression: FournisseurImpression = {
       // que l'administration a ouvert.
       charger: async () => {
         const [catalogue, actives] = await Promise.all([
-          store.dispatch(numerationApi.endpoints.getNumerationPositions.initiate(undefined)).unwrap(),
-          store.dispatch(numerationApi.endpoints.getNumerationActivePositions.initiate(undefined)).unwrap(),
+          store
+            .dispatch(
+              numerationApi.endpoints.getNumerationPositions.initiate(
+                undefined,
+              ),
+            )
+            .unwrap(),
+          store
+            .dispatch(
+              numerationApi.endpoints.getNumerationActivePositions.initiate(
+                undefined,
+              ),
+            )
+            .unwrap(),
         ]);
         return catalogue
           .filter((position) => actives.includes(position.key))

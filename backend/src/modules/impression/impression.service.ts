@@ -16,6 +16,12 @@ import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { getPosition, maximum } from '../numeration/numeration.positions';
+import {
+  collectionsAProposer,
+  decomposer,
+  ecritureJusteAuHasard,
+  ecrituresAProposer,
+} from '../numeration/numeration.ecritures';
 
 /** Ce que chaque type de question demande, en toutes lettres.
  *
@@ -171,6 +177,10 @@ export class ImpressionService {
         return this.numerationQuestion(ligne);
       case 'numeration/cubes':
         return this.numerationCubes(ligne);
+      case 'numeration/ecritures':
+        return this.numerationEcritures(ligne);
+      case 'numeration/collections':
+        return this.numerationCollections(ligne);
       case 'numeration/ranger':
         return this.numerationRanger(ligne);
       case 'numeration/encadrer':
@@ -350,6 +360,69 @@ export class ImpressionService {
       });
     }
     return items;
+  }
+
+  /**
+   * Les valeurs dont le materiel tient sur la feuille, pour les exercices « barre ce qui
+   * ne va pas ».
+   *
+   * Memes bornes de chiffres que `numerationCubes`, un peu plus larges : ici le materiel
+   * est dessine une fois (ou quatre fois, en petit), pas dix. Les zeros sont permis, ils
+   * font partie de ce qu'on veut voir echouer (503 n'est pas 53).
+   */
+  private async tirerValeursMaterielles(
+    ligne: LigneComposition,
+  ): Promise<number[]> {
+    const construite = await this.construireNumeration(ligne);
+    if (!construite) return [];
+    const plafond = Math.min(999, maximum(construite.positions));
+    const valeurs = new Set<number>();
+    for (
+      let essai = 0;
+      essai < ligne.nombre * 20 && valeurs.size < ligne.nombre;
+      essai++
+    ) {
+      const valeur =
+        Math.floor(Math.random() * 5) * 100 +
+        Math.floor(Math.random() * 9) * 10 +
+        Math.floor(Math.random() * 9);
+      if (valeur >= 11 && valeur <= plafond) valeurs.add(valeur);
+    }
+    return [...valeurs];
+  }
+
+  /** Des briques, et des ecritures dont l'enfant barre celles qui ne les valent pas. */
+  private async numerationEcritures(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const valeurs = await this.tirerValeursMaterielles(ligne);
+    return valeurs.map((valeur) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        valeur,
+        milliers: 0,
+        ...decomposer(valeur),
+        ecritures: ecrituresAProposer(valeur),
+      },
+    }));
+  }
+
+  /** Le sens inverse : une ecriture, et des collections dont l'enfant barre celles qui
+   * ne la valent pas. */
+  private async numerationCollections(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const valeurs = await this.tirerValeursMaterielles(ligne);
+    return valeurs.map((valeur) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        valeur,
+        ecriture: ecritureJusteAuHasard(valeur),
+        collections: collectionsAProposer(valeur),
+      },
+    }));
   }
 
   /** Ranger cinq nombres dans l'ordre croissant. Ils sont PROCHES les uns des autres :

@@ -748,4 +748,48 @@ describe('ImpressionService', () => {
       { nom: 'arêtes', reponse: 12 },
     ]);
   });
+
+  it('donne a barrer des ecritures dont certaines VALENT les briques et d’autres non', async () => {
+    const items = await service.composer([
+      { module: 'numeration', exercices: ['ecritures'], nombre: 6 },
+    ]);
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      const { valeur, centaines, dizaines, unites, ecritures } =
+        item.donnees as {
+          valeur: number;
+          centaines: number;
+          dizaines: number;
+          unites: number;
+          ecritures: { texte: string; juste: boolean }[];
+        };
+      // Les briques dessinees sont bien celles du nombre : sinon toute la feuille ment.
+      expect(centaines * 100 + dizaines * 10 + unites).toBe(valeur);
+      expect(ecritures.some((ecriture) => ecriture.juste)).toBe(true);
+      expect(ecritures.some((ecriture) => !ecriture.juste)).toBe(true);
+    }
+  });
+
+  it('donne a barrer des collections dont certaines VALENT l’ecriture et d’autres non', async () => {
+    const items = await service.composer([
+      { module: 'numeration', exercices: ['collections'], nombre: 6 },
+    ]);
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      const { collections } = item.donnees as {
+        collections: { juste: boolean }[];
+      };
+      expect(collections.some((collection) => collection.juste)).toBe(true);
+      expect(collections.some((collection) => !collection.juste)).toBe(true);
+      expect(typeof item.donnees.ecriture).toBe('string');
+    }
+  });
+
+  it('ne repete pas un meme nombre dans les exercices « barre ce qui ne va pas »', async () => {
+    const items = await service.composer([
+      { module: 'numeration', exercices: ['ecritures'], nombre: 8 },
+    ]);
+    const valeurs = items.map((item) => item.donnees.valeur);
+    expect(new Set(valeurs).size).toBe(valeurs.length);
+  });
 });
