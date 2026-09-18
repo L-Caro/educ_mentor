@@ -37,6 +37,13 @@ export class NumerationGameController {
     return this.service.getActivePositions();
   }
 
+  /** Le palier des chiffres romains ouvert par l'administration. Servi non protege, pour la
+   * meme raison que les positions : la feuille d'exercices n'en propose pas davantage. */
+  @Get('palier-romain')
+  async getPalierRomain() {
+    return { palier: await this.service.getPalierRomain() };
+  }
+
   @Post('session')
   startSession(@Body() dto: StartNumerationSessionDto) {
     return this.service.createSession(dto);

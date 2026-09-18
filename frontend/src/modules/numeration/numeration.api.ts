@@ -27,6 +27,12 @@ export const numerationApi = baseApi.injectEndpoints({
       query: () => '/numeration/positions-actives',
     }),
 
+    /** Jusqu'ou l'administration a ouvert les chiffres romains (39, 100 ou 1000). La
+     * feuille d'exercices n'en propose pas davantage. */
+    getNumerationPalierRomain: builder.query<{ palier: number }, void>({
+      query: () => '/numeration/palier-romain',
+    }),
+
     startNumerationSession: builder.mutation<
       NumerationSessionResponse,
       { questionTypes?: string[] }

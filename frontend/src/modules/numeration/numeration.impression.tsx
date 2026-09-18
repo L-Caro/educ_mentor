@@ -17,6 +17,13 @@ interface CollectionProposee {
   juste: boolean;
 }
 
+/** Les paliers des chiffres romains, avec l'alphabet qu'ils supposent connu. */
+const PALIERS_ROMAINS = [
+  { valeur: 39, label: 'Jusqu’à 39 (I, V, X)' },
+  { valeur: 100, label: 'Jusqu’à 100 (I, V, X, L, C)' },
+  { valeur: 1000, label: 'Jusqu’à 1 000 (I, V, X, L, C, D, M)' },
+];
+
 /** Les collections se designent par une lettre, pour que le corrige puisse dire
  * lesquelles barrer. */
 const LETTRES_DES_COLLECTIONS = ['A', 'B', 'C', 'D', 'E', 'F'];
@@ -165,6 +172,75 @@ export const numerationImpression: FournisseurImpression = {
           .join(', ')}`,
     },
     {
+      cle: 'romains_lecture',
+      label: 'Lire un nombre en chiffres romains',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">Écris en chiffres.</p>
+          <span>
+            {String(d.romain)} : <Blanc largeurMm={22} />
+          </span>
+        </div>
+      ),
+      reponse: (d) => String(d.valeur),
+    },
+    {
+      cle: 'romains_ecriture',
+      label: 'Écrire un nombre en chiffres romains',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">Écris en chiffres romains.</p>
+          <span>
+            {String(d.valeur)} : <Blanc largeurMm={40} />
+          </span>
+        </div>
+      ),
+      // « IV ou IIII » : celui qui ecrit IIII, comme sur un cadran, n'a pas fait de faute.
+      reponse: (d) => (d.reponses as string[]).join(' ou '),
+    },
+    {
+      cle: 'romains_ranger',
+      label: 'Ranger cinq nombres en chiffres romains',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">
+            Range du plus petit au plus grand.
+          </p>
+          <p>{(d.romains as string[]).join(' · ')}</p>
+          <Blanc largeurMm={60} />
+        </div>
+      ),
+      reponse: (d) => (d.reponse as string[]).join(' < '),
+    },
+    {
+      cle: 'romains_barrer',
+      label: 'Barrer les écritures romaines qui ne correspondent pas au nombre',
+      largeur: 'pleine',
+      enonce: (d) => (
+        <div>
+          <p className="Feuille__consigne">
+            Barre toutes les écritures en chiffres romains qui ne correspondent
+            pas à ce nombre.
+          </p>
+          <p className="Numeration__ecriture Numeration__ecriture--cible">
+            {String(d.valeur)}
+          </p>
+          <span className="Numeration__ecritures">
+            {(d.ecritures as EcritureProposee[]).map((ecriture) => (
+              <span key={ecriture.texte} className="Numeration__ecriture">
+                {ecriture.texte}
+              </span>
+            ))}
+          </span>
+        </div>
+      ),
+      reponse: (d) =>
+        `À barrer : ${(d.ecritures as EcritureProposee[])
+          .filter((ecriture) => !ecriture.juste)
+          .map((ecriture) => ecriture.texte)
+          .join(' ; ')}`,
+    },
+    {
       cle: 'ranger',
       label: 'Ranger cinq nombres dans l’ordre croissant',
       enonce: (d) => {
@@ -222,6 +298,32 @@ export const numerationImpression: FournisseurImpression = {
     },
   ],
   options: [
+    {
+      cle: 'palier',
+      label: 'Chiffres romains : jusqu’où',
+      type: 'unique',
+      pour: [
+        'romains_lecture',
+        'romains_ecriture',
+        'romains_ranger',
+        'romains_barrer',
+      ],
+      // Ce que l'administration a ouvert, et rien de plus : un palier plus haut
+      // contournerait le reglage, et ferait apparaitre des signes que la classe n'a pas
+      // vus. Rien de coche = le plus haut ouvert.
+      charger: async () => {
+        const { palier: ouvert } = await store
+          .dispatch(
+            numerationApi.endpoints.getNumerationPalierRomain.initiate(
+              undefined,
+            ),
+          )
+          .unwrap();
+        return PALIERS_ROMAINS.filter(({ valeur }) => valeur <= ouvert).map(
+          ({ valeur, label }) => ({ valeur: String(valeur), label }),
+        );
+      },
+    },
     {
       cle: 'positions',
       label: 'Jusqu’où compter',

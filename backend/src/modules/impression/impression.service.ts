@@ -17,6 +17,13 @@ import { LectureService } from '../lecture/lecture.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { getPosition, maximum } from '../numeration/numeration.positions';
 import {
+  enRomain,
+  estUnPalierRomain,
+  romainsAProposer,
+  romainsJustes,
+  type PalierRomain,
+} from '../numeration/numeration.romains';
+import {
   collectionsAProposer,
   decomposer,
   ecritureJusteAuHasard,
@@ -181,6 +188,14 @@ export class ImpressionService {
         return this.numerationEcritures(ligne);
       case 'numeration/collections':
         return this.numerationCollections(ligne);
+      case 'numeration/romains_lecture':
+        return this.numerationRomainsLecture(ligne);
+      case 'numeration/romains_ecriture':
+        return this.numerationRomainsEcriture(ligne);
+      case 'numeration/romains_ranger':
+        return this.numerationRomainsRanger(ligne);
+      case 'numeration/romains_barrer':
+        return this.numerationRomainsBarrer(ligne);
       case 'numeration/ranger':
         return this.numerationRanger(ligne);
       case 'numeration/encadrer':
@@ -422,6 +437,97 @@ export class ImpressionService {
         ecriture: ecritureJusteAuHasard(valeur),
         collections: collectionsAProposer(valeur),
       },
+    }));
+  }
+
+  /**
+   * Le palier des chiffres romains d'une ligne : ce que l'adulte a coche, sans jamais
+   * depasser ce que l'administration a ouvert (comme les positions), et le plus haut ouvert
+   * quand rien n'est coche.
+   */
+  private async palierRomain(ligne: LigneComposition): Promise<PalierRomain> {
+    const ouvert = await this.numerationService.getPalierRomain();
+    const demande = Number(ligne.options?.palier);
+    return estUnPalierRomain(demande) && demande < ouvert ? demande : ouvert;
+  }
+
+  /** Des nombres distincts de 1 au palier. */
+  private tirerValeursRomaines(nombre: number, palier: PalierRomain): number[] {
+    const valeurs = new Set<number>();
+    while (valeurs.size < Math.min(nombre, palier)) {
+      valeurs.add(1 + Math.floor(Math.random() * palier));
+    }
+    return [...valeurs];
+  }
+
+  /** Lire un nombre romain. `IIII` est juste et peut tomber ici : c'est celui des cadrans,
+   * l'enfant doit savoir le lire. */
+  private async numerationRomainsLecture(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const palier = await this.palierRomain(ligne);
+    return this.tirerValeursRomaines(ligne.nombre, palier).map((valeur) => {
+      const ecritures = romainsJustes(valeur);
+      return {
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          valeur,
+          romain: ecritures[Math.floor(Math.random() * ecritures.length)],
+        },
+      };
+    });
+  }
+
+  /** Ecrire un nombre en romain. Le corrige donne toutes les ecritures acceptees : celui
+   * qui ecrit `IIII` n'a pas fait une faute. */
+  private async numerationRomainsEcriture(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const palier = await this.palierRomain(ligne);
+    return this.tirerValeursRomaines(ligne.nombre, palier).map((valeur) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: { valeur, reponses: romainsJustes(valeur) },
+    }));
+  }
+
+  /** Ranger cinq nombres romains. Proches les uns des autres, pour la meme raison que
+   * `numerationRanger` : cinq nombres eloignes se rangent sans comparer. */
+  private async numerationRomainsRanger(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const palier = await this.palierRomain(ligne);
+    const etendue = Math.max(12, Math.floor(palier / 5));
+    return Array.from({ length: ligne.nombre }, () => {
+      const base = 1 + Math.floor(Math.random() * (palier - etendue + 1));
+      const valeurs = new Set<number>();
+      while (valeurs.size < 5) {
+        valeurs.add(base + Math.floor(Math.random() * etendue));
+      }
+      const croissantes = [...valeurs].sort((a, b) => a - b);
+      return {
+        module: ligne.module,
+        exercice: ligne.exercices[0],
+        donnees: {
+          romains: croissantes
+            .map((valeur) => enRomain(valeur))
+            .sort(() => Math.random() - 0.5),
+          reponse: croissantes.map((valeur) => enRomain(valeur)),
+        },
+      };
+    });
+  }
+
+  /** Un nombre, et des ecritures romaines dont l'enfant barre celles qui ne le valent pas. */
+  private async numerationRomainsBarrer(
+    ligne: LigneComposition,
+  ): Promise<ItemImprime[]> {
+    const palier = await this.palierRomain(ligne);
+    return this.tirerValeursRomaines(ligne.nombre, palier).map((valeur) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: { valeur, ecritures: romainsAProposer(valeur, palier) },
     }));
   }
 

@@ -12,6 +12,11 @@ import {
   trierPositions,
   type PositionKey,
 } from './numeration.positions';
+import {
+  PALIER_ROMAIN_PAR_DEFAUT,
+  estUnPalierRomain,
+  type PalierRomain,
+} from './numeration.romains';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -201,6 +206,13 @@ export class NumerationService {
       JSON.stringify(valid),
     );
     return valid;
+  }
+
+  /** Jusqu'ou vont les chiffres romains : 39, 100 ou 1000. C'est un reglage de l'adulte,
+   * comme les positions, et il borne AUSSI l'alphabet (voir `numeration.romains.ts`). */
+  async getPalierRomain(): Promise<PalierRomain> {
+    const brut = Number(await this.settingsService.get('numeration_romains_palier'));
+    return estUnPalierRomain(brut) ? brut : PALIER_ROMAIN_PAR_DEFAUT;
   }
 
   /** Le catalogue COMPLET des positions, des millièmes aux centaines de millions, avec la

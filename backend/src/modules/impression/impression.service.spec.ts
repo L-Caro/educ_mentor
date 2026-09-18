@@ -15,6 +15,7 @@ import { GeometrieService } from '../geometrie/geometrie.service';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
 import { MAXIMUM_ITEMS } from './impression.types';
+import { lireRomain } from '../numeration/numeration.romains';
 
 describe('ImpressionService', () => {
   let service: ImpressionService;
@@ -319,6 +320,8 @@ describe('ImpressionService', () => {
               },
               positions: ['u', 'd', 'c', 'm'],
             }),
+            // L'administration a ouvert les chiffres romains jusqu'a 100.
+            getPalierRomain: jest.fn().mockResolvedValue(100),
             createSession: jest.fn(),
           },
         },
@@ -791,5 +794,100 @@ describe('ImpressionService', () => {
     ]);
     const valeurs = items.map((item) => item.donnees.valeur);
     expect(new Set(valeurs).size).toBe(valeurs.length);
+  });
+
+  describe('chiffres romains', () => {
+    it('lit un nombre romain qui vaut bien la reponse, IIII compris', async () => {
+      const items = await service.composer([
+        { module: 'numeration', exercices: ['romains_lecture'], nombre: 39 },
+      ]);
+      const romains = items.map((item) => String(item.donnees.romain));
+      expect(romains.length).toBeGreaterThan(0);
+      for (const item of items) {
+        expect(lireRomain(String(item.donnees.romain))).toBe(
+          item.donnees.valeur,
+        );
+      }
+    });
+
+    it('donne toutes les ecritures acceptees au corrige de l’ecriture', async () => {
+      const items = await service.composer([
+        { module: 'numeration', exercices: ['romains_ecriture'], nombre: 20 },
+      ]);
+      for (const item of items) {
+        const reponses = item.donnees.reponses as string[];
+        expect(reponses.length).toBeGreaterThan(0);
+        for (const reponse of reponses) {
+          expect(lireRomain(reponse)).toBe(item.donnees.valeur);
+        }
+      }
+    });
+
+    it('range cinq nombres romains proches, dans le bon ordre au corrige', async () => {
+      const items = await service.composer([
+        { module: 'numeration', exercices: ['romains_ranger'], nombre: 10 },
+      ]);
+      for (const item of items) {
+        const melanges = item.donnees.romains as string[];
+        const reponse = item.donnees.reponse as string[];
+        expect(new Set(melanges).size).toBe(5);
+        expect([...melanges].sort()).toEqual([...reponse].sort());
+        const valeurs = reponse.map((romain) => lireRomain(romain)!);
+        expect(valeurs).toEqual([...valeurs].sort((a, b) => a - b));
+        expect(Math.max(...valeurs) - Math.min(...valeurs)).toBeLessThanOrEqual(
+          20,
+        );
+      }
+    });
+
+    it('donne a barrer des ecritures romaines dont certaines valent le nombre', async () => {
+      const items = await service.composer([
+        { module: 'numeration', exercices: ['romains_barrer'], nombre: 10 },
+      ]);
+      for (const item of items) {
+        const ecritures = item.donnees.ecritures as {
+          texte: string;
+          juste: boolean;
+        }[];
+        expect(ecritures.some((ecriture) => ecriture.juste)).toBe(true);
+        expect(ecritures.some((ecriture) => !ecriture.juste)).toBe(true);
+        for (const { texte, juste } of ecritures) {
+          expect(lireRomain(texte) === item.donnees.valeur).toBe(juste);
+        }
+      }
+    });
+
+    it('ne depasse JAMAIS le palier ouvert par l’administration', async () => {
+      // Ouvert : 100. Demander 1 000 ne doit pas contourner le reglage.
+      const items = await service.composer([
+        {
+          module: 'numeration',
+          exercices: ['romains_ecriture'],
+          nombre: 60,
+          options: { palier: '1000' },
+        },
+      ]);
+      for (const item of items) {
+        expect(item.donnees.valeur as number).toBeLessThanOrEqual(100);
+      }
+    });
+
+    it('respecte un palier plus bas que celui ouvert, alphabet compris', async () => {
+      const items = await service.composer([
+        {
+          module: 'numeration',
+          exercices: ['romains_barrer'],
+          nombre: 39,
+          options: { palier: '39' },
+        },
+      ]);
+      expect(items.length).toBeGreaterThan(0);
+      for (const item of items) {
+        expect(item.donnees.valeur as number).toBeLessThanOrEqual(39);
+        for (const { texte } of item.donnees.ecritures as { texte: string }[]) {
+          expect(texte).toMatch(/^[IVX]+$/);
+        }
+      }
+    });
   });
 });
