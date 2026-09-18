@@ -45,6 +45,23 @@ export function numerationFiche(question: NumerationQuestion): Fiche {
       };
     }
 
+    case 'romain_lecture':
+    case 'romain_ecriture':
+      return {
+        titre: 'Les chiffres romains',
+        idee: "I vaut 1, V vaut 5, X vaut 10, L vaut 50, C vaut 100, D vaut 500, M vaut 1 000. Un signe plus petit placé avant un plus grand se retire (IV = 5 − 1 = 4), placé après il s'ajoute (VI = 5 + 1 = 6).",
+        regle: `${question.display} = ${question.answer}`,
+        piege: "Sur les cadrans, 4 s'écrit souvent IIII : c'est juste aussi. Mais IV et VI ne sont pas le même nombre : l'ordre des signes compte.",
+      };
+
+    case 'romain_comparaison':
+      return {
+        titre: 'Comparer des nombres romains',
+        idee: "Lis chaque nombre romain et retrouve sa valeur, puis compare les valeurs. La longueur de l'écriture ne dit rien : XIV (14) est plus long que XX (20)... et pourtant plus petit.",
+        regle: `${question.display.replace(/\s{2,}/, ' ')} → ${question.answer}`,
+        piege: "IV et IIII s'écrivent différemment mais valent tous les deux 4 : ils sont égaux.",
+      };
+
     case 'valeur_positionnelle': {
       // `item_key` vaut « valpos_<nombre>_<rang> » : la donnée est là, propre, plutôt que
       // dans l'énoncé en français. Recopier l'énoncé dans l'encart le faisait déborder.

@@ -5,6 +5,21 @@ import { useGetNumerationPositionsQuery } from '../numeration.api';
 
 const ALL_STEPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 50, 100, 200, 500, 1000];
 
+/** Les paliers des chiffres romains, avec l'alphabet qu'ils supposent connu. Le palier
+ * borne les valeurs ET les signes : un piège n'a pas de L tant que la classe n'a vu que
+ * I, V et X. */
+const PALIERS_ROMAINS = [
+  { valeur: 39, label: 'Jusqu’à 39', signes: 'I V X' },
+  { valeur: 100, label: 'Jusqu’à 100', signes: 'I V X L C' },
+  { valeur: 1000, label: 'Jusqu’à 1 000', signes: 'I V X L C D M' },
+];
+const PALIER_ROMAIN_PAR_DEFAUT = 39;
+
+function parsePalierRomain(raw: string | undefined): number {
+  const palier = Number(raw);
+  return PALIERS_ROMAINS.some(({ valeur }) => valeur === palier) ? palier : PALIER_ROMAIN_PAR_DEFAUT;
+}
+
 function parsePositions(raw: string | undefined): PositionKey[] {
   try { return JSON.parse(raw ?? '["u","d"]') as PositionKey[]; }
   catch { return ['u', 'd']; }
@@ -25,6 +40,7 @@ export default function NumerationSettings() {
 
   const activePositions = parsePositions(settings.numeration_active_positions);
   const activeSteps     = parseSteps(settings.numeration_active_steps);
+  const palierRomain = parsePalierRomain(settings.numeration_romains_palier);
 
   function togglePosition(key: PositionKey) {
     const next = activePositions.includes(key)
@@ -40,6 +56,10 @@ export default function NumerationSettings() {
       : [...activeSteps, step];
     if (next.length === 0) return;
     updateSetting({ key: 'numeration_active_steps', value: JSON.stringify(next) });
+  }
+
+  function choosePalierRomain(palier: number) {
+    updateSetting({ key: 'numeration_romains_palier', value: String(palier) });
   }
 
   return (
@@ -93,6 +113,27 @@ export default function NumerationSettings() {
                 onClick={() => toggleStep(step)}
               >
                 {step}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="AdminCard GameSettings__card">
+          <p className="GameSettings__cardTitle">Chiffres romains</p>
+          <p className="GameSettings__hint">
+            Jusqu&rsquo;où vont les nombres, et quels signes existent. Un seul palier à la fois :
+            les questions et les exercices imprimés ne le dépassent jamais.
+          </p>
+          <div className="GameSettings__denominations">
+            {PALIERS_ROMAINS.map(({ valeur, label, signes }) => (
+              <button
+                key={valeur}
+                type="button"
+                className={`GameSettings__denomination${palierRomain === valeur ? ' GameSettings__denomination--active' : ''}`}
+                onClick={() => choosePalierRomain(valeur)}
+              >
+                {label}
+                <span className="GameSettings__niveau">{signes}</span>
               </button>
             ))}
           </div>

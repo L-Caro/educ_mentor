@@ -1,5 +1,12 @@
 export type PositionKey = 'u' | 'd' | 'c' | 'm' | 'dm' | 'cm';
-export type QuestionType = 'comparaison' | 'suite' | 'decomposition' | 'valeur_positionnelle';
+export type QuestionType =
+  | 'comparaison'
+  | 'suite'
+  | 'decomposition'
+  | 'valeur_positionnelle'
+  | 'romain_lecture'
+  | 'romain_ecriture'
+  | 'romain_comparaison';
 
 export interface NumerationQuestion {
   item_key:            string;

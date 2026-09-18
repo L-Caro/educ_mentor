@@ -14,7 +14,9 @@ import {
 } from './numeration.positions';
 import {
   PALIER_ROMAIN_PAR_DEFAUT,
+  choixRomains,
   estUnPalierRomain,
+  romainsJustes,
   type PalierRomain,
 } from './numeration.romains';
 import { Injectable } from '@nestjs/common';
@@ -34,14 +36,26 @@ type QuestionType =
   | 'comparaison'
   | 'suite'
   | 'decomposition'
-  | 'valeur_positionnelle';
+  | 'valeur_positionnelle'
+  | 'romain_lecture'
+  | 'romain_ecriture'
+  | 'romain_comparaison';
 
+/** Ce qu'on tire quand l'enfant ne coche rien. Les chiffres romains n'y sont PAS : un
+ * enfant de CP qui lance une partie sans rien choisir n'a pas a tomber sur XLII. Ils ne
+ * viennent que si on les demande. */
 const VALID_TYPES: QuestionType[] = [
   'comparaison',
   'suite',
   'decomposition',
   'valeur_positionnelle',
 ];
+const ROMAN_TYPES: QuestionType[] = [
+  'romain_lecture',
+  'romain_ecriture',
+  'romain_comparaison',
+];
+const ACCEPTED_TYPES: QuestionType[] = [...VALID_TYPES, ...ROMAN_TYPES];
 const ALL_STEPS = [
   1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 50, 100, 200, 500, 1000,
 ];
@@ -89,6 +103,7 @@ export class NumerationService {
   }> {
     const positions = await this.getActivePositions();
     const steps = await this.getActiveSteps();
+    const palierRomain = await this.getPalierRomain();
     const timerSec =
       parseInt(
         (await this.settingsService.get('question_timer_seconds')) ?? '',
@@ -103,7 +118,7 @@ export class NumerationService {
     const count = isUnlimited ? 50 : countSetting;
 
     const requestedTypes = (dto.question_types ?? []).filter(
-      (t): t is QuestionType => VALID_TYPES.includes(t as QuestionType),
+      (t): t is QuestionType => ACCEPTED_TYPES.includes(t as QuestionType),
     );
     const types: QuestionType[] =
       requestedTypes.length > 0 ? requestedTypes : VALID_TYPES;
@@ -115,7 +130,13 @@ export class NumerationService {
     ) as PositionKey[];
     const retenues = demandees.length > 0 ? demandees : positions;
 
-    const questions = this.generateQuestions(count, types, retenues, steps);
+    const questions = this.generateQuestions(
+      count,
+      types,
+      retenues,
+      steps,
+      palierRomain,
+    );
 
     return {
       resultat: {
@@ -211,7 +232,9 @@ export class NumerationService {
   /** Jusqu'ou vont les chiffres romains : 39, 100 ou 1000. C'est un reglage de l'adulte,
    * comme les positions, et il borne AUSSI l'alphabet (voir `numeration.romains.ts`). */
   async getPalierRomain(): Promise<PalierRomain> {
-    const brut = Number(await this.settingsService.get('numeration_romains_palier'));
+    const brut = Number(
+      await this.settingsService.get('numeration_romains_palier'),
+    );
     return estUnPalierRomain(brut) ? brut : PALIER_ROMAIN_PAR_DEFAUT;
   }
 
@@ -280,6 +303,7 @@ export class NumerationService {
     types: QuestionType[],
     positions: PositionKey[],
     steps: number[],
+    palierRomain: PalierRomain,
   ): NumerationSessionQuestion[] {
     const questions: NumerationSessionQuestion[] = [];
     const usedKeys = new Set<string>();
@@ -288,7 +312,7 @@ export class NumerationService {
     while (questions.length < count && attempts < count * 5) {
       attempts++;
       const type = types[Math.floor(Math.random() * types.length)];
-      const q = this.generateOne(type, positions, steps);
+      const q = this.generateOne(type, positions, steps, palierRomain);
       if (!q || usedKeys.has(q.item_key)) continue;
       usedKeys.add(q.item_key);
       questions.push(q);
@@ -301,6 +325,7 @@ export class NumerationService {
     type: QuestionType,
     positions: PositionKey[],
     steps: number[],
+    palierRomain: PalierRomain,
   ): NumerationSessionQuestion | null {
     const max = this.maxFromPositions(positions);
     const min = exposantMin(positions);
@@ -394,6 +419,61 @@ export class NumerationService {
           answer,
           choices: [],
           decompose_positions: shuffled,
+          suite_terms: null,
+        };
+      }
+
+      case 'romain_lecture': {
+        const valeur = this.rand(1, palierRomain);
+        // `IIII` peut tomber : c'est celui des cadrans, il faut savoir le lire.
+        const ecritures = romainsJustes(valeur);
+        const romain = ecritures[this.rand(0, ecritures.length - 1)];
+        return {
+          item_key: `romlec_${valeur}_${romain}`,
+          type,
+          display: romain,
+          answer: String(valeur),
+          choices: [],
+          decompose_positions: null,
+          suite_terms: null,
+        };
+      }
+
+      case 'romain_ecriture': {
+        const valeur = this.rand(1, palierRomain);
+        // Une seule bonne reponse parmi les choix : `IIII` n'est jamais propose comme
+        // faux (voir `romainsFaux`), et l'ecriture enseignee est la seule juste presentee.
+        const { bonne, choix } = choixRomains(valeur, palierRomain);
+        return {
+          item_key: `romecr_${valeur}`,
+          type,
+          display: String(valeur),
+          answer: bonne,
+          choices: choix,
+          decompose_positions: null,
+          suite_terms: null,
+        };
+      }
+
+      case 'romain_comparaison': {
+        const gauche = this.rand(1, palierRomain);
+        const egaux = Math.random() < 0.2;
+        const droite = egaux ? gauche : this.rand(1, palierRomain);
+        // Deux ecritures d'un meme nombre, quand il en a : `IV = IIII` est la question
+        // qui apprend que les deux sont justes.
+        const formesGauche = romainsJustes(gauche);
+        const formesDroite = romainsJustes(droite);
+        const romainGauche = formesGauche[0];
+        const romainDroite = egaux
+          ? formesDroite[formesDroite.length - 1]
+          : formesDroite[this.rand(0, formesDroite.length - 1)];
+        return {
+          item_key: `romcomp_${romainGauche}_${romainDroite}`,
+          type,
+          display: `${romainGauche}  □  ${romainDroite}`,
+          answer: gauche < droite ? '<' : gauche > droite ? '>' : '=',
+          choices: ['<', '=', '>'],
+          decompose_positions: null,
           suite_terms: null,
         };
       }

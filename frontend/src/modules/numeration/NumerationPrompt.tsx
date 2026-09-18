@@ -4,7 +4,7 @@ import { formatNumbers } from 'src/utils/formatNumber';
 // ─── Prompt ───────────────────────────────────────────────────────────────────
 
 export function NumerationPrompt({ question }: { question: NumerationQuestion }) {
-  if (question.type === 'comparaison') {
+  if (question.type === 'comparaison' || question.type === 'romain_comparaison') {
     const [left, , right] = question.display.split('  ');
     return (
       <div className="NumerationPrompt NumerationPrompt--comparaison">
@@ -31,6 +31,17 @@ export function NumerationPrompt({ question }: { question: NumerationQuestion })
     return (
       <div className="NumerationPrompt NumerationPrompt--decomposition">
         <p className="NumerationPrompt__label">Décompose</p>
+        <span className="NumerationPrompt__bigNumber">{formatNumbers(question.display)}</span>
+      </div>
+    );
+  }
+
+  if (question.type === 'romain_lecture' || question.type === 'romain_ecriture') {
+    return (
+      <div className="NumerationPrompt NumerationPrompt--decomposition">
+        <p className="NumerationPrompt__label">
+          {question.type === 'romain_lecture' ? 'Écris en chiffres' : 'Écris en chiffres romains'}
+        </p>
         <span className="NumerationPrompt__bigNumber">{formatNumbers(question.display)}</span>
       </div>
     );
