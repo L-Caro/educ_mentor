@@ -203,6 +203,15 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 24,
   },
   {
+    id: 'tetris',
+    name: 'Tétris',
+    description:
+      'Empiler les pièces qui tombent et compléter des lignes entières pour les faire disparaître',
+    icon: '🧱',
+    is_active: false,
+    display_order: 25,
+  },
+  {
     id: 'mahjong',
     name: 'Mahjong',
     description:
