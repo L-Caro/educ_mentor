@@ -92,14 +92,16 @@
     min-width: 0;
   }
 
+  // Un enonce court (« 7 × 8 ») tient sur une ligne et ne bouge pas : rien ne change
+  // pour les modules de calcul. Un enonce long passe a la ligne au lieu d'etre coupe
+  // par des points de suspension. « Ces mo... » ne dit plus de quel exercice il
+  // s'agissait, et c'est la seule chose que cette ligne avait a dire.
   &__errorOp {
     font-size: v.$font-size-base;
     font-weight: 600;
     color: var(--color-base-content);
     font-variant-numeric: tabular-nums;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    overflow-wrap: anywhere;
   }
 
   &__errorGiven,
@@ -130,11 +132,16 @@
   }
 
   // ─── Réponse correcte (tous modules) ─────────────────────────────────────
+  // `flex-shrink: 1` et non `0` : une reponse courte ne retrecit pas, puisqu'elle tient
+  // deja. Une reponse longue - cinq mots ranges - debordait de la carte, moitie du texte
+  // dehors, la ou elle peut simplement passer a la ligne.
   &__errorAnswer {
     font-size: v.$font-size-lg;
     font-weight: 800;
     color: var(--color-success);
-    flex-shrink: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    text-align: right;
   }
 
   // ─── Actions ──────────────────────────────────────────────────────────────

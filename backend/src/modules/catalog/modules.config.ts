@@ -194,6 +194,15 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 23,
   },
   {
+    id: 'alphabet',
+    name: 'Ordre alphabétique',
+    description:
+      'Ranger des mots dans l’ordre du dictionnaire : première lettre, puis deuxième, puis troisième',
+    icon: '🔤',
+    is_active: false,
+    display_order: 24,
+  },
+  {
     id: 'mahjong',
     name: 'Mahjong',
     description:

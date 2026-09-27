@@ -14,8 +14,34 @@ import { MonnaieService } from '../monnaie/monnaie.service';
 import { GeometrieService } from '../geometrie/geometrie.service';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
+import { AlphabetService } from '../alphabet/alphabet.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 import { lireRomain } from '../numeration/numeration.romains';
+
+/** Le vivier du module d'ordre alphabetique, tel qu'il le rendrait : des mots MELANGES,
+ * et la reponse a cote. */
+const QUESTIONS_ALPHABET = [
+  {
+    item_key: 'ranger:chat|cheval|chien',
+    type: 'ranger',
+    skill_key: 'ranger',
+    consigne: 'Range ces mots dans l\u2019ordre alphabétique.',
+    mots: ['chien', 'chat', 'cheval'],
+    reponse: ['chat', 'cheval', 'chien'],
+    aPlacer: null,
+    communes: 2,
+  },
+  {
+    item_key: 'intercaler:chaton|chatte',
+    type: 'intercaler',
+    skill_key: 'intercaler',
+    consigne: 'Où se range « chatouille » ?',
+    mots: ['chaton', 'chatte'],
+    reponse: ['1'],
+    aPlacer: 'chatouille',
+    communes: 4,
+  },
+];
 
 describe('ImpressionService', () => {
   let service: ImpressionService;
@@ -23,6 +49,7 @@ describe('ImpressionService', () => {
   let calcul: { construireQuestions: jest.Mock; startSession: jest.Mock };
   let pose: { construireQuestions: jest.Mock; startSession: jest.Mock };
   let dictee: { construireItems: jest.Mock; startSession: jest.Mock };
+  let alphabet: { construireQuestions: jest.Mock; startSession: jest.Mock };
 
   /** Un lot de faits distincts, comme en rendrait une vraie seance. */
   const faits = (n: number) =>
@@ -125,6 +152,25 @@ describe('ImpressionService', () => {
       }),
       startSession: jest.fn(),
     };
+    // Deux questions par lot, pour que `tirer` ait de quoi ecarter les doublons sans
+    // tourner vingt fois.
+    alphabet = {
+      construireQuestions: jest.fn().mockImplementation(
+        // Le vrai service ne rend QUE les types demandes : un mock qui les melange
+        // laisserait passer une ligne qui etiquette un rangement en « intercaler ».
+        (dto: { types?: string[] }) => ({
+          resultat: {
+            questions: QUESTIONS_ALPHABET.filter(
+              (q) => !dto.types?.length || dto.types.includes(q.type),
+            ),
+            timer_seconds: 0,
+            is_unlimited: false,
+          },
+        }),
+      ),
+      startSession: jest.fn(),
+    };
+
     const moduleRef = await Test.createTestingModule({
       providers: [
         ImpressionService,
@@ -294,6 +340,10 @@ describe('ImpressionService', () => {
             }),
             startSession: jest.fn(),
           },
+        },
+        {
+          provide: AlphabetService,
+          useValue: alphabet,
         },
         {
           provide: LectureService,
@@ -888,6 +938,43 @@ describe('ImpressionService', () => {
           expect(texte).toMatch(/^[IVX]+$/);
         }
       }
+    });
+  });
+  describe('ordre alphabétique', () => {
+    it('transmet les mots, le mot a placer et la reponse, sans rien reordonner', async () => {
+      const items = await service.composer([
+        {
+          module: 'alphabet',
+          exercices: ['ranger', 'intercaler'],
+          nombre: 2,
+          options: { communes: 2, combien: 3 },
+        },
+      ]);
+
+      expect(items).toHaveLength(2);
+      const ranger = items.find((i) => i.exercice === 'ranger');
+      // Les mots partent MELANGES : les ranger ici viderait l'exercice de sa substance,
+      // et c'est exactement ce qu'une feuille deja rangee donnerait a l'enfant.
+      expect(ranger?.donnees.mots).toEqual(['chien', 'chat', 'cheval']);
+      expect(ranger?.donnees.reponse).toEqual(['chat', 'cheval', 'chien']);
+
+      const intercaler = items.find((i) => i.exercice === 'intercaler');
+      expect(intercaler?.donnees.aPlacer).toBe('chatouille');
+      expect(intercaler?.donnees.reponse).toEqual(['1']);
+    });
+
+    it('passe la profondeur de comparaison au module', async () => {
+      await service.composer([
+        {
+          module: 'alphabet',
+          exercices: ['ranger'],
+          nombre: 1,
+          options: { communes: 4, combien: 6 },
+        },
+      ]);
+      expect(alphabet.construireQuestions).toHaveBeenCalledWith(
+        expect.objectContaining({ communes: 4, combien: 6, types: ['ranger'] }),
+      );
     });
   });
 });

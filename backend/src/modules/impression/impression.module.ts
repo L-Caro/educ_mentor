@@ -14,6 +14,7 @@ import { MonnaieModule } from '../monnaie/monnaie.module';
 import { GeometrieModule } from '../geometrie/geometrie.module';
 import { CompteModule } from '../compte/compte.module';
 import { LectureModule } from '../lecture/lecture.module';
+import { AlphabetModule } from '../alphabet/alphabet.module';
 import { AuthModule } from '../auth/auth.module';
 
 /** Aucune entite, aucune migration : ce module ne possede rien. Il emprunte les
@@ -33,6 +34,7 @@ import { AuthModule } from '../auth/auth.module';
     GeometrieModule,
     CompteModule,
     LectureModule,
+    AlphabetModule,
     AuthModule,
   ],
   controllers: [ImpressionController],

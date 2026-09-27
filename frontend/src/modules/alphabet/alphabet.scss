@@ -1,0 +1,202 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Ranger des mots ─────────────────────────────────────────────────────────
+// Des mots qu'on TOUCHE, jamais qu'on traine : le glisser-deposer demande deux
+// implementations (souris et doigt), et un mot lache a cote du bon endroit disparait
+// sans que l'enfant sache pourquoi. Les mots sont donc de grandes cibles, espacees
+// assez pour qu'un doigt de sept ans n'en attrape pas deux.
+
+.Alphabet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-7;
+  // Bornee, et centree : sans largeur maximale, la zone de depot des mots ranges
+  // s'etirait d'un bord a l'autre d'un ecran de bureau et ne ressemblait plus a rien.
+  width: min(100%, 44rem);
+  margin: 0 auto;
+
+  &__consigne {
+    margin: 0;
+    font-size: v.$font-size-xl;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__vide {
+    max-width: 30rem;
+    margin: v.$space-9 auto;
+    text-align: center;
+    opacity: 0.8;
+  }
+
+  // ─── Un mot ───────────────────────────────────────────────────────────────
+
+  &__mot {
+    // `inline-block` et une hauteur de ligne fixe : dans la zone de depot, un `span` et
+    // un `button` cote a cote ne s'alignaient pas, et le dernier mot pose retombait
+    // d'un ou deux pixels sous les autres.
+    display: inline-block;
+    padding: v.$space-4 v.$space-6;
+    line-height: 1.25;
+    font-family: inherit;
+    font-size: v.$font-size-lg;
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+    transition: transform 0.12s, border-color 0.12s;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      transform: translateY(-2px);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    // Un mot deja pose : il garde la couleur de l'action, parce qu'on peut encore le
+    // reprendre tant que la reponse n'est pas complete.
+    &--pose {
+      border-color: var(--color-primary);
+    }
+
+    // Un mot qu'on ne touche pas : le decor de « intercaler », et les mots deja poses
+    // qu'on ne peut plus reprendre. PAS d'opacite reduite : un mot palot au milieu
+    // d'une suite se lit comme une erreur, alors qu'il est simplement acquis.
+    &--fixe {
+      cursor: default;
+    }
+
+    &--choisi {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-base-100));
+    }
+  }
+
+  // ─── Ranger ───────────────────────────────────────────────────────────────
+
+  // La ligne des mots deja poses. Elle existe meme vide : sans elle, le premier mot
+  // choisi fait sauter toute la reserve d'une ligne, et l'enfant perd des yeux ceux
+  // qu'elle n'a pas encore pris.
+  &__poses {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$space-4;
+    justify-content: center;
+    align-content: center;
+    box-sizing: border-box;
+    min-height: 5.5rem;
+    width: 100%;
+    margin: 0;
+    padding: v.$space-4;
+    list-style: none;
+    border: 2px dashed var(--color-base-300);
+    border-radius: v.$radius-lg;
+  }
+
+  // Ce que dit la zone quand elle est vide. Un cadre en pointilles sans un mot dedans
+  // ne dit pas ce qu'on attend, et l'enfant cherche d'abord ce qu'elle a rate.
+  &__invite {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.6;
+  }
+
+  &__reserve,
+  &__liste {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: v.$space-4;
+    justify-content: center;
+  }
+
+  // ─── Intercaler ───────────────────────────────────────────────────────────
+
+  &__intercaler {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-6;
+    width: 100%;
+  }
+
+  &__aPlacer {
+    margin: 0;
+    padding: v.$space-4 v.$space-7;
+    font-size: v.$font-size-2xl;
+    font-weight: 700;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+    border-radius: v.$radius-md;
+  }
+
+  &__place {
+    display: contents;
+  }
+
+  // Le trou est une cible aussi grande que les mots qui l'entourent : c'est LUI qu'on
+  // designe, et un chevron fin entre deux gros mots se rate au doigt.
+  // Un « + » et non un chevron : le signe dit « ajoute ici », et il se lit a toutes les
+  // tailles. Un chevron entre deux mots se prend pour une decoration.
+  &__trou {
+    min-width: 2.75rem;
+    padding: v.$space-4 v.$space-3;
+    font-size: v.$font-size-xl;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--color-primary);
+    background: none;
+    border: 2px dashed var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-style: solid;
+      border-color: var(--color-primary);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.4;
+    }
+  }
+
+  // ─── Verdict ──────────────────────────────────────────────────────────────
+
+  &__verdict {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-5;
+    width: 100%;
+    padding: v.$space-6;
+    text-align: center;
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-lg;
+
+    p {
+      margin: 0;
+      font-size: v.$font-size-md;
+      font-weight: 600;
+    }
+
+    &--juste {
+      border-color: var(--color-success);
+      color: var(--color-success);
+    }
+
+    &--faux {
+      border-color: var(--color-error);
+    }
+  }
+
+  &__avancement {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.6;
+  }
+}

@@ -7,6 +7,7 @@ import { useDevMode } from 'src/hooks';
 import { DURATION_KEY, START_KEY } from 'src/context/SessionTimerContext.tsx';
 import { useGetSettingsQuery, useUpdateSettingMutation } from 'src/store/api/sharedApi.ts';
 import InvitationsAdmin from 'src/components/admin/settings/InvitationsAdmin.tsx';
+import MotsExclusAdmin from 'src/modules/alphabet/admin/MotsExclusAdmin.tsx';
 
 const DURATION_STEPS = [0, 1, 10, 15, 20, 30, 45, 60];
 const QUESTION_COUNTS = [5, 10, 15, 20];
@@ -21,6 +22,7 @@ function formatTimer(seconds: number): string {
 export default function Settings() {
   const { isDevMode, toggle } = useDevMode();
   const [isAccessOpen, setIsAccessOpen] = useState(false);
+  const [isMotsOpen, setIsMotsOpen] = useState(false);
 
   const { data: settings } = useGetSettingsQuery();
   const [updateSetting] = useUpdateSettingMutation();
@@ -290,6 +292,32 @@ export default function Settings() {
         {isAccessOpen && (
           <div className="Settings__accessBody">
             <InvitationsAdmin />
+          </div>
+        )}
+      </div>
+
+      {/* ── Mots de l'ordre alphabétique ────────────────────────────────── */}
+      <div className="Settings__accessCard">
+        <button
+          type="button"
+          className="Settings__accessHeader"
+          onClick={() => setIsMotsOpen(previous => !previous)}
+        >
+          <div className="Settings__devCardHeader">
+            <span className="Settings__devCardIcon">🔤</span>
+            <div>
+              <p className="Settings__devCardTitle">Mots de l'ordre alphabétique</p>
+              <p className="Settings__devCardDesc">
+                Écarter un mot du référentiel si l'on en croise un qui n'a rien
+                à faire là.
+              </p>
+            </div>
+          </div>
+          <span className={`Settings__accessChevron${isMotsOpen ? ' Settings__accessChevron--open' : ''}`}>▾</span>
+        </button>
+        {isMotsOpen && (
+          <div className="Settings__accessBody">
+            <MotsExclusAdmin />
           </div>
         )}
       </div>

@@ -1,0 +1,46 @@
+// ─── Ranger des mots, sur le papier ──────────────────────────────────────────
+// Tout est TRACE, jamais peint : les bordures s'impriment, un fond CSS non.
+
+.AlphabetImp {
+  &__liste {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3mm 6mm;
+    margin: 3mm 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  // Les trous de « intercaler » se lisent en LIGNE, comme une liste rangee qu'on relit
+  // de gauche a droite : en colonne, un trait sous chaque mot ressemble a une place
+  // reservee a ce mot-la.
+  &__liste--trous {
+    align-items: baseline;
+    gap: 2mm 3mm;
+  }
+
+  &__ligne {
+    display: inline-flex;
+    align-items: center;
+    gap: 2mm;
+  }
+
+  &__fixe {
+    margin-right: 3mm;
+  }
+
+  &__case {
+    display: inline-block;
+    width: 7mm;
+    height: 7mm;
+    border: 0.3mm solid #000;
+  }
+
+  &__suite {
+    margin: 3mm 0 0;
+    // Les mots respirent : on doit pouvoir en entourer un au crayon sans mordre sur ses
+    // voisins.
+    line-height: 2;
+    word-spacing: 2mm;
+  }
+}

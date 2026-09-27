@@ -14,6 +14,7 @@ import { GeometrieService } from '../geometrie/geometrie.service';
 import type { QuestionType } from '../geometrie/geometrie.logic';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
+import { AlphabetService } from '../alphabet/alphabet.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { getPosition, maximum } from '../numeration/numeration.positions';
 import {
@@ -82,6 +83,7 @@ export class ImpressionService {
     private readonly conjugaisonService: ConjugaisonService,
     private readonly accordsService: AccordsService,
     private readonly grammaireService: GrammaireService,
+    private readonly alphabetService: AlphabetService,
     private readonly numerationService: NumerationService,
     private readonly heureService: HeureService,
     private readonly monnaieService: MonnaieService,
@@ -224,6 +226,10 @@ export class ImpressionService {
         return this.compteTirage(ligne);
       case 'lecture/texte':
         return this.lectureTexte(ligne);
+      case 'alphabet/ranger':
+      case 'alphabet/intrus':
+      case 'alphabet/intercaler':
+        return this.alphabetOrdre(ligne);
       default:
         throw new BadRequestException(
           `Exercice inconnu : ${ligne.module}/${ligne.exercices[0]}`,
@@ -1782,6 +1788,49 @@ export class ImpressionService {
     mots[rang] = mot.endsWith('s') ? mot.slice(0, -1) : `${mot}s`;
     const fautif = mots.join(' ');
     return fautif === texte ? null : fautif;
+  }
+
+  /**
+   * Ranger des mots dans l'ordre alphabetique.
+   *
+   * C'est l'exercice de papier par excellence, et celui ou l'ecran est le plus pauvre :
+   * on numerote les mots au crayon, on entoure celui qui est mal place, on ecrit un mot
+   * dans le bon trou. Les trois formes du module passent telles quelles, sans rien
+   * perdre.
+   *
+   * La PROFONDEUR de comparaison (jusqu'ou les mots se ressemblent) est le seul reglage
+   * qui compte : c'est elle, et non le nombre de mots, qui separe « banane, lapin,
+   * tortue » de « chaton, chatte, chaque ».
+   */
+  private async alphabetOrdre(ligne: LigneComposition): Promise<ItemImprime[]> {
+    const communes = Number(ligne.options?.communes ?? 1);
+    const combien = Number(ligne.options?.combien ?? 4);
+    const type = ligne.exercices[0];
+
+    const questions = await this.tirer(
+      ligne.nombre,
+      (q: { item_key: string }) => q.item_key,
+      async () =>
+        (
+          await this.alphabetService.construireQuestions({
+            types: [type],
+            communes: Number.isFinite(communes) ? communes : 1,
+            combien: Number.isFinite(combien) ? combien : 4,
+          })
+        ).resultat.questions,
+    );
+
+    return questions.map((q) => ({
+      module: ligne.module,
+      exercice: ligne.exercices[0],
+      donnees: {
+        type: q.type,
+        consigne: q.consigne,
+        mots: q.mots,
+        aPlacer: q.aPlacer,
+        reponse: q.reponse,
+      },
+    }));
   }
 
   /**

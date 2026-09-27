@@ -1,0 +1,206 @@
+# Mots ecartes du corpus de l'ordre alphabetique.
+#
+# Le classement alphabetique ne demande pas de comprendre les mots, et Lionel a tranche :
+# un mot rare ou savant ne gene pas, elle ne cherche pas a les connaitre. Ce qui est
+# ecarte ici, c'est ce qu'on ne veut pas voir surgir sur une feuille d'exercices posee
+# devant une enfant : le vocabulaire sexuel explicite, les insultes, et quelques champs
+# crus (meurtre, torture, drogues dures).
+#
+# La liste vise les LEMMES, puisque le corpus n'en garde pas d'autres formes. Un mot par
+# ligne, en minuscules. Les lignes vides et celles qui commencent par # sont ignorees.
+#
+# Deliberement PAS de filtre par racine : « cul » aurait emporte culture, calcul et
+# reculer, « arme » armoire et charmer. Une liste de mots entiers se relit et ne se
+# trompe pas toute seule.
+
+# --- sexuel explicite
+baiser
+bite
+bitte
+branlette
+branleur
+capote
+coit
+coiter
+couille
+cunnilingus
+ejaculation
+ejaculer
+enculage
+enculer
+erection
+fellation
+fornication
+forniquer
+foutre
+gaule
+godemiche
+jouissance
+masturbation
+masturber
+nichon
+nymphomane
+orgasme
+partouze
+penetration
+penis
+pornographie
+pornographique
+preservatif
+proxenete
+proxenetisme
+pute
+putain
+sodomie
+sodomiser
+sperme
+testicule
+tringler
+vagin
+verge
+vulve
+zizi
+zob
+
+# --- insultes et grossieretes
+bordel
+connard
+connasse
+conne
+couillon
+crevard
+debile
+emmerdement
+emmerder
+emmerdeur
+encule
+enfoire
+merde
+merdeux
+merdier
+peteux
+salaud
+salope
+saloperie
+trouduc
+
+# --- violence crue
+assassinat
+assassiner
+carnage
+cadavre
+charnier
+decapitation
+decapiter
+egorger
+etrangler
+eventrer
+massacre
+massacrer
+meurtre
+meurtrier
+mutiler
+pendaison
+sevices
+strangulation
+suicidaire
+suicide
+suicider
+supplice
+torture
+torturer
+tortionnaire
+trucider
+tuerie
+viol
+violer
+violeur
+
+# --- drogues
+cocaine
+crack
+came
+defonce
+drogue
+droguer
+heroine
+junkie
+morphine
+opium
+overdose
+seringue
+shooter
+toxicomane
+toxicomanie
+
+# --- complements, trouves en passant le corpus genere au crible des familles
+# Beaucoup de faux positifs ont ete ECARTES DE CET ECART : violon, violette, violence,
+# niche, cocasse, salopette, sextuor, sextant, heroique, assassin, esclave, meurtri,
+# cadaverique, sexagenaire et putatif restent. Ce sont des mots de livres.
+anus
+cocainomane
+couillard
+couillonnade
+couillonner
+depucelage
+depuceler
+enculade
+enculerie
+enculeur
+erotique
+erotiquement
+erotisme
+erotomane
+erotomanie
+foutriquet
+lubrique
+merdique
+merdouille
+nichonnee
+nudisme
+nudiste
+nudite
+obscene
+obscenite
+orgastique
+orgie
+porno
+pornocrate
+pornographe
+prostituer
+prostitution
+prostitue
+putanat
+putasserie
+putassier
+salop
+salopard
+saloper
+salopiot
+sexe
+sexologie
+sexologique
+sexualite
+sexuel
+sexue
+sexy
+spermatique
+spermato
+spermicide
+
+# --- injures racistes et abus sur enfant, croises en jouant
+# Ce que la liste de depart avait manque : elle visait le sexe, les insultes ordinaires,
+# la violence crue et les drogues, et n'avait pas de rubrique pour ceci.
+# « fuhrer » est sorti sur un tirage d'essai. Ce n'est pas une insulte, mais pose seul au
+# milieu de trois mots a ranger, il n'apprend rien et charge la feuille pour rien.
+# Restent volontairement : nazi, fascisme, genocide, attentat, esclavage, colonialisme.
+# Ce sont des mots d'Histoire, et elle les lira.
+bougnoule
+fuhrer
+inceste
+incestueux
+negre
+negrier
+pedophile
+pedophilie
+youpin

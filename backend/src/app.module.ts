@@ -26,6 +26,7 @@ import { PenduModule } from './modules/pendu/pendu.module';
 import { PoseModule } from './modules/pose/pose.module';
 import { CompteModule } from './modules/compte/compte.module';
 import { ProgrammationModule } from './modules/programmation/programmation.module';
+import { AlphabetModule } from './modules/alphabet/alphabet.module';
 import { PeageModule } from './modules/peage/peage.module';
 import { ImpressionModule } from './modules/impression/impression.module';
 import { DicteeModule } from './modules/dictee/dictee.module';
@@ -78,6 +79,7 @@ import { AccessGuard } from './modules/invitation/access.guard';
     PoseModule,
     CompteModule,
     ProgrammationModule,
+    AlphabetModule,
     PeageModule,
     ImpressionModule,
     DicteeModule,
