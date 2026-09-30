@@ -15,6 +15,7 @@ import type { QuestionType } from '../geometrie/geometrie.logic';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
 import { AlphabetService } from '../alphabet/alphabet.service';
+import { SolfegeService } from '../solfege/solfege.service';
 import { nombreEnLettres } from '../numeration/numeration.lettres';
 import { getPosition, maximum } from '../numeration/numeration.positions';
 import {
@@ -84,6 +85,7 @@ export class ImpressionService {
     private readonly accordsService: AccordsService,
     private readonly grammaireService: GrammaireService,
     private readonly alphabetService: AlphabetService,
+    private readonly solfegeService: SolfegeService,
     private readonly numerationService: NumerationService,
     private readonly heureService: HeureService,
     private readonly monnaieService: MonnaieService,
@@ -226,6 +228,12 @@ export class ImpressionService {
         return this.compteTirage(ligne);
       case 'lecture/texte':
         return this.lectureTexte(ligne);
+      case 'solfege/notes':
+      case 'solfege/placer':
+      case 'solfege/figure':
+      case 'solfege/syllabes':
+      case 'solfege/mesure':
+        return Promise.resolve(this.solfege(ligne));
       case 'alphabet/ranger':
       case 'alphabet/intrus':
       case 'alphabet/intercaler':
@@ -1788,6 +1796,38 @@ export class ImpressionService {
     mots[rang] = mot.endsWith('s') ? mot.slice(0, -1) : `${mot}s`;
     const fautif = mots.join(' ');
     return fautif === texte ? null : fautif;
+  }
+
+  /**
+   * Le solfege sur le papier.
+   *
+   * Cinq exercices, tous tires du meme reglage : la cle, l'etendue des notes, les figures
+   * au programme et la mesure. Ce sont exactement les axes qui font la difficulte, et ils
+   * n'avancent pas au meme rythme : son cahier voit la cle de fa a la lecon trois alors
+   * que les croches ne sont toujours pas la.
+   *
+   * Aucun `tirer` ici, contrairement aux autres modules : chaque item est une LIGNE
+   * entiere tiree au hasard, pas une question unitaire. Deux lignes de huit notes
+   * identiques n'arriveront pas, et les ecarter demanderait de comparer des tableaux
+   * pour un gain nul.
+   */
+  private solfege(ligne: LigneComposition): ItemImprime[] {
+    const reglages = this.solfegeService.normaliser(ligne.options);
+    const exercice = ligne.exercices[0];
+
+    return Array.from({ length: ligne.nombre }, () => {
+      const donnees =
+        exercice === 'notes'
+          ? this.solfegeService.lireDesNotes(reglages)
+          : exercice === 'placer'
+            ? this.solfegeService.placerDesNotes(reglages)
+            : exercice === 'figure'
+              ? this.solfegeService.nommerUneFigure(reglages)
+              : exercice === 'syllabes'
+                ? this.solfegeService.ecrireLesSyllabes(reglages)
+                : this.solfegeService.completerUneMesure(reglages);
+      return { module: ligne.module, exercice, donnees };
+    });
   }
 
   /**

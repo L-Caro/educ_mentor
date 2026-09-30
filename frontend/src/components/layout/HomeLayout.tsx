@@ -12,6 +12,7 @@ import type { ModuleCategory } from 'src/types/modules.types';
 const CATEGORY_META: Record<ModuleCategory, { label: string; emoji: string }> = {
   maths:    { label: 'Maths',      emoji: '🔢' },
   francais: { label: 'Français',   emoji: '✍️' },
+  musique:  { label: 'Musique',    emoji: '🎵' },
   geo:      { label: 'Géographie', emoji: '🌍' },
   anglais:  { label: 'Anglais',    emoji: '🇬🇧' },
   jeux:     { label: 'Jeux',       emoji: '🎮' },
@@ -19,7 +20,7 @@ const CATEGORY_META: Record<ModuleCategory, { label: string; emoji: string }> = 
 
 /** Ordre des sections. `jeux` est en dernier et replié : ce sont des jeux, pas des
  * leçons, et les mettre au même rang que les autres faisait l'essentiel du désordre. */
-const CATEGORY_ORDER: ModuleCategory[] = ['maths', 'francais', 'geo', 'anglais', 'jeux'];
+const CATEGORY_ORDER: ModuleCategory[] = ['maths', 'francais', 'musique', 'geo', 'anglais', 'jeux'];
 
 /** Sections repliées à la première visite. */
 const REPLIEES_PAR_DEFAUT: ModuleCategory[] = ['jeux'];

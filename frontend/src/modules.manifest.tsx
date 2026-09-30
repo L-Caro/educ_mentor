@@ -24,6 +24,7 @@ import { compteModule } from 'src/modules/compte/compte.module';
 import { mahjongModule } from 'src/modules/mahjong/mahjong.module';
 import { alphabetModule } from 'src/modules/alphabet/alphabet.module';
 import { tetrisModule } from 'src/modules/tetris/tetris.module';
+import { solfegeModule } from 'src/modules/solfege/solfege.module';
 
 // Re-export pour compat des imports existants (`from 'src/modules.manifest'`).
 export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts';
@@ -32,4 +33,4 @@ export type { ModuleManifest, ProgressionStat } from 'src/types/modules.types.ts
  * Agrégateur : la source unique des modules. Ajouter un module = créer son dossier avec
  * `<id>.module.tsx` (descripteur co-localisé) + une ligne d'import ici.
  */
-export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule, franceModule, lectureModule, numerationModule, memoryModule, penduModule, poseModule, dicteeModule, geometrieModule, grammaireModule, accordsModule, morpionModule, puissance4Module, compteModule, mahjongModule, programmationModule, alphabetModule, tetrisModule];
+export const MODULES: ModuleManifest[] = [imagierModule, tablesModule, calculModule, monnaieModule, snakeModule, heureModule, conjugaisonModule, geoModule, franceModule, lectureModule, numerationModule, memoryModule, penduModule, poseModule, dicteeModule, geometrieModule, grammaireModule, accordsModule, morpionModule, puissance4Module, compteModule, mahjongModule, programmationModule, alphabetModule, tetrisModule, solfegeModule];

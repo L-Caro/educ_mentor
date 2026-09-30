@@ -1,0 +1,118 @@
+@use '../assets/styles/_abstracts/variables' as v;
+
+// ─── La portée ───────────────────────────────────────────────────────────────
+// Tout est TRACÉ, jamais peint : les traits et les remplissages d'un SVG sortent d'une
+// imprimante, un fond CSS non, tant que personne ne coche « graphiques d'arrière-plan ».
+// Le même dessin sert donc l'écran et le papier.
+
+.Portee {
+  display: block;
+  width: 100%;
+  height: auto;
+  // BORNÉE en hauteur. Une portée d'un seul symbole est plus haute que large : étirée à
+  // cent pour cent de la largeur, elle sortait de l'écran et poussait les boutons de
+  // réponse hors de vue. Le `preserveAspectRatio` la recentre dans ce qui reste.
+  max-height: 26rem;
+  // `currentColor` partout : la portée prend la couleur du texte, donc elle vit avec le
+  // thème clair comme sombre sans une seule règle de plus, et devient noire à l'impression.
+  color: var(--color-base-content);
+
+  &__ligne {
+    stroke: currentColor;
+    stroke-width: 1.1;
+    opacity: 0.75;
+
+    &--supplementaire {
+      opacity: 1;
+    }
+  }
+
+  &__barre {
+    stroke: currentColor;
+    stroke-width: 1.6;
+  }
+
+  &__cleGravee path {
+    fill: currentColor;
+  }
+
+  &__cle {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__pointCle,
+  &__barrePerc {
+    fill: currentColor;
+  }
+
+  &__tete {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+
+    &--pleine {
+      fill: currentColor;
+    }
+  }
+
+  &__croix line {
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+
+  &__queue {
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  &__crochet {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+  }
+
+  &__pause,
+  &__soupir {
+    fill: currentColor;
+  }
+
+  // La note sur laquelle porte la question. Une couleur, pas un cercle autour : le cercle
+  // ajoute un symbole sur une portée qui en est déjà pleine.
+  &__symbole--cible {
+    color: var(--color-primary);
+  }
+
+  &__symbole--juste {
+    color: var(--color-success);
+  }
+
+  &__symbole--faux {
+    color: var(--color-error);
+  }
+
+  // La syllabe se prononce sous la note, comme elle l'écrit dans son cahier.
+  &__syllabe {
+    fill: currentColor;
+    font-size: 9px;
+    font-family: inherit;
+  }
+
+  // Le trait où l'enfant écrit. Tracé, donc imprimé : un fond ou une bordure CSS ne
+  // sortirait pas de l'imprimante.
+  &__aRemplir {
+    stroke: currentColor;
+    stroke-width: 1.1;
+  }
+
+  &__zone {
+    fill: transparent;
+    cursor: pointer;
+  }
+}

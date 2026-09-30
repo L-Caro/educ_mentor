@@ -212,6 +212,15 @@ export const MODULES_CONFIG: Partial<AppModule>[] = [
     display_order: 25,
   },
   {
+    id: 'solfege',
+    name: 'Solfège',
+    description:
+      'Lire les notes sur la portée, nommer les figures, frapper un rythme sur le métronome',
+    icon: '🎵',
+    is_active: false,
+    display_order: 26,
+  },
+  {
     id: 'mahjong',
     name: 'Mahjong',
     description:

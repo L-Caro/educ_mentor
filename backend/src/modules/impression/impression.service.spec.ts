@@ -15,6 +15,7 @@ import { GeometrieService } from '../geometrie/geometrie.service';
 import { CompteService } from '../compte/compte.service';
 import { LectureService } from '../lecture/lecture.service';
 import { AlphabetService } from '../alphabet/alphabet.service';
+import { SolfegeService } from '../solfege/solfege.service';
 import { MAXIMUM_ITEMS } from './impression.types';
 import { lireRomain } from '../numeration/numeration.romains';
 
@@ -345,6 +346,9 @@ describe('ImpressionService', () => {
           provide: AlphabetService,
           useValue: alphabet,
         },
+        // Le vrai service : il ne dépend de rien, ne touche à aucune base, et le simuler
+        // reviendrait à réécrire ses règles une troisième fois.
+        SolfegeService,
         {
           provide: LectureService,
           useValue: {

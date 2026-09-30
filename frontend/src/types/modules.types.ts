@@ -11,7 +11,7 @@ export interface ProgressionStat {
   incorrect_count: number;
 }
 
-export type ModuleCategory = 'maths' | 'francais' | 'geo' | 'anglais' | 'jeux';
+export type ModuleCategory = 'maths' | 'francais' | 'musique' | 'geo' | 'anglais' | 'jeux';
 
 export interface ModuleManifest {
   id: string;            // = AppModule.id (backend) et segment d'URL ; label/icon = catalogue backend (useModuleMeta)

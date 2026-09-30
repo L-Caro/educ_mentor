@@ -1,0 +1,16 @@
+// ─── Le solfège sur le papier ────────────────────────────────────────────────
+// Tout est TRACÉ, jamais peint : les bordures s'impriment, un fond CSS non.
+
+.SolfegeImp {
+  &__ligne {
+    margin: 3mm 0 0;
+  }
+
+  // La case où dessiner une figure : carrée et haute, une figure a une queue.
+  &__boite {
+    display: inline-block;
+    width: 14mm;
+    height: 16mm;
+    border: 0.3mm solid #000;
+  }
+}

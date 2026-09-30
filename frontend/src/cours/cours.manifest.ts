@@ -15,6 +15,9 @@ import { eau } from './monde/l-eau';
 import { temps } from './monde/le-temps';
 import { vivant } from './monde/le-vivant';
 import { vivreIciEtAilleurs } from './monde/vivre-ici-et-ailleurs';
+import { laPortee } from './musique/la-portee';
+import { lesFigures } from './musique/les-figures';
+import { laMesure } from './musique/la-mesure';
 
 /**
  * La bibliothèque, matière par matière.
@@ -37,7 +40,21 @@ export const MATIERES: Matiere[] = [
     slug: 'francais',
     titre: 'Français',
     emoji: '✍️',
-    notions: [lesSons, laPhrase, natureDesMots, accords, fonctionDesMots, laConjugaison, vocabulaire],
+    notions: [
+      lesSons,
+      laPhrase,
+      natureDesMots,
+      accords,
+      fonctionDesMots,
+      laConjugaison,
+      vocabulaire,
+    ],
+  },
+  {
+    slug: 'musique',
+    titre: 'Musique',
+    emoji: '🎵',
+    notions: [laPortee, lesFigures, laMesure],
   },
   {
     slug: 'questionner-le-monde',

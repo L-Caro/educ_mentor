@@ -11,11 +11,15 @@ import type { PoseQuestion } from 'src/modules/pose/pose.type';
  * cela ne réveille le typage ni le lint, et tout se voit à la lecture avec l'enfant.
  */
 
-const CONCEPTS: Concept[] = MATIERES.flatMap((m) => m.notions.flatMap((n) => n.concepts));
+const CONCEPTS: Concept[] = MATIERES.flatMap((m) =>
+  m.notions.flatMap((n) => n.concepts),
+);
 
 /** Chaque concept avec la matière qui le contient, pour vérifier qu'ils se correspondent. */
 const AVEC_MATIERE = MATIERES.flatMap((m) =>
-  m.notions.flatMap((n) => n.concepts.map((c) => ({ matiere: m.slug, concept: c }))),
+  m.notions.flatMap((n) =>
+    n.concepts.map((c) => ({ matiere: m.slug, concept: c })),
+  ),
 );
 
 /** Les deux jeux de réglages qui changent une fiche. */
@@ -39,7 +43,9 @@ describe('bibliothèque de cours', () => {
     for (const matiere of MATIERES) {
       for (const notion of matiere.notions) {
         const slugs = notion.concepts.map((c) => c.slug);
-        expect(new Set(slugs).size, `${matiere.slug}/${notion.slug}`).toBe(slugs.length);
+        expect(new Set(slugs).size, `${matiere.slug}/${notion.slug}`).toBe(
+          slugs.length,
+        );
       }
       const notions = matiere.notions.map((n) => n.slug);
       expect(new Set(notions).size, matiere.slug).toBe(notions.length);
@@ -78,12 +84,23 @@ describe('bibliothèque de cours', () => {
     }
   });
 
+  /**
+   * Les matières que le corpus ne couvre pas.
+   *
+   * La musique n'y est pas : il n'existe aucune leçon de solfège dans le corpus, et ses
+   * fiches sont écrites d'après la méthode que Maëve utilise en cours. Leur inventer une
+   * source la ferait passer pour vérifiable alors qu'elle ne le serait pas, ce qui est
+   * exactement l'inverse de ce que ce garde-fou cherche à obtenir.
+   */
+  const SANS_CORPUS = ['musique'];
+
   it('trace la leçon du corpus qui a servi de source', () => {
     // Pas affiché, mais indispensable à la relecture : sans lui, impossible de vérifier
     // qu'une fiche réécrite n'a pas perdu un morceau du programme. La matière du corpus
     // doit être celle de la matière qui porte la fiche : c'est ce qui attrape une source
     // recopiée d'un fichier à l'autre.
     for (const { matiere, concept } of AVEC_MATIERE) {
+      if (SANS_CORPUS.includes(matiere)) continue;
       expect(concept.source, concept.slug).toMatch(
         new RegExp(`^ce1\\.${matiere}\\.[a-z0-9-]+$`),
       );
@@ -99,7 +116,10 @@ describe('bibliothèque de cours', () => {
  * beaucoup mieux qu'une seule relue à l'œil, et une figure fausse enseignerait une
  * méthode fausse.
  */
-function retenuesAttendues(q: PoseQuestion): { haut: (number | null)[]; bas: (number | null)[] } {
+function retenuesAttendues(q: PoseQuestion): {
+  haut: (number | null)[];
+  bas: (number | null)[];
+} {
   const taille = q.retenues.haut.length;
   const chiffres = (n: number) =>
     String(n).padStart(taille, '0').split('').reverse().map(Number);
@@ -146,7 +166,9 @@ function retenuesAttendues(q: PoseQuestion): { haut: (number | null)[]; bas: (nu
 }
 
 /** Parcourt l'arbre React des exemples et remonte ce que `lire` en extrait. */
-function dansLesExemples<T>(lire: (props: Record<string, unknown>) => T | undefined): T[] {
+function dansLesExemples<T>(
+  lire: (props: Record<string, unknown>) => T | undefined,
+): T[] {
   const trouves: T[] = [];
   const visiter = (noeud: unknown) => {
     if (!noeud || typeof noeud !== 'object') return;
@@ -159,7 +181,8 @@ function dansLesExemples<T>(lire: (props: Record<string, unknown>) => T | undefi
     }
   };
   for (const concept of CONCEPTS) {
-    for (const reglages of REGLAGES) visiter(ficheDe(concept, reglages).exemple);
+    for (const reglages of REGLAGES)
+      visiter(ficheDe(concept, reglages).exemple);
   }
   return trouves;
 }
@@ -174,9 +197,15 @@ function figures(): PoseQuestion[] {
 
 /** Toutes les chaînes balisées passées à `Phrases` et `Paires`. */
 function chainesBalisees(): string[] {
-  const lignes = dansLesExemples((props) => props.lignes as unknown[] | undefined);
-  const colonnes = dansLesExemples((props) => props.colonnes as string[] | undefined);
-  return [...lignes, ...colonnes].flat(2).filter((v): v is string => typeof v === 'string');
+  const lignes = dansLesExemples(
+    (props) => props.lignes as unknown[] | undefined,
+  );
+  const colonnes = dansLesExemples(
+    (props) => props.colonnes as string[] | undefined,
+  );
+  return [...lignes, ...colonnes]
+    .flat(2)
+    .filter((v): v is string => typeof v === 'string');
 }
 
 describe('balisage des exemples', () => {
@@ -204,7 +233,9 @@ describe('balisage des exemples', () => {
     for (const concept of CONCEPTS) {
       for (const texte of textes(concept)) {
         expect(texte, concept.slug).not.toMatch(/[{}]/);
-        expect(texte.replace(notationPhonetique, ''), concept.slug).not.toMatch(/[[\]]/);
+        expect(texte.replace(notationPhonetique, ''), concept.slug).not.toMatch(
+          /[[\]]/,
+        );
       }
     }
   });
@@ -214,10 +245,17 @@ describe('opérations posées montrées dans les fiches', () => {
   it('en montre au moins une par méthode de soustraction', () => {
     // Sinon le test suivant passerait sur un ensemble vide sans rien signaler.
     const trouvees = figures();
-    expect(trouvees.filter((q) => q.operation === 'addition').length).toBeGreaterThan(0);
-    expect(trouvees.filter((q) => q.method === 'compensation' && q.operation === 'soustraction').length)
-      .toBeGreaterThan(0);
-    expect(trouvees.filter((q) => q.method === 'cassage').length).toBeGreaterThan(0);
+    expect(
+      trouvees.filter((q) => q.operation === 'addition').length,
+    ).toBeGreaterThan(0);
+    expect(
+      trouvees.filter(
+        (q) => q.method === 'compensation' && q.operation === 'soustraction',
+      ).length,
+    ).toBeGreaterThan(0);
+    expect(
+      trouvees.filter((q) => q.method === 'cassage').length,
+    ).toBeGreaterThan(0);
   });
 
   it('affiche le bon résultat', () => {

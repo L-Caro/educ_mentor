@@ -1,0 +1,267 @@
+@use '../../assets/styles/_abstracts/variables' as v;
+
+// ─── Solfège ─────────────────────────────────────────────────────────────────
+// La portée est le seul élément qui compte : elle prend la largeur, et tout le reste se
+// range sous elle. Une portée petite se lit mal, et c'est ce qu'on lui demande de faire.
+
+.Solfege {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-6;
+  // Large : une phrase de seize notes tient sur une ligne, et chaque portée se borne
+  // elle-même, donc une note seule ne s'étire pas pour autant.
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  padding: v.$space-5 v.$space-4 0;
+
+  &__scene {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-5;
+    width: 100%;
+  }
+
+  &__consigne {
+    margin: 0;
+    font-size: v.$font-size-lg;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  &__aide {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.6;
+  }
+
+  // ─── Les réponses ─────────────────────────────────────────────────────────
+
+  &__notes,
+  &__choix {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: v.$space-4;
+  }
+
+  &__note {
+    min-width: 6rem;
+    min-height: 5.2rem;
+    padding: v.$space-4 v.$space-5;
+    font-family: inherit;
+    font-size: v.$font-size-lg;
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+    }
+
+    &--choisi {
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 15%, var(--color-base-100));
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  // Les figures se DESSINENT : l'exercice porte sur des durées, pas sur du vocabulaire,
+  // et « blanche » écrit en toutes lettres donne la réponse à qui sait lire.
+  &__figures {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: v.$space-4;
+  }
+
+  &__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-2;
+    width: 8rem;
+    padding: v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-sm;
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+
+    &--choisi {
+      border-color: var(--color-primary);
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+
+    // Les vignettes de choix restent petites : ce sont des étiquettes, pas la question.
+    .Portee {
+      max-height: 6rem;
+    }
+  }
+
+  // ─── La dictée ────────────────────────────────────────────────────────────
+
+  &__propositions {
+    display: flex;
+    flex-direction: column;
+    gap: v.$space-4;
+    width: 100%;
+  }
+
+  &__proposition {
+    display: flex;
+    align-items: center;
+    gap: v.$space-4;
+    width: 100%;
+    padding: v.$space-3 v.$space-4;
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+
+    &--choisi {
+      border-color: var(--color-primary);
+    }
+
+    &--juste {
+      border-color: var(--color-success);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    .Portee {
+      flex: 1;
+    }
+  }
+
+  &__numero {
+    flex: none;
+    width: 2.4rem;
+    font-size: v.$font-size-lg;
+    font-weight: 800;
+    opacity: 0.5;
+  }
+
+  // ─── Le verdict ───────────────────────────────────────────────────────────
+
+  &__verdict {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-4;
+    width: 100%;
+    padding: v.$space-5;
+    text-align: center;
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-lg;
+
+    p {
+      display: flex;
+      flex-direction: column;
+      gap: v.$space-2;
+      margin: 0;
+      font-size: v.$font-size-md;
+      font-weight: 600;
+    }
+
+    &--juste {
+      border-color: var(--color-success);
+      color: var(--color-success);
+    }
+
+    &--faux {
+      border-color: var(--color-error);
+    }
+  }
+
+  &__detail {
+    font-size: v.$font-size-sm;
+    font-weight: 400;
+    opacity: 0.75;
+  }
+
+  &__avancement {
+    margin: 0;
+    font-size: v.$font-size-sm;
+    opacity: 0.6;
+  }
+}
+
+// ─── Frapper un rythme ───────────────────────────────────────────────────────
+
+.Rythme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: v.$space-5;
+  width: 100%;
+
+  &__depart,
+  &__consigne {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-4;
+    margin: 0;
+    text-align: center;
+  }
+
+  &__compte {
+    margin: 0;
+    font-size: v.$font-size-xl;
+    font-weight: 800;
+    color: var(--color-primary);
+  }
+
+  // Une seule cible, et large : à sept ans on frappe en regardant la partition, jamais
+  // le bouton. `touch-action: none` sinon un appui répété fait défiler la page.
+  &__tambour {
+    width: min(100%, 22rem);
+    min-height: 9rem;
+    font-family: inherit;
+    font-size: v.$font-size-lg;
+    font-weight: 700;
+    color: var(--color-base-content);
+    background: var(--color-base-200);
+    border: 3px dashed var(--color-base-300);
+    border-radius: v.$radius-lg;
+    cursor: pointer;
+    touch-action: none;
+    user-select: none;
+
+    &--actif {
+      color: var(--color-primary-content);
+      background: var(--color-primary);
+      border-style: solid;
+      border-color: var(--color-primary);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+}
+
+// Le chiffre du décompte : gros, et seul. C'est ce qui remplace « on ne sait pas quand
+// taper » par « ça part maintenant ».
+.Rythme__chiffre {
+  display: inline-block;
+  min-width: 5rem;
+  font-size: 4.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
