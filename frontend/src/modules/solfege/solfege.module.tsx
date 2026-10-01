@@ -13,6 +13,11 @@ import { solfegeImpression } from './solfege.impression';
  * Les réglages sont donc ceux de son cours, et se cochent au fur et à mesure qu'elle les
  * voit. Rien n'est verrouillé par année : la progression d'une méthode ne suit pas le
  * calendrier.
+ *
+ * Et ils vivent dans l'ADMINISTRATION, pas ici : les notes ouvertes, les figures, la
+ * mesure, la longueur des phrases et le tempo disent où elle en est en cours, et cela ne
+ * se décide pas avant chaque partie. Le pré-jeu ne garde que ce qui lui appartient : ce
+ * qu'elle veut travailler aujourd'hui, et dans quelle clé.
  */
 export const solfegeModule: ModuleManifest = {
   id: 'solfege',
@@ -25,6 +30,11 @@ export const solfegeModule: ModuleManifest = {
       label: 'Ce qu’on travaille',
       choices: [
         { value: 'lire', label: 'Lire une note' },
+        {
+          value: 'partition',
+          label: 'Lire une partition',
+          description: 'Trois à cinq notes d’un coup, comme en lecture groupée',
+        },
         { value: 'placer', label: 'Placer une note sur la portée' },
         { value: 'figure', label: 'Nommer une figure ou un silence' },
         { value: 'mesure', label: 'Compléter une mesure' },
@@ -48,60 +58,6 @@ export const solfegeModule: ModuleManifest = {
       ],
     },
     {
-      key: 'etendue',
-      type: 'single',
-      label: 'Jusqu’où vont les notes',
-      choices: [
-        { value: '0', label: 'Dans la portée' },
-        { value: '1', label: '+ 1 ligne supplémentaire' },
-        { value: '2', label: '+ 2 lignes supplémentaires' },
-      ],
-    },
-    {
-      key: 'figures',
-      type: 'multi',
-      label: 'Quelles figures',
-      choices: [
-        { value: 'ronde', label: 'Ronde et pause' },
-        { value: 'blanche', label: 'Blanche et demi-pause' },
-        { value: 'noire', label: 'Noire et soupir' },
-        { value: 'croche', label: 'Croche et demi-soupir' },
-        { value: 'doubleCroche', label: 'Double croche' },
-      ],
-    },
-    {
-      key: 'mesure',
-      type: 'single',
-      label: 'Combien de temps par mesure',
-      choices: [
-        { value: '2', label: '2 temps' },
-        { value: '3', label: '3 temps' },
-        { value: '4', label: '4 temps' },
-      ],
-    },
-    {
-      key: 'longueur',
-      type: 'single',
-      label: 'Longueur des phrases à frapper',
-      choices: [
-        { value: '4', label: 'Très courte', description: 'Pour découvrir' },
-        { value: '8', label: 'Courte' },
-        { value: '12', label: 'Moyenne' },
-        { value: '16', label: 'Longue', description: 'Une quinzaine de notes' },
-      ],
-    },
-    {
-      key: 'tempo',
-      type: 'single',
-      label: 'Vitesse du métronome',
-      choices: [
-        { value: '60', label: 'Très lent' },
-        { value: '72', label: 'Lent' },
-        { value: '90', label: 'Moyen' },
-        { value: '110', label: 'Rapide' },
-      ],
-    },
-    {
       key: 'syllabes',
       type: 'single',
       label: 'Écrire Taé et Aé sous les notes',
@@ -116,7 +72,13 @@ export const solfegeModule: ModuleManifest = {
     },
   ],
   child: { Game: SolfegeGame },
-  adminTabs: [],
-  adminRoutes: [],
+  adminTabs: [{ to: '/admin/solfege', label: 'Paramètres', end: true }],
+  adminRoutes: [
+    {
+      index: true,
+      lazy: () =>
+        import('./SolfegeSettings.tsx').then((m) => ({ Component: m.default })),
+    },
+  ],
   impression: solfegeImpression,
 };

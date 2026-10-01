@@ -8,14 +8,22 @@ import { useGetSettingsQuery } from 'src/store/api/sharedApi';
 import type { GameResultEntry } from 'src/types/game.types';
 import Portee from 'src/musique/Portee';
 import { jouerNote, maintenant, reveiller } from 'src/musique/audio';
-import { dureeDuTemps, type Bilan } from 'src/musique/rythme';
-import { NOTES, syllabes, type Figure, type Mesure } from 'src/musique/solfege';
+import { dureeDuTemps, frequence, type Bilan } from 'src/musique/rythme';
+import {
+  NOTES,
+  hauteurDe,
+  syllabes,
+  type Figure,
+  type Mesure,
+  type Note,
+} from 'src/musique/solfege';
 import {
   genererDictee,
   genererFigure,
   genererLire,
   genererMesure,
   genererOreille,
+  genererPartition,
   genererPlacer,
   genererRythme,
   nomDe2,
@@ -32,6 +40,7 @@ const rand = (min: number, max: number) =>
 
 type Question =
   | ReturnType<typeof genererLire>
+  | ReturnType<typeof genererPartition>
   | ReturnType<typeof genererPlacer>
   | ReturnType<typeof genererFigure>
   | ReturnType<typeof genererMesure>
@@ -43,6 +52,8 @@ function engendrer(type: TypeSolfege, reglages: Reglages): Question {
   switch (type) {
     case 'lire':
       return genererLire(reglages, rand);
+    case 'partition':
+      return genererPartition(reglages, rand);
     case 'placer':
       return genererPlacer(reglages, rand);
     case 'figure':
@@ -76,22 +87,33 @@ export default function SolfegeGame() {
   const setup = useMemo(() => setupBrut ?? {}, [setupBrut]);
   const { data: reglagesApp } = useGetSettingsQuery();
 
+  /**
+   * Ce qui vient du PRÉ-JEU, et ce qui vient de l'ADMINISTRATION.
+   *
+   * Elle choisit ce qu'elle travaille et dans quelle clé. L'étendue des notes, les notes
+   * ouvertes, les figures au programme, la mesure, la longueur des phrases et le tempo
+   * dépendent de là où elle en est en cours, pas de son humeur : ils se règlent une fois
+   * dans l'administration, comme la méthode de soustraction du module « poser ».
+   */
   const reglages: Reglages = useMemo(() => {
     const cles = setup['cles'] as string | undefined;
-    const figures = (setup['figures'] as string[] | undefined) ?? [
-      'blanche',
-      'noire',
-    ];
+    const liste = (cle: string, defaut: string) =>
+      (reglagesApp?.[cle] ?? defaut).split(',').filter(Boolean);
+    const figures = liste('solfege_figures', 'blanche,noire') as Figure[];
+    const notes = liste('solfege_notes', NOTES.join(',')).filter(
+      (n): n is Note => (NOTES as readonly string[]).includes(n),
+    );
     return {
       cles:
         cles === 'fa' ? ['fa'] : cles === 'les-deux' ? ['sol', 'fa'] : ['sol'],
-      etendue: Number((setup['etendue'] as string | undefined) ?? '0'),
-      figures: figures as Figure[],
-      mesure: Number((setup['mesure'] as string | undefined) ?? '2') as Mesure,
-      tempo: Number((setup['tempo'] as string | undefined) ?? '72'),
-      longueur: Number((setup['longueur'] as string | undefined) ?? '12'),
+      etendue: Number(reglagesApp?.solfege_etendue ?? '0'),
+      figures: figures.length > 0 ? figures : ['blanche', 'noire'],
+      mesure: Number(reglagesApp?.solfege_mesure ?? '2') as Mesure,
+      tempo: Number(reglagesApp?.solfege_tempo ?? '72'),
+      longueur: Number(reglagesApp?.solfege_longueur ?? '12'),
+      notes: notes.length > 0 ? notes : [...NOTES],
     };
-  }, [setup]);
+  }, [setup, reglagesApp]);
 
   const types = useMemo(() => {
     const choisis = (setup['types'] as string[] | undefined) ?? [];
@@ -185,6 +207,58 @@ export default function SolfegeGame() {
                   }}
                 >
                   {note}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {question.type === 'partition' && (
+          <>
+            <p className="Solfege__consigne">
+              Lis ces {String(question.positions.length)} notes, puis choisis la
+              bonne suite.
+            </p>
+            <Portee
+              cle={question.cle}
+              symboles={question.positions.map((position) => ({
+                position,
+                figure: 'ronde' as const,
+              }))}
+              espace={44}
+            />
+            {/* Entendre ce qu'on vient de lire : la hauteur écrite et le son qu'elle
+                produit sont deux choses que rien ne relie tant qu'on ne les a pas
+                entendues ensemble. Ça n'aide pas à répondre, et c'est voulu : les
+                propositions sont des NOMS, qu'aucune oreille de débutant ne reconnaît. */}
+            <Button
+              variant="outline"
+              onClick={() => void jouerLaPartition(question)}
+            >
+              Écouter
+            </Button>
+            <div className="Solfege__suites">
+              {question.choix.map((suite, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`Solfege__suite${choisi === index ? ' Solfege__suite--choisi' : ''}${
+                    verdict !== null && suite.join() === question.reponse.join()
+                      ? ' Solfege__suite--juste'
+                      : ''
+                  }`}
+                  disabled={verdict !== null}
+                  onClick={() => {
+                    setChoisi(index);
+                    juger(
+                      suite.join() === question.reponse.join(),
+                      'Lire une partition',
+                      suite.join(' '),
+                      question.reponse.join(' '),
+                    );
+                  }}
+                >
+                  {suite.join(' ')}
                 </button>
               ))}
             </div>
@@ -427,11 +501,26 @@ function placerSymboles(
   ];
 }
 
+/** Joue la suite écrite, une note après l'autre, au rythme où on la lirait. */
+async function jouerLaPartition(
+  question: ReturnType<typeof genererPartition>,
+): Promise<void> {
+  const contexte = await reveiller();
+  if (!contexte) return;
+  let quand = maintenant() + 0.25;
+  for (const position of question.positions) {
+    jouerNote(frequence(hauteurDe(position, question.cle)), quand, 0.55);
+    quand += 0.65;
+  }
+}
+
 /** Ce qu'il fallait répondre, en une phrase qu'on lit sans réfléchir. */
 function reponseEnClair(question: Question): string {
   switch (question.type) {
     case 'lire':
       return `C’était un ${question.reponse}.`;
+    case 'partition':
+      return `C’était : ${question.reponse.join(' ')}.`;
     case 'placer':
       return `Le ${question.note} était en vert.`;
     case 'figure':

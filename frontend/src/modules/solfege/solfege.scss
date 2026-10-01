@@ -265,3 +265,96 @@
   font-weight: 800;
   line-height: 1;
 }
+
+// Les suites de noms de « lire une partition ». Empilées et non en grille : elles se
+// ressemblent d'une ou deux notes, et il faut pouvoir les comparer en descendant du
+// regard, pas en sautant d'une colonne à l'autre.
+.Solfege__suites {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+  width: min(100%, 30rem);
+}
+
+.Solfege__suite {
+  padding: v.$space-4 v.$space-5;
+  font-family: inherit;
+  font-size: v.$font-size-lg;
+  letter-spacing: 0.04em;
+  color: var(--color-base-content);
+  background: var(--color-base-100);
+  border: 2px solid var(--color-base-300);
+  border-radius: v.$radius-md;
+  cursor: pointer;
+
+  &--choisi {
+    border-color: var(--color-primary);
+  }
+
+  &--juste {
+    border-color: var(--color-success);
+    color: var(--color-success);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+// ─── Les réglages de classe ──────────────────────────────────────────────────
+
+.SolfegeSettings {
+  &__notes,
+  &__figures {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-3;
+  }
+
+  // Ouverte ou fermée, et rien entre les deux : une note décochée est simplement absente
+  // des questions, ce n'est pas un degré de difficulté.
+  &__note {
+    min-width: 5rem;
+    padding: v.$space-3 v.$space-4;
+    font-family: inherit;
+    font-size: v.$font-size-base;
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-pill;
+    cursor: pointer;
+    opacity: 0.45;
+
+    &--ouverte {
+      opacity: 1;
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 14%, var(--color-base-100));
+    }
+  }
+
+  &__figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: v.$space-2;
+    width: 9rem;
+    padding: v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-xs;
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+    border: 2px solid var(--color-base-300);
+    border-radius: v.$radius-md;
+    cursor: pointer;
+    opacity: 0.45;
+
+    .Portee {
+      max-height: 5rem;
+    }
+
+    &--ouverte {
+      opacity: 1;
+      border-color: var(--color-primary);
+    }
+  }
+}

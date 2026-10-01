@@ -7,8 +7,10 @@ import {
   genererMesure,
   genererOreille,
   genererPlacer,
+  genererPartition,
   genererRythme,
   memeRythme,
+  memeSuite,
   positionsPermises,
   remplirMesure,
   type Reglages,
@@ -19,6 +21,7 @@ import {
   mesureJuste,
   nomDe,
   type Figure,
+  type Note,
 } from './solfege';
 
 const rand = (min: number, max: number) =>
@@ -379,5 +382,73 @@ describe('la longueur des phrases', () => {
       if (tailles.size === 1) alignees++;
     }
     expect(alignees).toBeGreaterThan(30);
+  });
+});
+
+describe('les notes au programme', () => {
+  it('n’interroge que les notes ouvertes', () => {
+    // Sa méthode n'ouvre pas les sept d'un coup : interroger « si » la première semaine
+    // ne mesurerait que ce qu'elle n'a pas encore vu.
+    const notes: Note[] = ['do', 'ré', 'mi'];
+    for (const cles of [['sol'], ['fa']] as ('sol' | 'fa')[][]) {
+      for (let essai = 0; essai < 150; essai++) {
+        expect(notes).toContain(
+          genererLire(AVEC({ cles, notes }), rand).reponse,
+        );
+        expect(notes).toContain(
+          genererPlacer(AVEC({ cles, notes }), rand).note,
+        );
+        for (const n of genererPartition(AVEC({ cles, notes }), rand).reponse) {
+          expect(notes).toContain(n);
+        }
+      }
+    }
+  });
+
+  it('retombe sur l’étendue entière plutôt que de poser une question sans réponse', () => {
+    // Un réglage trop serré doit donner un exercice facile, pas un exercice cassé : avec
+    // une seule note ouverte et aucune place pour elle, on préfère élargir que planter.
+    const q = genererLire(AVEC({ notes: [], etendue: 0 }), rand);
+    expect(q.reponse).toBeTruthy();
+  });
+});
+
+describe('lire une partition', () => {
+  it('propose 3 à 5 notes, et quatre suites dont la bonne', () => {
+    for (let essai = 0; essai < 200; essai++) {
+      const q = genererPartition(AVEC({ etendue: 1 }), rand);
+      expect(q.positions.length).toBeGreaterThanOrEqual(3);
+      expect(q.positions.length).toBeLessThanOrEqual(5);
+      expect(q.choix).toHaveLength(4);
+      expect(q.choix.filter((s) => memeSuite(s, q.reponse))).toHaveLength(1);
+      for (const suite of q.choix) expect(suite).toHaveLength(q.reponse.length);
+    }
+  });
+
+  it('ne propose JAMAIS deux fois la même suite', () => {
+    // Deux propositions identiques rendraient la question sans réponse unique, et on ne
+    // s'en apercevrait qu'en tombant dessus.
+    for (let essai = 0; essai < 200; essai++) {
+      const { choix } = genererPartition(AVEC({ etendue: 1 }), rand);
+      for (let i = 0; i < choix.length; i++) {
+        for (let j = i + 1; j < choix.length; j++) {
+          expect(memeSuite(choix[i], choix[j])).toBe(false);
+        }
+      }
+    }
+  });
+
+  it('fait des leurres qui SE RESSEMBLENT : une ou deux notes d’écart, jamais plus', () => {
+    // Des suites qui ne se ressemblent pas se départagent sur la première note, sans lire
+    // la suite : l'exercice ne mesurerait plus la lecture groupée.
+    for (let essai = 0; essai < 200; essai++) {
+      const q = genererPartition(AVEC({ etendue: 1 }), rand);
+      for (const suite of q.choix) {
+        if (memeSuite(suite, q.reponse)) continue;
+        const ecarts = suite.filter((n, i) => n !== q.reponse[i]).length;
+        expect(ecarts).toBeGreaterThan(0);
+        expect(ecarts).toBeLessThanOrEqual(2);
+      }
+    }
   });
 });

@@ -43,6 +43,14 @@ export interface Reglages {
   /** La longueur d'une phrase rythmique, en TEMPS. Quatre temps, c'est deux mesures à
    * deux temps : de quoi montrer l'exercice, pas de quoi travailler. */
   longueur: number;
+  /**
+   * Les notes au programme.
+   *
+   * Sa méthode n'ouvre pas les sept d'un coup : on commence sur trois notes voisines, on
+   * en ajoute une, puis une autre. Interroger `si` la première semaine ne mesurerait que
+   * ce qu'elle n'a pas encore vu.
+   */
+  notes: Note[];
 }
 
 export const REGLAGES_DEFAUT: Reglages = {
@@ -52,6 +60,7 @@ export const REGLAGES_DEFAUT: Reglages = {
   mesure: 2,
   tempo: 72,
   longueur: 12,
+  notes: [...NOTES],
 };
 
 /** Les positions qu'on s'autorise à écrire, bornes comprises. */
@@ -59,6 +68,21 @@ export function positionsPermises(etendue: number): number[] {
   const bas = -2 * etendue;
   const haut = 8 + 2 * etendue;
   return Array.from({ length: haut - bas + 1 }, (_, i) => bas + i);
+}
+
+/**
+ * Les positions jouables : dans l'étendue ouverte, ET portant une note au programme.
+ *
+ * Jamais vide : si le réglage ne laissait aucune place, on rendrait l'étendue entière
+ * plutôt qu'une question sans réponse. Un réglage trop serré doit donner un exercice
+ * facile, pas un exercice cassé.
+ */
+export function positionsJouables(reglages: Reglages, cle: CleLue): number[] {
+  const permises = positionsPermises(reglages.etendue);
+  const retenues = permises.filter((p) =>
+    reglages.notes.includes(nomDe(hauteurDe(p, cle))),
+  );
+  return retenues.length > 0 ? retenues : permises;
 }
 
 function tirer<T>(liste: readonly T[], rand: Rand): T {
@@ -76,7 +100,7 @@ export interface QuestionLire {
 
 export function genererLire(reglages: Reglages, rand: Rand): QuestionLire {
   const cle = tirer(reglages.cles, rand);
-  const position = tirer(positionsPermises(reglages.etendue), rand);
+  const position = tirer(positionsJouables(reglages, cle), rand);
   return {
     type: 'lire',
     cle,
@@ -98,7 +122,7 @@ export interface QuestionPlacer {
 
 export function genererPlacer(reglages: Reglages, rand: Rand): QuestionPlacer {
   const cle = tirer(reglages.cles, rand);
-  const permises = positionsPermises(reglages.etendue);
+  const permises = positionsJouables(reglages, cle);
   // On tire parmi les notes QUI ONT UNE PLACE, plutôt que de tirer au hasard et de
   // recommencer : poser une question sans réponse est la pire chose qu'un exercice
   // puisse faire, et recommencer indéfiniment en est la deuxième.
@@ -112,6 +136,70 @@ export function genererPlacer(reglages: Reglages, rand: Rand): QuestionPlacer {
     note,
     reponses: permises.filter((p) => nomDe(hauteurDe(p, cle)) === note),
   };
+}
+
+// ─── Lire une partition ──────────────────────────────────────────────────────
+
+export interface QuestionPartition {
+  type: 'partition';
+  cle: CleLue;
+  positions: number[];
+  /** Les noms, dans l'ordre où ils se lisent. */
+  reponse: Note[];
+  /** Quatre suites, dont la bonne. */
+  choix: Note[][];
+}
+
+/** Combien de notes dans une plage. Trois à cinq : c'est la longueur des groupes liés de
+ * sa méthode, celle qu'on lit d'un coup d'oeil sans la relire note à note. */
+const PLAGE = { minimum: 3, maximum: 5 };
+
+/**
+ * Une plage de notes à lire d'un trait.
+ *
+ * C'est la lecture GROUPÉE de son cahier, et ce n'est pas la même chose que nommer une
+ * note isolée : on lit par paquets, on retient l'ordre, et on ne revient pas en arrière.
+ * C'est ce qui fait gagner en vitesse, et la vitesse est tout l'objet de l'exercice.
+ *
+ * Les leurres ne diffèrent que d'UNE ou DEUX notes, et d'un seul degré : des suites qui
+ * ne se ressemblent pas se départagent sur la première note, sans lire la suite.
+ */
+export function genererPartition(
+  reglages: Reglages,
+  rand: Rand,
+): QuestionPartition {
+  const cle = tirer(reglages.cles, rand);
+  const jouables = positionsJouables(reglages, cle);
+  const combien = rand(PLAGE.minimum, PLAGE.maximum);
+  const positions = Array.from({ length: combien }, () =>
+    tirer(jouables, rand),
+  );
+  const reponse = positions.map((p) => nomDe(hauteurDe(p, cle)));
+
+  const choix: Note[][] = [reponse];
+  for (let essai = 0; essai < 80 && choix.length < 4; essai++) {
+    const leurre = [...reponse];
+    const combienDeChangements = rand(1, 2);
+    for (let c = 0; c < combienDeChangements; c++) {
+      const rang = rand(0, leurre.length - 1);
+      const depart = NOTES.indexOf(leurre[rang]);
+      const pas = rand(0, 1) === 0 ? 1 : -1;
+      leurre[rang] = NOTES[(depart + pas + 7) % 7];
+    }
+    if (!choix.some((suite) => memeSuite(suite, leurre))) choix.push(leurre);
+  }
+
+  return {
+    type: 'partition',
+    cle,
+    positions,
+    reponse,
+    choix: melanger(choix, rand),
+  };
+}
+
+export function memeSuite(a: readonly Note[], b: readonly Note[]): boolean {
+  return a.length === b.length && a.every((note, i) => note === b[i]);
 }
 
 // ─── Nommer une figure ───────────────────────────────────────────────────────

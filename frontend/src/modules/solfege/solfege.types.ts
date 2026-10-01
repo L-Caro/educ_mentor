@@ -6,6 +6,7 @@
  */
 export const TYPES_SOLFEGE = [
   'lire',
+  'partition',
   'placer',
   'figure',
   'mesure',
