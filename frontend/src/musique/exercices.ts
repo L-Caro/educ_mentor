@@ -31,12 +31,36 @@ import { TIMBRES, type Timbre } from './audio';
 
 export type Rand = (min: number, max: number) => number;
 
+/**
+ * Comment la suite de notes se déplace d'une note à l'autre.
+ *
+ * `facile` : des secondes, c'est-à-dire la case d'à côté, dans un sens puis parfois dans
+ * l'autre. On lit un mouvement, pas des notes isolées.
+ * `moyen` : jusqu'à la tierce, deux cases.
+ * `difficile` : n'importe où dans l'intervalle ouvert.
+ */
+export type Mouvement = 'facile' | 'moyen' | 'difficile';
+
+/** Le plus grand saut autorisé, en cases de portée. Une seconde vaut une case, une
+ * tierce en vaut deux. */
+const SAUT: Record<Mouvement, number> = { facile: 1, moyen: 2, difficile: 0 };
+
 export interface Reglages {
   /** Les clés au programme. Deux clés mélangées, c'est le vrai saut : le même dessin
    * change de nom, et rien sur la page ne le dit à part la clé. */
   cles: CleLue[];
-  /** Combien de lignes supplémentaires on s'autorise, de zéro à deux. */
-  etendue: number;
+  /**
+   * L'intervalle de notes autorisé, en degrés absolus, bornes comprises.
+   *
+   * Un intervalle et non un nombre de lignes supplémentaires : les deux clés se
+   * chevauchent, et « deux lignes au-dessus de la clé de fa » désigne déjà des notes qui
+   * s'écrivent dans la clé de sol. Compter en lignes depuis chaque portée séparément
+   * laissait donc ouvrir d'un côté ce qu'on croyait fermé de l'autre.
+   */
+  grave: number;
+  aigu: number;
+  /** Comment la suite se déplace, pour la lecture groupée. */
+  mouvement: Mouvement;
   figures: Figure[];
   mesure: Mesure;
   tempo: number;
@@ -53,9 +77,16 @@ export interface Reglages {
   notes: Note[];
 }
 
+/** Du sol de la première ligne de la clé de fa au fa de la cinquième ligne de la clé de
+ * sol : les deux portées pleines, sans une seule ligne supplémentaire. */
+export const GRAVE_DEFAUT = hauteurDe(0, 'fa');
+export const AIGU_DEFAUT = hauteurDe(8, 'sol');
+
 export const REGLAGES_DEFAUT: Reglages = {
   cles: ['sol'],
-  etendue: 0,
+  grave: GRAVE_DEFAUT,
+  aigu: AIGU_DEFAUT,
+  mouvement: 'moyen',
   figures: ['blanche', 'noire'],
   mesure: 2,
   tempo: 72,
@@ -63,26 +94,41 @@ export const REGLAGES_DEFAUT: Reglages = {
   notes: [...NOTES],
 };
 
-/** Les positions qu'on s'autorise à écrire, bornes comprises. */
-export function positionsPermises(etendue: number): number[] {
-  const bas = -2 * etendue;
-  const haut = 8 + 2 * etendue;
-  return Array.from({ length: haut - bas + 1 }, (_, i) => bas + i);
-}
+/**
+ * Jusqu'où une portée se laisse écrire : une ligne supplémentaire de chaque côté.
+ *
+ * C'est une limite de DESSIN, pas un réglage, et elle a une raison. Une note grave peut
+ * s'écrire en clé de sol avec trois lignes supplémentaires, mais personne ne l'écrit comme
+ * ça : on l'écrit en clé de fa, où elle tombe dans la portée. C'est même à ça que servent
+ * deux clés. Borner chaque portée à son registre fait donc descendre les notes graves sur
+ * la portée du bas et monter les aiguës sur celle du haut, toutes seules.
+ *
+ * L'intervalle ouvert, lui, se règle en hauteurs et traverse les deux clés.
+ */
+const LISIBLE = { bas: -3, haut: 11 };
 
 /**
- * Les positions jouables : dans l'étendue ouverte, ET portant une note au programme.
+ * Les positions jouables sur cette clé : dans l'intervalle ouvert, portant une note au
+ * programme, et lisibles sur la portée.
  *
- * Jamais vide : si le réglage ne laissait aucune place, on rendrait l'étendue entière
- * plutôt qu'une question sans réponse. Un réglage trop serré doit donner un exercice
- * facile, pas un exercice cassé.
+ * Jamais vide : si le réglage ne laissait aucune place, on rend ce que la portée peut
+ * écrire plutôt qu'une question sans réponse. Un réglage trop serré doit donner un
+ * exercice facile, pas un exercice cassé.
  */
 export function positionsJouables(reglages: Reglages, cle: CleLue): number[] {
-  const permises = positionsPermises(reglages.etendue);
-  const retenues = permises.filter((p) =>
+  const toutes = Array.from(
+    { length: LISIBLE.haut - LISIBLE.bas + 1 },
+    (_, i) => LISIBLE.bas + i,
+  );
+  const dansLIntervalle = toutes.filter((p) => {
+    const hauteur = hauteurDe(p, cle);
+    return hauteur >= reglages.grave && hauteur <= reglages.aigu;
+  });
+  const retenues = dansLIntervalle.filter((p) =>
     reglages.notes.includes(nomDe(hauteurDe(p, cle))),
   );
-  return retenues.length > 0 ? retenues : permises;
+  if (retenues.length > 0) return retenues;
+  return dansLIntervalle.length > 0 ? dansLIntervalle : toutes;
 }
 
 function tirer<T>(liste: readonly T[], rand: Rand): T {
@@ -140,59 +186,120 @@ export function genererPlacer(reglages: Reglages, rand: Rand): QuestionPlacer {
 
 // ─── Lire une partition ──────────────────────────────────────────────────────
 
+export interface NotePartition {
+  cle: CleLue;
+  position: number;
+  note: Note;
+}
+
 export interface QuestionPartition {
   type: 'partition';
-  cle: CleLue;
-  positions: number[];
-  /** Les noms, dans l'ordre où ils se lisent. */
+  /** La suite, dans l'ordre où elle se lit, d'une portée à l'autre. */
+  notes: NotePartition[];
+  /** Les groupes liés : [premier, dernier] en index de note, bornes comprises. */
+  groupes: [number, number][];
   reponse: Note[];
   /** Quatre suites, dont la bonne. */
   choix: Note[][];
 }
 
-/** Combien de notes dans une plage. Trois à cinq : c'est la longueur des groupes liés de
- * sa méthode, celle qu'on lit d'un coup d'oeil sans la relire note à note. */
-const PLAGE = { minimum: 3, maximum: 5 };
+/** Combien de notes dans une lecture groupée, et combien par groupe lié. */
+const PLAGE = { minimum: 4, maximum: 6 };
+const GROUPE = { minimum: 2, maximum: 3 };
 
 /**
- * Une plage de notes à lire d'un trait.
+ * Une lecture groupée, telle que sa méthode l'écrit.
  *
- * C'est la lecture GROUPÉE de son cahier, et ce n'est pas la même chose que nommer une
- * note isolée : on lit par paquets, on retient l'ordre, et on ne revient pas en arrière.
- * C'est ce qui fait gagner en vitesse, et la vitesse est tout l'objet de l'exercice.
+ * Deux portées jointes, une clé de sol en haut, une clé de fa en bas, et une suite de
+ * notes qui PASSE DE L'UNE À L'AUTRE sans interruption. On ne lit pas le haut puis le
+ * bas : on lit de gauche à droite en changeant de portée quand la suite y passe. C'est
+ * exactement ce qui rend l'exercice difficile, et c'est pour ça qu'il existe.
  *
- * Les leurres ne diffèrent que d'UNE ou DEUX notes, et d'un seul degré : des suites qui
- * ne se ressemblent pas se départagent sur la première note, sans lire la suite.
+ * Le MOUVEMENT décide de l'écart entre deux notes voisines. En facile elles se suivent,
+ * case après case, dans un sens puis parfois dans l'autre : c'est la « seconde » de sa
+ * méthode, et ce qui se lit comme un mouvement plutôt que comme des notes isolées. En
+ * moyen on s'autorise la tierce. En difficile, l'intervalle entier.
+ *
+ * Quand une seule clé est ouverte au pré-jeu, tout reste sur une portée : on ne force pas
+ * la clé de fa à quelqu'un qui ne l'a pas vue.
  */
 export function genererPartition(
   reglages: Reglages,
   rand: Rand,
 ): QuestionPartition {
-  const cle = tirer(reglages.cles, rand);
-  const jouables = positionsJouables(reglages, cle);
   const combien = rand(PLAGE.minimum, PLAGE.maximum);
-  const positions = Array.from({ length: combien }, () =>
-    tirer(jouables, rand),
-  );
-  const reponse = positions.map((p) => nomDe(hauteurDe(p, cle)));
+  const notes: NotePartition[] = [];
+  const groupes: [number, number][] = [];
+  const saut = SAUT[reglages.mouvement];
+  // En facile, le mouvement garde un sens sur plusieurs notes avant de s'inverser :
+  // c'est ce qui fait une montée, une descente, ou une légère vague.
+  let sens = rand(0, 1) === 0 ? 1 : -1;
 
+  let cle = tirer(reglages.cles, rand);
+  let jouables = positionsJouables(reglages, cle);
+  // La position vit en dehors des groupes : la liaison dit où respirer, elle ne remet
+  // pas la lecture à zéro. Laisser chaque groupe repartir d'une note tirée au hasard
+  // produisait un saut incontrôlé à chaque arc, et le réglage « facile » ne tenait que
+  // DANS les groupes, jamais entre eux.
+  let position = tirer(jouables, rand);
+
+  while (notes.length < combien) {
+    const debutDuGroupe = notes.length;
+    const taille = Math.min(
+      rand(GROUPE.minimum, GROUPE.maximum),
+      combien - debutDuGroupe,
+    );
+
+    for (let i = 0; i < taille; i++) {
+      notes.push({ cle, position, note: nomDe(hauteurDe(position, cle)) });
+
+      const atteignables = jouables.filter(
+        (p) => p !== position && (saut === 0 || Math.abs(p - position) <= saut),
+      );
+      if (atteignables.length === 0) {
+        position = tirer(jouables, rand);
+        continue;
+      }
+      // On continue dans le même sens tant que c'est possible, et on se retourne quand on
+      // bute : une suite qui changerait de sens à chaque note ne se lirait plus comme un
+      // mouvement.
+      const dansLeSens = atteignables.filter((p) => (p - position) * sens > 0);
+      if (reglages.mouvement === 'facile' && dansLeSens.length > 0) {
+        position = tirer(dansLeSens, rand);
+        if (rand(0, 5) === 0) sens = -sens;
+      } else {
+        if (reglages.mouvement === 'facile') sens = -sens;
+        position = tirer(atteignables, rand);
+      }
+    }
+    groupes.push([debutDuGroupe, notes.length - 1]);
+
+    // On change de portée au groupe suivant, s'il y a de quoi changer. La position
+    // repart alors de zéro : deux positions de clés différentes ne se comparent pas en
+    // cases, c'est la hauteur qui compte, et elle change de repère.
+    if (reglages.cles.length > 1) {
+      cle = cle === 'sol' ? 'fa' : 'sol';
+      jouables = positionsJouables(reglages, cle);
+      position = tirer(jouables, rand);
+    }
+  }
+
+  const reponse = notes.map((n) => n.note);
   const choix: Note[][] = [reponse];
   for (let essai = 0; essai < 80 && choix.length < 4; essai++) {
     const leurre = [...reponse];
-    const combienDeChangements = rand(1, 2);
-    for (let c = 0; c < combienDeChangements; c++) {
+    for (let c = 0; c < rand(1, 2); c++) {
       const rang = rand(0, leurre.length - 1);
       const depart = NOTES.indexOf(leurre[rang]);
-      const pas = rand(0, 1) === 0 ? 1 : -1;
-      leurre[rang] = NOTES[(depart + pas + 7) % 7];
+      leurre[rang] = NOTES[(depart + (rand(0, 1) === 0 ? 1 : -1) + 7) % 7];
     }
     if (!choix.some((suite) => memeSuite(suite, leurre))) choix.push(leurre);
   }
 
   return {
     type: 'partition',
-    cle,
-    positions,
+    notes,
+    groupes,
     reponse,
     choix: melanger(choix, rand),
   };

@@ -6,10 +6,13 @@ import {
 import Portee from 'src/musique/Portee';
 import {
   NOTES,
-  ORDRE_FIGURES,
   NOM_FIGURE,
+  ORDRE_FIGURES,
+  hauteurDe,
+  nomDe,
   nomSilence,
 } from 'src/musique/solfege';
+import { AIGU_DEFAUT, GRAVE_DEFAUT } from 'src/musique/exercices';
 import './solfege.scss';
 
 /**
@@ -27,12 +30,6 @@ import './solfege.scss';
  * module « poser » : pas de table à soi pour six lignes qui changent trois fois par an.
  */
 
-const ETENDUES = [
-  { valeur: '0', label: 'Dans la portée' },
-  { valeur: '1', label: '+ 1 ligne supplémentaire' },
-  { valeur: '2', label: '+ 2 lignes supplémentaires' },
-];
-
 const MESURES = [
   { valeur: '2', label: '2 temps' },
   { valeur: '3', label: '3 temps' },
@@ -46,12 +43,53 @@ const LONGUEURS = [
   { valeur: '16', label: 'Longue' },
 ];
 
-const TEMPOS = [
-  { valeur: '60', label: 'Très lent' },
-  { valeur: '72', label: 'Lent' },
-  { valeur: '90', label: 'Moyen' },
-  { valeur: '110', label: 'Rapide' },
+const MOUVEMENTS = [
+  {
+    valeur: 'facile',
+    label: 'Les notes se suivent',
+    aide: 'La case d’à côté, en montant ou en descendant',
+  },
+  { valeur: 'moyen', label: 'Jusqu’à la tierce', aide: 'Deux cases au plus' },
+  {
+    valeur: 'difficile',
+    label: 'Libre',
+    aide: 'N’importe où dans l’intervalle',
+  },
 ];
+
+/**
+ * Les hauteurs qu'on peut choisir comme bornes, de la plus grave à la plus aiguë.
+ *
+ * Une seule liste pour les deux clés, et c'est tout l'intérêt : les deux portées se
+ * chevauchent, et « deux lignes au-dessus de la clé de fa » désigne déjà des notes qui
+ * s'écrivent en clé de sol. Compter en lignes depuis chaque portée séparément laissait
+ * ouvrir d'un côté ce qu'on croyait fermé de l'autre.
+ *
+ * Chaque borne est nommée par la portée où elle TOMBE, celle où elle s'écrit sans ligne
+ * supplémentaire : c'est ainsi qu'on la désigne quand on la cherche des yeux.
+ */
+const RANGS = ['1re', '2e', '3e', '4e', '5e'];
+
+function bornes(): { valeur: number; label: string }[] {
+  const liste: { valeur: number; label: string }[] = [];
+  for (const cle of ['fa', 'sol'] as const) {
+    for (let position = 0; position <= 8; position++) {
+      const hauteur = hauteurDe(position, cle);
+      if (liste.some((b) => b.valeur === hauteur)) continue;
+      const ou =
+        position % 2 === 0
+          ? `${RANGS[position / 2]} ligne`
+          : `${RANGS[(position - 1) / 2]} interligne`;
+      liste.push({
+        valeur: hauteur,
+        label: `${nomDe(hauteur)} (${ou}, clé de ${cle})`,
+      });
+    }
+  }
+  return liste.sort((a, b) => a.valeur - b.valeur);
+}
+
+const BORNES = bornes();
 
 export default function SolfegeSettings() {
   const { data: reglages = {}, isLoading } = useGetSettingsQuery();
@@ -135,13 +173,77 @@ export default function SolfegeSettings() {
 
         <div className="AdminCard GameSettings__card">
           <p className="GameSettings__cardTitle">
-            Jusqu&rsquo;où vont les notes
+            De quelle note à quelle note
           </p>
           <p className="GameSettings__hint">
-            Les lignes supplémentaires s&rsquo;ajoutent de chaque côté à la
-            fois.
+            Un intervalle, et non un nombre de lignes : les deux portées se
+            chevauchent, et chaque note s&rsquo;écrit sur celle où elle tombe
+            sans ligne supplémentaire.
           </p>
-          {choix('solfege_etendue', lire('solfege_etendue', '0'), ETENDUES)}
+          <div className="SolfegeSettings__intervalle">
+            <label>
+              <span>De</span>
+              <select
+                value={lire('solfege_grave', String(GRAVE_DEFAUT))}
+                onChange={(evenement) =>
+                  void enregistrer({
+                    key: 'solfege_grave',
+                    value: evenement.target.value,
+                  })
+                }
+              >
+                {BORNES.map(({ valeur, label }) => (
+                  <option key={valeur} value={valeur}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              <span>à</span>
+              <select
+                value={lire('solfege_aigu', String(AIGU_DEFAUT))}
+                onChange={(evenement) =>
+                  void enregistrer({
+                    key: 'solfege_aigu',
+                    value: evenement.target.value,
+                  })
+                }
+              >
+                {BORNES.map(({ valeur, label }) => (
+                  <option key={valeur} value={valeur}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="AdminCard GameSettings__card">
+          <p className="GameSettings__cardTitle">Comment la suite se déplace</p>
+          <p className="GameSettings__hint">
+            Pour la lecture groupée : l&rsquo;écart entre deux notes voisines.
+          </p>
+          <div className="GameSettings__radios">
+            {MOUVEMENTS.map(({ valeur, label, aide }) => (
+              <label key={valeur} className="GameSettings__radio">
+                <input
+                  type="radio"
+                  name="solfege_mouvement"
+                  checked={lire('solfege_mouvement', 'moyen') === valeur}
+                  onChange={() =>
+                    void enregistrer({
+                      key: 'solfege_mouvement',
+                      value: valeur,
+                    })
+                  }
+                />
+                {label}
+                <span className="SolfegeSettings__aide">{aide}</span>
+              </label>
+            ))}
+          </div>
         </div>
 
         <div className="AdminCard GameSettings__card">
@@ -192,11 +294,6 @@ export default function SolfegeSettings() {
             mesure mais la mémoire.
           </p>
           {choix('solfege_longueur', lire('solfege_longueur', '12'), LONGUEURS)}
-        </div>
-
-        <div className="AdminCard GameSettings__card">
-          <p className="GameSettings__cardTitle">Vitesse du métronome</p>
-          {choix('solfege_tempo', lire('solfege_tempo', '72'), TEMPOS)}
         </div>
       </div>
     </div>

@@ -61,6 +61,14 @@ export interface Symbole {
   verdict?: 'juste' | 'faux';
   /** Ce qui se prononce sous la note : « Taé », « aé », « Aé ». */
   syllabe?: string;
+  /**
+   * L'emplacement où poser la note, quand ce n'est pas son rang dans la liste.
+   *
+   * Sert aux systèmes de deux portées : la suite de notes passe de l'une à l'autre, et
+   * chaque portée ne reçoit que SES notes. Sans cet index, elles se tasseraient à gauche
+   * et les deux portées ne seraient plus alignées.
+   */
+  emplacement?: number;
 }
 
 interface Props {
@@ -86,6 +94,21 @@ interface Props {
   /** Le nombre d'emplacements, quand il ne vient pas des symboles : une portée VIDE sur
    * laquelle il faut dessiner garde des places, sinon rien ne dit où écrire. */
   emplacements?: number;
+  /**
+   * La place réservée à la clé, imposée de l'extérieur.
+   *
+   * Deux portées d'un même système doivent commencer à la MÊME abscisse, alors que leurs
+   * clés n'ont pas la même largeur. Sans cela, la troisième note du haut ne tomberait pas
+   * au-dessus de la troisième note du bas, et la lecture suivie n'aurait plus de sens.
+   */
+  largeurCle?: number;
+  /**
+   * Les groupes liés, en index d'emplacement, bornes comprises.
+   *
+   * C'est la liaison de sa méthode : elle ne dit rien du son, elle dit « lis ces trois-là
+   * d'un trait ». Tout l'exercice de lecture groupée tient dans ces arcs.
+   */
+  liaisons?: [number, number][];
 }
 
 // ─── Les clés ────────────────────────────────────────────────────────────────
@@ -295,6 +318,7 @@ function cadrer(
   symboles: Symbole[],
   hauteur: number,
   avecSous: boolean,
+  avecLiaisons = false,
 ): { y: number; hauteur: number } {
   // Ce que la clé déborde d'elle-même, au-dessus et en dessous de la portée.
   // Ce que la clé déborde d'elle-même, au-dessus et en dessous de la portée. Mesuré sur
@@ -335,6 +359,7 @@ function cadrer(
 
   // La rangée du dessous descend plus bas que tout le reste.
   if (avecSous) bas = Math.min(bas, -9);
+  if (avecLiaisons) haut = Math.max(haut, 12);
 
   const y = yDe(haut) - 4;
   const dessous = yDe(bas) + 4;
@@ -354,16 +379,25 @@ export default function Portee({
   barres = [],
   sous,
   emplacements,
+  largeurCle: largeurCleImposee,
+  liaisons = [],
 }: Props) {
-  const largeurCle = LARGEURS_CLE[cle];
+  const largeurCle = largeurCleImposee ?? LARGEURS_CLE[cle];
   const places = Math.max(
     1,
     emplacements ?? symboles.length,
     sous?.length ?? 0,
+    ...symboles.map((symbole) => (symbole.emplacement ?? 0) + 1),
   );
   const largeur = largeurCle + places * espace + 16;
   const hauteur = HAUTEUR_PORTEE + 2 * MARGE;
-  const cadre = cadrer(cle, symboles, hauteur, sous !== undefined);
+  const cadre = cadrer(
+    cle,
+    symboles,
+    hauteur,
+    sous !== undefined,
+    liaisons.length > 0,
+  );
 
   /** La position visée par un clic, arrondie au demi-interligne le plus proche. */
   function positionVisee(evenement: React.MouseEvent<SVGRectElement>): number {
@@ -409,7 +443,8 @@ export default function Portee({
       {cle === 'percussion' && <CleDePercussion />}
 
       {symboles.map((symbole, index) => {
-        const x = largeurCle + index * espace + espace / 2;
+        const rang = symbole.emplacement ?? index;
+        const x = largeurCle + rang * espace + espace / 2;
         const y = yDe(symbole.position);
         return (
           <g
@@ -490,6 +525,21 @@ export default function Portee({
           >
             {texte}
           </text>
+        );
+      })}
+
+      {/* Les liaisons, au-dessus de tout : ce sont elles qui disent où commence et où
+          finit un groupe, et un arc coupé par une queue de note se lit mal. */}
+      {liaisons.map(([debut, fin], index) => {
+        const xa = largeurCle + debut * espace + espace / 2;
+        const xb = largeurCle + fin * espace + espace / 2;
+        const y = yDe(10);
+        return (
+          <path
+            key={index}
+            className="Portee__liaison"
+            d={`M ${xa} ${y} Q ${(xa + xb) / 2} ${y - 11} ${xb} ${y}`}
+          />
         );
       })}
 

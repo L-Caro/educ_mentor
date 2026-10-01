@@ -358,3 +358,44 @@
     }
   }
 }
+
+// Les deux bornes de l'intervalle, l'une sous l'autre : « de » et « à » se lisent dans
+// cet ordre, et côte à côte les deux listes deviennent illisibles dès que le nom de la
+// borne est long.
+.SolfegeSettings__intervalle {
+  display: flex;
+  flex-direction: column;
+  gap: v.$space-3;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: v.$space-3;
+    font-size: v.$font-size-sm;
+  }
+
+  span {
+    flex: none;
+    width: 2rem;
+    opacity: 0.7;
+  }
+
+  select {
+    flex: 1;
+    min-width: 0;
+    padding: v.$space-3;
+    font-family: inherit;
+    font-size: v.$font-size-sm;
+    color: var(--color-base-content);
+    background: var(--color-base-100);
+    border: 1px solid var(--color-base-300);
+    border-radius: v.$radius-sm;
+  }
+}
+
+.SolfegeSettings__aide {
+  display: block;
+  margin-left: v.$space-6;
+  font-size: v.$font-size-xs;
+  opacity: 0.65;
+}

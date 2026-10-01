@@ -11,7 +11,7 @@ import {
   genererRythme,
   memeRythme,
   memeSuite,
-  positionsPermises,
+  positionsJouables,
   remplirMesure,
   type Reglages,
 } from './exercices';
@@ -32,33 +32,68 @@ const AVEC = (extra: Partial<Reglages>): Reglages => ({
   ...extra,
 });
 
-describe('l’étendue', () => {
-  it('reste dans la portée quand aucune ligne supplémentaire n’est ouverte', () => {
-    expect(positionsPermises(0)).toEqual([0, 1, 2, 3, 4, 5, 6, 7, 8]);
+describe('l’intervalle de notes', () => {
+  it('se règle en HAUTEURS, et traverse donc les deux clés', () => {
+    // Les deux portées se chevauchent : compter en lignes supplémentaires depuis chacune
+    // laissait ouvrir d'un côté ce qu'on croyait fermé de l'autre. Le do du milieu est
+    // une ligne sous la clé de sol et une ligne au-dessus de la clé de fa : c'est la même
+    // note, et un seul réglage doit la décrire.
+    const doDuMilieu = hauteurDe(-2, 'sol');
+    expect(hauteurDe(10, 'fa')).toBe(doDuMilieu);
+
+    const serre = AVEC({ grave: doDuMilieu, aigu: doDuMilieu });
+    for (const cle of ['sol', 'fa'] as const) {
+      for (const p of positionsJouables(serre, cle)) {
+        expect(hauteurDe(p, cle)).toBe(doDuMilieu);
+      }
+    }
   });
 
-  it('s’ouvre d’une ligne de chaque côté à la fois', () => {
-    expect(positionsPermises(1)[0]).toBe(-2);
-    expect(positionsPermises(1).at(-1)).toBe(10);
-    expect(positionsPermises(2)[0]).toBe(-4);
+  it('ne laisse sortir aucune note de l’intervalle ouvert', () => {
+    const reglages = AVEC({
+      cles: ['sol', 'fa'],
+      grave: hauteurDe(0, 'fa'),
+      aigu: hauteurDe(8, 'sol'),
+    });
+    for (let essai = 0; essai < 200; essai++) {
+      for (const note of genererPartition(reglages, rand).notes) {
+        const hauteur = hauteurDe(note.position, note.cle);
+        expect(hauteur).toBeGreaterThanOrEqual(reglages.grave);
+        expect(hauteur).toBeLessThanOrEqual(reglages.aigu);
+      }
+    }
   });
 });
 
 describe('lire et placer une note', () => {
-  it('ne pose jamais de note hors de l’étendue ouverte', () => {
-    const reglages = AVEC({ cles: ['sol', 'fa'], etendue: 1 });
+  it('ne pose jamais de note hors de l’intervalle ouvert', () => {
+    const reglages = AVEC({ cles: ['sol', 'fa'] });
     for (let essai = 0; essai < 200; essai++) {
       const q = genererLire(reglages, rand);
-      expect(q.position).toBeGreaterThanOrEqual(-2);
-      expect(q.position).toBeLessThanOrEqual(10);
-      expect(q.reponse).toBe(nomDe(hauteurDe(q.position, q.cle)));
+      const hauteur = hauteurDe(q.position, q.cle);
+      expect(hauteur).toBeGreaterThanOrEqual(reglages.grave);
+      expect(hauteur).toBeLessThanOrEqual(reglages.aigu);
+      expect(q.reponse).toBe(nomDe(hauteur));
+    }
+  });
+
+  it('écrit chaque note sur la portée où elle TOMBE, sans empiler les lignes', () => {
+    // Une note grave peut s'écrire en clé de sol avec trois lignes supplémentaires, mais
+    // personne ne l'écrit comme ça : on l'écrit en clé de fa. C'est même à ça que servent
+    // deux clés, et c'est ce qui fait descendre les graves sur la portée du bas.
+    const reglages = AVEC({ cles: ['sol', 'fa'] });
+    for (let essai = 0; essai < 200; essai++) {
+      for (const note of genererPartition(reglages, rand).notes) {
+        expect(note.position).toBeGreaterThanOrEqual(-3);
+        expect(note.position).toBeLessThanOrEqual(11);
+      }
     }
   });
 
   it('accepte TOUTES les places qui conviennent, pas seulement la première', () => {
     // Un do se pose à plusieurs hauteurs dès qu'on ouvre l'étendue. N'en accepter qu'une
     // apprendrait qu'il n'y en a qu'une, ce qui est faux.
-    const reglages = AVEC({ cles: ['sol'], etendue: 2 });
+    const reglages = AVEC({ cles: ['sol'], grave: 0, aigu: 99 });
     let vuPlusieurs = false;
     for (let essai = 0; essai < 300; essai++) {
       const q = genererPlacer(reglages, rand);
@@ -74,7 +109,7 @@ describe('lire et placer une note', () => {
   it('ne pose jamais une question sans réponse', () => {
     // Dans une étendue étroite, une note peut n'avoir aucune place : la question serait
     // alors impossible, et c'est la pire chose qu'un exercice puisse faire.
-    const reglages = AVEC({ cles: ['sol'], etendue: 0 });
+    const reglages = AVEC({ cles: ['sol'] });
     for (let essai = 0; essai < 200; essai++) {
       expect(genererPlacer(reglages, rand).reponses.length).toBeGreaterThan(0);
     }
@@ -272,10 +307,14 @@ describe('les garde-fous ajoutés après les premiers essais avec Maëve', () =>
   });
 
   it('ne part pas en récursion non plus pour placer une note', () => {
-    for (const etendue of [0, 1, 2]) {
+    for (const [grave, aigu] of [
+      [hauteurDe(0, 'sol'), hauteurDe(8, 'sol')],
+      [hauteurDe(0, 'fa'), hauteurDe(8, 'sol')],
+      [0, 99],
+    ]) {
       for (const cles of [['sol'], ['fa']] as ('sol' | 'fa')[][]) {
         for (let essai = 0; essai < 60; essai++) {
-          const q = genererPlacer(AVEC({ cles, etendue }), rand);
+          const q = genererPlacer(AVEC({ cles, grave, aigu }), rand);
           expect(q.reponses.length).toBeGreaterThan(0);
         }
       }
@@ -408,17 +447,17 @@ describe('les notes au programme', () => {
   it('retombe sur l’étendue entière plutôt que de poser une question sans réponse', () => {
     // Un réglage trop serré doit donner un exercice facile, pas un exercice cassé : avec
     // une seule note ouverte et aucune place pour elle, on préfère élargir que planter.
-    const q = genererLire(AVEC({ notes: [], etendue: 0 }), rand);
+    const q = genererLire(AVEC({ notes: [] }), rand);
     expect(q.reponse).toBeTruthy();
   });
 });
 
 describe('lire une partition', () => {
-  it('propose 3 à 5 notes, et quatre suites dont la bonne', () => {
+  it('propose 4 à 6 notes, et quatre suites dont la bonne', () => {
     for (let essai = 0; essai < 200; essai++) {
-      const q = genererPartition(AVEC({ etendue: 1 }), rand);
-      expect(q.positions.length).toBeGreaterThanOrEqual(3);
-      expect(q.positions.length).toBeLessThanOrEqual(5);
+      const q = genererPartition(AVEC({}), rand);
+      expect(q.notes.length).toBeGreaterThanOrEqual(4);
+      expect(q.notes.length).toBeLessThanOrEqual(6);
       expect(q.choix).toHaveLength(4);
       expect(q.choix.filter((s) => memeSuite(s, q.reponse))).toHaveLength(1);
       for (const suite of q.choix) expect(suite).toHaveLength(q.reponse.length);
@@ -429,7 +468,7 @@ describe('lire une partition', () => {
     // Deux propositions identiques rendraient la question sans réponse unique, et on ne
     // s'en apercevrait qu'en tombant dessus.
     for (let essai = 0; essai < 200; essai++) {
-      const { choix } = genererPartition(AVEC({ etendue: 1 }), rand);
+      const { choix } = genererPartition(AVEC({}), rand);
       for (let i = 0; i < choix.length; i++) {
         for (let j = i + 1; j < choix.length; j++) {
           expect(memeSuite(choix[i], choix[j])).toBe(false);
@@ -442,7 +481,7 @@ describe('lire une partition', () => {
     // Des suites qui ne se ressemblent pas se départagent sur la première note, sans lire
     // la suite : l'exercice ne mesurerait plus la lecture groupée.
     for (let essai = 0; essai < 200; essai++) {
-      const q = genererPartition(AVEC({ etendue: 1 }), rand);
+      const q = genererPartition(AVEC({}), rand);
       for (const suite of q.choix) {
         if (memeSuite(suite, q.reponse)) continue;
         const ecarts = suite.filter((n, i) => n !== q.reponse[i]).length;
@@ -450,5 +489,139 @@ describe('lire une partition', () => {
         expect(ecarts).toBeLessThanOrEqual(2);
       }
     }
+  });
+});
+
+describe('la lecture groupée', () => {
+  const DEUX_CLES = { cles: ['sol', 'fa'] as ('sol' | 'fa')[] };
+
+  it('fait PASSER la suite d’une portée à l’autre', () => {
+    // C'est tout l'objet de l'exercice : on lit de gauche à droite en changeant de
+    // portée, et non le haut puis le bas. Avec une seule clé ouverte, rien ne change.
+    let aChange = 0;
+    for (let essai = 0; essai < 60; essai++) {
+      const { notes } = genererPartition(AVEC(DEUX_CLES), rand);
+      if (notes.some((n, i) => i > 0 && n.cle !== notes[i - 1].cle)) aChange++;
+    }
+    expect(aChange).toBe(60);
+  });
+
+  it('reste sur UNE portée quand une seule clé est ouverte', () => {
+    // On ne force pas la clé de fa à quelqu'un qui ne l'a pas encore vue.
+    for (let essai = 0; essai < 60; essai++) {
+      const { notes } = genererPartition(AVEC({ cles: ['sol'] }), rand);
+      expect(notes.every((n) => n.cle === 'sol')).toBe(true);
+    }
+  });
+
+  it('couvre toutes les notes par un groupe lié, sans trou ni chevauchement', () => {
+    // Un arc manquant laisserait des notes sans groupe, et l'enfant ne saurait pas où
+    // s'arrête la plage qu'elle doit lire d'un trait.
+    for (let essai = 0; essai < 100; essai++) {
+      const { notes, groupes } = genererPartition(AVEC(DEUX_CLES), rand);
+      const couverts = groupes.flatMap(([a, b]) =>
+        Array.from({ length: b - a + 1 }, (_, i) => a + i),
+      );
+      expect([...couverts].sort((a, b) => a - b)).toEqual(
+        notes.map((_, i) => i),
+      );
+    }
+  });
+
+  it('garde un groupe sur UNE SEULE portée', () => {
+    // Un arc à cheval sur les deux portées ne se dessine pas : il appartient à l'une.
+    for (let essai = 0; essai < 100; essai++) {
+      const { notes, groupes } = genererPartition(AVEC(DEUX_CLES), rand);
+      for (const [a, b] of groupes) {
+        const cles = new Set(notes.slice(a, b + 1).map((n) => n.cle));
+        expect(cles.size).toBe(1);
+      }
+    }
+  });
+
+  it('garde les notes d’un groupe VOISINES sur la portée', () => {
+    // Sa méthode appelle ces groupes des secondes puis des tricordes : l'intérêt est de
+    // lire un mouvement, pas une suite de notes sans rapport.
+    for (let essai = 0; essai < 100; essai++) {
+      const { notes, groupes } = genererPartition(AVEC(DEUX_CLES), rand);
+      for (const [a, b] of groupes) {
+        for (let i = a + 1; i <= b; i++) {
+          expect(
+            Math.abs(notes[i].position - notes[i - 1].position),
+          ).toBeLessThanOrEqual(3);
+        }
+      }
+    }
+  });
+});
+
+describe('le mouvement des notes', () => {
+  /** Le plus grand saut entre deux notes VOISINES de la suite, sur la même portée. Un
+   * changement de portée n'est pas un saut : les deux notes ne se comparent pas en cases. */
+  function plusGrandSaut(
+    notes: { cle: 'sol' | 'fa'; position: number }[],
+  ): number {
+    let maximum = 0;
+    for (let i = 1; i < notes.length; i++) {
+      if (notes[i].cle !== notes[i - 1].cle) continue;
+      maximum = Math.max(
+        maximum,
+        Math.abs(notes[i].position - notes[i - 1].position),
+      );
+    }
+    return maximum;
+  }
+
+  it('facile : les notes SE SUIVENT, une case à la fois', () => {
+    for (let essai = 0; essai < 200; essai++) {
+      const { notes } = genererPartition(AVEC({ mouvement: 'facile' }), rand);
+      expect(plusGrandSaut(notes)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it('facile : ça monte ou ça descend, ça ne zigzague pas à chaque note', () => {
+    // Une suite qui changerait de sens à chaque note ne se lirait plus comme un mouvement,
+    // ce qui est pourtant tout ce que l'exercice cherche à faire travailler.
+    let suites = 0;
+    for (let essai = 0; essai < 200; essai++) {
+      const { notes } = genererPartition(AVEC({ mouvement: 'facile' }), rand);
+      const memeCle = notes.filter(
+        (n, i) => i > 0 && n.cle === notes[i - 1].cle,
+      );
+      if (memeCle.length < 2) continue;
+      let virages = 0;
+      for (let i = 2; i < notes.length; i++) {
+        if (
+          notes[i].cle !== notes[i - 1].cle ||
+          notes[i - 1].cle !== notes[i - 2].cle
+        )
+          continue;
+        const avant = notes[i - 1].position - notes[i - 2].position;
+        const apres = notes[i].position - notes[i - 1].position;
+        if (avant * apres < 0) virages++;
+      }
+      if (virages <= 1) suites++;
+    }
+    expect(suites).toBeGreaterThan(150);
+  });
+
+  it('moyen : jamais plus d’une tierce, soit deux cases', () => {
+    for (let essai = 0; essai < 200; essai++) {
+      const { notes } = genererPartition(AVEC({ mouvement: 'moyen' }), rand);
+      expect(plusGrandSaut(notes)).toBeLessThanOrEqual(2);
+    }
+  });
+
+  it('difficile : des sauts que les deux autres réglages ne produisent jamais', () => {
+    // Sans ça, « difficile » pourrait être identique à « moyen » sans qu'on le voie.
+    let grandsSauts = 0;
+    for (let essai = 0; essai < 200; essai++) {
+      const { notes } = genererPartition(
+        AVEC({ mouvement: 'difficile' }),
+        rand,
+      );
+      if (plusGrandSaut(notes) > 2) grandsSauts++;
+    }
+    expect(grandsSauts).toBeGreaterThan(100);
   });
 });

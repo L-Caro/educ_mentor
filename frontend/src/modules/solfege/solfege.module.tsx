@@ -14,10 +14,11 @@ import { solfegeImpression } from './solfege.impression';
  * voit. Rien n'est verrouillé par année : la progression d'une méthode ne suit pas le
  * calendrier.
  *
- * Et ils vivent dans l'ADMINISTRATION, pas ici : les notes ouvertes, les figures, la
- * mesure, la longueur des phrases et le tempo disent où elle en est en cours, et cela ne
- * se décide pas avant chaque partie. Le pré-jeu ne garde que ce qui lui appartient : ce
- * qu'elle veut travailler aujourd'hui, et dans quelle clé.
+ * Et ils vivent dans l'ADMINISTRATION, pas ici : l'intervalle de notes, les notes
+ * ouvertes, le mouvement, les figures, la mesure et la longueur des phrases disent où elle
+ * en est en cours, et cela ne se décide pas avant chaque partie. Le pré-jeu garde ce qui
+ * relève de la séance : ce qu'elle travaille aujourd'hui, dans quelle clé, et à quelle
+ * vitesse bat le métronome.
  */
 export const solfegeModule: ModuleManifest = {
   id: 'solfege',
@@ -55,6 +56,17 @@ export const solfegeModule: ModuleManifest = {
           label: 'Les deux mélangées',
           description: 'Le même dessin change de nom : c’est le vrai saut',
         },
+      ],
+    },
+    {
+      key: 'tempo',
+      type: 'single',
+      label: 'Vitesse du métronome',
+      choices: [
+        { value: '60', label: 'Très lente' },
+        { value: '72', label: 'Lente' },
+        { value: '90', label: 'Moyenne' },
+        { value: '110', label: 'Rapide' },
       ],
     },
     {

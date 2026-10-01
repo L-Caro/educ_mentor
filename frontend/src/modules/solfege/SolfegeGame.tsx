@@ -7,6 +7,7 @@ import { setGameResult } from 'src/store/slice/gameResultSlice';
 import { useGetSettingsQuery } from 'src/store/api/sharedApi';
 import type { GameResultEntry } from 'src/types/game.types';
 import Portee from 'src/musique/Portee';
+import Systeme from 'src/musique/Systeme';
 import { jouerNote, maintenant, reveiller } from 'src/musique/audio';
 import { dureeDuTemps, frequence, type Bilan } from 'src/musique/rythme';
 import {
@@ -18,6 +19,8 @@ import {
   type Note,
 } from 'src/musique/solfege';
 import {
+  AIGU_DEFAUT,
+  GRAVE_DEFAUT,
   genererDictee,
   genererFigure,
   genererLire,
@@ -27,6 +30,7 @@ import {
   genererPlacer,
   genererRythme,
   nomDe2,
+  type Mouvement,
   type Reglages,
 } from 'src/musique/exercices';
 import RythmeExercice from './RythmeExercice';
@@ -90,10 +94,11 @@ export default function SolfegeGame() {
   /**
    * Ce qui vient du PRÉ-JEU, et ce qui vient de l'ADMINISTRATION.
    *
-   * Elle choisit ce qu'elle travaille et dans quelle clé. L'étendue des notes, les notes
-   * ouvertes, les figures au programme, la mesure, la longueur des phrases et le tempo
-   * dépendent de là où elle en est en cours, pas de son humeur : ils se règlent une fois
-   * dans l'administration, comme la méthode de soustraction du module « poser ».
+   * Elle choisit ce qu'elle travaille, dans quelle clé, et à quelle vitesse bat le
+   * métronome : ce sont des choix de séance. L'intervalle de notes, les notes ouvertes,
+   * le mouvement, les figures, la mesure et la longueur des phrases disent où elle en est
+   * en cours : ils se règlent une fois dans l'administration, comme la méthode de
+   * soustraction du module « poser ».
    */
   const reglages: Reglages = useMemo(() => {
     const cles = setup['cles'] as string | undefined;
@@ -106,10 +111,12 @@ export default function SolfegeGame() {
     return {
       cles:
         cles === 'fa' ? ['fa'] : cles === 'les-deux' ? ['sol', 'fa'] : ['sol'],
-      etendue: Number(reglagesApp?.solfege_etendue ?? '0'),
+      grave: Number(reglagesApp?.solfege_grave ?? String(GRAVE_DEFAUT)),
+      aigu: Number(reglagesApp?.solfege_aigu ?? String(AIGU_DEFAUT)),
+      mouvement: (reglagesApp?.solfege_mouvement ?? 'moyen') as Mouvement,
       figures: figures.length > 0 ? figures : ['blanche', 'noire'],
       mesure: Number(reglagesApp?.solfege_mesure ?? '2') as Mesure,
-      tempo: Number(reglagesApp?.solfege_tempo ?? '72'),
+      tempo: Number((setup['tempo'] as string | undefined) ?? '72'),
       longueur: Number(reglagesApp?.solfege_longueur ?? '12'),
       notes: notes.length > 0 ? notes : [...NOTES],
     };
@@ -216,16 +223,34 @@ export default function SolfegeGame() {
         {question.type === 'partition' && (
           <>
             <p className="Solfege__consigne">
-              Lis ces {String(question.positions.length)} notes, puis choisis la
-              bonne suite.
+              Lis ces {String(question.notes.length)} notes à la suite, en
+              passant d&rsquo;une portée à l&rsquo;autre.
             </p>
-            <Portee
-              cle={question.cle}
-              symboles={question.positions.map((position) => ({
-                position,
-                figure: 'ronde' as const,
-              }))}
-              espace={44}
+            <Systeme
+              emplacements={question.notes.length}
+              espace={46}
+              haut={question.notes
+                .map((n, i) => ({ ...n, i }))
+                .filter((n) => n.cle === 'sol')
+                .map((n) => ({
+                  position: n.position,
+                  figure: 'ronde' as const,
+                  emplacement: n.i,
+                }))}
+              bas={question.notes
+                .map((n, i) => ({ ...n, i }))
+                .filter((n) => n.cle === 'fa')
+                .map((n) => ({
+                  position: n.position,
+                  figure: 'ronde' as const,
+                  emplacement: n.i,
+                }))}
+              liaisonsHaut={question.groupes.filter(
+                ([debut]) => question.notes[debut].cle === 'sol',
+              )}
+              liaisonsBas={question.groupes.filter(
+                ([debut]) => question.notes[debut].cle === 'fa',
+              )}
             />
             {/* Entendre ce qu'on vient de lire : la hauteur écrite et le son qu'elle
                 produit sont deux choses que rien ne relie tant qu'on ne les a pas
@@ -508,8 +533,8 @@ async function jouerLaPartition(
   const contexte = await reveiller();
   if (!contexte) return;
   let quand = maintenant() + 0.25;
-  for (const position of question.positions) {
-    jouerNote(frequence(hauteurDe(position, question.cle)), quand, 0.55);
+  for (const { cle, position } of question.notes) {
+    jouerNote(frequence(hauteurDe(position, cle)), quand, 0.55);
     quand += 0.65;
   }
 }
